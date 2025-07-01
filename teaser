@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Discover True Yogi (YOGI): The Awakening Economy." />
+  <title>True Yogi – Teaser Document</title>
+  <style>
+    body {
+      background: #0e0e0e;
+      color: #f2f2f2;
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      line-height: 1.7;
+    }
+    header, footer {
+      text-align: center;
+      padding: 2rem;
+      background: #111;
+    }
+    header h1 {
+      font-size: 2.3rem;
+      color: #f9d976;
+    }
+    main {
+      max-width: 800px;
+      margin: auto;
+      padding: 2rem 1rem;
+    }
+    h2 {
+      color: #ffdf91;
+      font-size: 1.6rem;
+      margin-top: 2rem;
+    }
+    p, li {
+      color: #ddd;
+    }
+    ul {
+      padding-left: 1.2rem;
+    }
+    .quote {
+      font-style: italic;
+      color: #bbb;
+      margin: 2rem 0;
+    }
+    a.back {
+      display: inline-block;
+      margin-top: 3rem;
+      text-decoration: none;
+      color: #ffdf91;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🌕 True Yogi (YOGI): The Awakening Economy</h1>
+    <p>Teaser Document – 2025</p>
+  </header>
+
+  <main>
+    <h2>🧘‍♂️ What Is True Yogi?</h2>
+    <p><strong>True Yogi (YOGI)</strong> is not just another cryptocurrency.</p>
+    <p>It is a spiritual technology, built on Solana, that rewards human beings not for work or attention — but for silence, discipline, and inner presence.</p>
+    <p>In a world addicted to stimulation, we are introducing the unthinkable:</p>
+    <ul>
+      <li>💠 A currency powered by meditation.</li>
+      <li>💠 A protocol based on stillness.</li>
+      <li>💠 A reward for your breath — not your bandwidth.</li>
+    </ul>
+
+    <h2>🌱 The Mission</h2>
+    <p>Our core mission is simple:</p>
+    <p><strong>“To awaken humanity through stillness.”</strong></p>
+    <p>We believe:</p>
+    <ul>
+      <li>That the highest wealth is awareness.</li>
+      <li>That meditation is the forgotten key to truth.</li>
+      <li>That blockchain, when guided by dharma, can become a global instrument of peace.</li>
+    </ul>
+    <p>True Yogi unites two seemingly opposite worlds — the ancient path of silence, and the cutting-edge world of decentralized technology — into a single sacred offering.</p>
+
+    <h2>🔁 The Dharma Loop (Essence Only)</h2>
+    <p><strong>YOGI</strong> is distributed through a sacred cycle:</p>
+    <ol>
+      <li>Meditate Daily — Using our app, sit in silence for a set time.</li>
+      <li>Earn After 41 Days — Stay consistent and the tokens are yours.</li>
+      <li>Sell or Share — Detachment is sacred. No pressure.</li>
+      <li>Tokens Return — What is released in peace becomes the fuel for another’s awakening.</li>
+    </ol>
+    <p>There is no mining, no minting, no hype.</p>
+    <p><em>Just pure breath → becoming energy → becoming truth.</em></p>
+
+    <h2>🌐 Coming Soon: The True Yogi App</h2>
+    <ul>
+      <li>• Connect your wallet</li>
+      <li>• Choose your meditation time</li>
+      <li>• Meditate in full presence, uninterrupted</li>
+      <li>• Get rewarded in YOGI tokens</li>
+      <li>• Fail to stay still — and you earn nothing</li>
+    </ul>
+    <p>No distractions. No loopholes.</p>
+    <p><strong>Just Proof of Stillness.</strong></p>
+
+    <h2>✨ Why It Matters</h2>
+    <ul>
+      <li>• YOGI gives meaning to money.</li>
+      <li>• YOGI rewards the inner journey.</li>
+      <li>• YOGI reminds the world: “The one who becomes still, becomes everything.”</li>
+    </ul>
+    <p>This is not a financial game.</p>
+    <p><strong>It’s a spiritual revolution, disguised as a token.</strong></p>
+
+    <h2>☀️ Return to Stillness</h2>
+    <p>Website: <a href="https://trueyogi.app" target="_blank">https://trueyogi.app</a></p>
+
+    <div class="quote">
+      Built for silence. <br />Backed by breath. <br />Powered by dharma.
+    </div>
+
+    <a class="back" href="/index.html">← Back to Home</a>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 True Yogi – Proof of Stillness</p>
+  </footer>
+</body>
+</html>
