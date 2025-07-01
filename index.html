@@ -3,20 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="True Yogi (YOGI) – A meditative economy powered by stillness." />
+  <meta name="description" content="True Yogi (YOGI) – A meditative economy powered by stillness and truth." />
   <title>True Yogi – Proof of Stillness</title>
   <style>
     body {
-      background-color: #0d0d0d;
+      background: #0e0e0e;
       color: #f2f2f2;
       font-family: 'Segoe UI', sans-serif;
       margin: 0;
-      padding: 0;
+      line-height: 1.7;
     }
     header {
-      background: linear-gradient(45deg, #1a1a1a, #222, #1a1a1a);
       text-align: center;
       padding: 4rem 1rem 2rem 1rem;
+      background: linear-gradient(45deg, #1a1a1a, #222, #1a1a1a);
       animation: gradientShift 10s infinite;
     }
     @keyframes gradientShift {
@@ -28,11 +28,13 @@
       font-size: 2.5rem;
       color: #f9d976;
       margin: 0;
+      animation: fadeIn 1s ease-in;
     }
     header p {
       font-size: 1.2rem;
       color: #ccc;
       margin-top: 0.5rem;
+      animation: fadeIn 1s ease-in 0.5s backwards;
     }
     .progress-circle {
       width: 100px;
@@ -44,24 +46,32 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      animation: fadeIn 1s ease-in 1s backwards;
     }
     .progress-circle::before {
       content: "41 Days";
       font-size: 1rem;
       color: #f9d976;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
     main {
       max-width: 800px;
-      margin: 2rem auto;
-      padding: 0 1rem;
+      margin: auto;
+      padding: 2rem 1rem;
       text-align: center;
+    }
+    p {
+      color: #ddd;
     }
     .button {
       display: inline-block;
       margin-top: 2rem;
       padding: 0.75rem 1.5rem;
       background: #f9d976;
-      color: #0d0d0d;
+      color: #0e0e0e;
       border-radius: 30px;
       text-decoration: none;
       font-weight: bold;
@@ -76,23 +86,24 @@
       background: #111;
       font-size: 0.9rem;
       color: #888;
+      animation: fadeIn 1s ease-in 1.5s backwards;
     }
   </style>
 </head>
 <body>
   <header>
     <h1>🧘‍♂️ True Yogi (YOGI)</h1>
-    <p>Proof of Stillness. Backed by Breath. Powered by Dharma.</p>
+    <p>Proof of Stillness. Backed by Breath. Powered by Dharma and Truth.</p>
   </header>
 
   <main>
-    <p>True Yogi is a spiritual currency that rewards inner presence, not productivity. No mining. No hype. Just meditation and meaning.</p>
     <div class="progress-circle"></div>
-    <a href="teaser.html" class="button">❃ Read the Teaser</a>
+    <p>True Yogi is a spiritual currency that rewards inner presence and the realization of truth through meditation. No mining. No hype. Just stillness and meaning.</p>
+    <a href="teaser.html" class="button">❃ Explore the Vision</a>
   </main>
 
   <footer>
-    <p>© 2025 True Yogi. All breath reserved.</p>
+    <p>© 2025 True Yogi – Proof of Stillness</p>
   </footer>
 </body>
 </html>
