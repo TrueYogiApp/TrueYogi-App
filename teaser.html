@@ -21,6 +21,11 @@
     header h1 {
       font-size: 2.3rem;
       color: #f9d976;
+      animation: fadeIn 1s ease-in;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
     }
     main {
       max-width: 800px;
@@ -31,24 +36,57 @@
       color: #ffdf91;
       font-size: 1.6rem;
       margin-top: 2rem;
+      animation: fadeIn 1s ease-in 0.5s backwards;
     }
     p, li {
       color: #ddd;
     }
-    ul {
+    ul, ol {
       padding-left: 1.2rem;
+    }
+    .timeline {
+      display: flex;
+      justify-content: space-between;
+      margin: 2rem 0;
+    }
+    .timeline div {
+      text-align: center;
+      width: 22%;
+      border-left: 2px solid #f9d976;
+      padding-left: 1rem;
+      position: relative;
+    }
+    .timeline div:first-child { border-left: none; }
+    .timeline div::before {
+      content: "●";
+      color: #f9d976;
+      position: absolute;
+      left: -12px;
+      top: 0;
     }
     .quote {
       font-style: italic;
       color: #bbb;
       margin: 2rem 0;
+      animation: fadeIn 1s ease-in 1s backwards;
     }
-    a.back {
+    a.back, a.join {
       display: inline-block;
       margin-top: 3rem;
       text-decoration: none;
       color: #ffdf91;
       font-weight: bold;
+      padding: 0.5rem 1rem;
+      border: 2px solid #ffdf91;
+      border-radius: 5px;
+      transition: background 0.3s, color 0.3s;
+    }
+    a.back:hover, a.join:hover {
+      background: #ffdf91;
+      color: #0e0e0e;
+    }
+    a.join {
+      margin-left: 1rem;
     }
   </style>
 </head>
@@ -82,18 +120,18 @@
 
     <h2>🔁 The Dharma Loop (Essence Only)</h2>
     <p><strong>YOGI</strong> is distributed through a sacred cycle:</p>
-    <ol>
-      <li>Meditate Daily — Using our app, sit in silence for a set time.</li>
-      <li>Earn After 41 Days — Stay consistent and the tokens are yours.</li>
-      <li>Sell or Share — Detachment is sacred. No pressure.</li>
-      <li>Tokens Return — What is released in peace becomes the fuel for another’s awakening.</li>
-    </ol>
+    <div class="timeline">
+      <div>Meditate Daily</div>
+      <div>Earn After 41 Days</div>
+      <div>Sell or Share</div>
+      <div>Tokens Return</div>
+    </div>
     <p>There is no mining, no minting, no hype.</p>
     <p><em>Just pure breath → becoming energy → becoming truth.</em></p>
 
     <h2>🌐 Coming Soon: The True Yogi App</h2>
     <ul>
-      <li>• Connect your solana wallet</li>
+      <li>• Connect your Solana wallet</li>
       <li>• Choose your meditation time</li>
       <li>• Meditate in full presence, uninterrupted</li>
       <li>• Get rewarded in YOGI tokens</li>
@@ -118,11 +156,12 @@
       Built for silence. <br />Backed by breath. <br />Powered by dharma.
     </div>
 
-    <a class="back" href="/index.html">← Back to Home</a>
+    <a class="back" href="index.html">← Back to Home</a>
+    <a class="join" href="https://github.com/TrueYogiApp/TrueYogi-website/issues" target="_blank">Join the Community</a>
   </main>
 
   <footer>
-    <p>&copy; 2025 True Yogi – Proof of Stillness</p>
+    <p>© 2025 True Yogi – Proof of Stillness</p>
   </footer>
 </body>
 </html>
