@@ -14,9 +14,15 @@
       padding: 0;
     }
     header {
-      background: linear-gradient(to right, #1a1a1a, #222);
+      background: linear-gradient(45deg, #1a1a1a, #222, #1a1a1a);
       text-align: center;
       padding: 4rem 1rem 2rem 1rem;
+      animation: gradientShift 10s infinite;
+    }
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
     }
     header h1 {
       font-size: 2.5rem;
@@ -27,6 +33,22 @@
       font-size: 1.2rem;
       color: #ccc;
       margin-top: 0.5rem;
+    }
+    .progress-circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      background: conic-gradient(#f9d976 0%, #1a1a1a 0%);
+      margin: 2rem auto;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .progress-circle::before {
+      content: "41 Days";
+      font-size: 1rem;
+      color: #f9d976;
     }
     main {
       max-width: 800px;
@@ -65,9 +87,12 @@
 
   <main>
     <p>True Yogi is a spiritual currency that rewards inner presence, not productivity. No mining. No hype. Just meditation and meaning.</p>
+    <div class="progress-circle"></div>
     <a href="teaser.html" class="button">❃ Read the Teaser</a>
   </main>
 
   <footer>
-    <p>&copy; 2025 True Yogi. All breath reserved.</p>
+    <p>© 2025 True Yogi. All breath reserved.</p>
   </footer>
+</body>
+</html>
