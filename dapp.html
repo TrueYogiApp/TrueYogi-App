@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>True Yogi DApp</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white flex items-center justify-center min-h-screen px-4">
+  <div class="w-full max-w-md text-center">
+    <!-- Meditation Avatar -->
+    <img src="assets/yogi-avatar.gif" alt="Meditating Avatar" class="w-40 h-40 mx-auto rounded-full mb-6 shadow-lg">
+
+    <!-- Headline -->
+    <h1 class="text-2xl md:text-3xl font-semibold mb-2 text-yellow-300">Proof of Stillness</h1>
+    <p class="text-sm text-gray-300 mb-6">Silence is the currency. Stillness is the path.</p>
+
+    <!-- Start Button -->
+    <div id="start-section">
+      <button onclick="startMeditation()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">Start Meditation</button>
+    </div>
+
+    <!-- Timer Section -->
+    <div id="timer-section" class="hidden">
+      <p class="text-lg mt-4 mb-2">🧘‍♂️ Meditating...</p>
+      <p id="timer" class="text-3xl font-bold text-green-400">00:00</p>
+    </div>
+
+    <!-- Completion Section -->
+    <div id="complete-section" class="hidden mt-6">
+      <p class="text-green-300 text-lg font-semibold">✨ Session Complete</p>
+      <button onclick="confirmCompletion()" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full font-medium">Confirm</button>
+    </div>
+
+    <!-- Claim Section -->
+    <div id="claim-section" class="hidden mt-6">
+      <p class="text-blue-300 text-lg">🎉 You've completed 1 day of your 41-day journey.</p>
+      <button onclick="claimToken()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full font-medium">Claim Token</button>
+    </div>
+
+    <!-- Final Message -->
+    <div id="final-section" class="hidden mt-6">
+      <p class="text-yellow-300">🌕 Your stillness is recorded. Return tomorrow to continue the path.</p>
+    </div>
+  </div>
+
+  <!-- Audio -->
+  <audio id="bell" src="assets/meditation-end.mp3" preload="auto"></audio>
+
+  <script>
+    let duration = 10; // Set short time (in seconds) for testing
+    let timer;
+
+    function startMeditation() {
+      document.getElementById('start-section').classList.add('hidden');
+      document.getElementById('timer-section').classList.remove('hidden');
+
+      let timeLeft = duration;
+      updateDisplay(timeLeft);
+
+      timer = setInterval(() => {
+        timeLeft--;
+        updateDisplay(timeLeft);
+
+        if (timeLeft <= 0) {
+          clearInterval(timer);
+          document.getElementById('timer-section').classList.add('hidden');
+          document.getElementById('complete-section').classList.remove('hidden');
+          document.getElementById('bell').play();
+        }
+      }, 1000);
+    }
+
+    function updateDisplay(seconds) {
+      const min = String(Math.floor(seconds / 60)).padStart(2, '0');
+      const sec = String(seconds % 60).padStart(2, '0');
+      document.getElementById('timer').textContent = `${min}:${sec}`;
+    }
+
+    function confirmCompletion() {
+      document.getElementById('complete-section').classList.add('hidden');
+      document.getElementById('claim-section').classList.remove('hidden');
+    }
+
+    function claimToken() {
+      document.getElementById('claim-section').classList.add('hidden');
+      document.getElementById('final-section').classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
