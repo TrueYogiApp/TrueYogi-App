@@ -39,7 +39,7 @@ The core mechanism is simple:
 ## 🌐 Coming Soon
 
 ### 🛠️ True Yogi DApp
-- Choose your meditation session (1–180 minutes)
+- Choose your meditation session
 - Meditation timer (strict mode)
 - Earn tokens only through full presence
 - Fail to stay still — and you earn nothing 
