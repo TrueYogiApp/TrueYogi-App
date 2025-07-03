@@ -30,7 +30,7 @@ The core mechanism is simple:
 3. **Sell or Share** — Detachment is sacred
 4. **Tokens Return** — To support future seekers
 
-🪙 No mining.  
+🚫 No mining.  
 📡 No attention farming.  
 🧘 Just **Proof of Stillness**.
 
