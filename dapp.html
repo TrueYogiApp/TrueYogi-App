@@ -61,11 +61,12 @@
       <button onclick="confirmCompletion()" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full font-medium">Confirm</button>
     </div>
 
-    <!-- Claim Token -->
-    <div id="claim-section" class="hidden mt-6">
-      <p class="text-blue-300 text-lg">🎉 You've completed 1 day of your 41-day journey.</p>
-      <button onclick="claimToken()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full font-medium">Claim Token</button>
-    </div>
+    <!-- Post Session Message -->
+<div id="claim-section" class="hidden mt-6">
+  <p class="text-blue-300 text-lg">🎉 You've completed 1 day of your 41-day journey.</p>
+  <p class="text-gray-400 mt-2">Complete 41 days in a row to claim your tokens.</p>
+  <button onclick="continueJourney()" class="mt-4 bg-blue-400 hover:bg-blue-500 text-gray-900 px-6 py-2 rounded-full font-medium">Continue 🌱</button>
+</div>
 
     <div id="final-section" class="hidden mt-6">
       <p class="text-yellow-300">🌕 Your stillness is recorded. Return tomorrow to continue the path.</p>
@@ -271,10 +272,11 @@
       document.getElementById('claim-section').classList.remove('hidden');
     }
 
-    function claimToken() {
-      document.getElementById('claim-section').classList.add('hidden');
-      document.getElementById('final-section').classList.remove('hidden');
-    }
+function continueJourney() {
+  document.getElementById('claim-section').classList.add('hidden');
+  document.getElementById('final-section').classList.remove('hidden');
+}
+
   </script>
 </body>
 </html>
