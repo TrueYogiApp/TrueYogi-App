@@ -57,17 +57,17 @@
     </div>
 
     <!-- Inside #final-section -->
-<div id="final-section" class="hidden mt-6">
-  <p class="text-yellow-300">🌕 Your stillness is recorded. Return tomorrow to continue the path.</p>
-  <a href="dapp.html" class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">🌿 Return to Peace</a>
-</div>
+    <div id="final-section" class="hidden mt-6">
+      <p class="text-yellow-300">🌕 Your stillness is recorded. Return tomorrow to continue the path.</p>
+      <a href="dapp.html" class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">🌿 Return to Peace</a>
+    </div>
 
-<!-- Inside #incomplete-section -->
-<div id="incomplete-section" class="hidden mt-6">
-  <p class="text-red-300 text-lg font-semibold">⛔ Session Incomplete</p>
-  <p class="text-gray-400 mt-2">No tokens were claimed.<br />Return tomorrow to try again.</p>
-  <a href="dapp.html" class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">🌿 Return to Peace</a>
-</div>
+    <!-- Inside #incomplete-section -->
+    <div id="incomplete-section" class="hidden mt-6">
+      <p class="text-red-300 text-lg font-semibold">⛔ Session Incomplete</p>
+      <p class="text-gray-400 mt-2">No tokens were claimed.<br />Return tomorrow to try again.</p>
+      <a href="dapp.html" class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">🌿 Return to Peace</a>
+    </div>
 
   </div>
 
@@ -76,27 +76,52 @@
 
   <script>
     let timer;
-    let timeLeft = 0;
+    let endTime = 0;
+    let sessionActive = false;
 
     function startMeditation() {
       const selectedDuration = parseInt(document.getElementById('duration').value);
-      timeLeft = selectedDuration;
+      endTime = Date.now() + (selectedDuration * 1000);
+      sessionActive = true;
 
       document.getElementById('start-section').classList.add('hidden');
       document.getElementById('timer-section').classList.remove('hidden');
-      updateDisplay(timeLeft);
+      updateTimer();
 
-      timer = setInterval(() => {
-        timeLeft--;
-        updateDisplay(timeLeft);
+      // Start the timer
+      timer = setInterval(updateTimer, 1000);
+      
+      // Add visibility change listener
+      document.addEventListener('visibilitychange', handleVisibilityChange);
+    }
 
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          document.getElementById('timer-section').classList.add('hidden');
-          document.getElementById('complete-section').classList.remove('hidden');
-          document.getElementById('bell').play();
-        }
-      }, 1000);
+    function updateTimer() {
+      if (!sessionActive) return;
+      
+      const now = Date.now();
+      const secondsLeft = Math.max(0, Math.floor((endTime - now) / 1000));
+      
+      updateDisplay(secondsLeft);
+
+      if (secondsLeft <= 0) {
+        completeSession();
+      }
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === 'visible' && sessionActive) {
+        // When the app becomes visible again, immediately update the timer
+        updateTimer();
+      }
+    }
+
+    function completeSession() {
+      clearInterval(timer);
+      sessionActive = false;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      document.getElementById('timer-section').classList.add('hidden');
+      document.getElementById('complete-section').classList.remove('hidden');
+      document.getElementById('bell').play();
     }
 
     function updateDisplay(seconds) {
@@ -109,6 +134,8 @@
       const confirmEnd = confirm("Are you sure you want to end the meditation?");
       if (confirmEnd) {
         clearInterval(timer);
+        sessionActive = false;
+        document.removeEventListener('visibilitychange', handleVisibilityChange);
         document.getElementById('timer-section').classList.add('hidden');
         document.getElementById('incomplete-section').classList.remove('hidden');
       }
