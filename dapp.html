@@ -146,15 +146,17 @@
  let yogiQuotes = [];
 
   // Load quotes from external JSON
-  async function loadQuotes() {
-    try {
-      const response = await fetch('assets/quotes.json');
-      yogiQuotes = await response.json();
-    } catch (error) {
-      console.error("Error loading quotes:", error);
-      yogiQuotes = ["Stillness is your superpower."] // fallback
-    }
+async function loadQuotes() {
+  try {
+    const response = await fetch('https://raw.githubusercontent.com/TrueYogiApp/TrueYogi-App/main/assets/quotes.json');
+    if (!response.ok) throw new Error('Failed to fetch');
+    yogiQuotes = await response.json();
+    console.log("Quotes loaded:", yogiQuotes);
+  } catch (error) {
+    console.error("Error loading quotes:", error);
+    yogiQuotes = ["Stillness is your superpower."]; // fallback
   }
+}
 // Call this before starting the meditation
   async function startMeditation() {
     await loadQuotes();  // ensure quotes are loaded
