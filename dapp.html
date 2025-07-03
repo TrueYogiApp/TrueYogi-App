@@ -35,7 +35,7 @@
         <option value="5400">90 minutes</option>
         <option value="10800">180 minutes</option>
       </select><br>
-      <button onclick="startMeditation()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">Start Meditation</button>
+      <button id="start-button" onclick="startMeditation()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">Start Meditation</button>
     </div>
 
     <!-- Timer Section -->
@@ -70,8 +70,8 @@
 
   </div>
 
-  <!-- Sound (iOS requires this to be preloaded in the HTML) -->
-  <audio id="bell" src="assets/meditation-end.mp3" preload="auto"></audio>
+  <!-- Sound - muted by default -->
+  <audio id="bell" src="assets/meditation-end.mp3" preload="auto" muted></audio>
 
   <script>
     let timer;
@@ -81,24 +81,20 @@
     let targetDuration = 0;
     let notificationPermission = false;
 
-    // Request notification permission when page loads
+    // Initialize the app
     document.addEventListener('DOMContentLoaded', () => {
+      // Request notification permission
       if ('Notification' in window) {
         Notification.requestPermission().then(permission => {
           notificationPermission = permission === 'granted';
         });
       }
       
-      // iOS sound workaround - create and play empty sound on tap
-      document.addEventListener('click', () => {
+      // Initialize audio when start button is clicked
+      document.getElementById('start-button').addEventListener('click', () => {
         const audio = document.getElementById('bell');
-        audio.volume = 0;
-        audio.play().then(() => {
-          audio.pause();
-          audio.currentTime = 0;
-          audio.volume = 1;
-        });
-      }, { once: true });
+        audio.muted = false; // Unmute only when user starts meditation
+      });
     });
 
     function startMeditation() {
@@ -132,14 +128,18 @@
       if (document.visibilityState === 'visible' && sessionActive) {
         updateTimer();
       } else if (document.visibilityState === 'hidden' && sessionActive) {
-        // Phone locked or app backgrounded - send notification if permission granted
+        // Phone locked - send notification if permission granted
         if (notificationPermission) {
-          const timeLeft = Math.floor((endTime - Date.now()) / 1000);
-          if (timeLeft > 0) {
+          const timeLeft = Math.max(0, Math.floor((endTime - Date.now()) / 1000));
+          const minutesLeft = Math.ceil(timeLeft / 60);
+          
+          try {
             new Notification("Meditation in Progress", {
-              body: `Your ${Math.floor(targetDuration/60)}min session will complete in ${Math.ceil(timeLeft/60)} minutes`,
+              body: `Your session will complete in ${minutesLeft} minute${minutesLeft !== 1 ? 's' : ''}`,
               requireInteraction: true
             });
+          } catch (e) {
+            console.log("Notification error:", e);
           }
         }
       }
@@ -151,19 +151,13 @@
       document.removeEventListener('visibilitychange', handleVisibilityChange);
       
       const actualDuration = Math.floor((Date.now() - startTime) / 1000);
-      const targetMinutes = Math.floor(targetDuration / 60);
       const actualMinutes = Math.floor(actualDuration / 60);
       
-      let message = "✨ Session Complete";
-      if (actualMinutes > targetMinutes) {
-        message = `✨ Session Complete (Meditated for ${actualMinutes} minutes)`;
-      }
-      
-      document.getElementById('completion-message').textContent = message;
+      document.getElementById('completion-message').textContent = 
+        `✨ Session Complete (Meditated for ${actualMinutes} minute${actualMinutes !== 1 ? 's' : ''})`;
       document.getElementById('timer-section').classList.add('hidden');
       document.getElementById('complete-section').classList.remove('hidden');
       
-      // Play sound and show notification
       playCompletionSound();
       showCompletionNotification(actualMinutes);
     }
@@ -171,18 +165,31 @@
     function playCompletionSound() {
       const audio = document.getElementById('bell');
       audio.play().catch(e => {
-        console.log("Audio playback failed:", e);
-        // iOS workaround - require user interaction
-        alert("Meditation complete! 🔔");
+        // Fallback notification if sound fails
+        if (Notification.permission === 'granted') {
+          try {
+            const minutes = Math.floor((Date.now() - startTime) / 60000);
+            new Notification("Meditation Complete", {
+              body: `🔔 You meditated for ${minutes} minute${minutes !== 1 ? 's' : ''}`,
+              requireInteraction: true
+            });
+          } catch (e) {
+            console.log("Notification failed:", e);
+          }
+        }
       });
     }
 
     function showCompletionNotification(minutes) {
       if (notificationPermission) {
-        new Notification("Meditation Complete", {
-          body: `Great job! You meditated for ${minutes} minutes`,
-          requireInteraction: true
-        });
+        try {
+          new Notification("Meditation Complete", {
+            body: `Great job! You meditated for ${minutes} minutes`,
+            requireInteraction: true
+          });
+        } catch (e) {
+          console.log("Notification failed:", e);
+        }
       }
     }
 
