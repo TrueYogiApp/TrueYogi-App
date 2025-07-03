@@ -191,10 +191,12 @@ async function loadQuotes() {
     }
 
 function showRandomQuote() {
-    if (yogiQuotes.length === 0) return;
-    const quote = yogiQuotes[Math.floor(Math.random() * yogiQuotes.length)];
-    document.getElementById("yogi-quote").textContent = quote;
-  }
+  if (yogiQuotes.length === 0) return;
+  const quote = yogiQuotes[Math.floor(Math.random() * yogiQuotes.length)];
+  const quoteEl = document.getElementById("yogi-quote");
+  quoteEl.textContent = quote;
+  quoteEl.classList.add("opacity-100"); // 🔥 make it visible
+}
 
 
     function updateTimer() {
