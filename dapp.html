@@ -24,10 +24,17 @@
   </ol>
 </div>
 
+<!-- Random Quote Display -->
+<p id="yogi-quote" class="text-sm text-blue-300 italic mb-2 opacity-0 transition-opacity duration-700"></p>
+
 
     <!-- Avatar -->
-    <img src="assets/yogi-avatar.gif" alt="Meditating Avatar" class="w-50 h-50 mx-auto rounded-full mb-6 shadow-lg">
+<img src="assets/yogi-avatar.gif" 
+     alt="Meditating Avatar" 
+     class="w-40 h-40 mx-auto rounded-full mb-6 shadow-lg object-scale-down object-center" />
 
+
+	 
     <!-- Heading -->
     <h1 class="text-2xl md:text-3xl font-semibold mb-2 text-yellow-300">Proof of Stillness</h1>
     <p class="text-sm text-gray-300 mb-6">Silence is the currency. Stillness is the path.</p>
@@ -136,11 +143,27 @@
       });
     });
 
-    function startMeditation() {
+ let yogiQuotes = [];
+
+  // Load quotes from external JSON
+  async function loadQuotes() {
+    try {
+      const response = await fetch('assets/quotes.json');
+      yogiQuotes = await response.json();
+    } catch (error) {
+      console.error("Error loading quotes:", error);
+      yogiQuotes = ["Stillness is your superpower."] // fallback
+    }
+  }
+// Call this before starting the meditation
+  async function startMeditation() {
+    await loadQuotes();  // ensure quotes are loaded
+    showRandomQuote();
       targetDuration = parseInt(document.getElementById('duration').value);
       startTime = Date.now();
       endTime = startTime + (targetDuration * 1000);
       sessionActive = true;
+
 
       // Stop any currently playing background music
       if (backgroundAudio) {
@@ -164,6 +187,13 @@
       timer = setInterval(updateTimer, 1000);
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }
+
+function showRandomQuote() {
+    if (yogiQuotes.length === 0) return;
+    const quote = yogiQuotes[Math.floor(Math.random() * yogiQuotes.length)];
+    document.getElementById("yogi-quote").textContent = quote;
+  }
+
 
     function updateTimer() {
       if (!sessionActive) return;
