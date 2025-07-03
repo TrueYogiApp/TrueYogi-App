@@ -35,6 +35,16 @@
         <option value="5400">90 minutes</option>
         <option value="10800">180 minutes</option>
       </select><br>
+      
+      <!-- Music Toggle -->
+      <div class="flex items-center justify-center mb-4">
+        <label class="inline-flex items-center cursor-pointer">
+          <input type="checkbox" id="music-toggle" class="sr-only peer" checked>
+          <div class="relative w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-yellow-400"></div>
+          <span class="ml-3 text-sm font-medium text-gray-300">Background Music</span>
+        </label>
+      </div>
+      
       <button id="start-button" onclick="startMeditation()" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">Start Meditation</button>
     </div>
 
@@ -70,8 +80,16 @@
 
   </div>
 
-  <!-- Sound - muted by default -->
+  <!-- Sound elements -->
   <audio id="bell" src="assets/meditation-end.mp3" preload="auto" muted></audio>
+  <audio id="bg-music-10" src="assets/music-10sec.mp3" preload="auto" loop></audio>
+  <audio id="bg-music-60" src="assets/music-1min.mp3" preload="auto" loop></audio>
+  <audio id="bg-music-180" src="assets/music-3min.mp3" preload="auto" loop></audio>
+  <audio id="bg-music-300" src="assets/music-5min.mp3" preload="auto" loop></audio>
+  <audio id="bg-music-1800" src="assets/music-30min.mp3" preload="auto" loop></audio>
+  <audio id="bg-music-3600" src="assets/music-60min.mp3" preload="auto" loop></audio>
+  <audio id="bg-music-5400" src="assets/music-90min.mp3" preload="auto" loop></audio>
+  <audio id="bg-music-10800" src="assets/music-180min.mp3" preload="auto" loop></audio>
 
   <script>
     let timer;
@@ -80,6 +98,7 @@
     let sessionActive = false;
     let targetDuration = 0;
     let notificationPermission = false;
+    let backgroundAudio = null;
 
     // Initialize the app
     document.addEventListener('DOMContentLoaded', () => {
@@ -94,6 +113,13 @@
       document.getElementById('start-button').addEventListener('click', () => {
         const audio = document.getElementById('bell');
         audio.muted = false; // Unmute only when user starts meditation
+        
+        // Initialize all background audio elements
+        const audioElements = document.querySelectorAll('audio[id^="bg-music-"]');
+        audioElements.forEach(audio => {
+          audio.volume = 0.5; // Set volume to 50%
+          audio.muted = !document.getElementById('music-toggle').checked;
+        });
       });
     });
 
@@ -102,6 +128,21 @@
       startTime = Date.now();
       endTime = startTime + (targetDuration * 1000);
       sessionActive = true;
+
+      // Stop any currently playing background music
+      if (backgroundAudio) {
+        backgroundAudio.pause();
+        backgroundAudio.currentTime = 0;
+      }
+
+      // Start appropriate background music if enabled
+      if (document.getElementById('music-toggle').checked) {
+        backgroundAudio = document.getElementById(`bg-music-${targetDuration}`);
+        if (backgroundAudio) {
+          backgroundAudio.currentTime = 0;
+          backgroundAudio.play().catch(e => console.log("Background music error:", e));
+        }
+      }
 
       document.getElementById('start-section').classList.add('hidden');
       document.getElementById('timer-section').classList.remove('hidden');
@@ -149,6 +190,13 @@
       clearInterval(timer);
       sessionActive = false;
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      // Stop background music
+      if (backgroundAudio) {
+        backgroundAudio.pause();
+        backgroundAudio.currentTime = 0;
+        backgroundAudio = null;
+      }
       
       const actualDuration = Math.floor((Date.now() - startTime) / 1000);
       const actualMinutes = Math.floor(actualDuration / 60);
@@ -205,6 +253,14 @@
         clearInterval(timer);
         sessionActive = false;
         document.removeEventListener('visibilitychange', handleVisibilityChange);
+        
+        // Stop background music
+        if (backgroundAudio) {
+          backgroundAudio.pause();
+          backgroundAudio.currentTime = 0;
+          backgroundAudio = null;
+        }
+        
         document.getElementById('timer-section').classList.add('hidden');
         document.getElementById('incomplete-section').classList.remove('hidden');
       }
