@@ -14,9 +14,19 @@
 </head>
 <body class="bg-gray-900 text-white flex items-center justify-center min-h-screen px-4">
   <div class="w-full max-w-md text-center">
+  <div id="meditation-guide" class="hidden text-left bg-gray-800 text-gray-200 p-4 rounded-lg shadow-md mb-4 text-sm">
+  <h2 class="text-yellow-300 font-semibold mb-2">How to Meditate:</h2>
+  <ol class="list-decimal list-inside space-y-1">
+    <li>Take any comfortable sitting position on chair or mat.</li>
+    <li>Close your eyes, join your hands and cross your legs. Observe your natural Breath.</li>
+    <li>If any thoughts arise bring your awareness back to your Breath.</li>
+    <li>After finishing your meditation, gently place your hands over your eyes. Open your eyes with a smile and feel a sense of loving gratitude.</li>
+  </ol>
+</div>
+
 
     <!-- Avatar -->
-    <img src="assets/yogi-avatar.gif" alt="Meditating Avatar" class="w-40 h-40 mx-auto rounded-full mb-6 shadow-lg">
+    <img src="assets/yogi-avatar.gif" alt="Meditating Avatar" class="w-50 h-50 mx-auto rounded-full mb-6 shadow-lg">
 
     <!-- Heading -->
     <h1 class="text-2xl md:text-3xl font-semibold mb-2 text-yellow-300">Proof of Stillness</h1>
@@ -26,6 +36,7 @@
     <div id="start-section">
       <label for="duration" class="block text-sm text-gray-400 mb-2">Select Meditation Duration:</label>
       <select id="duration" class="bg-gray-800 text-white px-4 py-2 rounded-full mb-4">
+
         <option value="10">10 seconds (test)</option>
         <option value="60">1 minute</option>
         <option value="180">3 minutes</option>
@@ -36,6 +47,7 @@
         <option value="10800">180 minutes</option>
       </select><br>
       
+	  <p class="text-sm text-blue-400 underline cursor-pointer mb-4" onclick="toggleMeditationGuide()">🧘‍♀️ How to Meditate?</p> 
       <!-- Music Toggle -->
       <div class="flex items-center justify-center mb-4">
         <label class="inline-flex items-center cursor-pointer">
@@ -200,7 +212,7 @@
       }
       
       const actualDuration = Math.floor((Date.now() - startTime) / 1000);
-      const actualMinutes = Math.floor(actualDuration / 60);
+      const actualMinutes = Math.round(actualDuration / 60);
       
       document.getElementById('completion-message').textContent = 
         `✨ Session Complete (Meditated for ${actualMinutes} minute${actualMinutes !== 1 ? 's' : ''})`;
@@ -275,6 +287,11 @@
 function continueJourney() {
   document.getElementById('claim-section').classList.add('hidden');
   document.getElementById('final-section').classList.remove('hidden');
+}
+
+function toggleMeditationGuide() {
+  const guide = document.getElementById('meditation-guide');
+  guide.classList.toggle('hidden');
 }
 
   </script>
