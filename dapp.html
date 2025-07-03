@@ -26,6 +26,7 @@
     <div id="start-section">
       <label for="duration" class="block text-sm text-gray-400 mb-2">Select Meditation Duration:</label>
       <select id="duration" class="bg-gray-800 text-white px-4 py-2 rounded-full mb-4">
+        <option value="10">10 seconds (test)</option>
         <option value="60">1 minute</option>
         <option value="180">3 minutes</option>
         <option value="300">5 minutes</option>
@@ -46,7 +47,7 @@
 
     <!-- Complete Section -->
     <div id="complete-section" class="hidden mt-6">
-      <p class="text-green-300 text-lg font-semibold">✨ Session Complete</p>
+      <p id="completion-message" class="text-green-300 text-lg font-semibold">✨ Session Complete</p>
       <button onclick="confirmCompletion()" class="mt-4 bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-full font-medium">Confirm</button>
     </div>
 
@@ -56,13 +57,11 @@
       <button onclick="claimToken()" class="mt-4 bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full font-medium">Claim Token</button>
     </div>
 
-    <!-- Inside #final-section -->
     <div id="final-section" class="hidden mt-6">
       <p class="text-yellow-300">🌕 Your stillness is recorded. Return tomorrow to continue the path.</p>
       <a href="dapp.html" class="mt-4 inline-block bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-2 rounded-full font-semibold text-lg transition">🌿 Return to Peace</a>
     </div>
 
-    <!-- Inside #incomplete-section -->
     <div id="incomplete-section" class="hidden mt-6">
       <p class="text-red-300 text-lg font-semibold">⛔ Session Incomplete</p>
       <p class="text-gray-400 mt-2">No tokens were claimed.<br />Return tomorrow to try again.</p>
@@ -71,27 +70,48 @@
 
   </div>
 
-  <!-- Sound -->
+  <!-- Sound (iOS requires this to be preloaded in the HTML) -->
   <audio id="bell" src="assets/meditation-end.mp3" preload="auto"></audio>
 
   <script>
     let timer;
     let endTime = 0;
+    let startTime = 0;
     let sessionActive = false;
+    let targetDuration = 0;
+    let notificationPermission = false;
+
+    // Request notification permission when page loads
+    document.addEventListener('DOMContentLoaded', () => {
+      if ('Notification' in window) {
+        Notification.requestPermission().then(permission => {
+          notificationPermission = permission === 'granted';
+        });
+      }
+      
+      // iOS sound workaround - create and play empty sound on tap
+      document.addEventListener('click', () => {
+        const audio = document.getElementById('bell');
+        audio.volume = 0;
+        audio.play().then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = 1;
+        });
+      }, { once: true });
+    });
 
     function startMeditation() {
-      const selectedDuration = parseInt(document.getElementById('duration').value);
-      endTime = Date.now() + (selectedDuration * 1000);
+      targetDuration = parseInt(document.getElementById('duration').value);
+      startTime = Date.now();
+      endTime = startTime + (targetDuration * 1000);
       sessionActive = true;
 
       document.getElementById('start-section').classList.add('hidden');
       document.getElementById('timer-section').classList.remove('hidden');
       updateTimer();
 
-      // Start the timer
       timer = setInterval(updateTimer, 1000);
-      
-      // Add visibility change listener
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
@@ -110,8 +130,18 @@
 
     function handleVisibilityChange() {
       if (document.visibilityState === 'visible' && sessionActive) {
-        // When the app becomes visible again, immediately update the timer
         updateTimer();
+      } else if (document.visibilityState === 'hidden' && sessionActive) {
+        // Phone locked or app backgrounded - send notification if permission granted
+        if (notificationPermission) {
+          const timeLeft = Math.floor((endTime - Date.now()) / 1000);
+          if (timeLeft > 0) {
+            new Notification("Meditation in Progress", {
+              body: `Your ${Math.floor(targetDuration/60)}min session will complete in ${Math.ceil(timeLeft/60)} minutes`,
+              requireInteraction: true
+            });
+          }
+        }
       }
     }
 
@@ -119,9 +149,41 @@
       clearInterval(timer);
       sessionActive = false;
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      const actualDuration = Math.floor((Date.now() - startTime) / 1000);
+      const targetMinutes = Math.floor(targetDuration / 60);
+      const actualMinutes = Math.floor(actualDuration / 60);
+      
+      let message = "✨ Session Complete";
+      if (actualMinutes > targetMinutes) {
+        message = `✨ Session Complete (Meditated for ${actualMinutes} minutes)`;
+      }
+      
+      document.getElementById('completion-message').textContent = message;
       document.getElementById('timer-section').classList.add('hidden');
       document.getElementById('complete-section').classList.remove('hidden');
-      document.getElementById('bell').play();
+      
+      // Play sound and show notification
+      playCompletionSound();
+      showCompletionNotification(actualMinutes);
+    }
+
+    function playCompletionSound() {
+      const audio = document.getElementById('bell');
+      audio.play().catch(e => {
+        console.log("Audio playback failed:", e);
+        // iOS workaround - require user interaction
+        alert("Meditation complete! 🔔");
+      });
+    }
+
+    function showCompletionNotification(minutes) {
+      if (notificationPermission) {
+        new Notification("Meditation Complete", {
+          body: `Great job! You meditated for ${minutes} minutes`,
+          requireInteraction: true
+        });
+      }
     }
 
     function updateDisplay(seconds) {
