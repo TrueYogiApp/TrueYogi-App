@@ -7,20 +7,22 @@
   <title>True Yogi – Proof of Stillness</title>
   <link rel="icon" type="image/png" href="assets/favicon.ico" />
   <link rel="icon" type="image/png" href="assets/favicon.png" />	
-  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">	
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:wght@400;600&display=swap" rel="stylesheet">	
   <style>
     body {
       background: #0e0e0e;
       color: #f2f2f2;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Playfair Display', serif;
       margin: 0;
-      line-height: 1.7;
+      line-height: 1.8;
+      letter-spacing: 0.3px;
     }
     header {
       text-align: center;
-      padding: 4rem 1rem 2rem 1rem;
+      padding: 5rem 1rem 3rem 1rem;
       background: linear-gradient(45deg, #1a1a1a, #222, #1a1a1a);
-      animation: gradientShift 10s infinite;
+      animation: gradientShift 12s infinite;
+      border-bottom: 1px solid rgba(249, 217, 118, 0.1);
     }
     @keyframes gradientShift {
       0% { background-position: 0% 50%; }
@@ -28,125 +30,151 @@
       100% { background-position: 0% 50%; }
     }
     header h1 {
-      font-size: 2.5rem;
+      font-size: 3rem;
       color: #f9d976;
       margin: 0;
-      animation: fadeIn 1s ease-in;
+      text-shadow: 0 0 15px rgba(249, 217, 118, 0.3);
+      animation: fadeIn 1.5s ease-in;
     }
     header p {
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       color: #ccc;
-      margin-top: 0.5rem;
-      animation: fadeIn 1s ease-in 0.5s backwards;
+      margin-top: 1rem;
+      font-style: italic;
+      animation: fadeIn 1.5s ease-in 0.5s backwards;
     }
     .progress-circle {
-      width: 100px;
-      height: 100px;
+      width: 120px;
+      height: 120px;
       border-radius: 50%;
       background: conic-gradient(#f9d976 0%, #1a1a1a 0%);
-      margin: 2rem auto;
+      margin: 3rem auto;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      animation: fadeIn 1s ease-in 1s backwards;
+      animation: fadeIn 1.5s ease-in 1s backwards;
+      box-shadow: 0 0 20px rgba(249, 217, 118, 0.1);
     }
     .progress-circle::before {
       content: "41 Days";
-      font-size: 1rem;
+      font-size: 1.2rem;
       color: #f9d976;
+      font-weight: bold;
     }
     @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     main {
       max-width: 800px;
       margin: auto;
-      padding: 2rem 1rem;
+      padding: 3rem 1rem;
       text-align: center;
     }
     p {
       color: #ddd;
+      font-size: 1.1rem;
     }
     .button {
       display: inline-block;
-      margin-top: 2rem;
-      padding: 0.75rem 1.5rem;
-      background: #f9d976;
+      margin-top: 2.5rem;
+      padding: 0.9rem 2rem;
+      background: linear-gradient(135deg, #f9d976, #e8c35d);
       color: #0e0e0e;
       border-radius: 30px;
       text-decoration: none;
       font-weight: bold;
-      transition: background 0.3s;
+      transition: all 0.3s;
+      font-size: 1.1rem;
+      box-shadow: 0 4px 15px rgba(249, 217, 118, 0.2);
     }
     .button:hover {
-      background: #ffe480;
+      background: linear-gradient(135deg, #ffe480, #f9d976);
+      box-shadow: 0 6px 20px rgba(249, 217, 118, 0.3);
+      transform: translateY(-2px);
     }
 
     .avatar-preview {
-      max-width: 300px;
+      max-width: 320px;
       width: 100%;
-      margin-top: 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 0 12px rgba(255, 255, 255, 0.1);
+      margin-top: 2rem;
+      border-radius: 16px;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
     }
 
     .feature-avatar {
-      margin-top: 3rem;
+      margin-top: 4rem;
       text-align: center;
       padding: 0 1rem;
     }
     .feature-avatar h2 {
       color: #f9d976;
-      font-size: 1.6rem;
-      margin-bottom: 0.5rem;
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px rgba(249, 217, 118, 0.2);
     }
     .feature-avatar p {
       color: #ccc;
       max-width: 700px;
       margin: 0 auto;
+      font-size: 1.15rem;
     }
 
     footer {
       text-align: center;
-      padding: 2rem;
+      padding: 3rem;
       background: #111;
-      font-size: 0.9rem;
+      font-size: 1rem;
       color: #888;
-      animation: fadeIn 1s ease-in 1.5s backwards;
+      animation: fadeIn 1.5s ease-in 1.5s backwards;
+      border-top: 1px solid rgba(249, 217, 118, 0.1);
     }
-	.button:hover {
-  background: #ffe480;
-  box-shadow: 0 0 10px #f9d97699;
-  transform: scale(1.02);
-}
+
 .breathing-avatar {
-  animation: breathe 6s ease-in-out infinite;
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.08);
-  transition: transform 0.3s ease;
+  animation: breathe 8s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  transition: all 0.4s ease;
+  border: 1px solid rgba(249, 217, 118, 0.2);
 }
 
 @keyframes breathe {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.03); }
+  0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+  50% { transform: scale(1.03); box-shadow: 0 0 30px rgba(249, 217, 118, 0.3); }
 }
 
 .fade-in-delayed {
   opacity: 0;
-  animation: fadeInSoft 2.5s ease forwards;
-  animation-delay: 1.2s;
+  animation: fadeInSoft 3s ease forwards;
+  animation-delay: 1.5s;
 }
 
 @keyframes fadeInSoft {
-  from { opacity: 0; transform: translateY(10px); }
+  from { opacity: 0; transform: translateY(15px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+.quote {
+  font-style: italic;
+  color: #aaa;
+  margin-top: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.8;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+}
+.quote::before, .quote::after {
+  content: '"';
+  color: rgba(249, 217, 118, 0.5);
+  font-size: 1.5rem;
 }
   </style>
 </head>
 <body>
   <header>
-    <h1>🧘‍♂️ True Yogi (YOGI)</h1>
+    <h1>🧘‍♂️ True Yogi</h1>
     <p>Proof of Stillness. Backed by Breath. Powered by Dharma and Truth.</p>
   </header>
 
@@ -165,22 +193,20 @@
       </p>
       <img src="https://trueyogiapp.github.io/TrueYogi-App/assets/yogi-avatar.gif" alt="Digital Yogi Avatar Example" class="avatar-preview breathing-avatar" />
 
-<p style="font-style: italic; color: #aaa; margin-top: 1rem;">
-  Your $YOGI avatar is a meditating version of you that lives in the blockchain.<br>
-  Every time you see it, it meditates with you.
-</p>
+      <div class="quote">
+        Your $YOGI avatar is a meditating version of you that lives in the blockchain.<br>
+        Every time you see it, it meditates with you.
+      </div>
 
-<div class="fade-in-delayed" style="margin-top: 1.5rem;">
-  <a href="https://cults.fun/coin/6a5ne3Yfg9Z5oFBXu6i92wr5MVCXnTt63GLg1mxCULT" target="_blank" class="button" style="background: #222; color: #f9d976; border: 1px solid #f9d976;">
-    🌀 Generate Your Avatar
-  </a>
-  <p style="font-size: 0.9rem; color: #888; margin-top: 0.75rem;">
+      <div class="fade-in-delayed">
+        <a href="https://cults.fun/coin/6a5ne3Yfg9Z5oFBXu6i92wr5MVCXnTt63GLg1mxCULT" target="_blank" class="button" style="background: transparent; color: #f9d976; border: 2px solid #f9d976; box-shadow: none;">
+          🌀 Generate Your Avatar
+        </a>
+        <p style="font-size: 0.9rem; color: #888; margin-top: 0.75rem;">
     Begin your avatar transmission.  
     <br/>Your presence shapes its form — your stillness fuels its light.
   </p>
-</div>
-
-
+      </div>
     </section>
   </main>
 
