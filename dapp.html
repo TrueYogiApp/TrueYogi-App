@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>True Yogi DApp</title>
-  <link rel="icon" type="image/png" href="assets/favicon.ico" />
-  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" href="assets/favicon.png" />
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
   <link rel="android-chrome-192x192" href="assets/android-chrome-192x192.png"/>
   <link rel="android-chrome-512x512" href="assets/android-chrome-512x512.png"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">	
@@ -124,6 +124,7 @@
     let targetDuration = 0;
     let notificationPermission = false;
     let backgroundAudio = null;
+    let musicWasPlaying = false;
 
     // Initialize the app
     document.addEventListener('DOMContentLoaded', () => {
@@ -133,6 +134,9 @@
           notificationPermission = permission === 'granted';
         });
       }
+      
+      // Check for existing session in localStorage
+      checkForExistingSession();
       
       // Initialize audio when start button is clicked
       document.getElementById('start-button').addEventListener('click', () => {
@@ -148,29 +152,85 @@
       });
     });
 
- let yogiQuotes = [];
+    // Check if there's an existing session in localStorage
+    function checkForExistingSession() {
+      const savedSession = localStorage.getItem('meditationSession');
+      if (savedSession) {
+        const session = JSON.parse(savedSession);
+        const now = Date.now();
+        
+        if (now < session.endTime) {
+          // Session is still active
+          startTime = session.startTime;
+          endTime = session.endTime;
+          targetDuration = session.targetDuration;
+          sessionActive = true;
+          musicWasPlaying = session.musicWasPlaying;
+          
+          // Restore UI state
+          document.getElementById('start-section').classList.add('hidden');
+          document.getElementById('timer-section').classList.remove('hidden');
+          
+          // Start timer
+          updateTimer();
+          timer = setInterval(updateTimer, 1000);
+          document.addEventListener('visibilitychange', handleVisibilityChange);
+          
+          // Restore music if it was playing
+          if (musicWasPlaying && document.getElementById('music-toggle').checked) {
+            backgroundAudio = document.getElementById(`bg-music-${targetDuration}`);
+            if (backgroundAudio) {
+              backgroundAudio.currentTime = 0;
+              backgroundAudio.play().catch(e => console.log("Background music error:", e));
+            }
+          }
+          
+          console.log("Resumed existing meditation session");
+        } else {
+          // Session has expired, clean up
+          localStorage.removeItem('meditationSession');
+          if (session.completed) {
+            // Session was completed before refresh
+            document.getElementById('complete-section').classList.remove('hidden');
+          }
+        }
+      }
+      
+      // Load quotes
+      loadQuotes();
+    }
 
-  // Load quotes from external JSON
-async function loadQuotes() {
-  try {
-    const response = await fetch('https://raw.githubusercontent.com/TrueYogiApp/TrueYogi-App/main/assets/quotes.json');
-    if (!response.ok) throw new Error('Failed to fetch');
-    yogiQuotes = await response.json();
-    console.log("Quotes loaded:", yogiQuotes);
-  } catch (error) {
-    console.error("Error loading quotes:", error);
-    yogiQuotes = ["Stillness is your superpower."]; // fallback
-  }
-}
-// Call this before starting the meditation
-  async function startMeditation() {
-    await loadQuotes();  // ensure quotes are loaded
-    showRandomQuote();
+    let yogiQuotes = [];
+
+    // Load quotes from external JSON
+    async function loadQuotes() {
+      try {
+        const response = await fetch('https://raw.githubusercontent.com/TrueYogiApp/TrueYogi-App/main/assets/quotes.json');
+        if (!response.ok) throw new Error('Failed to fetch');
+        yogiQuotes = await response.json();
+        console.log("Quotes loaded:", yogiQuotes);
+        
+        // Show a random quote if not in an active session
+        if (!sessionActive) {
+          showRandomQuote();
+        }
+      } catch (error) {
+        console.error("Error loading quotes:", error);
+        yogiQuotes = ["Stillness is your superpower."]; // fallback
+      }
+    }
+
+    async function startMeditation() {
+      await loadQuotes();  // ensure quotes are loaded
+      showRandomQuote();
       targetDuration = parseInt(document.getElementById('duration').value);
       startTime = Date.now();
       endTime = startTime + (targetDuration * 1000);
       sessionActive = true;
+      musicWasPlaying = document.getElementById('music-toggle').checked;
 
+      // Save session to localStorage
+      saveSessionState();
 
       // Stop any currently playing background music
       if (backgroundAudio) {
@@ -179,7 +239,7 @@ async function loadQuotes() {
       }
 
       // Start appropriate background music if enabled
-      if (document.getElementById('music-toggle').checked) {
+      if (musicWasPlaying) {
         backgroundAudio = document.getElementById(`bg-music-${targetDuration}`);
         if (backgroundAudio) {
           backgroundAudio.currentTime = 0;
@@ -195,16 +255,28 @@ async function loadQuotes() {
       document.addEventListener('visibilitychange', handleVisibilityChange);
     }
 
-function showRandomQuote() {
-  if (yogiQuotes.length === 0) return;
-  const quote = yogiQuotes[Math.floor(Math.random() * yogiQuotes.length)];
-  const quoteEl = document.getElementById("yogi-quote");
-  quoteEl.textContent = quote;
-  quoteEl.classList.add("opacity-100");
-  quoteEl.classList.remove("translate-y-2");
-  quoteEl.classList.add("translate-y-0");
-}
+    function saveSessionState(completed = false) {
+      if (sessionActive) {
+        const sessionData = {
+          startTime: startTime,
+          endTime: endTime,
+          targetDuration: targetDuration,
+          musicWasPlaying: musicWasPlaying,
+          completed: completed
+        };
+        localStorage.setItem('meditationSession', JSON.stringify(sessionData));
+      }
+    }
 
+    function showRandomQuote() {
+      if (yogiQuotes.length === 0) return;
+      const quote = yogiQuotes[Math.floor(Math.random() * yogiQuotes.length)];
+      const quoteEl = document.getElementById("yogi-quote");
+      quoteEl.textContent = quote;
+      quoteEl.classList.add("opacity-100");
+      quoteEl.classList.remove("translate-y-2");
+      quoteEl.classList.add("translate-y-0");
+    }
 
     function updateTimer() {
       if (!sessionActive) return;
@@ -216,6 +288,9 @@ function showRandomQuote() {
 
       if (secondsLeft <= 0) {
         completeSession();
+      } else {
+        // Update saved session state periodically
+        saveSessionState();
       }
     }
 
@@ -244,6 +319,9 @@ function showRandomQuote() {
       clearInterval(timer);
       sessionActive = false;
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      
+      // Save completed session state
+      saveSessionState(true);
       
       // Stop background music
       if (backgroundAudio) {
@@ -308,6 +386,9 @@ function showRandomQuote() {
         sessionActive = false;
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         
+        // Clear saved session
+        localStorage.removeItem('meditationSession');
+        
         // Stop background music
         if (backgroundAudio) {
           backgroundAudio.pause();
@@ -321,20 +402,33 @@ function showRandomQuote() {
     }
 
     function confirmCompletion() {
+      // Clear saved session
+      localStorage.removeItem('meditationSession');
+      
       document.getElementById('complete-section').classList.add('hidden');
       document.getElementById('claim-section').classList.remove('hidden');
     }
 
-function continueJourney() {
-  document.getElementById('claim-section').classList.add('hidden');
-  document.getElementById('final-section').classList.remove('hidden');
-}
+    function continueJourney() {
+      document.getElementById('claim-section').classList.add('hidden');
+      document.getElementById('final-section').classList.remove('hidden');
+    }
 
-function toggleMeditationGuide() {
-  const guide = document.getElementById('meditation-guide');
-  guide.classList.toggle('hidden');
-}
+    function toggleMeditationGuide() {
+      const guide = document.getElementById('meditation-guide');
+      guide.classList.toggle('hidden');
+    }
 
+    // Save session state before page unload
+    window.addEventListener('beforeunload', (e) => {
+      if (sessionActive) {
+        saveSessionState();
+        // For modern browsers
+        e.preventDefault();
+        // For older browsers
+        e.returnValue = '';
+      }
+    });
   </script>
 </body>
 </html>
