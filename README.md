@@ -36,7 +36,7 @@ The core mechanism is simple:
 
 ---
 
-## 🌐 Coming Soon
+## 🌐 Coming Up
 
 ### 🛠️ True Yogi DApp
 - Choose your meditation session
@@ -44,7 +44,7 @@ The core mechanism is simple:
 - Earn tokens only through full presence
 - Fail to stay still — and you earn nothing 
 
-### 📄 Whitepaper (Coming Soon)
+### 📄 Whitepaper (Coming Up)
 - Full system design and tokenomics
 - Conscious economic model
 - Governance and future expansion
