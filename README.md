@@ -44,12 +44,12 @@ The core mechanism is simple:
 - Earn tokens only through full presence
 - Fail to stay still — and you earn nothing 
 
-### 📄 Whitepaper (Coming Up)
+### 📄 Whitepaper
 - Full system design and tokenomics
 - Conscious economic model
 - Governance and future expansion
 
-### 🛍️ Future Modules
+### 🧿 Future Modules
 - **Knowledge Exchange** — Trade spiritual insights for YOGI
 - **Conscious Marketplace** — Art, books, music, and tools aligned with awakening
 
