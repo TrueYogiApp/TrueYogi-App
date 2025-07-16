@@ -14,10 +14,10 @@ It is a **sacred offering** to awaken human consciousness through stillness, sil
 True Yogi (YOGI) is a **spiritual token** that rewards people not for mining, scrolling, or spending time —  
 but for **being silent**, **sitting in meditation**, and **honoring the present moment**.
 
-- 🔹 Built on Solana
-- 🔹 Deployed using Meteora’s dynamic bonding curve
-- 🔹 Fully decentralized and non-extractive
-- 🔹 Designed to give — not to take
+🔹 Built on Solana
+🔹 Deployed using Meteora’s dynamic bonding curve
+🔹 Fully decentralized and non-extractive
+🔹 Designed to give — not to take
 
 ---
 
