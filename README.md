@@ -17,7 +17,7 @@ but for **being silent**, **sitting in meditation**, and **honoring the present 
     Core Features:
 🔹 Built on Solana  
 🔹 Deployed using Meteora's dynamic bonding curve  
-🔹 Fully decentralized and non-extractive  
+🔹 Powered by Solana’s decentralized network  
 🔹 Designed to give — not to take  
 
     Key Principles:
