@@ -1,6 +1,6 @@
 # 🌕 True Yogi (YOGI) – Proof of Stillness
 
-Welcome to the official repository of **True Yogi (YOGI)** — a one-of-a-kind decentralized spiritual protocol built on Solana.
+Welcome to the official repository of **True Yogi (YOGI)** — a one-of-a-kind progessive decentralized spiritual protocol built on Solana.
 
 **True Yogi** is not just a token.  
 It is a **sacred offering** to awaken human consciousness through stillness, silence, and disciplined meditation.
