@@ -51,11 +51,6 @@ The core mechanism is simple:
 - Earn tokens only through full presence
 - Fail to stay still — and you earn nothing 
 
-### 📄 Whitepaper
-- Full system design and tokenomics
-- Conscious economic model
-- Governance and future expansion
-
 ### 🧿 Future Modules
 - **Knowledge Exchange** — Trade spiritual insights for YOGI
 - **Conscious Marketplace** — Art, books, music, and tools aligned with awakening
@@ -65,7 +60,7 @@ The core mechanism is simple:
 🌐 [https://trueyogi.app](https://trueyogi.app)
 
 📄 [Teaser Document](https://trueyogi.app/teaser.html)  
-📘 Whitepaper – [View Now](https://trueyogi.app/whitepaper.html)  
+📘 [Whitepaper](https://trueyogi.app/whitepaper.html)  
 🎨 Yogi Avatars – [Digital reflection of your meditative self](https://cults.fun/coin/6a5ne3Yfg9Z5oFBXu6i92wr5MVCXnTt63GLg1mxCULT)
 
 ---
