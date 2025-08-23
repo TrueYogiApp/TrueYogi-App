@@ -105,7 +105,6 @@ However, the **spiritual intention** behind it is sacred. Use it with reverence.
 Let the world chase.  
 Let you sit.
 
-—
 🧘‍♂️ [trueyogi.app](https://trueyogi.app)  
 🕊️ Powered by silence.  
 🔗 Built on Solana.
