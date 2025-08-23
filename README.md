@@ -65,7 +65,7 @@ The core mechanism is simple:
 🌐 [https://trueyogi.app](https://trueyogi.app)
 
 📄 [Teaser Document](https://trueyogi.app/teaser.html)  
-📘 Whitepaper – [Coming soon](https://github.com/TrueYogiApp/TrueYogi-App/raw/main/assets/TrueYogi_Whitepaper_Coming_Soon.pdf)  
+📘 Whitepaper – [View Now](https://trueyogi.app/whitepaper.html)  
 🎨 Yogi Avatars – [Digital reflection of your meditative self](https://cults.fun/coin/6a5ne3Yfg9Z5oFBXu6i92wr5MVCXnTt63GLg1mxCULT)
 
 ---
