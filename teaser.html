@@ -98,6 +98,50 @@
   font-style: normal; /* Remove italics from <em> parent */
   letter-spacing: 0.3px; /* Slight spacing for elegance */
 }
+
+.dharma-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.65em 1.4em;
+  font-size: 1rem;
+  font-family: 'Playfair Display', serif;
+  background: linear-gradient(90deg, #f9d976 70%, #e8c35d 100%);
+  color: #222;
+  border-radius: 36px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-decoration: none;
+  box-shadow: 0 0 22px #f9d97655, 0 3px 18px #e8c35d22;
+  border: 2px solid #f9d976;
+  transition:
+    background 0.22s,
+    box-shadow 0.22s,
+    color 0.22s,
+    transform 0.18s;
+  position: relative;
+  overflow: hidden;
+}
+.dharma-btn:hover, .dharma-btn:focus {
+  background: linear-gradient(90deg, #ffe480 0%, #f9d976 100%);
+  color: #c28800;
+  box-shadow: 0 0 40px #f9d97688, 0 5px 24px #e8c35d44;
+  transform: translateY(-2px) scale(1.04);
+  text-decoration: none;
+}
+.dharma-scroll-icon {
+  font-size: 1.5em;
+  filter: drop-shadow(0 0 4px #f9d97644);
+  transition: transform 0.22s;
+}
+.dharma-btn:hover .dharma-scroll-icon {
+  transform: rotate(-8deg) scale(1.15);
+}
+.dharma-btn-text {
+  font-family: 'Playfair Display', serif;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}	  
   </style>
 </head>
 <body>
@@ -153,7 +197,17 @@
 <p>It will serve as a sacred blueprint for seekers, developers, and supporters alike.</p>
 <p><em>When the breath is still, the truth is revealed — so too, our full vision.</em></p>
 
-<p><a href="/whitepaper.html" target="_blank" style="color:#f9d976;">View Whitepaper</a></p>
+<section style="margin-top:2.5rem;">
+  <a href="https://trueyogi.app/whitepaper.html" class="dharma-btn">
+    <span class="dharma-scroll-icon">📜</span>
+    <span class="dharma-btn-text">Read the Dharma Scroll</span>
+  </a>
+  <p style="color:#ccc; font-size:0.98rem;">
+    Journey into the heart of True Yogi.<br>
+    Discover the philosophy, token flow, and the sacred mechanics behind Stillness.<br>
+    The Dharma Loop awaits those who seek both wisdom and presence.
+  </p>
+</section>
 	  
 <h2>🌐 The True Yogi DApp – Awakening in Progress</h2>
 <ul style="list-style: none; padding-left: 0;">
