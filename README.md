@@ -45,7 +45,7 @@ The core mechanism is simple:
 
 ## 🌐 Coming Up
 
-### 🛠️ True Yogi DApp
+### 🛠️ True Yogi App
 - Choose your meditation session
 - Meditation timer (strict mode)
 - Earn tokens only through full presence
@@ -61,7 +61,6 @@ The core mechanism is simple:
 
 📄 [Teaser Document](https://trueyogi.app/teaser.html)  
 📘 [Whitepaper](https://trueyogi.app/whitepaper.html)  
-🎨 Yogi Avatars – [Digital reflection of your meditative self](https://cults.fun/coin/6a5ne3Yfg9Z5oFBXu6i92wr5MVCXnTt63GLg1mxCULT)
 
 ---
 
