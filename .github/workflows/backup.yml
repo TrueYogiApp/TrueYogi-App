@@ -1,16 +1,24 @@
 name: Mirror Public Repo to Private Backup
 
 on:
-  push:           # Run on every push
-  workflow_dispatch:   # Allow manual run
+  push:
+  workflow_dispatch:
 
 jobs:
   mirror:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout public repo
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Print remote URL (for debugging)
+        env:
+          BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
+        run: |
+          echo "Remote URL: https://x-access-token:${BACKUP_TOKEN}@github.com/TrueYogiApp/TrueYogi-App-Backup.git"
+
       - name: Mirror to Private Backup
         env:
           BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
