@@ -1,0 +1,23 @@
+name: Backup Repo to Private
+
+on:
+  schedule:
+    - cron: '0 4 * * *' # Every day at 4AM UTC
+  workflow_dispatch: # Manual trigger
+  push: # Optional: backup on push
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source repo
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Full git history
+
+      - name: Mirror to backup repo
+        env:
+          BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
+        run: |
+          git remote add backup https://x-access-token:${BACKUP_TOKEN}@github.com/TrueYogiApp/TrueYogi-App-Backup.git
+          git push --mirror backup
