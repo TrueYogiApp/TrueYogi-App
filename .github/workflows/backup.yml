@@ -12,11 +12,11 @@ jobs:
       - name: Checkout source repo
         uses: actions/checkout@v3
         with:
-          fetch-depth: 0   # Get all history, branches, and tags
+          fetch-depth: 0
 
       - name: Push to backup repo
         run: |
           git config user.name "github-actions"
           git config user.email "actions@github.com"
           git remote add backup https://x-access-token:${{ secrets.BACKUP_TOKEN }}@github.com/TrueYogiApp/TrueYogi-App-Backup.git
-          git push backup --mirror
+          git push backup --mirror --force
