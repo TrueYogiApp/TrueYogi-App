@@ -1,10 +1,8 @@
 name: Backup Repo to Private
 
 on:
-  schedule:
-    - cron: '0 4 * * *' # Every day at 4AM UTC
-  workflow_dispatch: # Manual trigger
-  push: # Optional: backup on push
+  workflow_dispatch:   # Manual trigger
+  push:                # On every push
 
 jobs:
   backup:
