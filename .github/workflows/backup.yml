@@ -1,19 +1,17 @@
-name: Backup Repo to Private
+name: Mirror Public Repo to Private Backup
 
 on:
-  workflow_dispatch:   # Manual trigger
-  push:                # On every push
+  push:           # Run on every push
+  workflow_dispatch:   # Allow manual run
 
 jobs:
-  backup:
+  mirror:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout source repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Full git history
-
-      - name: Mirror to backup repo
+          fetch-depth: 0
+      - name: Mirror to Private Backup
         env:
           BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
         run: |
