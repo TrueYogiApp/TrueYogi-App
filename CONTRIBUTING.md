@@ -24,6 +24,15 @@ Thank you for considering contributing to our project! Your help makes this App 
 4. Test locally
 5. Submit your PR!
 
----
 
+## Note on Backend Features
+
+This repository does **not** include the backend server file.  
+Features such as wallet authentication, token claiming, and syncing require our hosted backend API.
+
+- For most frontend contributions, you can run and test the meditation app without the backend.
+
+If you clone and run this code locally, wallet-based features will not work unless you have access to our backend.
+
+Thank you for understanding!
 Thank you for helping to improve True Yogi App.
