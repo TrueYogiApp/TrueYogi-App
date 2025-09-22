@@ -1706,6 +1706,22 @@
   </div>
 </div>
 
+<!-- Mobile Device Required Modal (for mobile browsers excluding Phantom) -->
+<div id="mobile-yogi-modal" class="hidden fixed inset-0 flex items-center justify-center z-50">
+  <div class="bg-gray-800 rounded-xl shadow-lg max-w-md w-full p-6 text-center">
+    <div class="text-yellow-400 text-4xl mb-2">
+      <i class="fas fa-mobile-alt"></i>
+    </div>
+    <h2 class="text-lg font-semibold text-yellow-300 mb-2">Unlock WEB3 Rewards</h2>
+    <p class="text-gray-200 mb-4">
+      You can start and complete a <span class="text-yellow-300 font-semibold">21-day challenge</span> on your mobile browser.<br><br>
+      To unlock the <span class="text-yellow-300 font-semibold">full 41-day challenge</span> and claim tokens, connect your wallet using Phantom.<br><br>
+      <a href="#" class="text-blue-400 underline">Flow Mode is always available!</a>
+    </p>
+    <button id="mobile-yogi-modal-button" onclick="closeMobileYogiModal()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">OK</button>
+  </div>
+</div>
+
 <!-- Mode Selection Screen -->
 <div id="mode-selection" class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-6 fade-in">
   <div class="text-center">
@@ -2865,6 +2881,22 @@ async function loadLanguage(lang) {
 
 function getDeviceType() {
   return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent) ? "mobile" : "desktop";
+}
+
+function isMobileSafariOrChromeNotPhantom() {
+  const ua = navigator.userAgent;
+  // Mobile browser detection
+  const isMobile = /iPhone|iPad|iPod|Android|Mobile/i.test(ua);
+  // Exclude Phantom (has window.solana.isPhantom)
+  const isPhantom = window.solana && window.solana.isPhantom;
+  return isMobile && !isPhantom;
+}
+
+function showMobileYogiModal() {
+  document.getElementById('mobile-yogi-modal').classList.remove('hidden');
+}
+function closeMobileYogiModal() {
+  document.getElementById('mobile-yogi-modal').classList.add('hidden');
 }
 
 function getLocalDateString(date = new Date()) {
@@ -4517,6 +4549,10 @@ if (bgMusicPlayer) {
 	  if (!isMobile()) {
     showDesktopYogiModal();
   }
+  if (isMobileSafariOrChromeNotPhantom()) {
+  showMobileYogiModal();
+}
+
   document.getElementById('app-interface').classList.add('hidden');
   document.getElementById('yogi-config-modal').classList.remove('hidden');
   const today = getLocalDateString();
