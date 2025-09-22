@@ -56,7 +56,6 @@ The core mechanism is simple:
 
 ## 🔗 Live Website
 🌐 [https://trueyogi.app](https://trueyogi.app)
-
 📄 [Teaser Document](https://trueyogi.app/teaser.html)  
 📘 [Whitepaper](https://trueyogi.app/whitepaper.html)  
 
