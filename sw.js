@@ -1,22 +1,25 @@
 self.addEventListener('fetch', event => {
+  const url = event.request.url;
+
   // Always fetch HTML from network first (for updates)
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request)
-        .then(response => {
-          // Optionally update cached HTML here if you want offline
-          return response;
-        })
-        .catch(() => caches.match(event.request))
+      fetch(event.request).catch(() => caches.match(event.request))
     );
     return;
   }
 
-  // For assets, use cache first, then network if missing
+  // Network-first for JSON files (translations, quotes, etc.)
+  if (url.endsWith('.json')) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-first for everything else (images, fonts, JS, CSS, etc.)
   event.respondWith(
-    caches.match(event.request).then(cached => {
-      return cached || fetch(event.request);
-    })
+    caches.match(event.request).then(cached => cached || fetch(event.request))
   );
 });
 
