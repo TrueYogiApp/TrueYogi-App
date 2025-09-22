@@ -1706,6 +1706,20 @@
   </div>
 </div>
 
+	  <!-- Mobile - Wallet Required Modal -->
+<div id="mobile-wallet-modal" class="hidden fixed inset-0 flex items-center justify-center z-50">
+  <div class="bg-gray-800 rounded-xl shadow-lg max-w-md w-full p-6 text-center">
+    <div class="text-yellow-400 text-4xl mb-2">
+      <i class="fas fa-wallet"></i>
+    </div>
+    <h2 id="connect-wallet-modal-heading" class="text-lg font-semibold text-yellow-300 mb-2">Connect Wallet for 41-Day Challenge</h2>
+    <p id="connect-wallet-modal-paragraph" class="text-gray-200 mb-4">You can start the 21-day challenge now. To unlock the full 41-day challenge and claim YOGI tokens, connect your wallet.</p>
+    <div class="flex justify-center">
+      <button id="connect-wallet-modal-button" onclick="closeMobileWalletModal()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 py-2 rounded-lg font-medium cursor-pointer">Start 21-Day</button>
+    </div>
+  </div>
+</div>
+	  
 <!-- Mode Selection Screen -->
 <div id="mode-selection" class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-6 fade-in">
   <div class="text-center">
@@ -2962,6 +2976,16 @@ function closeDesktopYogiModal() {
   document.getElementById('desktop-yogi-modal').classList.add('hidden');
 }
 
+function showMobileWalletModal() {
+  const modal = document.getElementById('mobile-wallet-modal');
+  modal.classList.remove('hidden');
+}
+
+function closeMobileWalletModal() {
+  const modal = document.getElementById('mobile-wallet-modal');
+  modal.classList.add('hidden');
+}
+	  
 function updateFAQVisibility() {
   const faqTab = document.getElementById('faq-tab');
   const modeSelection = document.getElementById('mode-selection');
@@ -4514,9 +4538,21 @@ if (bgMusicPlayer) {
     }
 
     function showYogiConfig() {	
-	  if (!isMobile()) {
+	   if (!isMobile()) {
     showDesktopYogiModal();
+  } else {
+    // Check if user is in a regular mobile browser (Safari, Chrome, etc.)
+    const isPhantomBrowser = window.solana || window.phantom;
+    
+    if (!isPhantomBrowser) {
+      // User is on mobile Safari/Chrome - show wallet modal
+      showMobileWalletModal();
+    } else {
+      // User is in Phantom mobile browser - proceed normally
+      // Your existing yogi mode logic here
+    }
   }
+		
   document.getElementById('app-interface').classList.add('hidden');
   document.getElementById('yogi-config-modal').classList.remove('hidden');
   const today = getLocalDateString();
