@@ -7481,7 +7481,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
   </script>
-    
+	
+ <script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js');
+}
+</script>  
+	
 <script>
 // run when DOM is ready
 window.addEventListener('DOMContentLoaded', () => {
