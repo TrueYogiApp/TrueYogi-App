@@ -266,7 +266,7 @@
   "resetYogiConfigHeading": "Reset True Yogi",
   "resetYogiConfigDescription": "Use this to reset your True Yogi challenge or start a new challenge.",
   "resetYogiConfigButton": "Reset True Yogi",
-  "connectWallet_paragraph":"Connect Wallet for 41-Day Challenge",
-  "connectWallet_heading": "You can start the 21-day challenge now. To unlock the full 41-day challenge and claim YOGI tokens, connect your wallet.",
-  "connectWallet_button": "Start 21-Day"  
+  "mobileYogi_heading": "Unlock WEB3 Rewards",
+  "mobileYogi_paragraph": "You can start and complete a <span class='text-yellow-300 font-semibold'>21-day challenge</span> on your mobile browser.<br><br>To unlock the <span class='text-yellow-300 font-semibold'>full 41-day challenge</span> and claim tokens, connect your wallet using Phantom.<br><br><a href='#' class='text-blue-400 underline'>Flow Mode is always available!</a>",
+  "mobileYogi_button": "OK"
 }
