@@ -43,9 +43,7 @@ The core mechanism is simple:
 
 ---
 
-## 🌐 Coming Up
-
-### 🛠️ True Yogi App
+### 🛠️ True Yogi App - Live now
 - Choose your meditation session
 - Meditation timer (strict mode)
 - Earn tokens only through full presence
@@ -67,11 +65,11 @@ The core mechanism is simple:
 ## 💠 Token Details
 
 - Token Name: **True Yogi**
-- Symbol: **$YOGI**
+- Symbol: **YOGI**
 - Chain: **Solana**
 - Total Supply: **1,000,000,000**
-- Current Status: Tradable on Jupiter
-
+- Current Status: Tradable
+- Mint Address: [`6a5n...CULT`](https://solscan.io/token/6a5ne3Yfg9Z5oFBXu6i92wr5MVCXnTt63GLg1mxCULT)
 ---
 
 ## 🧘 Contribute to the Stillness
