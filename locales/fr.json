@@ -265,6 +265,9 @@
   "TokensUnclaimed": "Jetons non réclamés",
   "resetYogiConfigHeading": "Réinitialiser la True Yogi",
   "resetYogiConfigDescription": "Utilisez ceci pour réinitialiser votre défi True Yogi ou commencer un nouveau défi.",
-  "resetYogiConfigButton": "Réinitialiser la True Yogi"
+  "resetYogiConfigButton": "Réinitialiser la True Yogi",
+  "connectWallet_paragraph":"Connectez le portefeuille pour un défi de 41 jours",
+  "connectWallet_heading": "Vous pouvez commencer le défi de 21 jours maintenant. Pour déverrouiller le défi complet de 41 jours et réclamer des jetons yogi, connectez votre portefeuille.",
+  "connectWallet_button": "Commencer 21 jours"  
   
 }
