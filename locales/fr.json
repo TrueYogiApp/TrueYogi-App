@@ -80,7 +80,7 @@
   "selectDurationLabel": "Sélectionner la durée :",
   "backgroundMusic": "Musique",
   "meditating": "En méditation",
-  "youaresecret": "VOUS ÊTES VOTRE SECRET",
+  "youaresecret": "'VOUS ÊTES VOTRE SECRET'",
   "sacred": "Sacré 41",
   "day": "Jour",
   "reset": "Réinitialiser la tranquillité",
@@ -193,7 +193,7 @@
   "faq_wallet_anew_note": "(L’ancien parcours se dissout pour faire place à de nouveaux débuts)",
   "faq_wallet_ending_quote": "«Chaque fin est le début d’une nouvelle aventure– votre pratique demeure éternelle, que vous soyez connecté ou libre.»",
   "dapp_faq_q1": "Comment connecter mon portefeuille ?",
-  "dapp_faq_a1": "Cliquez sur le bouton « Connecter le portefeuille » et validez l’opération dans votre application Phantom. Sur mobile, vous serez redirigé vers Phantom.",
+  "dapp_faq_a1": "Cliquez sur le bouton « Connecter le portefeuille » et validez l’opération dans votre application Phantom.",
   "dapp_faq_q2": "Pourquoi dois-je vérifier mon identité chaque jour ?",
   "dapp_faq_a2": "Votre identité est renouvelée quotidiennement. Comme une respiration consciente, une vérification quotidienne protège votre chemin et reconnaît votre présence.",
   "dapp_faq_q3": "Mes données sont-elles privées?",
@@ -246,7 +246,7 @@
   "mobileReminder_paragraph": "Pour une <span style='color: #fbbf24;'>profonde tranquillité</span> et des <span style='color: #22c55e;'>récompenses spirituelles</span>,<br>poursuivez votre voyage sur <span style='color: #0080FF;'>mobile</span>.<br>Terminez les séances et réclamez vos jetons avec l’application <span style='color: #BF00FF;'>Phantom</span> sur votre téléphone.",
   "mobileReminder_peaceflow": "Votre voyage intérieur façonne votre monde extérieur.",
   "desktopYogi_heading": "Débloquez les récompenses WEB3",
-  "desktopYogi_paragraph": "Vous pouvez commencer et terminer un <span class='text-yellow-300'>défi de 21 jours</span> sur ordinateur.<br><br>Pour débloquer le <span class='text-yellow-300'>défi complet de 41 jours</span> et réclamer des jetons, continuez sur votre appareil mobile avec l'application Phantom wallet.<br><br><span class='text-blue-400'>Le mode Flow est toujours disponible !</span>",
+  "desktopYogi_paragraph": "Vous pouvez commencer et terminer un <span class='text-yellow-300'>défi de 21 jours</span> sur ordinateur.<br><br>Pour débloquer le <span class='text-yellow-300'>défi complet de 41 jours</span> et réclamer des jetons, continuez sur votre appareil mobile.<br><br><span class='text-blue-400'>Le mode Flow est toujours disponible !</span>",
   "desktopYogi_button": "OK",
   "mobileRequired_heading": "Continuer sur mobile",
   "mobileRequired_paragraph": "Pour continuer votre parcours de 41 jours après le 21ème jour,<br>utilisez votre appareil mobile.<br>et emportez votre méditation partout avec vous.",
@@ -266,5 +266,4 @@
   "resetYogiConfigHeading": "Réinitialiser la True Yogi",
   "resetYogiConfigDescription": "Utilisez ceci pour réinitialiser votre défi True Yogi ou commencer un nouveau défi.",
   "resetYogiConfigButton": "Réinitialiser la True Yogi"
-  
 }
