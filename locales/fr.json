@@ -267,7 +267,7 @@
   "resetYogiConfigDescription": "Utilisez ceci pour réinitialiser votre défi True Yogi ou commencer un nouveau défi.",
   "resetYogiConfigButton": "Réinitialiser la True Yogi",
   "mobileYogi_heading": "Débloquez les récompenses WEB3",
-  "mobileYogi_paragraph": "Vous pouvez commencer et terminer un <span class='text-yellow-300 font-semibold'>défi de 21 jours</span> ici.<br><br>Pour débloquer le <span class='text-yellow-300 font-semibold'>défi complet de 41 jours</span> et réclamer des jetons, connectez votre portefeuille via Phantom.<br><br><a href='#' class='text-blue-400 underline'>Le mode Flow est toujours disponible !</a>",
+  "mobileYogi_paragraph": "Vous pouvez commencer et terminer un <span class='text-yellow-300 font-semibold'>défi de 21 jours</span> ici.<br><br>Pour débloquer le <span class='text-yellow-300 font-semibold'>défi complet de 41 jours</span> et réclamer des jetons, connectez votre portefeuille.<br><br><a href='#' class='text-blue-400 underline'>Le mode Flow est toujours disponible !</a>",
   "mobileYogi_button": "OK"
   
 }
