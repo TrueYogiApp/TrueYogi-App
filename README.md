@@ -54,9 +54,7 @@ The core mechanism is simple:
 - **Conscious Marketplace** — Art, books, music, and tools aligned with awakening
 
 
-## 🔗 Live Website
-🌐 [https://trueyogi.app](https://trueyogi.app)
-📄 [Teaser Document](https://trueyogi.app/teaser.html)  
+## 📄 Whitepaper
 📘 [Whitepaper](https://trueyogi.app/whitepaper.html)  
 
 ---
