@@ -265,8 +265,8 @@
   "resetYogiConfigHeading": "ట్రూ యోగి రీసెట్  ",
   "resetYogiConfigDescription": "మీ ట్రూ యోగి చాలెంజ్ ను రీసెట్ చేయడానికి లేదా కొత్త చాలెంజ్ ను ప్రారంభించడానికి దీన్ని ఉపయోగించండి.",
   "resetYogiConfigButton": "ట్రూ యోగి రీసెట్ చేయండి",
-  "connectWallet_paragraph":"41 రోజుల ఛాలెంజ్ కోసం వాలెట్ ను కనెక్ట్ చేయండి",
-  "connectWallet_heading": "మీరు ఇప్పుడు 21 రోజుల ఛాలెంజ్ ప్రారంభించవచ్చు. పూర్తి 41 రోజుల ఛాలెంజ్ అన్ లాక్ చేయడానికి మరియు యోగి టోకెన్లను క్లెయిమ్ చేయడానికి, మీ వాలెట్ ను కనెక్ట్ చేయండి.",
-  "connectWallet_button": "21-రోజు ప్రారంభించండి"
+  "mobileYogi_heading": "WEB3 రివార్డ్స్‌ను అన్లాక్ చేయండి",
+  "mobileYogi_paragraph": "మీ మొబైల్ బ్రౌజర్‌లో <span class='text-yellow-300 font-semibold'>21-రోజుల ఛాలెంజ్</span>‌ను ప్రారంభించి పూర్తి చేయవచ్చు.<br><br>పూర్తి <span class='text-yellow-300 font-semibold'>41-రోజుల ఛాలెంజ్</span> మరియు టోకెన్లను పొందాలంటే, Phantom ద్వారా మీ వాలెట్‌ను కనెక్ట్ చేయండి.<br><br><a href='#' class='text-blue-400 underline'>ఫ్లో మోడ్ ఎప్పుడూ అందుబాటులో ఉంటుంది!</a>",
+  "mobileYogi_button": "అలాగే"
   
 }
