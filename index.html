@@ -7445,48 +7445,6 @@ window.addEventListener('focus', () => {
   if (sessionActive) requestWakeLock();
 });
 
-// === ADD THIS SECTION AFTER YOUR EXISTING CODE ===
-
-// PWA-specific wake lock fix
-document.addEventListener('DOMContentLoaded', function() {
-  // Force wake lock on any user interaction in PWA mode
-  const handleUserInteraction = () => {
-    if (sessionActive && document.visibilityState === 'visible') {
-      console.log('PWA: User interaction detected, requesting wake lock');
-      requestWakeLock();
-    }
-  };
-
-  // Add multiple interaction listeners for PWA
-  document.addEventListener('click', handleUserInteraction);
-  document.addEventListener('touchstart', handleUserInteraction);
-  document.addEventListener('keydown', handleUserInteraction);
-
-  // Special PWA resume event (works better than visibilitychange)
-  document.addEventListener('resume', () => {
-    if (sessionActive) {
-      console.log('PWA: App resumed, requesting wake lock');
-      setTimeout(() => requestWakeLock(), 300);
-    }
-  });
-
-  // Additional PWA-specific event
-  window.addEventListener('pageshow', () => {
-    if (sessionActive) {
-      console.log('PWA: Page shown, requesting wake lock');
-      setTimeout(() => requestWakeLock(), 500);
-    }
-  });
-
-  // Initial trigger after page load for PWA
-  setTimeout(() => {
-    if (sessionActive && document.visibilityState === 'visible') {
-      console.log('PWA: Initial wake lock attempt');
-      requestWakeLock();
-    }
-  }, 1000);
-});
-
 document.addEventListener('DOMContentLoaded', function() {
   const logo = document.getElementById('logo-sacred');
   const om = document.getElementById('om-sound');
