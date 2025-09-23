@@ -2811,6 +2811,46 @@
       challengeStreak: 0 // Add this line
     };
 
+function enableMobileAudioResume() {
+  // Find all elements that could be touched during meditation
+  const elements = [
+    document.getElementById('timer-section'),
+    document.getElementById('meditating'),
+    document.getElementById('timer'),
+    document.getElementById('session-info-badge'),
+    document.getElementById('meditation-canvas'),
+    document.body // fallback
+  ];
+  elements.forEach(el => {
+    if (!el) return;
+    el.addEventListener('touchstart', tryResumeAudio, { once: false });
+    el.addEventListener('click', tryResumeAudio, { once: false });
+  });
+}
+
+function tryResumeAudio() {
+  if (audioContext && audioContext.state === 'suspended') {
+    audioContext.resume().then(() => {
+      if (backgroundAudio) backgroundAudio.play();
+    });
+  }
+}
+
+function disableMobileAudioResume() {
+  const elements = [
+    document.getElementById('timer-section'),
+    document.getElementById('meditating'),
+    document.getElementById('timer'),
+    document.getElementById('session-info-badge'),
+    document.getElementById('meditation-canvas'),
+    document.body
+  ];
+  elements.forEach(el => {
+    if (!el) return;
+    el.removeEventListener('touchstart', tryResumeAudio);
+    el.removeEventListener('click', tryResumeAudio);
+  });
+}
 // Function to request screen wake lock
 async function requestWakeLock() {
   try {
@@ -5416,6 +5456,7 @@ if (document.getElementById('music-toggle').checked) {
   document.getElementById('now-date-display').classList.add('hidden');
   document.getElementById('end-date-display').classList.add('hidden');
   updateBackButtonVisibility();
+  enableMobileAudioResume();
 
   // Save session state
   localStorage.setItem('activeSession', JSON.stringify({
@@ -5463,6 +5504,7 @@ if (document.getElementById('music-toggle').checked) {
 	stopMeditationBackground();
 	updateHideUiBtnVisibility();
 	updateHideUiButtonVisibility();
+	disableMobileAudioResume();
   if (sessionCompletedWhileModalOpen) {
     document.getElementById('end-meditation-modal').classList.add('hidden');
     return;
@@ -5547,6 +5589,7 @@ function updateTimer() {
 	updateHideUiButtonVisibility();
 	updateHideUiBtnVisibility();
 	releaseWakeLock();
+	disableMobileAudioResume();
     
     const modal = document.getElementById('end-meditation-modal');
     if (!modal.classList.contains('hidden')) {
@@ -6208,6 +6251,7 @@ function handleVisibilityChange() {
     // When user returns to tab
     if (sessionActive) {
 	  requestWakeLock();
+	  enableMobileAudioResume();
       const now = Date.now();
       if (endTime <= now) {
         // The session should be over — complete it immediately!
@@ -6231,6 +6275,7 @@ function handleVisibilityChange() {
         stopMeditationBackground();
 		showCompletionStats();
 		updateHideUiBtnVisibility();
+		disableMobileAudioResume();
         const bell = document.getElementById('bell');
         if (bell) {
           bell.muted = false;
@@ -9372,7 +9417,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 
 // 4️⃣ Sync when coming online (add this!)
 window.addEventListener('online', () => {
-  if (!isJwtValid()) {
+  if (window.walletPublicKey && !isJwtValid()) {
     showSyncAuthBanner();
     return;
   }
