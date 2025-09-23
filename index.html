@@ -7529,7 +7529,20 @@ document.addEventListener('DOMContentLoaded', function() {
 	
  <script>
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js');
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/sw.js')
+      .then(function(registration) {
+        console.log('SW registered successfully with scope: ', registration.scope);
+        
+        // Optional: Check for updates
+        registration.addEventListener('updatefound', () => {
+          console.log('New version found, updating...');
+        });
+      })
+      .catch(function(error) {
+        console.log('SW registration failed: ', error);
+      });
+  });
 }
 </script>  
 	
