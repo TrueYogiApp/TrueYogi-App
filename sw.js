@@ -1,18 +1,30 @@
 self.addEventListener('fetch', event => {
-  // Network-first for EVERYTHING - simple and consistent
+  const url = event.request.url;
+
+  // Always network-first for HTML
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Network-first for JSON, images, MP3, SVG, etc.
+  if (
+    url.endsWith('.json') || 
+    url.endsWith('.png') || 
+    url.endsWith('.mp3') ||
+    url.endsWith('.ico')
+  ) {
+    event.respondWith(
+      fetch(event.request).catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache-first ONLY for super-static files (if you have any)
   event.respondWith(
-    fetch(event.request)
-      .then(networkResponse => {
-        // If network request succeeds, update cache
-        caches.open('app-cache')
-          .then(cache => cache.put(event.request, networkResponse.clone()));
-        return networkResponse;
-      })
-      .catch(() => {
-        // If network fails, try cache
-        return caches.match(event.request)
-          .then(cached => cached || new Response('Offline content not available'));
-      })
+    caches.match(event.request).then(cached => cached || fetch(event.request))
   );
 });
 
