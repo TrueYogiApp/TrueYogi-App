@@ -7442,6 +7442,11 @@ window.addEventListener('focus', () => {
   if (sessionActive) requestWakeLock();
 });
 
+// Add this one line after your existing focus event listener
+window.addEventListener('pageshow', () => {
+  if (sessionActive) setTimeout(requestWakeLock, 500);
+});
+
 document.addEventListener('DOMContentLoaded', function() {
   const logo = document.getElementById('logo-sacred');
   const om = document.getElementById('om-sound');
