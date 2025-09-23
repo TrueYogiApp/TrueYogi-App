@@ -12,8 +12,8 @@ self.addEventListener('fetch', event => {
   // Network-first for JSON, images, MP3, SVG, etc.
   if (
     url.endsWith('.json') || 
-    url.endsWith('.png') || 
-    url.endsWith('.mp3') ||
+   // url.endsWith('.png') || 
+   // url.endsWith('.mp3') ||
     url.endsWith('.ico')
   ) {
     event.respondWith(
