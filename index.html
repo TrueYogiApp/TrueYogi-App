@@ -4857,6 +4857,8 @@ if (challengeData.currentDay >= 22 && !isMobile()) {
   
   // Preserve reset count when reconfiguring
 const currentResetCount = challengeData.resetCount || 0;
+// Get the domain/source
+const challengeSourceFull = window.location.origin;
 
 // --- GENERATE UNIQUE CHALLENGE ID ---
   // Use startDate, endDate and timestamp for uniqueness
@@ -4886,7 +4888,8 @@ challengeData = {
   timezone: userTimezone,
   created_at_local: created_at_local,
   device_type: deviceType,
-  user_agent: userAgent
+  user_agent: userAgent,
+  challenge_source: challengeSourceFull
 };
 
   localStorage.setItem('yogiConfig', JSON.stringify({
@@ -4900,7 +4903,8 @@ challengeData = {
 	timezone: userTimezone,
 	created_at_local: created_at_local,
 	device_type: deviceType,
-    user_agent: userAgent
+    user_agent: userAgent,
+	challenge_source: challengeSourceFull
   }));
   saveChallengeData(); 
   updateYogiIcon(); 
