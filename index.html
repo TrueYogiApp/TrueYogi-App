@@ -5815,6 +5815,7 @@ function saveSession(minutes, sessionTime) {
 }
 
    function saveChallengeData() {
+  challengeData.challenge_source = window.location.origin; 
   localStorage.setItem('yogiChallenge', JSON.stringify(challengeData));
   updateProgressDisplay();
   
