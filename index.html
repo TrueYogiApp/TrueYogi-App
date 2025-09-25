@@ -2774,6 +2774,7 @@
   </div>
 </div>
 
+
   <script>
     // State Management
     let endTime = 0;
@@ -3193,6 +3194,14 @@ function showCertificateInFaq() {
               <i class="fas fa-times-circle" style="margin-right:5px;"></i>${t('TokensUnclaimed')}
             </div>
           `}
+		          ${idx >= 3 ? `
+          <button
+            onclick="openWherebyForCertificate('${cert.challengeId}')"
+            ...style...
+          >
+            <i class="fas fa-users"></i> Join Conscious Session
+          </button>
+        ` : ''}
         </div>
       `).join('')}
     </div>
