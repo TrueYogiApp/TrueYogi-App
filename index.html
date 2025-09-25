@@ -7600,8 +7600,9 @@ document.addEventListener('touchstart', function(e) {
   if (window.scrollY === 0) {
     startY = e.touches[0].pageY;
     isDragging = true;
-    spinner.style.opacity = '0';
+    spinner.style.opacity = '1';
     lungsImg.style.transform = 'scale(1)';
+    lungsImg.style.transition = 'none';
   }
 });
 
@@ -7609,8 +7610,8 @@ document.addEventListener('touchmove', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
-  const maxScale = 2.0;          // Expand more
-  const expansionPx = 180;       // User can pull further
+  const maxScale = 2.6;
+  const expansionPx = 140;
   const minScale = 0.8;
 
   if (pullDistance > 0) {
@@ -7618,11 +7619,11 @@ document.addEventListener('touchmove', function(e) {
     spinner.classList.add('show');
     const scale = 1 + Math.min(pullDistance / expansionPx, maxScale - 1);
     lungsImg.style.transform = `scale(${scale})`;
-    spinner.style.opacity = Math.min(pullDistance / 40, 1);
+    spinner.style.opacity = 1;
 
-    // Haptic: buzz when crossing refresh threshold (once)
+    // Most robust haptic: only once per threshold-cross, only if supported
     if (pullDistance > 80 && !spinner.classList.contains('haptic-fired')) {
-      if (navigator.vibrate) navigator.vibrate(50);
+      if ('vibrate' in navigator) navigator.vibrate(50);
       spinner.classList.add('haptic-fired');
     }
     if (pullDistance < 80 && spinner.classList.contains('haptic-fired')) {
@@ -7637,13 +7638,14 @@ document.addEventListener('touchmove', function(e) {
 document.addEventListener('touchend', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   const pullDistance = currentY - startY;
+  lungsImg.style.transition = 'transform 0.45s cubic-bezier(.22,1,.36,1)';
+
   if (pullDistance > 80) {
     spinner.classList.add('refreshing');
     lungsImg.style.transform = 'scale(1) rotate(0deg)';
-    lungsImg.style.transition = 'transform 0.7s cubic-bezier(.22,1,.36,1)';
     lungsImg.style.opacity = '0';
-    // Haptic: triple pulse on refresh
-    if (navigator.vibrate) navigator.vibrate([30, 30, 30]);
+    // Triple haptic on refresh (again, only if supported)
+    if ('vibrate' in navigator) navigator.vibrate([30, 30, 30]);
     setTimeout(() => {
       spinner.style.opacity = '1';
       lungsImg.style.transform = 'scale(1)';
@@ -7652,8 +7654,9 @@ document.addEventListener('touchend', function(e) {
     }, 500);
   } else {
     spinner.classList.remove('show', 'refreshing', 'haptic-fired');
-    spinner.style.opacity = '0';
+    spinner.style.opacity = '1';
     lungsImg.style.transform = 'scale(1)';
+    setTimeout(() => { spinner.style.opacity = '0'; }, 400);
   }
   isDragging = false;
   startY = 0;
