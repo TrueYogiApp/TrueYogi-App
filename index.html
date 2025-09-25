@@ -7618,7 +7618,7 @@ document.addEventListener('touchmove', function(e) {
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
   const maxScale = 3.0;
-  const minScale = 0.8;
+  const minScale = 0.3;
 
   if (pullDistance > minShowPx) {
     // Only show spinner once enough pull
