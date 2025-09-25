@@ -29,8 +29,11 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Update service worker immediately
+// Update service worker immediately AND cache main page
 self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open('true-yogi-cache').then(cache => cache.add('/'))
+  );
   self.skipWaiting();
 });
 
