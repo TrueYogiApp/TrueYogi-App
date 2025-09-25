@@ -7596,7 +7596,7 @@ let hapticFired = false;
 const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
-const expansionPx = 140; // Full pull distance for max scale
+const expansionPx = 200; // Full pull distance for max scale
 const minShowPx = 80;    // Only show lungs after pulling at least 20px
 const refreshThresholdPx = 120; // Require 50% pull for refresh
 
@@ -7617,7 +7617,7 @@ document.addEventListener('touchmove', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
-  const maxScale = 2.6;
+  const maxScale = 3.0;
   const minScale = 0.8;
 
   if (pullDistance > minShowPx) {
