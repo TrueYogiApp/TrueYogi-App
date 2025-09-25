@@ -1358,19 +1358,18 @@
 }
 
 #pull-refresh-spinner {
-  position: fixed;
-  top: 10px;
-  left: 50%;
-  transform: translateX(-50%) scale(1) rotate(0deg);
+  /* Remove: position: fixed; top: 10px; left: 50%; transform: translateX(-50%) ... */
+  position: static; /* Or simply remove this line */
   width: 48px;
   height: 48px;
-  z-index: 10000;
+  margin: 0 auto 12px auto; /* Center and add space below */
   opacity: 0;
   transition: opacity 0.3s, transform 0.3s;
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
+  z-index: 1; /* Lower z-index so it doesn't float above everything */
 }
 
 #pull-refresh-spinner.show {
