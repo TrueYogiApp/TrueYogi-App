@@ -1357,30 +1357,25 @@
   }
 }
 
-.text-center {
-  position: relative; /* Enable absolute positioning for children */
-}
-
 #pull-refresh-spinner {
-  position: absolute;
-  top: 60px; /* You can tweak this value to align lungs vertically */
+  position: fixed;
+  top: 10px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%) scale(1) rotate(0deg);
   width: 48px;
   height: 48px;
+  z-index: 10000;
   opacity: 0;
   transition: opacity 0.3s, transform 0.3s;
   pointer-events: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 5; /* Above logo/title */
 }
 
 #pull-refresh-spinner.show {
   opacity: 1;
 }
-
 #pull-refresh-spinner.refreshing svg {
   animation: spinlotus 1s linear infinite;
 }
@@ -1791,10 +1786,10 @@
 </div>
     </div>
 	
-  <!-- Lungs spinner (absolute, overlays logo/title when active) -->
-  <div id="pull-refresh-spinner">
-    <img src="/assets/lungs.svg" alt="Lungs Icon" width="40" height="40" class="breathing-lungs">
-  </div>
+	    <!-- Lungs (place here, below logo, above title) -->
+    <div id="pull-refresh-spinner">
+      <img src="/assets/lungs.svg" alt="Lungs Icon" width="40" height="40" class="breathing-lungs">
+    </div>
 	
     <h2 class="calm-heading text-yellow-200 text-2xl md:text-3xl font-playfair italic leading-relaxed text-shadow mt-4">
       Awaken within
