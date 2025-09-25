@@ -7609,18 +7609,27 @@ document.addEventListener('touchmove', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
+  const maxScale = 2.0;          // Expand more
+  const expansionPx = 180;       // User can pull further
+  const minScale = 0.8;
+
   if (pullDistance > 0) {
     e.preventDefault();
     spinner.classList.add('show');
-    // Expand lungs: scale from 1 to 1.7 as you pull (max at 120px)
-    const maxScale = 1.7;
-    const scale = 1 + Math.min(pullDistance / 120, maxScale - 1); // 1 → 1.7
+    const scale = 1 + Math.min(pullDistance / expansionPx, maxScale - 1);
     lungsImg.style.transform = `scale(${scale})`;
     spinner.style.opacity = Math.min(pullDistance / 40, 1);
+
+    // Haptic: buzz when crossing refresh threshold (once)
+    if (pullDistance > 80 && !spinner.classList.contains('haptic-fired')) {
+      if (navigator.vibrate) navigator.vibrate(50);
+      spinner.classList.add('haptic-fired');
+    }
+    if (pullDistance < 80 && spinner.classList.contains('haptic-fired')) {
+      spinner.classList.remove('haptic-fired');
+    }
   } else if (pullDistance < 0) {
-    // If user pushes up, contract lungs
-    const minScale = 0.8;
-    const scale = Math.max(1 + pullDistance / 120, minScale); // never below 0.8
+    const scale = Math.max(1 + pullDistance / expansionPx, minScale);
     lungsImg.style.transform = `scale(${scale})`;
   }
 });
@@ -7631,9 +7640,10 @@ document.addEventListener('touchend', function(e) {
   if (pullDistance > 80) {
     spinner.classList.add('refreshing');
     lungsImg.style.transform = 'scale(1) rotate(0deg)';
-    // Optional: spin during refresh
     lungsImg.style.transition = 'transform 0.7s cubic-bezier(.22,1,.36,1)';
     lungsImg.style.opacity = '0';
+    // Haptic: triple pulse on refresh
+    if (navigator.vibrate) navigator.vibrate([30, 30, 30]);
     setTimeout(() => {
       spinner.style.opacity = '1';
       lungsImg.style.transform = 'scale(1)';
@@ -7641,7 +7651,7 @@ document.addEventListener('touchend', function(e) {
       window.location.reload(true);
     }, 500);
   } else {
-    spinner.classList.remove('show', 'refreshing');
+    spinner.classList.remove('show', 'refreshing', 'haptic-fired');
     spinner.style.opacity = '0';
     lungsImg.style.transform = 'scale(1)';
   }
