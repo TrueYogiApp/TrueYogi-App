@@ -1385,15 +1385,19 @@
   100% { transform: rotate(360deg);}
 }
 
-/* Gentle pulse for awakeness */
-#pull-refresh-spinner svg {
-  animation: gentlePulseSpinner 2s infinite;
+.breathing-lungs {
+  width: 40px;
+  height: 40px;
+  animation: inhaleExhale 2.2s infinite ease-in-out;
+  filter: drop-shadow(0 0 8px #fde68a88); /* Gold glow */
 }
-@keyframes gentlePulseSpinner {
-  0%, 100% { filter: drop-shadow(0 0 8px #fde68a66);}
-  50%      { filter: drop-shadow(0 0 18px #fde68aee);}
+@keyframes inhaleExhale {
+  0%   { transform: scale(1);}
+  35%  { transform: scale(1.06);}
+  55%  { transform: scale(1.10);}
+  70%  { transform: scale(1.06);}
+  100% { transform: scale(1);}
 }
-	  
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -1762,19 +1766,8 @@
 <!-- Mode Selection Screen -->
 <div id="mode-selection" class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-6 fade-in">
   <div class="text-center">
-  <div id="pull-refresh-spinner">
-  <!-- Replace with SVG or Unicode as desired -->
-  <svg width="40" height="40" viewBox="0 0 40 40">
-    <g>
-      <!-- Lotus petals -->
-      <ellipse cx="20" cy="11" rx="7" ry="12" fill="#fde68a" opacity="0.7"/>
-      <ellipse cx="20" cy="29" rx="7" ry="12" fill="#fde68a" opacity="0.7"/>
-      <ellipse cx="11" cy="20" rx="12" ry="7" fill="#fde68a" opacity="0.7" transform="rotate(-45 20 20)"/>
-      <ellipse cx="29" cy="20" rx="12" ry="7" fill="#fde68a" opacity="0.7" transform="rotate(45 20 20)"/>
-      <!-- Center circle -->
-      <circle cx="20" cy="20" r="6" fill="#fffbe6" opacity="0.9"/>
-    </g>
-  </svg>
+<div id="pull-refresh-spinner">
+  <img src="/assets/lungs.svg" alt="Lungs Icon" width="40" height="40" class="breathing-lungs">
 </div>
 
     <div class="flex justify-center mb-4">
