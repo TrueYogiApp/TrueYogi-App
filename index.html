@@ -1357,6 +1357,34 @@
   }
 }
 
+#pull-refresh-spinner {
+  position: fixed;
+  top: 10px; /* Always fixed at top */
+  left: 50%;
+  transform: translateX(-50%) rotate(0deg);
+  width: 40px;
+  height: 40px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #007bff;
+  border-radius: 50%;
+  z-index: 10000;
+  opacity: 0;
+  transition: opacity 0.3s ease, transform 0.3s ease; /* Only animate opacity & rotation */
+}
+
+#pull-refresh-spinner.show {
+  opacity: 1;
+}
+
+#pull-refresh-spinner.refreshing {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translateX(-50%) rotate(0deg); }
+  100% { transform: translateX(-50%) rotate(360deg); }
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -1724,6 +1752,7 @@
 
 <!-- Mode Selection Screen -->
 <div id="mode-selection" class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-6 fade-in">
+  <div id="pull-refresh-spinner"></div>
   <div class="text-center">
     <div class="flex justify-center mb-4">
 <div class="w-32 h-32 rounded-full overflow-hidden shadow-md glow" style="position:relative;">
@@ -7542,6 +7571,73 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+// Pull to refresh - fixed position spinner
+let startY = 0;
+let currentY = 0;
+let isDragging = false;
+
+document.addEventListener('touchstart', function(e) {
+  if (window.scrollY === 0) {
+    startY = e.touches[0].pageY;
+    isDragging = true;
+  }
+});
+
+document.addEventListener('touchmove', function(e) {
+  if (!isDragging) return;
+  
+  currentY = e.touches[0].pageY;
+  const pullDistance = currentY - startY;
+  
+  if (pullDistance > 0) {
+    e.preventDefault();
+    const spinner = document.getElementById('pull-refresh-spinner');
+    
+    // Show spinner when starting to pull
+    if (pullDistance > 10) {
+      spinner.classList.add('show');
+      
+      // Progressive rotation based on pull distance (0° to 270°)
+      const maxPull = 150;
+      const rotation = Math.min((pullDistance / maxPull) * 270, 270);
+      spinner.style.transform = `translateX(-50%) rotate(${rotation}deg)`;
+    }
+  }
+});
+
+document.addEventListener('touchend', function(e) {
+  if (!isDragging) return;
+  
+  const pullDistance = currentY - startY;
+  const spinner = document.getElementById('pull-refresh-spinner');
+  
+  if (pullDistance > 80) {
+    // Trigger refresh with continuous spinning
+    spinner.classList.add('refreshing');
+    spinner.style.transform = `translateX(-50%) rotate(0deg)`; // Reset for animation
+    
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 500);
+  } else {
+    // Hide spinner if not pulled enough
+    spinner.classList.remove('show');
+    spinner.style.transform = `translateX(-50%) rotate(0deg)`;
+  }
+  
+  isDragging = false;
+  startY = 0;
+  currentY = 0;
+});
+
+// Reset on page load
+window.addEventListener('load', function() {
+  const spinner = document.getElementById('pull-refresh-spinner');
+  spinner.classList.remove('show', 'refreshing');
+  spinner.style.transform = `translateX(-50%) rotate(0deg)`;
+});
+
 
   </script>
 	
