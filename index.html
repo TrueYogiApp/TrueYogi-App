@@ -7592,6 +7592,7 @@ function isModeSelectionVisible() {
 let startY = 0;
 let currentY = 0;
 let isDragging = false;
+let hapticFired = false;
 const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
@@ -7600,7 +7601,9 @@ document.addEventListener('touchstart', function(e) {
   if (window.scrollY === 0) {
     startY = e.touches[0].pageY;
     isDragging = true;
+    hapticFired = false;
     spinner.style.opacity = '1';
+    spinner.classList.add('show');
     lungsImg.style.transform = 'scale(1)';
     lungsImg.style.transition = 'none';
   }
@@ -7616,18 +7619,21 @@ document.addEventListener('touchmove', function(e) {
 
   if (pullDistance > 0) {
     e.preventDefault();
+    // Always show spinner, never flicker
     spinner.classList.add('show');
+    spinner.style.opacity = 1;
+    // Dramatic expansion
     const scale = 1 + Math.min(pullDistance / expansionPx, maxScale - 1);
     lungsImg.style.transform = `scale(${scale})`;
-    spinner.style.opacity = 1;
 
-    // Most robust haptic: only once per threshold-cross, only if supported
-    if (pullDistance > 80 && !spinner.classList.contains('haptic-fired')) {
-      if ('vibrate' in navigator) navigator.vibrate(50);
-      spinner.classList.add('haptic-fired');
+    // Haptic fires **every time** you cross threshold, even if you go back and forth
+    if (pullDistance > 80 && !hapticFired) {
+      if ('vibrate' in navigator) navigator.vibrate(70);
+      hapticFired = true;
     }
-    if (pullDistance < 80 && spinner.classList.contains('haptic-fired')) {
-      spinner.classList.remove('haptic-fired');
+    if (pullDistance < 80 && hapticFired) {
+      // Reset so you can get haptic again if you go back over threshold
+      hapticFired = false;
     }
   } else if (pullDistance < 0) {
     const scale = Math.max(1 + pullDistance / expansionPx, minScale);
@@ -7639,12 +7645,12 @@ document.addEventListener('touchend', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   const pullDistance = currentY - startY;
   lungsImg.style.transition = 'transform 0.45s cubic-bezier(.22,1,.36,1)';
-
+  // Only refresh if release while pulled down past threshold
   if (pullDistance > 80) {
     spinner.classList.add('refreshing');
     lungsImg.style.transform = 'scale(1) rotate(0deg)';
     lungsImg.style.opacity = '0';
-    // Triple haptic on refresh (again, only if supported)
+    // Triple haptic on refresh (if supported)
     if ('vibrate' in navigator) navigator.vibrate([30, 30, 30]);
     setTimeout(() => {
       spinner.style.opacity = '1';
@@ -7653,14 +7659,15 @@ document.addEventListener('touchend', function(e) {
       window.location.reload(true);
     }, 500);
   } else {
-    spinner.classList.remove('show', 'refreshing', 'haptic-fired');
-    spinner.style.opacity = '1';
+    // No refresh, fade out spinner smoothly, keep opacity until lungs restore
+    spinner.classList.remove('show', 'refreshing');
     lungsImg.style.transform = 'scale(1)';
     setTimeout(() => { spinner.style.opacity = '0'; }, 400);
   }
   isDragging = false;
   startY = 0;
   currentY = 0;
+  hapticFired = false;
 });
 
   </script>
