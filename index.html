@@ -1387,12 +1387,13 @@
 
 /* Gentle pulse for awakeness */
 #pull-refresh-spinner svg {
-  animation: gentlePulse 2s infinite;
+  animation: gentlePulseSpinner 2s infinite;
 }
-@keyframes gentlePulse {
+@keyframes gentlePulseSpinner {
   0%, 100% { filter: drop-shadow(0 0 8px #fde68a66);}
   50%      { filter: drop-shadow(0 0 18px #fde68aee);}
 }
+	  
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
