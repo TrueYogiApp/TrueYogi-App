@@ -4,7 +4,7 @@ self.addEventListener('fetch', event => {
   // Always network-first for HTML
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
+      fetch(event.request).catch(() => caches.match('/'))  // ← Only change: fallback to '/'
     );
     return;
   }
