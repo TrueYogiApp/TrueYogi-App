@@ -5,6 +5,7 @@ self.addEventListener('fetch', event => {
   if (event.request.mode === 'navigate') {
     event.respondWith(
       fetch(event.request).catch(() => caches.match(event.request))
+      .then(response => response || caches.match('/'))  // ← ONLY CHANGE
     );
     return;
   }
