@@ -1,10 +1,24 @@
 self.addEventListener('fetch', event => {
   const url = event.request.url;
 
-  // Always network-first for HTML
+  // Stale-while-revalidate for HTML - best of both worlds
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match('/'))  // ← Only change: fallback to '/'
+      caches.match(event.request).then(cached => {
+        // Always try to fetch fresh version
+        const fetchPromise = fetch(event.request)
+          .then(networkResponse => {
+            // Update cache with fresh version
+            caches.open('dynamic-cache').then(cache => {
+              cache.put(event.request, networkResponse.clone());
+            });
+            return networkResponse;
+          })
+          .catch(() => { /* Ignore fetch errors */ });
+
+        // Return cached version immediately if available, otherwise wait for network
+        return cached || fetchPromise;
+      })
     );
     return;
   }
