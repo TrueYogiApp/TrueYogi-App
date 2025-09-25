@@ -1394,16 +1394,6 @@
   100% { transform: scale(1);}
 }
 
-@keyframes alveoliWiggle {
-  0% { transform: translate(0, 0); }
-  40% { transform: translate(1px, -1.5px); }
-  60% { transform: translate(-1px, 1.5px); }
-  100% { transform: translate(0, 0); }
-}
-.alveolus {
-  animation: alveoliWiggle 2.5s infinite ease-in-out;
-}
-
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -7594,35 +7584,16 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Load SVG inline for animation
-function loadLungsSVGInline() {
-  fetch('/assets/lungs.svg')
-    .then(r => r.text())
-    .then(svgText => {
-      // Insert SVG into spinner
-      spinner.innerHTML = svgText;
-      spinner.querySelector('svg').classList.add('breathing-lungs');
-    });
-}
-document.addEventListener('DOMContentLoaded', loadLungsSVGInline);
-
-function animateAlveoli(scale) {
-  const alveoli = document.querySelectorAll('.breathing-lungs .alveolus');
-  alveoli.forEach((circle, i) => {
-    const angle = (i * 23) % 360;
-    const wiggle = Math.sin(Date.now()/500 + i) * scale * 2;
-    circle.setAttribute('transform', `translate(${wiggle*Math.cos(angle)}, ${wiggle*Math.sin(angle)})`);
-  });
-}
-
 function isModeSelectionVisible() {
   const el = document.getElementById('mode-selection');
   return el && !el.classList.contains('hidden');
 }
 
+let startY = 0;
+let currentY = 0;
+let isDragging = false;
 const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
-let startY = 0, currentY = 0, isDragging = false;
 
 document.addEventListener('touchstart', function(e) {
   if (!isModeSelectionVisible()) return;
@@ -7631,7 +7602,6 @@ document.addEventListener('touchstart', function(e) {
     isDragging = true;
     spinner.style.opacity = '0';
     lungsImg.style.transform = 'scale(1)';
-    lungsImg.style.transition = 'none'; // Remove transitions during drag
   }
 });
 
@@ -7639,8 +7609,9 @@ document.addEventListener('touchmove', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
-  const maxScale = 2.2;          // Increase as desired
-  const expansionPx = 180;       // Lower for faster scaling
+  const maxScale = 2.0;          // Expand more
+  const expansionPx = 180;       // User can pull further
+  const minScale = 0.8;
 
   if (pullDistance > 0) {
     e.preventDefault();
@@ -7648,30 +7619,31 @@ document.addEventListener('touchmove', function(e) {
     const scale = 1 + Math.min(pullDistance / expansionPx, maxScale - 1);
     lungsImg.style.transform = `scale(${scale})`;
     spinner.style.opacity = Math.min(pullDistance / 40, 1);
-    animateAlveoli(scale); // Animate alveoli if needed
 
-    // ---- Haptic feedback: single buzz on threshold ----
+    // Haptic: buzz when crossing refresh threshold (once)
     if (pullDistance > 80 && !spinner.classList.contains('haptic-fired')) {
-      if ('vibrate' in navigator) navigator.vibrate(50); // Single buzz
+      if (navigator.vibrate) navigator.vibrate(50);
       spinner.classList.add('haptic-fired');
     }
     if (pullDistance < 80 && spinner.classList.contains('haptic-fired')) {
       spinner.classList.remove('haptic-fired');
     }
+  } else if (pullDistance < 0) {
+    const scale = Math.max(1 + pullDistance / expansionPx, minScale);
+    lungsImg.style.transform = `scale(${scale})`;
   }
 });
 
 document.addEventListener('touchend', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   const pullDistance = currentY - startY;
-
-  // ---- Haptic feedback: triple buzz on refresh ----
   if (pullDistance > 80) {
-    if ('vibrate' in navigator) navigator.vibrate([30, 30, 30]);
     spinner.classList.add('refreshing');
     lungsImg.style.transform = 'scale(1) rotate(0deg)';
     lungsImg.style.transition = 'transform 0.7s cubic-bezier(.22,1,.36,1)';
     lungsImg.style.opacity = '0';
+    // Haptic: triple pulse on refresh
+    if (navigator.vibrate) navigator.vibrate([30, 30, 30]);
     setTimeout(() => {
       spinner.style.opacity = '1';
       lungsImg.style.transform = 'scale(1)';
@@ -7679,10 +7651,9 @@ document.addEventListener('touchend', function(e) {
       window.location.reload(true);
     }, 500);
   } else {
-    lungsImg.style.transition = 'transform 0.4s cubic-bezier(.22,1,.36,1)';
-    lungsImg.style.transform = 'scale(1)'; // Reset to normal gently
     spinner.classList.remove('show', 'refreshing', 'haptic-fired');
     spinner.style.opacity = '0';
+    lungsImg.style.transform = 'scale(1)';
   }
   isDragging = false;
   startY = 0;
