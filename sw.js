@@ -4,7 +4,10 @@ self.addEventListener('fetch', event => {
   // Always network-first for HTML
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
+      fetch(event.request).catch(() => 
+        // Try to find cached root page instead of exact request
+        caches.match('/').catch(() => caches.match('/index.html'))
+      )
     );
     return;
   }
