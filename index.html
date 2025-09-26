@@ -7607,9 +7607,9 @@ let hapticFired = false;
 const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
-const expansionPx = 200;
-const minShowPx = 60;
-const refreshThresholdPx = expansionPx * 0.95;
+const expansionPx = 300;
+const minShowPx = 50;
+const refreshThresholdPx = expansionPx * 0.75;
 
 // Rainbow color thresholds with your exact colors
 const colorStops = [
@@ -7667,7 +7667,7 @@ document.addEventListener('touchmove', function(e) {
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
   const maxScale = 3.0;
-  const minScale = 0.1;
+  const minScale = 0.3;
 
   if (pullDistance > minShowPx) {
     spinner.classList.add('show');
