@@ -7599,7 +7599,7 @@ const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
 const expansionPx = 200; // Full pull distance for max scale
-const minShowPx = 60;    // Only show lungs after pulling at least 20px
+const minShowPx = 50;    // Only show lungs after pulling at least 20px
 const refreshThresholdPx = expansionPx * 0.95; // Require 50% pull for refresh
 
 document.addEventListener('touchstart', function(e) {
@@ -7620,7 +7620,7 @@ document.addEventListener('touchmove', function(e) {
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
   const maxScale = 3.0;
-  const minScale = 0.1;
+  const minScale = 0.3;
 
   if (pullDistance > minShowPx) {
     spinner.classList.add('show');
