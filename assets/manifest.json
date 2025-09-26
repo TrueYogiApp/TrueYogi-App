@@ -1,5 +1,5 @@
 {
-  "name": "True Yogi App",
+  "name": "TrueYogi App",
   "short_name": "TrueYogi",
   "start_url": "/",
   "display": "standalone",
@@ -7,8 +7,8 @@
   "theme_color": "#1e293b",
   "orientation": "any",
   "scope": "/",
-  "description": "Yoga meditation and breathing app",
-  "categories": ["health", "lifestyle", "wellness"],
+  "description": "Meditation and breathing app",
+  "categories": ["spirituality", "health", "lifestyle", "wellness"],
   "icons": [
     {
       "src": "/assets/android-chrome-192x192.png",
