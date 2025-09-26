@@ -1376,6 +1376,7 @@
 #pull-refresh-spinner.show {
   opacity: 1;
 }
+
 #pull-refresh-spinner.refreshing svg {
   animation: spinlotus 1s linear infinite;
 }
@@ -1385,7 +1386,6 @@
   100% { transform: rotate(360deg);}
 }
 
- 
 @keyframes inhaleExhale {
   0%   { transform: scale(1);}
   35%  { transform: scale(1.06);}
@@ -1393,6 +1393,15 @@
   70%  { transform: scale(1.06);}
   100% { transform: scale(1);}
 }
+
+/* Rainbow color classes using your exact colors */
+.lungs-red { filter: invert(42%) sepia(65%) saturate(1352%) hue-rotate(325deg) brightness(99%) contrast(96%); } /* #ef4444 */
+.lungs-orange { filter: invert(67%) sepia(90%) saturate(400%) hue-rotate(340deg) brightness(102%) contrast(91%); } /* #f59e42 */
+.lungs-yellow { filter: invert(81%) sepia(40%) saturate(1000%) hue-rotate(5deg) brightness(105%) contrast(91%); } /* #eab308 */
+.lungs-green { filter: invert(61%) sepia(65%) saturate(450%) hue-rotate(90deg) brightness(95%) contrast(90%); } /* #22c55e */
+.lungs-lightblue { filter: invert(85%) sepia(20%) saturate(400%) hue-rotate(170deg) brightness(105%) contrast(90%); } /* #7dd3fc */
+.lungs-indigo { filter: invert(40%) sepia(90%) saturate(500%) hue-rotate(220deg) brightness(95%) contrast(90%); } /* #6366f1 */
+.lungs-violet { filter: invert(50%) sepia(90%) saturate(400%) hue-rotate(230deg) brightness(95%) contrast(90%); } /* #8b5cf6 */
 
 </style>
   
@@ -7598,9 +7607,45 @@ let hapticFired = false;
 const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
-const expansionPx = 200; // Full pull distance for max scale
-const minShowPx = 50;    // Only show lungs after pulling at least 20px
-const refreshThresholdPx = expansionPx * 0.95; // Require 50% pull for refresh
+const expansionPx = 200;
+const minShowPx = 50;
+const refreshThresholdPx = expansionPx * 0.95;
+
+// Rainbow color thresholds with your exact colors
+const colorStops = [
+  { scale: 1.0, color: 'lungs-red' },
+  { scale: 1.3, color: 'lungs-orange' },
+  { scale: 1.6, color: 'lungs-yellow' },
+  { scale: 1.9, color: 'lungs-green' },
+  { scale: 2.2, color: 'lungs-lightblue' },
+  { scale: 2.5, color: 'lungs-indigo' },
+  { scale: 2.8, color: 'lungs-violet' }
+];
+
+// Remove all color classes
+function removeColorClasses() {
+  colorStops.forEach(stop => {
+    lungsImg.classList.remove(stop.color);
+  });
+}
+
+// Update color based on current scale
+function updateLungsColor(scale) {
+  removeColorClasses();
+  
+  // Find the appropriate color for current scale
+  for (let i = colorStops.length - 1; i >= 0; i--) {
+    if (scale >= colorStops[i].scale) {
+      lungsImg.classList.add(colorStops[i].color);
+      break;
+    }
+  }
+  
+  // Default to red if no color matched
+  if (scale < colorStops[0].scale) {
+    lungsImg.classList.add('lungs-red');
+  }
+}
 
 document.addEventListener('touchstart', function(e) {
   if (!isModeSelectionVisible()) return;
@@ -7608,10 +7653,12 @@ document.addEventListener('touchstart', function(e) {
     startY = e.touches[0].pageY;
     isDragging = true;
     hapticFired = false;
-    spinner.style.opacity = '0'; // Hide spinner until enough pull
+    spinner.style.opacity = '0';
     spinner.classList.remove('show');
     lungsImg.style.transform = 'scale(1)';
     lungsImg.style.transition = 'none';
+    removeColorClasses();
+    lungsImg.classList.add('lungs-red'); // Start with red
   }
 });
 
@@ -7627,6 +7674,9 @@ document.addEventListener('touchmove', function(e) {
     spinner.style.opacity = 1;
     const scale = 1 + Math.min((pullDistance - minShowPx) / (expansionPx - minShowPx), maxScale - 1);
     lungsImg.style.transform = `scale(${scale})`;
+    
+    // Update color based on scale
+    updateLungsColor(scale);
 
     if (pullDistance > refreshThresholdPx && !hapticFired) {
       if ('vibrate' in navigator) navigator.vibrate(70);
@@ -7636,10 +7686,10 @@ document.addEventListener('touchmove', function(e) {
       hapticFired = false;
     }
   } else {
-    // Use minScale for shrinking the lungs
-    const shrinkDistance = Math.max(pullDistance, 0); // negative or zero
+    const shrinkDistance = Math.max(pullDistance, 0);
     const scale = Math.max(1 + shrinkDistance / minShowPx, minScale);
     lungsImg.style.transform = `scale(${scale})`;
+    updateLungsColor(scale); // Update color even when shrinking
     spinner.classList.remove('show');
     spinner.style.opacity = '0';
   }
@@ -7654,7 +7704,6 @@ document.addEventListener('touchend', function(e) {
     spinner.classList.add('refreshing');
     lungsImg.style.transform = 'scale(1) rotate(0deg)';
     lungsImg.style.opacity = '0';
-    // Triple haptic on refresh
     if ('vibrate' in navigator) navigator.vibrate([30, 30, 30]);
     setTimeout(() => {
       spinner.style.opacity = '1';
@@ -7663,7 +7712,6 @@ document.addEventListener('touchend', function(e) {
       window.location.reload(true);
     }, 500);
   } else {
-    // Fade out spinner/lungs smoothly, no refresh
     spinner.classList.remove('show', 'refreshing');
     lungsImg.style.transform = 'scale(1)';
     setTimeout(() => { spinner.style.opacity = '0'; }, 400);
