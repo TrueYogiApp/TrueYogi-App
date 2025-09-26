@@ -12,8 +12,8 @@ self.addEventListener('fetch', event => {
   // Network-first for JSON, images, MP3, SVG, etc.
   if (
     url.endsWith('.json') || 
-   // url.endsWith('.png') || 
-   // url.endsWith('.mp3') ||
+    url.endsWith('.png') || 
+    url.endsWith('.mp3') ||
     url.endsWith('.ico')
   ) {
     event.respondWith(
@@ -30,6 +30,14 @@ self.addEventListener('fetch', event => {
 
 // Update service worker immediately
 self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open('static-v1').then(cache => {
+      return cache.addAll([
+        '/assets/icrown3.png', // Precache your logo
+        // add other must-have assets here
+      ]);
+    })
+  );
   self.skipWaiting();
 });
 
