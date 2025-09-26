@@ -1,45 +1,40 @@
 self.addEventListener('fetch', event => {
   const url = event.request.url;
 
-  // Always network-first for HTML
-  if (event.request.mode === 'navigate') {
-    event.respondWith(
-      fetch(event.request).catch(() => 
-        // Try to find cached root page instead of exact request
-        caches.match('/').catch(() => caches.match('/index.html'))
-      )
-    );
-    return;
-  }
-
-  // Network-first for JSON, images, MP3, SVG, etc.
-  if (
-    url.endsWith('.json') || 
-    url.endsWith('.png') || 
-    url.endsWith('.mp3') ||
-    url.endsWith('.ico')
-  ) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Cache-first ONLY for super-static files (if you have any)
+  // Cache-first for EVERYTHING
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    caches.match(event.request)
+      .then(cached => {
+        // Always return cached version if available
+        if (cached) {
+          return cached;
+        }
+        
+        // If not in cache, fetch from network
+        return fetch(event.request)
+          .then(response => {
+            // Optionally cache the new response for future
+            return response;
+          })
+          .catch(error => {
+            // If both cache and network fail, you could return a fallback
+            throw error;
+          });
+      })
   );
 });
 
-// Update service worker immediately
+// Cache important files during install
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open('static-v1').then(cache => {
-      return cache.addAll([
-        '/assets/icrown3.png', // Precache your logo
-        // add other must-have assets here
-      ]);
-    })
+    caches.open('app-cache-v1')
+      .then(cache => {
+        return cache.addAll([
+          '/', // Your main HTML
+          '/index.html',
+          // Add other critical files like CSS, JS, manifest here
+        ]);
+      })
   );
   self.skipWaiting();
 });
