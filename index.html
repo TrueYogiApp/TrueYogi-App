@@ -1323,37 +1323,37 @@
   0% {
     opacity: 1;
     box-shadow:
-      0 0 8px 4px #fde68a,
-      0 0 15px 7px #fbbf24cc,
-      0 0 21px 11px #ea580c66;
+      0 0 8px 4px #fbb6ce,
+      0 0 15px 7px #f472b6,
+      0 0 21px 11px #ec489988;
   }
   25% {
     opacity: 0.7;
     box-shadow:
-      0 0 5px 2px #fde68a,
-      0 0 10px 5px #fbbf24cc,
-      0 0 12px 8px #ea580c66;
+      0 0 5px 2px #fbb6ce,
+      0 0 10px 5px #f472b6,
+      0 0 12px 8px #ec489988;
   }
   50% {
     opacity: 0.3;
     box-shadow:
-      0 0 0px 0px #fde68a,
-      0 0 0px 0px #fbbf24cc,
-      0 0 0px 0px #ea580c66;
+      0 0 0px 0px #fbb6ce,
+      0 0 0px 0px #f472b6,
+      0 0 0px 0px #ec489988;
   }
   75% {
     opacity: 0.7;
     box-shadow:
-      0 0 5px 2px #fde68a,
-      0 0 10px 5px #fbbf24cc,
-      0 0 12px 8px #ea580c66;
+      0 0 5px 2px #fbb6ce,
+      0 0 10px 5px #f472b6,
+      0 0 12px 8px #ec489988;
   }
   100% {
     opacity: 1;
     box-shadow:
-      0 0 8px 4px #fde68a,
-      0 0 15px 7px #fbbf24cc,
-      0 0 21px 11px #ea580c66;
+      0 0 8px 4px #fbb6ce,
+      0 0 15px 7px #f472b6,
+      0 0 21px 11px #ec489988;
   }
 }
 
@@ -1396,12 +1396,12 @@
 
 /* Rainbow color classes using your exact colors */
 .lungs-red { filter: invert(42%) sepia(65%) saturate(1352%) hue-rotate(325deg) brightness(99%) contrast(96%); } /* #ef4444 */
-.lungs-orange { filter: invert(67%) sepia(90%) saturate(400%) hue-rotate(340deg) brightness(102%) contrast(91%); } /* #f59e42 */
-.lungs-yellow { filter: invert(81%) sepia(40%) saturate(1000%) hue-rotate(5deg) brightness(105%) contrast(91%); } /* #eab308 */
+.lungs-orange { filter: invert(81%) sepia(94%) saturate(726%) hue-rotate(-17deg) brightness(111%) contrast(104%); }
+.lungs-yellow { filter: invert(92%) sepia(90%) saturate(720%) hue-rotate(1deg) brightness(115%) contrast(105%); }
 .lungs-green { filter: invert(61%) sepia(65%) saturate(450%) hue-rotate(90deg) brightness(95%) contrast(90%); } /* #22c55e */
-.lungs-lightblue { filter: invert(85%) sepia(20%) saturate(400%) hue-rotate(170deg) brightness(105%) contrast(90%); } /* #7dd3fc */
-.lungs-indigo { filter: invert(40%) sepia(90%) saturate(500%) hue-rotate(220deg) brightness(95%) contrast(90%); } /* #6366f1 */
-.lungs-violet { filter: invert(50%) sepia(90%) saturate(400%) hue-rotate(230deg) brightness(95%) contrast(90%); } /* #8b5cf6 */
+.lungs-lightblue { filter: invert(43%) sepia(97%) saturate(1800%) hue-rotate(195deg) brightness(110%) contrast(104%); } /* #7dd3fc */
+.lungs-indigo { filter: invert(30%) sepia(98%) saturate(1500%) hue-rotate(228deg) brightness(110%) contrast(102%); } /* #6366f1 */
+.lungs-violet { filter: invert(46%) sepia(85%) saturate(1400%) hue-rotate(275deg) brightness(112%) contrast(105%); } /* #8b5cf6 */
 
 </style>
   
@@ -1772,6 +1772,10 @@
 <div id="mode-selection" class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-6 fade-in">
   <div class="text-center">
     <div class="flex justify-center mb-4">
+		    <!-- Lungs (place here, below logo, above title) -->
+    <div id="pull-refresh-spinner">
+      <img src="/assets/lungs.svg" alt="Lungs Icon" width="40" height="40" class="breathing-lungs">
+    </div>
 <div class="w-32 h-32 rounded-full overflow-hidden shadow-md glow" style="position:relative;">
   <img id="logo-sacred" src="/assets/icrown3.png" alt="Sacred Symbol" class="w-full h-full object-cover" style="display:block;">
 <div id="lotus-eye-flare"
@@ -1782,11 +1786,11 @@
        width:3px; height:3px;
        pointer-events:none;
        border-radius:50%;
-       background: radial-gradient(circle at 50% 48%, #fffbe6 0%, #fde68a 45%, #fbbf24cc 70%, #ea580cbb 98%, #0000 100%);
+       background: radial-gradient(circle at 50% 48%, #ffe4ef 0%, #fbb6ce 45%, #f472b6 80%, #0000 100%);
        box-shadow:
-         0 0 8px 4px #fde68a,
-         0 0 15px 7px #fbbf24cc,
-         0 0 21px 11px #ea580c66;
+         0 0 8px 4px #fbb6ce,
+         0 0 15px 7px #f472b6,
+         0 0 21px 11px #f472b688;
        opacity: 1;
        z-index: 2;
        transition: opacity 0.4s;
@@ -1794,11 +1798,7 @@
      "></div>
 </div>
     </div>
-	
-	    <!-- Lungs (place here, below logo, above title) -->
-    <div id="pull-refresh-spinner">
-      <img src="/assets/lungs.svg" alt="Lungs Icon" width="40" height="40" class="breathing-lungs">
-    </div>
+
 	
     <h2 class="calm-heading text-yellow-200 text-2xl md:text-3xl font-playfair italic leading-relaxed text-shadow mt-4">
       Awaken within
@@ -7608,7 +7608,7 @@ const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
 const expansionPx = 200;
-const minShowPx = 50;
+const minShowPx = 60;
 const refreshThresholdPx = expansionPx * 0.95;
 
 // Rainbow color thresholds with your exact colors
@@ -7667,7 +7667,7 @@ document.addEventListener('touchmove', function(e) {
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
   const maxScale = 3.0;
-  const minScale = 0.3;
+  const minScale = 0.1;
 
   if (pullDistance > minShowPx) {
     spinner.classList.add('show');
