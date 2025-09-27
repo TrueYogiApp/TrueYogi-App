@@ -7769,34 +7769,33 @@ function showZoomFeedback(zoomed) {
   }, 1500);
 }
 
-// Add fadeOut animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes fadeOut {
-    0% { opacity: 1; }
-    100% { opacity: 0; }
-  }
-`;
-document.head.appendChild(style);
+  // Create AudioContext once (not inside click each time)
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  let unlocked = false;
 
-const avatar = document.querySelector('.avatar-container img');
+  function playChime() {
+    // Unlock audio context on first user interaction if needed
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
 
-  avatar.addEventListener('click', () => {
-    const ctx = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+    const oscillator = audioCtx.createOscillator();
+    const gainNode = audioCtx.createGain();
 
     oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(432, ctx.currentTime); // 432 Hz = spiritual resonance
-    gainNode.gain.setValueAtTime(0.2, ctx.currentTime); // volume
+    oscillator.frequency.setValueAtTime(432, audioCtx.currentTime); // sacred 432Hz
+    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // volume
 
     oscillator.connect(gainNode);
-    gainNode.connect(ctx.destination);
+    gainNode.connect(audioCtx.destination);
 
     oscillator.start();
-    oscillator.stop(ctx.currentTime + 1.5); // 1.5 sec chime
-  });
+    oscillator.stop(audioCtx.currentTime + 1.5); // play for 1.5 sec
+  }
 
+  // Attach to avatar
+  const avatar = document.querySelector('.avatar-container img');
+  avatar.addEventListener('click', playChime);
 
   </script>
 	
