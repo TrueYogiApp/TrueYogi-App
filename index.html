@@ -1403,13 +1403,26 @@
 .lungs-indigo { filter: invert(30%) sepia(98%) saturate(1500%) hue-rotate(228deg) brightness(110%) contrast(102%); } /* #6366f1 */
 .lungs-violet { filter: invert(46%) sepia(85%) saturate(1400%) hue-rotate(275deg) brightness(112%) contrast(105%); } /* #8b5cf6 */
 
+  /* Enhanced Zoom Styles */
 .zoomable-content {
-  transition: transform 0.3s ease;
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transform-origin: center center;
 }
 
 .zoomed {
-  transform: scale(1.1); /* 10% zoom */
+  transform: scale(1.15); /* Increased zoom level */
 }
+
+/* Prevent zoom on images/text from being blurry */
+.zoomed img {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+.zoomed {
+  text-rendering: optimizeLegibility;
+}
+
 
 </style>
   
@@ -7719,83 +7732,81 @@ document.addEventListener('touchend', function(e) {
   currentY = 0;
 });
 
-// Double Tap to Zoom
+// Enhanced Double-Tap Zoom - Clean Version
 let lastTap = 0;
 let isZoomed = false;
+let tapX = 0;
+let tapY = 0;
 
-document.addEventListener('touchend', e => {
+document.addEventListener('touchend', function(e) {
   const currentTime = new Date().getTime();
   const tapLength = currentTime - lastTap;
+  
+  // Store tap position for directional zoom
+  tapX = e.changedTouches[0].clientX;
+  tapY = e.changedTouches[0].clientY;
   
   // Double tap detected (taps within 300ms)
   if (tapLength < 300 && tapLength > 0) {
     e.preventDefault();
     
-    // Toggle zoom on the main content or specific element
     const content = document.querySelector('.zoomable-content') || document.body;
     
+    // Zoom towards tap position
+    content.style.transformOrigin = `${tapX}px ${tapY}px`;
+    
     if (isZoomed) {
+      // Zoom out
       content.classList.remove('zoomed');
       isZoomed = false;
+      showZoomFeedback('Zoom Out', '🔍−');
     } else {
+      // Zoom in towards tap point
       content.classList.add('zoomed');
       isZoomed = true;
+      showZoomFeedback('Zoom In', '🔍+');
     }
-    
-    // Optional: Add visual feedback
-    showZoomFeedback(isZoomed);
   }
   
   lastTap = currentTime;
 });
 
-// Visual feedback for zoom
-function showZoomFeedback(zoomed) {
+// Enhanced visual feedback
+function showZoomFeedback(text, icon) {
+  // Remove existing feedback if any
+  const existingFeedback = document.getElementById('zoom-feedback');
+  if (existingFeedback) existingFeedback.remove();
+  
   const feedback = document.createElement('div');
-  feedback.textContent = zoomed ? '🔍 Zoomed In' : '🔍 Zoomed Out';
+  feedback.id = 'zoom-feedback';
+  feedback.innerHTML = `${icon} ${text}`;
   feedback.style.cssText = `
-    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.8); color: white; padding: 10px 20px;
-    border-radius: 20px; z-index: 10000; font-size: 16px;
-    animation: fadeOut 1s ease 0.5s forwards;
+    position: fixed; top: ${tapY - 60}px; left: ${tapX}px; 
+    transform: translateX(-50%); background: rgba(0,0,0,0.85); 
+    color: white; padding: 12px 18px; border-radius: 25px; 
+    z-index: 10000; font-size: 16px; font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    animation: zoomFloat 1.2s ease forwards;
+    pointer-events: none;
   `;
   
   document.body.appendChild(feedback);
   
   setTimeout(() => {
-    if (feedback.parentNode) {
-      feedback.parentNode.removeChild(feedback);
-    }
-  }, 1500);
+    if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
+  }, 1200);
 }
 
-  // Create AudioContext once (not inside click each time)
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  let unlocked = false;
-
-  function playChime() {
-    // Unlock audio context on first user interaction if needed
-    if (audioCtx.state === 'suspended') {
-      audioCtx.resume();
-    }
-
-    const oscillator = audioCtx.createOscillator();
-    const gainNode = audioCtx.createGain();
-
-    oscillator.type = 'sine';
-    oscillator.frequency.setValueAtTime(432, audioCtx.currentTime); // sacred 432Hz
-    gainNode.gain.setValueAtTime(0.2, audioCtx.currentTime); // volume
-
-    oscillator.connect(gainNode);
-    gainNode.connect(audioCtx.destination);
-
-    oscillator.start();
-    oscillator.stop(audioCtx.currentTime + 1.5); // play for 1.5 sec
+// Add ONLY the animation (no background color changes)
+const zoomStyle = document.createElement('style');
+zoomStyle.textContent = `
+  @keyframes zoomFloat {
+    0% { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.8); }
+    50% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    100% { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(0.8); }
   }
-
-  // Attach to avatar
-  const avatar = document.querySelector('.avatar-container img');
-  avatar.addEventListener('click', playChime);
+`;
+document.head.appendChild(zoomStyle);
 
   </script>
 	
