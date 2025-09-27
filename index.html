@@ -7627,9 +7627,9 @@ let isDragging = false;
 const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
-const expansionPx = 300;
+const expansionPx = 250;
 const minShowPx = 60;
-const refreshThresholdPx = expansionPx * 0.75;
+const refreshThresholdPx = minShowPx + 1.8 * (expansionPx - minShowPx); // matches violet
 
 // Rainbow color thresholds with your exact colors
 const colorStops = [
@@ -7759,12 +7759,12 @@ document.addEventListener('touchend', function(e) {
       // Zoom out
       content.classList.remove('zoomed');
       isZoomed = false;
-      showZoomFeedback('Zoom Out', '🔍−');
+      showZoomFeedback('', '🔍−');
     } else {
       // Zoom in towards tap point
       content.classList.add('zoomed');
       isZoomed = true;
-      showZoomFeedback('Zoom In', '🔍+');
+      showZoomFeedback('', '🔍+');
     }
   }
   
