@@ -1403,6 +1403,14 @@
 .lungs-indigo { filter: invert(30%) sepia(98%) saturate(1500%) hue-rotate(228deg) brightness(110%) contrast(102%); } /* #6366f1 */
 .lungs-violet { filter: invert(46%) sepia(85%) saturate(1400%) hue-rotate(275deg) brightness(112%) contrast(105%); } /* #8b5cf6 */
 
+.zoomable-content {
+  transition: transform 0.3s ease;
+}
+
+.zoomed {
+  transform: scale(1.1); /* 10% zoom */
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -7710,6 +7718,66 @@ document.addEventListener('touchend', function(e) {
   startY = 0;
   currentY = 0;
 });
+
+// Double Tap to Zoom
+let lastTap = 0;
+let isZoomed = false;
+
+document.addEventListener('touchend', e => {
+  const currentTime = new Date().getTime();
+  const tapLength = currentTime - lastTap;
+  
+  // Double tap detected (taps within 300ms)
+  if (tapLength < 300 && tapLength > 0) {
+    e.preventDefault();
+    
+    // Toggle zoom on the main content or specific element
+    const content = document.querySelector('.zoomable-content') || document.body;
+    
+    if (isZoomed) {
+      content.classList.remove('zoomed');
+      isZoomed = false;
+    } else {
+      content.classList.add('zoomed');
+      isZoomed = true;
+    }
+    
+    // Optional: Add visual feedback
+    showZoomFeedback(isZoomed);
+  }
+  
+  lastTap = currentTime;
+});
+
+// Visual feedback for zoom
+function showZoomFeedback(zoomed) {
+  const feedback = document.createElement('div');
+  feedback.textContent = zoomed ? '🔍 Zoomed In' : '🔍 Zoomed Out';
+  feedback.style.cssText = `
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.8); color: white; padding: 10px 20px;
+    border-radius: 20px; z-index: 10000; font-size: 16px;
+    animation: fadeOut 1s ease 0.5s forwards;
+  `;
+  
+  document.body.appendChild(feedback);
+  
+  setTimeout(() => {
+    if (feedback.parentNode) {
+      feedback.parentNode.removeChild(feedback);
+    }
+  }, 1500);
+}
+
+// Add fadeOut animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+`;
+document.head.appendChild(style);
 
   </script>
 	
