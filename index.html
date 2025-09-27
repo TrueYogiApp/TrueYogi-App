@@ -2754,6 +2754,7 @@
   <audio id="bell" src="/assets/meditation-end.mp3" preload="auto" muted></audio>
   <audio id="om-sound" src="/assets/aum.mp3" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
+  <audio id="doubletap-sound" src="/assets/doubletap.wav" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -7732,81 +7733,69 @@ document.addEventListener('touchend', function(e) {
   currentY = 0;
 });
 
-// Enhanced Double-Tap Zoom - Clean Version
 let lastTap = 0;
-let isZoomed = false;
-let tapX = 0;
-let tapY = 0;
 
 document.addEventListener('touchend', function(e) {
+  // Get both screens
+  const modeSelectionEl = document.getElementById('mode-selection');
+  const appInterfaceEl  = document.getElementById('app-interface');
+  // Check if either is visible (not hidden), and not in session
+  const onModeSelection = modeSelectionEl && !modeSelectionEl.classList.contains('hidden');
+  const onAppInterface  = appInterfaceEl && !appInterfaceEl.classList.contains('hidden');
+  if (!(onModeSelection || onAppInterface)) return;
+  if (typeof sessionActive !== "undefined" && sessionActive) return; // Don't trigger during session
+
   const currentTime = new Date().getTime();
   const tapLength = currentTime - lastTap;
-  
-  // Store tap position for directional zoom
-  tapX = e.changedTouches[0].clientX;
-  tapY = e.changedTouches[0].clientY;
-  
-  // Double tap detected (taps within 300ms)
-  if (tapLength < 300 && tapLength > 0) {
+
+  if (tapLength < 200 && tapLength > 0) {
     e.preventDefault();
-    
-    const content = document.querySelector('.zoomable-content') || document.body;
-    
-    // Zoom towards tap position
-    content.style.transformOrigin = `${tapX}px ${tapY}px`;
-    
-    if (isZoomed) {
-      // Zoom out
-      content.classList.remove('zoomed');
-      isZoomed = false;
-      showZoomFeedback('', '🔍−');
-    } else {
-      // Zoom in towards tap point
-      content.classList.add('zoomed');
-      isZoomed = true;
-      showZoomFeedback('', '🔍+');
+    const sound = document.getElementById('doubletap-sound');
+    if (sound) {
+      sound.currentTime = 0;
+      sound.volume = 0.7;
+      sound.play().catch(()=>{});
     }
+    showDoubleTapIcon(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
   }
-  
   lastTap = currentTime;
 });
 
-// Enhanced visual feedback
-function showZoomFeedback(text, icon) {
-  // Remove existing feedback if any
-  const existingFeedback = document.getElementById('zoom-feedback');
-  if (existingFeedback) existingFeedback.remove();
-  
-  const feedback = document.createElement('div');
-  feedback.id = 'zoom-feedback';
-  feedback.innerHTML = `${icon} ${text}`;
-  feedback.style.cssText = `
-    position: fixed; top: ${tapY - 60}px; left: ${tapX}px; 
-    transform: translateX(-50%); background: rgba(0,0,0,0.85); 
-    color: white; padding: 12px 18px; border-radius: 25px; 
-    z-index: 10000; font-size: 16px; font-weight: bold;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    animation: zoomFloat 1.2s ease forwards;
+// Floating icon function (same as before)
+function showDoubleTapIcon(x, y) {
+  const iconDiv = document.createElement('div');
+  iconDiv.textContent = '🎶';
+  iconDiv.style.cssText = `
+    position: fixed;
+    left: ${x}px;
+    top: ${y-40}px;
+    transform: translate(-50%, 0);
+    font-size: 1.2em;
+    background: rgba(30,41,59,0.89);
+    color: #fde68a;
+    border-radius: 24px;
+    padding: 4px 20px;
+    z-index: 9999;
+    box-shadow: 0 4px 14px #eab30833;
     pointer-events: none;
+    opacity: 0;
+    animation: dtMusicFloat 1s forwards;
   `;
-  
-  document.body.appendChild(feedback);
-  
+  document.body.appendChild(iconDiv);
   setTimeout(() => {
-    if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
-  }, 1200);
+    if (iconDiv.parentNode) iconDiv.parentNode.removeChild(iconDiv);
+  }, 1000);
 }
 
-// Add ONLY the animation (no background color changes)
-const zoomStyle = document.createElement('style');
-zoomStyle.textContent = `
-  @keyframes zoomFloat {
-    0% { opacity: 0; transform: translateX(-50%) translateY(20px) scale(0.8); }
-    50% { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
-    100% { opacity: 0; transform: translateX(-50%) translateY(-20px) scale(0.8); }
-  }
-`;
-document.head.appendChild(zoomStyle);
+// Animation for icon
+const dtStyle = document.createElement('style');
+dtStyle.textContent = `
+@keyframes dtMusicFloat {
+  0% {opacity:0;transform:translate(-50%,10px) scale(0.85);}
+  40% {opacity:1;transform:translate(-50%,0) scale(1);}
+  100% {opacity:0;transform:translate(-50%,-30px) scale(0.8);}
+}`;
+document.head.appendChild(dtStyle);
 
   </script>
 	
