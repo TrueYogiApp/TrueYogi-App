@@ -7733,9 +7733,14 @@ document.addEventListener('touchend', function(e) {
   currentY = 0;
 });
 
+// Double-tap music ONLY on home screen (mode selection), show icon feedback
 let lastTap = 0;
 
 document.addEventListener('touchend', function(e) {
+  // Prevent bell sound on avatar tap
+  const avatarEl = document.querySelector('.avatar-container');
+  if (avatarEl && avatarEl.contains(e.target)) return; // Ignore taps on avatar or its children
+
   // Get both screens
   const modeSelectionEl = document.getElementById('mode-selection');
   const appInterfaceEl  = document.getElementById('app-interface');
