@@ -7764,23 +7764,25 @@ document.addEventListener('touchend', function(e) {
 // Floating icon function (same as before)
 function showDoubleTapIcon(x, y) {
   const iconDiv = document.createElement('div');
-  iconDiv.textContent = '🎶';
-  iconDiv.style.cssText = `
-    position: fixed;
-    left: ${x}px;
-    top: ${y-40}px;
-    transform: translate(-50%, 0);
-    font-size: 1.2em;
-    background: rgba(30,41,59,0.89);
-    color: #fde68a;
-    border-radius: 24px;
-    padding: 4px 20px;
-    z-index: 9999;
-    box-shadow: 0 4px 14px #eab30833;
-    pointer-events: none;
-    opacity: 0;
-    animation: dtMusicFloat 1s forwards;
-  `;
+  iconDiv.textContent = '🔔';
+iconDiv.style.cssText = `
+  position: fixed;
+  left: ${x}px;
+  top: ${y-40}px;
+  transform: translate(-50%, 0);
+  font-size: 1.2em;
+  background: #fff;
+  color: #eab308;
+  border-radius: 24px;
+  padding: 4px 20px;
+  z-index: 9999;
+  box-shadow: 0 0 24px #fff, 0 0 9px #eab30888;
+  text-shadow: 0 0 14px #fff, 0 0 4px #eab308;
+  border: 2px solid #fde68a;
+  pointer-events: none;
+  opacity: 0;
+  animation: dtMusicFloat 1s forwards;
+`;
   document.body.appendChild(iconDiv);
   setTimeout(() => {
     if (iconDiv.parentNode) iconDiv.parentNode.removeChild(iconDiv);
