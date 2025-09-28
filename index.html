@@ -1423,6 +1423,22 @@
   text-rendering: optimizeLegibility;
 }
 
+.card-aura {
+  border-radius: 24px;
+  transition: box-shadow 3s;
+}
+.card-aura.red        { box-shadow: 0 0 32px 0 #ff3c3c55, 0 0 8px 2px #ff3c3c33; }
+.card-aura.orange     { box-shadow: 0 0 32px 0 #ff980055, 0 0 8px 2px #ff980033; }
+.card-aura.yellow     { box-shadow: 0 0 32px 0 #ffd70055, 0 0 8px 2px #ffd70033; }
+.card-aura.green      { box-shadow: 0 0 32px 0 #43ea7e55, 0 0 8px 2px #43ea7e33; }
+.card-aura.blue       { box-shadow: 0 0 32px 0 #2196f355, 0 0 8px 2px #2196f333; }
+.card-aura.indigo     { box-shadow: 0 0 32px 0 #4b008255, 0 0 8px 2px #4b008233; }
+.card-aura.violet     { box-shadow: 0 0 32px 0 #8f5cff55, 0 0 8px 2px #8f5cff33; }
+.card-aura.gold       { box-shadow: 0 0 32px 0 #ffd700bb, 0 0 8px 2px #ffd70099; }
+.card-aura.silver     { box-shadow: 0 0 32px 0 #c0c0c099, 0 0 8px 2px #c0c0c066; }
+.card-aura.sapphire   { box-shadow: 0 0 32px 0 #0f52ba99, 0 0 8px 2px #0f52ba66; }
+.card-aura.dark-silver{ box-shadow: 0 0 32px 0 #75757599, 0 0 8px 2px #75757566; }
+.card-aura.white      { box-shadow: 0 0 32px 0 #ffffffbb, 0 0 8px 2px #ffffff88; }
 
 </style>
   
@@ -1790,7 +1806,7 @@
 </div>
 
 <!-- Mode Selection Screen -->
-<div id="mode-selection" class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-6 fade-in">
+<div id="mode-selection" class="bg-gray-800 rounded-2xl shadow-xl p-6 mb-6 fade-in card-aura">
   <div class="text-center">
     <div class="flex justify-center mb-4">
 		    <!-- Lungs (place here, below logo, above title) -->
@@ -2755,7 +2771,7 @@
   <audio id="om-sound" src="/assets/aum.mp3" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
   <audio id="sound-bell" src="/assets/bell.wav" preload="auto"></audio>
-  <audio id="avatar-sound" src="/assets/meditation-eterna.wav" preload="auto"></audio>
+  <audio id="avatar-sound" src="/assets/meditation-eternal.wav" preload="auto"></audio>
 
   <!-- Add these 3 new sounds -->
 <audio id="sound-chimes" src="assets/tamtam_gong.wav" preload="auto"></audio>
@@ -7884,14 +7900,14 @@ document.addEventListener('DOMContentLoaded', function() {
       const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
       
       // Only toggle sound if click is within reasonable distance from center
-      const avatarRadius = Math.min(rect.width, rect.height) / 2;
+      const avatarRadius = Math.min(rect.width, rect.height) / 22;
       
       if (dist < avatarRadius) {
         if (!avatarPlaying) {
           // Start playing avatar sound
           avatarSound.muted = false;
           avatarSound.currentTime = 0;
-          avatarSound.volume = 0.7;
+          avatarSound.volume = 0.6;
           avatarSound.play().catch(()=>{});
           avatarPlaying = true;
           
@@ -7908,7 +7924,74 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+// Visual feedback for avatar tap
+function showAvatarFeedback(x, y) {
+  const feedback = document.createElement('div');
+  feedback.innerHTML = ''; // Or use '🧘' or '✨'
+  feedback.style.cssText = `
+    position: fixed;
+    left: ${x}px;
+    top: ${y}px;
+    transform: translate(-50%, -50%);
+    font-size: 2em;
+    z-index: 9999;
+    pointer-events: none;
+    opacity: 0;
+    animation: avatarPulse 2s ease-out forwards;
+  `;
+  
+  document.body.appendChild(feedback);
+  setTimeout(() => {
+    if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
+  }, 2000);
+}
+
+// Add avatar animation
+const avatarStyle = document.createElement('style');
+avatarStyle.textContent = `
+@keyframes avatarPulse {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
+}
+`;
 document.head.appendChild(avatarStyle);
+
+// Border Colors
+const auraColors = [
+  "red",        // 0
+  "orange",     // 1
+  "yellow",     // 2
+  "green",      // 3
+  "blue",       // 4
+  "indigo",     // 5
+  "violet",     // 6
+  "gold",       // 7
+  "silver",     // 8
+  "sapphire",   // 9
+  "dark-silver",// 10
+  "white"       // 11
+];
+
+// Change color every 21 seconds
+function getAuraIndex() {
+  const now = new Date();
+  // 12 colors, cycle every 252 seconds (21s x 12)
+  const seconds = now.getMinutes() * 60 + now.getSeconds();
+  const slot = Math.floor((seconds / 21) % auraColors.length);
+  return slot;
+}
+
+function setAuraColor() {
+  const auraClass = auraColors[getAuraIndex()];
+  const card = document.querySelector('.card-aura');
+  if (!card) return;
+  auraColors.forEach(c => card.classList.remove(c));
+  card.classList.add(auraClass);
+}
+
+setAuraColor();
+setInterval(setAuraColor, 1000);
 
   </script>
 	
@@ -9955,7 +10038,7 @@ window.addEventListener('online', () => {
   "></div>
 </div>
 
-<!-- Reconfigure Indicator - Bottom Center- Botto, Yellow -->
+<!-- Reconfigure Indicator - Bottom Center, Yellow -->
 <div id="yellow-indicator" style="
   position: fixed;
   bottom: 90px;
