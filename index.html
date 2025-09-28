@@ -2754,7 +2754,12 @@
   <audio id="bell" src="/assets/meditation-end.mp3" preload="auto" muted></audio>
   <audio id="om-sound" src="/assets/aum.mp3" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
-  <audio id="doubletap-sound" src="/assets/doubletap.wav" preload="auto"></audio>
+  <audio id="sound-bell" src="/assets/bell.wav" preload="auto"></audio>
+
+  <!-- Add these 3 new sounds -->
+<audio id="sound-chimes" src="assets/tamtam_gong.wav" preload="auto"></audio>
+<audio id="sound-gong" src="assets/tao-chi-gong.mp3" preload="auto"></audio>
+<audio id="sound-bowl" src="assets/harmony-bell.wav" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -7733,68 +7738,121 @@ document.addEventListener('touchend', function(e) {
   currentY = 0;
 });
 
-// Double-tap music ONLY on home screen (mode selection), show icon feedback
+// Double-tap music with 4 screen zones
 let lastTap = 0;
 
-document.addEventListener('touchend', function(e) {
-  // Prevent bell sound on avatar tap
-  const avatarEl = document.querySelector('.avatar-container');
-  if (avatarEl && avatarEl.contains(e.target)) return; // Ignore taps on avatar or its children
+// Define 4 different sounds (add these audio elements to your HTML)
+const zoneSounds = {
+  'top-left': 'sound-bell',      // Your existing bell sound
+  'top-right': 'sound-chimes',   // Add new sound elements
+  'bottom-left': 'sound-gong',   // Add new sound elements  
+  'bottom-right': 'sound-bowl'   // Add new sound elements
+};
 
-  // Get both screens
+const zoneIcons = {
+  'top-left': '🔔',      // Bell
+  'top-right': '🥁',     // Music notes
+  'bottom-left': '🥁',   // Drum
+  'bottom-right': '🔔'   // Multiple notes
+};
+
+document.addEventListener('touchend', function(e) {
+  // Your existing filters (keep these)
+  const avatarEl = document.querySelector('.avatar-container');
+  if (avatarEl && avatarEl.contains(e.target)) return;
+
+  const logoEl = document.getElementById('logo-sacred');
+  if (logoEl && logoEl.contains(e.target)) return;
+  
   const modeSelectionEl = document.getElementById('mode-selection');
   const appInterfaceEl  = document.getElementById('app-interface');
-  // Check if either is visible (not hidden), and not in session
   const onModeSelection = modeSelectionEl && !modeSelectionEl.classList.contains('hidden');
   const onAppInterface  = appInterfaceEl && !appInterfaceEl.classList.contains('hidden');
   if (!(onModeSelection || onAppInterface)) return;
-  if (typeof sessionActive !== "undefined" && sessionActive) return; // Don't trigger during session
+  if (typeof sessionActive !== "undefined" && sessionActive) return;
 
   const currentTime = new Date().getTime();
   const tapLength = currentTime - lastTap;
 
   if (tapLength < 200 && tapLength > 0) {
     e.preventDefault();
-    const sound = document.getElementById('doubletap-sound');
-    if (sound) {
-      sound.currentTime = 0;
-      sound.volume = 0.7;
-      sound.play().catch(()=>{});
-    }
-    showDoubleTapIcon(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    
+    // Determine which zone was tapped
+    const zone = getTapZone(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+    
+    // Play zone-specific sound
+    playZoneSound(zone);
+    
+    // Show zone-specific icon
+    showZoneIcon(e.changedTouches[0].clientX, e.changedTouches[0].clientY, zone);
   }
   lastTap = currentTime;
 });
 
-// Floating icon function (same as before)
-function showDoubleTapIcon(x, y) {
+// Determine which zone was tapped
+function getTapZone(x, y) {
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+  const isTop = y < screenHeight / 2;
+  const isLeft = x < screenWidth / 2;
+  
+  if (isTop && isLeft) return 'top-left';
+  if (isTop && !isLeft) return 'top-right';
+  if (!isTop && isLeft) return 'bottom-left';
+  return 'bottom-right'; // !isTop && !isLeft
+}
+
+// Play zone-specific sound
+function playZoneSound(zone) {
+  const soundId = zoneSounds[zone];
+  const sound = document.getElementById(soundId);
+  if (sound) {
+    sound.currentTime = 0;
+    sound.volume = 0.7;
+    sound.play().catch(()=>{});
+  }
+}
+
+// Show zone-specific icon with different colors
+function showZoneIcon(x, y, zone) {
   const iconDiv = document.createElement('div');
-  iconDiv.textContent = '🔔';
-iconDiv.style.cssText = `
-  position: fixed;
-  left: ${x}px;
-  top: ${y-40}px;
-  transform: translate(-50%, 0);
-  font-size: 1.2em;
-  background: #fff;
-  color: #eab308;
-  border-radius: 24px;
-  padding: 4px 20px;
-  z-index: 9999;
-  box-shadow: 0 0 24px #fff, 0 0 9px #eab30888;
-  text-shadow: 0 0 14px #fff, 0 0 4px #eab308;
-  border: 2px solid #fde68a;
-  pointer-events: none;
-  opacity: 0;
-  animation: dtMusicFloat 1s forwards;
-`;
+  const icon = zoneIcons[zone];
+  const colors = {
+    'top-left': { bg: '#fff', color: '#eab308', border: '#fde68a' },      // Yellow (original)
+    'top-right': { bg: '#fff', color: '#3b82f6', border: '#93c5fd' },     // Blue
+    'bottom-left': { bg: '#fff', color: '#ef4444', border: '#fca5a5' },   // Red
+    'bottom-right': { bg: '#fff', color: '#10b981', border: '#6ee7b7' }   // Green
+  };
+  
+  const zoneColor = colors[zone];
+  
+  iconDiv.textContent = icon;
+  iconDiv.style.cssText = `
+    position: fixed;
+    left: ${x}px;
+    top: ${y-40}px;
+    transform: translate(-50%, 0);
+    font-size: 1.2em;
+    background: ${zoneColor.bg};
+    color: ${zoneColor.color};
+    border-radius: 24px;
+    padding: 4px 20px;
+    z-index: 9999;
+    box-shadow: 0 0 24px #fff, 0 0 9px ${zoneColor.color}88;
+    text-shadow: 0 0 14px #fff, 0 0 4px ${zoneColor.color};
+    border: 2px solid ${zoneColor.border};
+    pointer-events: none;
+    opacity: 0;
+    animation: dtMusicFloat 1s forwards;
+  `;
+  
   document.body.appendChild(iconDiv);
   setTimeout(() => {
     if (iconDiv.parentNode) iconDiv.parentNode.removeChild(iconDiv);
   }, 1000);
 }
 
-// Animation for icon
+// Keep your existing animation
 const dtStyle = document.createElement('style');
 dtStyle.textContent = `
 @keyframes dtMusicFloat {
