@@ -7880,7 +7880,7 @@ dtStyle.textContent = `
 }`;
 document.head.appendChild(dtStyle);
 
-
+// Avatar music
 document.addEventListener('DOMContentLoaded', function() {
   const avatar = document.querySelector('.avatar-container');
   const avatarSound = document.getElementById('avatar-sound'); // Add this audio element
@@ -7957,29 +7957,36 @@ avatarStyle.textContent = `
 `;
 document.head.appendChild(avatarStyle);
 
-// Border Colors
+// Aura 12 Colors
 const auraColors = [
-  "red",        // 0
-  "orange",     // 1
-  "yellow",     // 2
-  "green",      // 3
-  "blue",       // 4
-  "indigo",     // 5
-  "violet",     // 6
-  "gold",       // 7
-  "silver",     // 8
-  "sapphire",   // 9
-  "dark-silver",// 10
-  "white"       // 11
+  "red",         // 1 (4:30–6:30am)
+  "orange",      // 2 (6:30–8:30am)
+  "yellow",      // 3 (8:30–10:30am)
+  "green",       // 4 (10:30–12:30pm)
+  "blue",        // 5 (12:30–2:30pm)
+  "indigo",      // 6 (2:30–4:30pm)
+  "violet",      // 7 (4:30–6:30pm)
+  "gold",        // 8 (6:30–8:30pm)
+  "silver",      // 9 (8:30–10:30pm)
+  "sapphire",    // 10 (10:30–12:30am)
+  "dark-silver", // 11 (12:30–2:30am)
+  "white"        // 12 (2:30–4:30am)
 ];
 
-// Change color every 21 seconds
+// Returns 0–11 for slot, 1–12 for display
 function getAuraIndex() {
   const now = new Date();
-  // 12 colors, cycle every 252 seconds (21s x 12)
-  const seconds = now.getMinutes() * 60 + now.getSeconds();
-  const slot = Math.floor((seconds / 21) % auraColors.length);
-  return slot;
+  const localHour = now.getHours();
+  const localMin = now.getMinutes();
+
+  // Calculate minutes since 4:30am
+  let minutesSinceStart = (localHour * 60 + localMin) - (4 * 60 + 30);
+
+  // Wrap negative times to next day
+  if (minutesSinceStart < 0) minutesSinceStart += 24 * 60;
+
+  const slot = Math.floor(minutesSinceStart / 120); // 120 mins per slot
+  return slot % 12; // 0–11
 }
 
 function setAuraColor() {
@@ -7988,10 +7995,13 @@ function setAuraColor() {
   if (!card) return;
   auraColors.forEach(c => card.classList.remove(c));
   card.classList.add(auraClass);
+
+  // If you want to display slot number (1–12):
+  // card.setAttribute("data-aura-slot", getAuraIndex() + 1);
 }
 
 setAuraColor();
-setInterval(setAuraColor, 1000);
+setInterval(setAuraColor, 60 * 1000); // update every minute (no need for every second)
 
   </script>
 	
