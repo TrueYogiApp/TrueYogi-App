@@ -7978,7 +7978,7 @@ function getAuraIndex() {
   const now = new Date();
   // 12 colors, cycle every 252 seconds (21s x 12)
   const seconds = now.getMinutes() * 60 + now.getSeconds();
-  const slot = Math.floor((seconds / 21) % auraColors.length);
+  const slot = Math.floor((seconds / 900) % auraColors.length);
   return slot;
 }
 
