@@ -22,9 +22,11 @@ self.addEventListener('fetch', event => {
     return;
   }
 
-  // Cache-first ONLY for super-static files (if you have any)
+  // Cache-first ONLY for super-static files
   event.respondWith(
-    caches.match(event.request).then(cached => cached || fetch(event.request))
+    caches.match(event.request).then(cached => {
+      return cached || fetch(event.request).catch(() => cached);
+    })
   );
 });
 
