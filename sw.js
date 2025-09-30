@@ -37,7 +37,7 @@ self.addEventListener('install', event => {
     caches.open('static-assets').then(cache => {
       return cache.addAll([
         // Add your critical image paths here
-        '/',
+        '/index.html',
         '/assets/icrown3.png',
         '/assets/yogi-avatar.gif',
         // Add other important images that should never be blank
