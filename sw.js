@@ -1,53 +1,41 @@
 self.addEventListener('fetch', event => {
-  const url = event.request.url;
-
-  // Always network-first for HTML
+  // For HTML pages - try cache first, then network
   if (event.request.mode === 'navigate') {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
+      caches.match(event.request).then(cached => {
+        // Return cached page if available
+        if (cached) return cached;
+        // Otherwise fetch from network
+        return fetch(event.request);
+      })
     );
     return;
   }
 
-  // Network-first for JSON, images, MP3, SVG, etc.
-  if (
-    url.endsWith('.json') || 
-    // url.endsWith('.png') || 
-    // url.endsWith('.gif') ||
-    url.endsWith('.mp3') ||
-    url.endsWith('.ico')
-  ) {
-    event.respondWith(
-      fetch(event.request).catch(() => caches.match(event.request))
-    );
-    return;
-  }
-
-  // Cache-first ONLY for super-static files
+  // For everything else - try cache first, then network
   event.respondWith(
     caches.match(event.request).then(cached => {
-      return cached || fetch(event.request).catch(() => cached);
+      return cached || fetch(event.request);
     })
   );
 });
 
-// Pre-cache critical assets on install
+// Pre-cache critical assets
 self.addEventListener('install', event => {
   event.waitUntil(
     caches.open('static-assets').then(cache => {
       return cache.addAll([
-        // Add your critical image paths here
-        '/index.html',
         '/',
-        '/assets/icrown3.png',
+        '/index.html',
+        '/output.css',
+        '/assets/icrown3.png', 
         '/assets/yogi-avatar.gif',
-        // Add other important images that should never be blank
+        // Add paths to your CSS and JS files here
       ]);
     })
   );
   self.skipWaiting();
 });
-
 
 self.addEventListener('activate', event => {
   clients.claim();
