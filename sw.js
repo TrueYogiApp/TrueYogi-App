@@ -12,8 +12,8 @@ self.addEventListener('fetch', event => {
   // Network-first for JSON, images, MP3, SVG, etc.
   if (
     url.endsWith('.json') || 
-    url.endsWith('.png') || 
-    url.endsWith('.gif') ||
+    // url.endsWith('.png') || 
+    // url.endsWith('.gif') ||
     url.endsWith('.mp3') ||
     url.endsWith('.ico')
   ) {
@@ -31,10 +31,21 @@ self.addEventListener('fetch', event => {
   );
 });
 
-// Update service worker immediately
+// Pre-cache critical assets on install
 self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open('static-assets').then(cache => {
+      return cache.addAll([
+        // Add your critical image paths here
+        '/images/logo.png',
+        '/images/avatar.gif',
+        // Add other important images that should never be blank
+      ]);
+    })
+  );
   self.skipWaiting();
 });
+
 
 self.addEventListener('activate', event => {
   clients.claim();
