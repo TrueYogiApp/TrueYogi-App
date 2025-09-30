@@ -391,25 +391,48 @@
   /* Same as .end-date-display otherwise */
 }
 
-/* ...existing code... */
-.loader-spinner {
-  border: 6px solid #eab308;
-  border-top: 6px solid #fff;
+/* Loader spinner for app loader only */
+#app-loader .loader-spinner {
+  background: conic-gradient(from 0deg, transparent, #eab308, transparent);
   border-radius: 50%;
   width: 48px;
   height: 48px;
-  animation: spin 1s linear infinite;
+  animation: spin 1.2s linear infinite;
+  position: relative;
+  border: 6px solid #eab308;
+  border-top: 6px solid #fff;
   box-shadow: 0 0 24px #eab30888;
 }
+
+#app-loader .loader-spinner::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #eab308;
+  border-radius: 50%;
+  animation: pulse1 2.4s ease-in-out infinite;
+}
+
+#claim-loader .loader-spinner {
+  border: 6px solid #3b82f6;
+  border-top: 6px solid #60a5fa;
+  box-shadow: 0 0 24px #3b82f688;
+  /* You can add other claim-specific spinner styles here */
+}
+
+/* General spin animation */
 @keyframes spin {
   0% { transform: rotate(0deg);}
   100% { transform: rotate(360deg);}
 }
 
-#claim-loader .loader-spinner {
-  border: 6px solid #3b82f6;   /* blue-500 */
-  border-top: 6px solid #60a5fa; /* blue-400 */
-  box-shadow: 0 0 24px #3b82f688;
+/* Pulse animation for dot */
+@keyframes pulse1 {
+  0% { width: 0px; height: 0px; opacity: 1; }
+  50% { width: 20px; height: 20px; opacity: 0.8; }
+  100% { width: 0px; height: 0px; opacity: 1; }
 }
 
 /* FAQ Tab Styles */
