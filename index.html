@@ -7744,29 +7744,28 @@ let isDragging = false;
 const spinner = document.getElementById('pull-refresh-spinner');
 const lungsImg = spinner.querySelector('.breathing-lungs');
 
-const expansionPx = 250;
-const minShowPx = 60;
+const expansionPx = 350;
+const minShowPx = 96;
 const refreshThresholdPx = minShowPx + 1.8 * (expansionPx - minShowPx); // matches violet
 
 // Breathing phase thresholds - UPDATED FOR BOTH DIRECTIONS
 const BREATHING_PHASES = {
   RED:      { scale: 1.0, message: "" },
-  ORANGE:   { scale: 1.3, message: "breath_in_slow" },
-  YELLOW:   { scale: 1.6, message: "keep_breathing_in" },
-  GREEN:    { scale: 1.9, message: "almost_full" },
-  LIGHTBLUE:{ scale: 2.2, message: "get_ready_hold" },
-  INDIGO:   { scale: 2.5, message: "deep_breath_in" },
-  VIOLET:   { scale: 2.8, message: "hold" }
+  ORANGE:   { scale: 1.42, message: "breath_in_slow" },
+  YELLOW:   { scale: 1.83, message: "keep_breathing_in" },
+  GREEN:    { scale: 2.25, message: "almost_full" },
+  LIGHTBLUE:{ scale: 2.67, message: "get_ready_hold" },
+  INDIGO:   { scale: 3.08, message: "deep_breath_in" },
+  VIOLET:   { scale: 3.5, message: "hold" }
 };
 
-// Reverse breathing for exhale
 const EXHALE_PHASES = {
-  VIOLET:    { scale: 2.8, message: "hold_breath" },
-  INDIGO:    { scale: 2.5, message: "breath_out_slow" },
-  LIGHTBLUE: { scale: 2.2, message: "keep_breathing_out" },
-  GREEN:     { scale: 1.9, message: "releasing_slowly" },
-  YELLOW:    { scale: 1.6, message: "almost_empty" },
-  ORANGE:    { scale: 1.3, message: "final_exhale" },
+  VIOLET:    { scale: 3.5, message: "hold_breath" },
+  INDIGO:    { scale: 3.08, message: "breath_out_slow" },
+  LIGHTBLUE: { scale: 2.67, message: "keep_breathing_out" },
+  GREEN:     { scale: 2.25, message: "releasing_slowly" },
+  YELLOW:    { scale: 1.83, message: "almost_empty" },
+  ORANGE:    { scale: 1.42, message: "final_exhale" },
   RED:       { scale: 1.0, message: "hold_breath" }
 };
 
@@ -7975,7 +7974,7 @@ document.addEventListener('touchmove', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
   currentY = e.touches[0].pageY;
   const pullDistance = currentY - startY;
-  const maxScale = 3.0;
+  const maxScale = 3.5;
   const minScale = 0.3;
 
   if (pullDistance > minShowPx) {
