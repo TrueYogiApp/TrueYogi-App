@@ -434,6 +434,33 @@
   50% { width: 20px; height: 20px; opacity: 0.8; }
   100% { width: 0px; height: 0px; opacity: 1; }
 }
+  .loader-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+.cosmic-bg {
+  position: absolute;
+  opacity: 0.23;
+  width: 100vw;
+  height: 100vh;
+  object-fit: cover;
+  pointer-events: none;
+}
+.cosmic-quote {
+  font-family: 'Playfair Display', serif;
+  color: #fde68a;
+  font-size: 1.3em;
+  text-align: center;
+  margin-top: 4em;
+  text-shadow: 0 0 18px #fde68a88;
+  z-index: 3;
+}
+
 
 /* FAQ Tab Styles */
 #faq-tab {
@@ -1557,6 +1584,10 @@
 
   <div id="app-loader" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
     <div class="loader-spinner"></div>
+	  <div class="loader-overlay">
+  <!--  <img src="/assets/boom.gif" class="cosmic-bg" />
+  <!--  <div class="cosmic-quote">"Your presence is the cosmic dance."</div> -->
+  </div>
   </div>
   <!-- Welcome Message Modal -->
   <div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true">
