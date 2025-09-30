@@ -248,6 +248,9 @@
   "desktopYogi_heading": "Débloquez les récompenses WEB3",
   "desktopYogi_paragraph": "Vous pouvez commencer et terminer un <span class='text-yellow-300'>défi de 21 jours</span> sur ordinateur.<br><br>Pour débloquer le <span class='text-yellow-300'>défi complet de 41 jours</span> et réclamer des jetons, continuez sur votre appareil mobile.<br><br><span class='text-blue-400'>Le mode Flow est toujours disponible !</span>",
   "desktopYogi_button": "OK",
+  "connectWallet_paragraph":"Connectez le portefeuille pour un défi de 41 jours",
+  "connectWallet_heading": "Vous pouvez commencer le défi de 21 jours maintenant. Pour déverrouiller le défi complet de 41 jours et réclamer des jetons yogi, connectez votre portefeuille.",
+  "connectWallet_button": "Commencer 21 jours",  
   "mobileRequired_heading": "Continuer sur mobile",
   "mobileRequired_paragraph": "Pour continuer votre parcours de 41 jours après le 21ème jour,<br>utilisez votre appareil mobile.<br>et emportez votre méditation partout avec vous.",
   "mobileRequired_button": "OK, je comprends",
@@ -266,8 +269,18 @@
   "resetYogiConfigHeading": "Réinitialiser la True Yogi",
   "resetYogiConfigDescription": "Utilisez ceci pour réinitialiser votre défi True Yogi ou commencer un nouveau défi.",
   "resetYogiConfigButton": "Réinitialiser la True Yogi",
-  "mobileYogi_heading": "Débloquez les récompenses WEB3",
-  "mobileYogi_paragraph": "Vous pouvez commencer et terminer un <span class='text-yellow-300 font-semibold'>défi de 21 jours</span> ici.<br><br>Pour débloquer le <span class='text-yellow-300 font-semibold'>défi complet de 41 jours</span> et réclamer des jetons, connectez votre portefeuille.<br><br><a href='#' class='text-blue-400 underline'>Le mode Flow est toujours disponible !</a>",
-  "mobileYogi_button": "OK"
-  
+  "breath_in_slow": "Inspirez lentement...",
+  "keep_breathing_in": "Continuez à inspirer...",
+  "almost_full": "Presque plein...",
+  "get_ready_hold": "Préparez-vous à retenir...",
+  "deep_breath_in": "Inspirez profondément...",
+  "hold": "Retenez...",
+  "hold_breath": "Retenez votre souffle",
+  "breath_out_slow": "Expirez lentement...",
+  "keep_breathing_out": "Continuez à expirer...",
+  "releasing_slowly": "Relâchez doucement...",
+  "almost_empty": "Presque vide...",
+  "final_exhale": "Dernière expiration...", 
+  "hold_breath_countdown": "Retenez votre souffle... {countdown}",
+  "breath_out_slow": "Expirez lentement..."  
 }

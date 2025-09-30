@@ -247,6 +247,9 @@
   "desktopYogi_heading": "వెబ్3 రివార్డ్స్ ను అన్లాక్ చేయండి",
   "desktopYogi_paragraph": "మీరు డెస్క్ టాప్ లో <span class='text-yellow-300'>21-రోజుల ఛాలెంజ్</span> ప్రారంభించి పూర్తి చేయవచ్చు.<br><br><span class='text-yellow-300'>41-రోజుల పూర్తి ఛాలెంజ్</span> మరియు టోకెన్లను పొందేందుకు, మీ మొబైల్ డివైస్ ఉపయోగించండి.<br><br><span class='text-blue-400'>ఫ్లో మోడ్ ఎప్పుడూ అందుబాటులో ఉంటుంది!</span>",
   "desktopYogi_button": "సరే",
+    "connectWallet_paragraph":"41 రోజుల ఛాలెంజ్ కోసం వాలెట్ ను కనెక్ట్ చేయండి",
+  "connectWallet_heading": "మీరు ఇప్పుడు 21 రోజుల ఛాలెంజ్ ప్రారంభించవచ్చు. పూర్తి 41 రోజుల ఛాలెంజ్ అన్ లాక్ చేయడానికి మరియు యోగి టోకెన్లను క్లెయిమ్ చేయడానికి, మీ వాలెట్ ను కనెక్ట్ చేయండి.",
+  "connectWallet_button": "21-రోజు ప్రారంభించండి",
   "mobileRequired_heading": "మొబైల్ లో కొనసాగించండి",
   "mobileRequired_paragraph": "మీ 41-రోజుల యోగి ప్రయాణాన్ని 21వ రోజు తర్వాత కొనసాగించేందుకు,<br>దయచేసి మీ మొబైల్ డివైస్ ఉపయోగించండి.<br>మీ ధ్యానాన్ని ఎక్కడున్నా మీతో తీసుకెళ్ళండి.",
   "mobileRequired_button": "సరే, నాకు అర్థమైంది",
@@ -265,8 +268,18 @@
   "resetYogiConfigHeading": "ట్రూ యోగి రీసెట్  ",
   "resetYogiConfigDescription": "మీ ట్రూ యోగి చాలెంజ్ ను రీసెట్ చేయడానికి లేదా కొత్త చాలెంజ్ ను ప్రారంభించడానికి దీన్ని ఉపయోగించండి.",
   "resetYogiConfigButton": "ట్రూ యోగి రీసెట్ చేయండి",
-  "mobileYogi_heading": " అన్లాక్ వెబ్3 రివార్డ్స్‌",
-  "mobileYogi_paragraph": "మీ మొబైల్ బ్రౌజర్‌లో <span class='text-yellow-300 font-semibold'>21-రోజుల ఛాలెంజ్</span>‌ను ప్రారంభించవచ్చు.<br><br>పూర్తి <span class='text-yellow-300 font-semibold'>41-రోజుల ఛాలెంజ్</span> మరియు టోకెన్లను పొందాలంటే, మీ వాలెట్‌ను కనెక్ట్ చేయండి.<br><br><a href='#' class='text-blue-400 underline'>ఫ్లో మోడ్ ఎప్పుడూ అందుబాటులో ఉంటుంది!</a>",
-  "mobileYogi_button": "అలాగే"
-  
+  "breath_in_slow": "మెల్లగా శ్వాస తీసుకోండి...",
+  "keep_breathing_in": "శ్వాస కొనసాగించండి...",
+  "almost_full": "దాదాపు పూర్తి...",
+  "get_ready_hold": "శ్వాస నిలుపుకోవడానికి  సిద్ధం...",
+  "deep_breath_in": "లోతైన శ్వాస తీసుకోండి...",
+  "hold": "శ్వాసను నిలుపుకొంది ...",
+  "hold_breath": "మీ శ్వాసను నిలుపుకోండి",
+  "breath_out_slow": "మెల్లగా శ్వాస వదలండి ...",
+  "keep_breathing_out": "శ్వాస విడిచిపెట్టడం కొనసాగించండి...",
+  "releasing_slowly": "మెల్లగా వదలడం...",
+  "almost_empty": "దాదాపు ఖాళీ...",
+  "final_exhale": "పూర్తిగా శ్వాసను వదలండి ...",  
+  "hold_breath_countdown": "శ్వాసను నిలుపుకోండి... {countdown}",
+  "breath_out_slow": "నెమ్మదిగా ఊపిరి విడిచండి..."  
 }
