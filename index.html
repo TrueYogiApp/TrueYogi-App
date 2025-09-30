@@ -412,49 +412,6 @@
   box-shadow: 0 0 24px #3b82f688;
 }
 
-.loader-spinner {
-  background: conic-gradient(from 0deg, transparent, #eab308, transparent);
-  border-radius: 50%;
-  width: 48px;
-  height: 48px;
-  animation: spin 1.6s linear infinite;
-  position: relative;
-}
-
-.loader-spinner::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #eab308;
-  border-radius: 50%;
-  animation: pulse 11.2s ease-in-out infinite;
-}
-
-@keyframes pulse {
-  0% {
-    width: 0px;
-    height: 0px;
-    opacity: 1;
-  }
-  50% {
-    width: 20px;
-    height: 20px;
-    opacity: 0.8;
-  }
-  100% {
-    width: 0px;
-    height: 0px;
-    opacity: 1;
-  }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
 /* FAQ Tab Styles */
 #faq-tab {
   position: fixed;
