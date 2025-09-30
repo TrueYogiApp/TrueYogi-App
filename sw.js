@@ -13,6 +13,7 @@ self.addEventListener('fetch', event => {
   if (
     url.endsWith('.json') || 
     url.endsWith('.png') || 
+    url.endsWith('.gif') ||
     url.endsWith('.mp3') ||
     url.endsWith('.ico')
   ) {
