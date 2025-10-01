@@ -7767,12 +7767,15 @@ document.addEventListener('DOMContentLoaded', function() {
 function isModeSelectionVisible() {
   const modeSelection = document.getElementById('mode-selection');
   const faqModal = document.getElementById('faq-modal');
+  const welcomeModal = document.getElementById('welcome-message');
   
-  // Return true ONLY if mode selection is visible AND FAQ modal is hidden
+  // Return true ONLY if mode selection is visible AND both modals are hidden
   return modeSelection && 
          faqModal && 
+         welcomeModal &&
          !modeSelection.classList.contains('hidden') && 
-         faqModal.classList.contains('hidden');
+         faqModal.classList.contains('hidden') &&
+         welcomeModal.classList.contains('hidden');
 }
 
 let startY = 0;
