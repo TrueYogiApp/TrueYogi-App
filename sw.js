@@ -1,19 +1,39 @@
 // service-worker.js
 
-const CACHE_NAME = 'TryeYogi-App-v1.0.0'; // Update version when you make changes
+const CACHE_NAME = `TryeYogi-App-${Date.now()}`;
+
 const urlsToCache = [
   '/',
   '/index.html',
   '/output.css',
+  
+  // All your assets in one simple list
   '/assets/icrown3.png',
-  '/assets/yogi-avatar.gif',
-  '/assets/aum.mp3'
-  // Add other critical assets your app needs to work offline
+  '/assets/yogi-avatar.gif', 
+  '/assets/aum.mp3',
+  
+  // Just add all JSON files here
+  '/locale/en.json',
+  '/lacale/te.json',
+  '/assets/settings.json',
+  '/assets/questions.json',
+  
+  // Add MP3 files
+  '/assets/sound1.mp3',
+  '/assets/sound2.mp3',
+  
+  // Add SVG files
+  '/assets/icon.svg',
+  '/assets/logo.svg',
+  
+  // Add any other files
+  '/assets/whatever.jpg',
+  '/assets/some-file.whatever'
 ];
 
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installing...');
+  console.log('Service Worker: Installing with cache', CACHE_NAME);
   
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -23,7 +43,7 @@ self.addEventListener('install', (event) => {
       })
       .then(() => {
         console.log('Service Worker: Installed');
-        return self.skipWaiting(); // Activate immediately
+        return self.skipWaiting();
       })
       .catch((error) => {
         console.error('Service Worker: Installation failed', error);
