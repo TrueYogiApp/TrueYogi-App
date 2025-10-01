@@ -13,18 +13,22 @@ const urlsToCache = [
   '/assets/aum.mp3',
   
   // Just add all JSON files here
-  '/locale/en.json',
-  '/lacale/te.json',
-  '/assets/settings.json',
-  '/assets/questions.json',
+  '/locales/en.json',
+  '/locales/te.json',
+  '/locales/fr.json',
+  '/assets/quotes.en.json',
+  '/assets/welcomeMessages.en.json',
   
-  // Add MP3 files
-  '/assets/sound1.mp3',
-  '/assets/sound2.mp3',
+  // music files
+  '/assets/bell.wav',
+  '/assets/harmony-bell.wav',
+  '/assets/tao-chi-gong.mp3',
+  '/assets/meditation-eternal.wav',
+  '/assets/tamtam_gong.wav',
   
   // Add SVG files
-  '/assets/icon.svg',
-  '/assets/logo.svg',
+  '/assets/lungs.svg',
+  '/assets/flowmeditate.svg',
   
   // Add any other files
   '/assets/whatever.jpg',
