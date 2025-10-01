@@ -8324,7 +8324,7 @@ setInterval(setAuraColor, 1000); // update every minute (no need for every secon
 // Register Service Worker
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/service-worker.js')
+    navigator.serviceWorker.register('/sw.js')
       .then((registration) => {
         console.log('Service Worker registered: ', registration);
         
