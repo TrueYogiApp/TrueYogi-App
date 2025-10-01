@@ -8321,20 +8321,35 @@ setInterval(setAuraColor, 1000); // update every minute (no need for every secon
   </script>
 	
  <script>
+// Register Service Worker
 if ('serviceWorker' in navigator) {
-  window.addEventListener('load', function() {
-    navigator.serviceWorker.register('/sw.js')
-      .then(function(registration) {
-        console.log('SW registered successfully with scope: ', registration.scope);
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/service-worker.js')
+      .then((registration) => {
+        console.log('Service Worker registered: ', registration);
         
-        // Optional: Check for updates
+        // Check for updates
         registration.addEventListener('updatefound', () => {
-          console.log('New version found, updating...');
+          const newWorker = registration.installing;
+          console.log('Service Worker update found!');
+          
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content is available, show update notification
+              console.log('New content is available; please refresh.');
+              // You can show an update notification to the user here
+            }
+          });
         });
       })
-      .catch(function(error) {
-        console.log('SW registration failed: ', error);
+      .catch((registrationError) => {
+        console.log('Service Worker registration failed: ', registrationError);
       });
+  });
+
+  // Listen for controller changes (when SW takes control)
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.log('Service Worker controller changed');
   });
 }
 </script>  
