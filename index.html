@@ -3069,7 +3069,12 @@ function enableMobileAudioResume() {
 function tryResumeAudio() {
   if (audioContext && audioContext.state === 'suspended') {
     audioContext.resume().then(() => {
-      if (backgroundAudio) backgroundAudio.play();
+      // Resume ALL audio elements
+      document.querySelectorAll('audio').forEach(audio => {
+        if (audio.paused && audio.currentTime > 0) {
+          audio.play().catch(() => {});
+        }
+      });
     });
   }
 }
