@@ -76,47 +76,35 @@ self.addEventListener('activate', (event) => {
   );
 });
 
-// Fetch event - serve cached content when available
+// Fetch event - NETWORK FIRST strategy
 self.addEventListener('fetch', (event) => {
-  // Skip non-GET requests and chrome-extension requests
-  if (event.request.method !== 'GET' || event.request.url.startsWith('chrome-extension://')) {
-    return;
-  }
+  if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    caches.match(event.request)
-      .then((response) => {
-        // Return cached version or fetch from network
-        return response || fetch(event.request)
-          .then((fetchResponse) => {
-            // Check if we received a valid response
-            if (!fetchResponse || fetchResponse.status !== 200 || fetchResponse.type !== 'basic') {
-              return fetchResponse;
+    // ALWAYS try network first
+    fetch(event.request)
+      .then(networkResponse => {
+        // If we get a good response, cache it
+        if (networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => {
+              cache.put(event.request, responseToCache);
+            });
+        }
+        return networkResponse;
+      })
+      .catch(error => {
+        // Network failed - try cache
+        console.log('🌐 Network failed, trying cache:', event.request.url);
+        return caches.match(event.request)
+          .then(cachedResponse => {
+            if (cachedResponse) {
+              return cachedResponse;
             }
-
-            // Clone the response
-            const responseToCache = fetchResponse.clone();
-
-            // Add to cache for future visits
-            caches.open(CACHE_NAME)
-              .then((cache) => {
-                cache.put(event.request, responseToCache);
-              });
-
-            return fetchResponse;
-          })
-          .catch(() => {
-            // If both cache and network fail, you can return a fallback page
-            // For example, return a custom offline page:
-            // return caches.match('/offline.html');
-            
-            // For API requests, you might want different fallback behavior
-            if (event.request.url.includes('/api/')) {
-              return new Response(JSON.stringify({ 
-                error: 'You are offline and this data is not available' 
-              }), {
-                headers: { 'Content-Type': 'application/json' }
-              });
+            // If nothing in cache, return offline page for HTML requests
+            if (event.request.destination === 'document') {
+              return caches.match('/index.html');
             }
           });
       })
