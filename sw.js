@@ -31,7 +31,7 @@ const urlsToCache = [
   '/assets/flowmeditate.svg',
   
   // Add any other files
-  '/assets/whatever.jpg',
+  '/assets/manifest.json',
   '/assets/some-file.whatever'
 ];
 
