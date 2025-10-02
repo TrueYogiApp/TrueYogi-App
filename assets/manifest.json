@@ -1,5 +1,5 @@
 {
-  "name": "True Yogi",
+  "name": "TrueYogi",
   "short_name": "TrueYogi",
   "start_url": "/",
   "display": "standalone",
@@ -7,8 +7,8 @@
   "theme_color": "#1e293b",
   "orientation": "any",
   "scope": "/",
-  "description": "Meditation App",
-  "categories": ["spirituality", "health", "lifestyle", "wellness"],
+  "description": "Spiritual App",
+  "categories": ["Spirituality", "Consciousness", "Truth", "Cosmos"],
   "icons": [
     {
       "src": "/assets/android-chrome-192x192.png",
