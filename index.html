@@ -8334,6 +8334,41 @@ function setAuraColor() {
 setAuraColor();
 setInterval(setAuraColor, 1000); // update every minute (no need for every second)
 
+// Offline detection
+function updateOnlineStatus() {
+  const status = document.getElementById('online-status');
+  if (!navigator.onLine) {
+    status.style.display = 'block';
+    status.textContent = '🔴';
+  } else {
+    status.style.display = 'none';
+  }
+}
+
+// Create status element
+const statusElement = document.createElement('div');
+statusElement.id = 'online-status';
+statusElement.style.cssText = `
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  background: #ff4444;
+  color: white;
+  // padding: 5px 10px;
+  border-radius: 15px;
+  font-size: 6px;
+  z-index: 10000;
+  display: none;
+`;
+document.body.appendChild(statusElement);
+
+// Listen for online/offline events
+window.addEventListener('online', updateOnlineStatus);
+window.addEventListener('offline', updateOnlineStatus);
+
+// Initial check
+updateOnlineStatus();
+
   </script>
 	
  <script>
