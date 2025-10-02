@@ -16,6 +16,9 @@ self.addEventListener('install', (event) => {
           '/',
           '/index.html',
           '/output.css',
+          '/whitepaper.html',
+          '/terms.html',
+          '/privacy.html',
           '/assets/icrown3.png',
           '/assets/yogi-avatar.gif',
           '/locales/en.json',
@@ -25,12 +28,14 @@ self.addEventListener('install', (event) => {
           '/assets/welcomeMessages.en.json',
           '/assets/lungs.svg',
           '/assets/flowmeditate.svg',
+          '/assets/truemeditate.svg',
           '/assets/manifest.json'
         ];
         
         // Cache audio files individually (more reliable)
         const audioFiles = [
           '/assets/bell.wav',
+          '/assets/aum.mp3',
           '/assets/harmony-bell.wav', 
           '/assets/tao-chi-gong.mp3',
           '/assets/meditation-eternal.wav',
