@@ -2,39 +2,6 @@
 
 const CACHE_NAME = `TryeYogi-App-${Date.now()}`;
 
-const urlsToCache = [
-  '/',
-  '/index.html',
-  '/output.css',
-  
-  // All your assets in one simple list
-  '/assets/icrown3.png',
-  '/assets/yogi-avatar.gif', 
-  '/assets/aum.mp3',
-  
-  // Just add all JSON files here
-  '/locales/en.json',
-  '/locales/te.json',
-  '/locales/fr.json',
-  '/assets/quotes.en.json',
-  '/assets/welcomeMessages.en.json',
-  
-  // music files
-  '/assets/bell.wav',
-  '/assets/harmony-bell.wav',
-  '/assets/tao-chi-gong.mp3',
-  '/assets/meditation-eternal.wav',
-  '/assets/tamtam_gong.wav',
-  
-  // Add SVG files
-  '/assets/lungs.svg',
-  '/assets/flowmeditate.svg',
-  
-  // Add any other files
-  '/assets/manifest.json',
-  '/assets/some-file.whatever'
-];
-
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing with cache', CACHE_NAME);
@@ -43,7 +10,46 @@ self.addEventListener('install', (event) => {
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Service Worker: Caching files');
-        return cache.addAll(urlsToCache);
+        
+        // Cache regular files
+        const regularFiles = [
+          '/',
+          '/index.html',
+          '/output.css',
+          '/assets/icrown3.png',
+          '/assets/yogi-avatar.gif',
+          '/locales/en.json',
+          '/locales/te.json', 
+          '/locales/fr.json',
+          '/assets/quotes.en.json',
+          '/assets/welcomeMessages.en.json',
+          '/assets/lungs.svg',
+          '/assets/flowmeditate.svg',
+          '/assets/manifest.json'
+        ];
+        
+        // Cache audio files individually (more reliable)
+        const audioFiles = [
+          '/assets/bell.wav',
+          '/assets/harmony-bell.wav', 
+          '/assets/tao-chi-gong.mp3',
+          '/assets/meditation-eternal.wav',
+          '/assets/tamtam_gong.wav'
+        ];
+        
+        // Cache regular files first
+        return cache.addAll(regularFiles)
+          .then(() => {
+            console.log('Regular files cached');
+            // Cache audio files one by one
+            return Promise.all(
+              audioFiles.map(audioFile => {
+                return cache.add(audioFile)
+                  .then(() => console.log('✅ Audio cached:', audioFile))
+                  .catch(error => console.log('❌ Audio cache failed:', audioFile, error));
+              })
+            );
+          });
       })
       .then(() => {
         console.log('Service Worker: Installed');
