@@ -450,7 +450,7 @@
   50% { width: 20px; height: 20px; opacity: 0.8; }
   100% { width: 0px; height: 0px; opacity: 1; }
 }
-.loader-overlay {
+  .loader-overlay {
   position: absolute;
   inset: 0;
   display: flex;
@@ -459,19 +459,13 @@
   align-items: center;
   z-index: 2;
 }
-
 .cosmic-bg {
   position: absolute;
-  opacity: 0;
+  opacity: 0.23;
   width: 100vw;
   height: 100vh;
   object-fit: cover;
   pointer-events: none;
-  transition: opacity 1s ease-in-out;
-}
-
-.cosmic-bg.active {
-  opacity: 0.23;
 }
 .cosmic-quote {
   font-family: 'Playfair Display', serif;
