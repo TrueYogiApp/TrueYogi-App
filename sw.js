@@ -123,7 +123,7 @@ self.addEventListener('fetch', (event) => {
   
   // ⬇️ SIMPLE CACHE FIRST FOR ICONS
 if (event.request.url.includes('/assets/') && 
-    event.request.url.match(/\.(svg|png|jpg|jpeg|gif)$/)) {
+    event.request.url.match(/\.(svg)$/)) {
   console.log('🖼️ Handling asset request:', event.request.url);
   event.respondWith(
     caches.match(event.request)
