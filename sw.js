@@ -1,6 +1,7 @@
 // service-worker.js
 
-const CACHE_NAME = `TryeYogi-App-${Date.now()}`;
+const APP_VERSION = 'v1.2.4'; // Change this when you update your app
+const CACHE_NAME = `TryeYogi-App-${APP_VERSION}`;
 
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
@@ -16,14 +17,14 @@ self.addEventListener('install', (event) => {
           '/',
           '/index.html',
           '/output.css',
-		  '/assets/manifest.json',
+          '/assets/manifest.json',
           '/assets/yogi-avatar.gif',
           '/assets/icrown3.png',
           '/assets/flowmeditate.svg',
-		  '/assets/truemeditate.svg',
+          '/assets/truemeditate.svg',
           '/assets/quotes.en.json',
           '/assets/welcomeMessages.en.json',
-		  '/assets/wisdom.en.json',
+          '/assets/wisdom.en.json',
           '/locales/en.json',
           '/locales/te.json',
           '/locales/fr.json',
@@ -31,7 +32,7 @@ self.addEventListener('install', (event) => {
           '/assets/privacy.html',  
           '/assets/terms.html',
           '/assets/whitepaper.html',
-		  '/assets/lungs.svg',		  
+          '/assets/lungs.svg',		  
           '/assets/spaceship.svg',         
           '/assets/quotes.en.json'
         ];
@@ -46,23 +47,15 @@ self.addEventListener('install', (event) => {
           '/assets/meditation-eternal.wav'
         ];
 
-        // Cache regular files one by one (skip failures)
-        for (const file of regularFiles) {
+        const allFiles = [...regularFiles, ...audioFiles];
+
+        // Cache files one by one (skip failures)
+        for (const file of allFiles) {
           try {
             await cache.add(file);
             console.log('✅ Cached:', file);
           } catch (e) {
             console.warn('❌ Failed to cache:', file, e);
-          }
-        }
-
-        // Cache audio files one by one (skip failures)
-        for (const audioFile of audioFiles) {
-          try {
-            await cache.add(audioFile);
-            console.log('✅ Audio cached:', audioFile);
-          } catch (e) {
-            console.warn('❌ Audio cache failed:', audioFile, e);
           }
         }
       })
@@ -76,36 +69,35 @@ self.addEventListener('install', (event) => {
   );
 });
 
-// Activate event - clean up old caches
+// Activate event - clean up ALL old caches
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activated');
   
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
-        cacheNames.map((cache) => {
-          if (cache !== CACHE_NAME) {
-            console.log('Service Worker: Clearing old cache');
-            return caches.delete(cache);
+        cacheNames.map((cacheName) => {
+          // Delete ALL caches that start with "TryeYogi-App-" but are NOT the current version
+          if (cacheName.startsWith('TryeYogi-App-') && cacheName !== CACHE_NAME) {
+            console.log('Service Worker: Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
       console.log('Service Worker: Now ready to handle fetches');
-      return self.clients.claim(); // Take control of all clients
+      return self.clients.claim();
     })
   );
 });
 
-// Fetch event - NETWORK FIRST strategy
+// Fetch event - NETWORK FIRST strategy (keep your existing fetch logic)
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
     
   event.respondWith(
-    // ALWAYS try network first
     fetch(event.request)
       .then(networkResponse => {
-        // If we get a good response, cache it
         if (networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           caches.open(CACHE_NAME)
@@ -116,14 +108,12 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       })
       .catch(error => {
-        // Network failed - try cache
         console.log('🌐 Network failed, trying cache:', event.request.url);
         return caches.match(event.request)
           .then(cachedResponse => {
             if (cachedResponse) {
               return cachedResponse;
             }
-            // If nothing in cache, return offline page for HTML requests
             if (event.request.destination === 'document') {
               return caches.match('/index.html');
             }
