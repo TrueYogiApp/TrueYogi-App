@@ -8092,15 +8092,77 @@ document.addEventListener('touchend', function(e) {
   currentY = 0;
 });
 
+// === ADD THIS NEW CODE AT THE BOTTOM OF YOUR FILE ===
+
+// Audio Manager for better sound management
+class AudioManager {
+  constructor() {
+    this.audioElements = new Map();
+    this.maxSimultaneous = 6;
+  }
+
+  playSound(src, volume = 1.0, loop = false) {
+    this.cleanup();
+    
+    const audio = new Audio();
+    audio.src = src;
+    audio.volume = volume;
+    audio.loop = loop;
+    audio.preload = 'auto';
+    
+    const audioId = Date.now() + Math.random();
+    this.audioElements.set(audioId, audio);
+    
+    audio.play().catch(e => {
+      console.log('Audio play failed:', e);
+    });
+    
+    if (!loop) {
+      audio.onended = () => {
+        this.audioElements.delete(audioId);
+      };
+    }
+    
+    if (this.audioElements.size > this.maxSimultaneous) {
+      this.removeOldestNonLooping();
+    }
+    
+    return audioId;
+  }
+
+  cleanup() {
+    for (const [id, audio] of this.audioElements) {
+      if (!audio.loop && (audio.ended || audio.paused)) {
+        audio.src = '';
+        this.audioElements.delete(id);
+      }
+    }
+  }
+
+  removeOldestNonLooping() {
+    for (const [id, audio] of this.audioElements) {
+      if (!audio.loop) {
+        audio.pause();
+        audio.src = '';
+        this.audioElements.delete(id);
+        break;
+      }
+    }
+  }
+}
+
+// Create the audio manager
+const audioManager = new AudioManager();
+
 // Double-tap music with 4 screen zones
 let lastTap = 0;
 
 // Define 4 different sounds (add these audio elements to your HTML)
 const zoneSounds = {
-  'top-left': 'sound-bell',      // Your existing bell sound
-  'top-right': 'sound-bowl',   // Add new sound elements
-  'bottom-left': 'sound-gong',   // Add new sound elements  
-  'bottom-right': 'sound-chimes'   // Add new sound elements
+  'top-left': '/assets/bell.wav',      
+  'top-right': '/assets/harmony-bell.wav',
+  'bottom-left': '/assets/tamtam_gong.wav',  
+  'bottom-right': '/assets/tao-chi-gong.mp3'
 };
 
 const zoneIcons = {
@@ -8157,13 +8219,28 @@ function getTapZone(x, y) {
 }
 
 // Play zone-specific sound
+// Play zone-specific sound - UPDATED VERSION
 function playZoneSound(zone) {
-  const soundId = zoneSounds[zone];
-  const sound = document.getElementById(soundId);
-  if (sound) {
-    sound.currentTime = 0;
-    sound.volume = 0.7;
-    sound.play().catch(()=>{});
+  const soundFiles = {
+    'top-left': '/assets/bell.wav',
+    'top-right': '/assets/harmony-bell.wav', 
+    'bottom-left': '/assets/tamtam_gong.wav',
+    'bottom-right': '/assets/tao-chi-gong.mp3'
+  };
+  
+  const volumes = {
+    'top-left': 0.7,
+    'top-right': 0.6,
+    'bottom-left': 0.8,
+    'bottom-right': 0.5
+  };
+  
+  const soundFile = soundFiles[zone];
+  const volume = volumes[zone];
+  
+  if (soundFile) {
+    // Use the AudioManager for better performance
+    audioManager.playSound(soundFile, volume);
   }
 }
 
