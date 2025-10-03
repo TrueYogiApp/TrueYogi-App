@@ -15,7 +15,6 @@ self.addEventListener('install', (event) => {
         // List of files
         const regularFiles = [
           '/',
-          '/index.html',
           '/output.css',
           '/assets/manifest.json',
           '/assets/yogi-avatar.gif',
@@ -29,9 +28,9 @@ self.addEventListener('install', (event) => {
           '/locales/te.json',
           '/locales/fr.json',
           '/assets/lungs.svg',
-          '/assets/privacy.html',  
-          '/assets/terms.html',
-          '/assets/whitepaper.html',
+          '/privacy.html',  
+          '/terms.html',
+          '/whitepaper.html',
           '/assets/lungs.svg',		  
           '/assets/spaceship.svg',         
           '/assets/quotes.en.json'
