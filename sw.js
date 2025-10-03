@@ -29,7 +29,9 @@ self.addEventListener('install', (event) => {
           '/assets/lungs.svg',
           '/assets/flowmeditate.svg',
           '/assets/truemeditate.svg',
-          '/assets/manifest.json'
+		  '/assets/spaceship.svg',
+          '/assets/manifest.json',
+		  '/assets/quotes.en.json'
         ];
         
         // Cache audio files individually (more reliable)
