@@ -92,34 +92,6 @@ self.addEventListener('activate', (event) => {
 // Fetch event - NETWORK FIRST strategy
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-
-// ONLY for the specific avatar image - CACHE FIRST
-  if (event.request.url.includes('/assets/yogi-avatar.gif')) {
-    console.log('🔄 Handling avatar request');
-    event.respondWith(
-      caches.match(event.request)
-        .then(cachedResponse => {
-          // Always return cached version immediately if available
-          if (cachedResponse) {
-            console.log('✅ Avatar served from cache');
-            return cachedResponse;
-          }
-          
-          // If not in cache (shouldn't happen), try network
-          console.log('⚠️ Avatar not in cache, fetching from network');
-          return fetch(event.request);
-        })
-        .catch(error => {
-          console.error('❌ Avatar fetch failed:', error);
-          // Return a simple placeholder as last resort
-          return new Response(
-            '<svg width="200" height="200" xmlns="http://www.w3.org/2000/svg"><rect width="100%" height="100%" fill="#e0f2fe"/><text x="50%" y="50%" font-family="Arial" font-size="14" fill="#0369a1" text-anchor="middle" dy=".3em">Yogi Avatar</text></svg>',
-            { headers: { 'Content-Type': 'image/svg+xml' } }
-          );
-        })
-    );
-    return; // Stop here for avatar
-  }
     
   event.respondWith(
     // ALWAYS try network first
