@@ -120,34 +120,7 @@ self.addEventListener('fetch', (event) => {
     );
     return; // Stop here for avatar
   }
-  
-  // ⬇️ SIMPLE CACHE FIRST FOR ICONS
-if (event.request.url.includes('/assets/') && 
-    event.request.url.match(/\.(svg)$/)) {
-  console.log('🖼️ Handling asset request:', event.request.url);
-  event.respondWith(
-    caches.match(event.request)
-      .then(cachedResponse => {
-        // Return cached version immediately
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        // If not in cache, try network
-        return fetch(event.request)
-          .then(networkResponse => {
-            // Cache the new asset
-            if (networkResponse.status === 200) {
-              const responseToCache = networkResponse.clone();
-              caches.open(CACHE_NAME)
-                .then(cache => cache.put(event.request, responseToCache));
-            }
-            return networkResponse;
-          });
-      })
-  );
-  return;
-}
-
+    
   event.respondWith(
     // ALWAYS try network first
     fetch(event.request)
