@@ -5,58 +5,64 @@ const CACHE_NAME = `TryeYogi-App-${Date.now()}`;
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing with cache', CACHE_NAME);
-  
+
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
+      .then(async (cache) => {
         console.log('Service Worker: Caching files');
-        
-        // Cache regular files
+
+        // List of files
         const regularFiles = [
           '/',
           '/index.html',
           '/output.css',
-          '/whitepaper.html',
-          '/terms.html',
-          '/privacy.html',
-          '/assets/icrown3.png',
+		  '/assets/manifest.json',
           '/assets/yogi-avatar.gif',
-          '/locales/en.json',
-          '/locales/te.json', 
-          '/locales/fr.json',
+          '/assets/icrown3.png',
+          '/assets/flowmeditate.svg',
+		  '/assets/truemeditate.svg',
           '/assets/quotes.en.json',
           '/assets/welcomeMessages.en.json',
+          '/locales/en.json',
+          '/locales/te.json',
+          '/locales/fr.json',
           '/assets/lungs.svg',
-          '/assets/flowmeditate.svg',
-          '/assets/truemeditate.svg',
-		  '/assets/spaceship.svg',
-          '/assets/manifest.json',
-		  '/assets/quotes.en.json'
+          '/assets/privacy.html',  
+          '/assets/terms.html',
+          '/assets/whitepaper.html',		  
+          '/assets/spaceship.svg',         
+          '/assets/quotes.en.json'
         ];
-        
-        // Cache audio files individually (more reliable)
+
         const audioFiles = [
-          '/assets/bell.wav',
           '/assets/aum.mp3',
-          '/assets/harmony-bell.wav', 
+          '/assets/bell.wav',
+          '/assets/harmony-bell.wav',
           '/assets/tao-chi-gong.mp3',
-          '/assets/meditation-eternal.wav',
-          '/assets/tamtam_gong.wav'
+          '/assets/tamtam_gong.wav',
+          '/assets/music4.mp3',
+          '/assets/meditation-eternal.wav'
         ];
-        
-        // Cache regular files first
-        return cache.addAll(regularFiles)
-          .then(() => {
-            console.log('Regular files cached');
-            // Cache audio files one by one
-            return Promise.all(
-              audioFiles.map(audioFile => {
-                return cache.add(audioFile)
-                  .then(() => console.log('✅ Audio cached:', audioFile))
-                  .catch(error => console.log('❌ Audio cache failed:', audioFile, error));
-              })
-            );
-          });
+
+        // Cache regular files one by one (skip failures)
+        for (const file of regularFiles) {
+          try {
+            await cache.add(file);
+            console.log('✅ Cached:', file);
+          } catch (e) {
+            console.warn('❌ Failed to cache:', file, e);
+          }
+        }
+
+        // Cache audio files one by one (skip failures)
+        for (const audioFile of audioFiles) {
+          try {
+            await cache.add(audioFile);
+            console.log('✅ Audio cached:', audioFile);
+          } catch (e) {
+            console.warn('❌ Audio cache failed:', audioFile, e);
+          }
+        }
       })
       .then(() => {
         console.log('Service Worker: Installed');
