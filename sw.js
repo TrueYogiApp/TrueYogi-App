@@ -23,13 +23,15 @@ self.addEventListener('install', (event) => {
 		  '/assets/truemeditate.svg',
           '/assets/quotes.en.json',
           '/assets/welcomeMessages.en.json',
+		  '/assets/wisdom.en.json',
           '/locales/en.json',
           '/locales/te.json',
           '/locales/fr.json',
           '/assets/lungs.svg',
           '/assets/privacy.html',  
           '/assets/terms.html',
-          '/assets/whitepaper.html',		  
+          '/assets/whitepaper.html',
+		  '/assets/lungs.svg',		  
           '/assets/spaceship.svg',         
           '/assets/quotes.en.json'
         ];
