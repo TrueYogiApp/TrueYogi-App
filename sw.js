@@ -1,7 +1,7 @@
 // service-worker.js
 
-const APP_VERSION = '1.1'; // Change this when you update your app
-const CACHE_NAME = `TryeYogi-App-${APP_VERSION}`;
+const APP_VERSION = '1.2'; // Change this when you update your app
+const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 
 // Install event - cache essential files
 self.addEventListener('install', (event) => {
@@ -72,20 +72,26 @@ self.addEventListener('install', (event) => {
 // Activate event - clean up ALL old caches
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activated');
-  
+
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          // Delete ALL caches that start with "TryeYogi-App-" but are NOT the current version
-          if (cacheName.startsWith('TryeYogi-App-') && cacheName !== CACHE_NAME) {
-            console.log('Service Worker: Deleting old cache:', cacheName);
+          // 1. Delete any old TrueYogi app caches (except current)
+          if (cacheName.startsWith('TrueYogi-App-') && cacheName !== CACHE_NAME) {
+            console.log('🧹 Deleting old TrueYogi app cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+
+          // 2. Delete ALL old TryeYogi caches (both app + permanent)
+          if (cacheName.startsWith('TryeYogi-')) {
+            console.log('🧹 Removing legacy TryeYogi cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('Service Worker: Now ready to handle fetches');
+      console.log('✅ Service Worker cleanup complete. Now ready to handle fetches.');
       return self.clients.claim();
     })
   );
