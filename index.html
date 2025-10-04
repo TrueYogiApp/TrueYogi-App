@@ -8320,7 +8320,7 @@ document.addEventListener('DOMContentLoaded', function() {
           // Start playing avatar sound
           avatarSound.muted = false;
           avatarSound.currentTime = 0;
-          avatarSound.volume = 1.0;
+          avatarSound.volume = 0.0;
           avatarSound.play().catch(()=>{});
           avatarPlaying = true;
           
@@ -8337,38 +8337,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Visual feedback for avatar tap
-function showAvatarFeedback(x, y) {
-  const feedback = document.createElement('div');
-  feedback.innerHTML = ''; // Or use '🧘' or '✨'
-  feedback.style.cssText = `
-    position: fixed;
-    left: ${x}px;
-    top: ${y}px;
-    transform: translate(-50%, -50%);
-    font-size: 2em;
-    z-index: 9999;
-    pointer-events: none;
-    opacity: 0;
-    animation: avatarPulse 2s ease-out forwards;
-  `;
-  
-  document.body.appendChild(feedback);
-  setTimeout(() => {
-    if (feedback.parentNode) feedback.parentNode.removeChild(feedback);
-  }, 2000);
-}
-
-// Add avatar animation
-const avatarStyle = document.createElement('style');
-avatarStyle.textContent = `
-@keyframes avatarPulse {
-  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.2); }
-  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.5); }
-}
-`;
-document.head.appendChild(avatarStyle);
 
 // Aura 12 Colors
 const auraColors = [
