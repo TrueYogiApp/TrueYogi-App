@@ -1,6 +1,6 @@
 // service-worker.js
 
-const APP_VERSION = '1.3'; // Change this when you update your app
+const APP_VERSION = '1.2'; // Change this when you update your app
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 
 // Install event - cache essential files

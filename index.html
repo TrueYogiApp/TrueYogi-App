@@ -8322,10 +8322,7 @@ document.addEventListener('DOMContentLoaded', function() {
           avatarSound.currentTime = 0;
           avatarSound.volume = 1.0;
           avatarSound.play().catch(()=>{});
-          avatarPlaying = true;
-          
-          // Visual feedback for avatar
-          showAvatarFeedback(centerX, centerY);
+          avatarPlaying = true;         
         } else {
           // Stop playing
           avatarSound.pause();
