@@ -450,15 +450,6 @@
   50% { width: 20px; height: 20px; opacity: 0.8; }
   100% { width: 0px; height: 0px; opacity: 1; }
 }
-  .loader-overlay {
-  position: fixed;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 2;
-}
 
 /* FAQ Tab Styles */
 #faq-tab {
@@ -1582,10 +1573,7 @@
 
   <div id="app-loader" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
     <div class="loader-spinner"></div>
-	  <div class="loader-overlay">
-  <!--  <img src="/assets/boom.gif" class="cosmic-bg" />
-  <!--  <div class="cosmic-quote">"Your presence is the cosmic dance."</div> -->
-  </div>
+
   </div>
   
   <!-- Service Worker Status Indicator -->
