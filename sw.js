@@ -1,6 +1,6 @@
 // service-worker.js
 
-const APP_VERSION = '1.2'; // Change this when you update your app
+const APP_VERSION = '1.3'; // Change this when you update your app
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 
 // Install event - cache essential files
@@ -42,7 +42,7 @@ self.addEventListener('install', (event) => {
           '/assets/bell.wav',
           '/assets/harmony-bell.wav',
           '/assets/tao-chi-gong.mp3',
-          '/assets/tamtam_gong.wav',
+          '/assets/tamtam-gong.wav',
           '/assets/music4.mp3',
           '/assets/meditation-eternal.wav'
         ];
