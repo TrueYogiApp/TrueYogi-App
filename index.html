@@ -1617,6 +1617,7 @@
     <div class="loader-spinner"></div>
     <div class="loader-overlay">
         <img src="/assets/cosmos.gif" class="cosmic-bg active" />
+		<img src="/assets/Merkaba.gif" class="cosmic-bg" />
     </div>
 </div>
   
@@ -3937,7 +3938,7 @@ async function confirmFullReset() {
     console.error("Error during full reset:", e);
     alert("Reset failed. Please try again.");
   }
-}
+} 
 
     // Initialize the app
       document.addEventListener('DOMContentLoaded', async () => {
@@ -8400,6 +8401,48 @@ function setAuraColor() {
 
 setAuraColor();
 setInterval(setAuraColor, 1000); // update every minute (no need for every second)
+
+
+// Array of image elements
+const loaderImages = document.querySelectorAll('.cosmic-bg');
+const HOUR_IN_MS = 3600000; // 1 hour
+
+function switchLoaderImage() {
+    // Remove active class from all images
+    loaderImages.forEach(img => img.classList.remove('active'));
+    
+    // Pick a random image
+    const randomIndex = Math.floor(Math.random() * loaderImages.length);
+    loaderImages[randomIndex].classList.add('active');
+    
+    // Save the time we made this change
+    localStorage.setItem('lastImageSwitch', Date.now());
+    localStorage.setItem('currentImageIndex', randomIndex);
+}
+
+function initializeLoaderImage() {
+    const lastSwitch = localStorage.getItem('lastImageSwitch');
+    const savedIndex = localStorage.getItem('currentImageIndex');
+    const now = Date.now();
+    
+    // If it's been more than 1 hour since last switch, OR no saved data
+    if (!lastSwitch || (now - lastSwitch) >= HOUR_IN_MS) {
+        // Time for a new random image
+        switchLoaderImage();
+    } else {
+        // Still within the 1 hour - show the saved image
+        loaderImages.forEach(img => img.classList.remove('active'));
+        const index = savedIndex ? parseInt(savedIndex) : 0;
+        loaderImages[index].classList.add('active');
+    }
+}
+
+// Initialize on page load
+initializeLoaderImage();
+
+// Check every minute if it's time to switch
+setInterval(initializeLoaderImage, 60000);
+
 
 // Offline detection
 // Enhanced offline detection
