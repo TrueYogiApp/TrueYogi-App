@@ -2664,13 +2664,13 @@
   </label>
   <div class="relative">
   <select id="music-choice" class="w-full bg-gray-800 text-white px-4 py-3 rounded-xl appearance-none cursor-pointer">
-    <option value="music1.mp3">Miracle-cell-regeneration</option>
-    <option value="music2.mp3">Soul-of-the-earth</option>
-    <option value="music3.mp3">Krishna-flute</option>
-    <option value="music4.mp3">Meditation-relaxing</option> 
-    <option value="music5.mp3">Tibetian-bowls</option>
-    <option value="music6.mp3">Ambient-yoga</option>
-    <option value="music7.mp3">Gayatri-mantra</option>
+    <option value="music1.m4a">Miracle-cell-regeneration</option>
+    <option value="music2.m4a">Soul-of-the-earth</option>
+    <option value="music3.m4a">Krishna-flute</option>
+    <option value="music4.m4a">Meditation-relaxing</option> 
+    <option value="music5.m4a">Tibetian-bowls</option>
+    <option value="music6.m4a">Ambient-yoga</option>
+    <option value="music7.m4a">Gayatri-mantra</option>
   </select>
   <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <i class="fas fa-chevron-down"></i>
@@ -2930,13 +2930,13 @@
   <audio id="bell" src="/assets/meditation-end.mp3" preload="auto" muted></audio>
   <audio id="om-sound" src="/assets/aum.mp3" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
-  <audio id="sound-bell" src="/assets/bell.wav" preload="auto"></audio>
-  <audio id="avatar-sound" src="/assets/meditation-eternal.wav" preload="auto"></audio>
+  <audio id="sound-bell" src="/assets/bell.m4a" preload="auto"></audio>
+  <audio id="avatar-sound" src="/assets/meditation-eternal.m4a" preload="auto"></audio>
 
   <!-- Add these 3 new sounds -->
-<audio id="sound-chimes" src="assets/tamtam-gong.wav" preload="auto"></audio>
+<audio id="sound-chimes" src="assets/tamtam-gong.m4a" preload="auto"></audio>
 <audio id="sound-gong" src="assets/tao-chi-gong.mp3" preload="auto"></audio>
-<audio id="sound-bowl" src="assets/harmony-bell.wav" preload="auto"></audio>
+<audio id="sound-bowl" src="assets/harmony-bell.m4a" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -3049,7 +3049,7 @@
 	let completedChallenges = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
     let LANGUAGES = {}; // Will hold current language map
 	let timerRunning = false;
-    let selectedMusicFile = localStorage.getItem('selectedMusicFile') || 'music4.mp3';
+    let selectedMusicFile = localStorage.getItem('selectedMusicFile') || 'music4.m4a';
 	let wakeLock = null;
     let isWakeLockSupported = 'wakeLock' in navigator;	
 	
@@ -5671,6 +5671,7 @@ async function beginMeditationSession() {
   updateHideUiBtnVisibility();
   updateHideUiButtonVisibility();
   requestWakeLock();
+  if ("vibrate" in navigator) navigator.vibrate(20);
     // Device type detection
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const deviceType = isMobile ? "mobile" : "desktop";
@@ -8178,9 +8179,9 @@ let lastTap = 0;
 
 // Define 4 different sounds (add these audio elements to your HTML)
 const zoneSounds = {
-  'top-left': '/assets/bell.wav',      
-  'top-right': '/assets/harmony-bell.wav',
-  'bottom-left': '/assets/tamtam-gong.wav',  
+  'top-left': '/assets/bell.m4a',      
+  'top-right': '/assets/harmony-bell.m4a',
+  'bottom-left': '/assets/tamtam-gong.m4a',  
   'bottom-right': '/assets/tao-chi-gong.mp3'
 };
 
@@ -8241,9 +8242,9 @@ function getTapZone(x, y) {
 // Play zone-specific sound - UPDATED VERSION
 function playZoneSound(zone) {
   const soundFiles = {
-    'top-left': '/assets/bell.wav',
-    'top-right': '/assets/harmony-bell.wav', 
-    'bottom-left': '/assets/tamtam-gong.wav',
+    'top-left': '/assets/bell.m4a',
+    'top-right': '/assets/harmony-bell.m4a', 
+    'bottom-left': '/assets/tamtam-gong.m4a',
     'bottom-right': '/assets/tao-chi-gong.mp3'
   };
   

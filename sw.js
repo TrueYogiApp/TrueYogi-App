@@ -1,76 +1,99 @@
-// service-worker.js
+// service-worker.js — Optimized version
 
-const APP_VERSION = '1.4'; // Change this when you update your app
+const APP_VERSION = '1.1';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v1'; // Never changes
 
-// Install event - cache essential files
+// Permanent assets that rarely change 13
+const PERMANENT_ASSETS = [
+  '/assets/aum.mp3',
+  '/assets/bell.m4a',
+  '/assets/harmony-bell.m4a',
+  '/assets/tao-chi-gong.mp3',
+  '/assets/tamtam-gong.m4a',
+  '/assets/meditation-eternal.m4a',
+  '/assets/yogi-avatar.gif',
+  '/assets/icrown3.png',
+  '/assets/lungs.svg',
+  '/assets/music4.m4a',
+  '/assets/flowmeditate.svg',
+  '/assets/truemeditate.svg'
+];
+
+// App files that change more often
+const APP_FILES = [
+  '/',
+  '/index.html',
+  '/output.css',
+  '/assets/manifest.json',
+  '/assets/welcomeMessages.en.json',
+  '/assets/welcomeMessages.te.json',
+  '/assets/welcomeMessages.fr.json',
+  '/assets/wisdom.en.json',
+  '/assets/wisdom.te.json',
+  '/assets/wisdom.fr.json',
+  '/locales/en.json',
+  '/locales/te.json',
+  '/locales/fr.json',      
+  '/assets/quotes.en.json',
+  '/assets/quotes.te.json',
+  '/assets/quotes.fr.json',
+  '/assets/spaceship.svg'
+];
+
+// INSTALL EVENT
 self.addEventListener('install', (event) => {
-  console.log('Service Worker: Installing with cache', CACHE_NAME);
+  console.log('Service Worker: Installing caches', CACHE_NAME, PERMANENT_CACHE_NAME);
 
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(async (cache) => {
-        console.log('Service Worker: Caching files');
+    Promise.all([
+      // Permanent cache: only add missing files
+      caches.open(PERMANENT_CACHE_NAME).then(async (permanentCache) => {
+        const existingKeys = await permanentCache.keys();
+        const existingUrls = new Set(existingKeys.map(req => req.url));
 
-        // List of files
-        const regularFiles = [
-          '/',
-          '/index.html',
-          '/output.css',
-          '/assets/manifest.json',
-          '/assets/yogi-avatar.gif',
-          '/assets/icrown3.png',
-          '/assets/flowmeditate.svg',
-          '/assets/truemeditate.svg',
-          '/assets/welcomeMessages.en.json',
-		  '/assets/welcomeMessages.te.json',
-		  '/assets/welcomeMessages.fr.json',
-          '/assets/wisdom.en.json',
-		  '/assets/wisdom.te.json',
-		  '/assets/wisdom.fr.json',
-          '/locales/en.json',
-          '/locales/te.json',
-          '/locales/fr.json',      
-          '/assets/quotes.en.json',
-		  '/assets/quotes.te.json',
-		  '/assets/quotes.fr.json',
-		  '/assets/lungs.svg',
-		  '/assets/spaceship.svg'
-        ];
+        await Promise.all(
+          PERMANENT_ASSETS.map(async (file) => {
+            const fullUrl = new URL(file, self.location.origin).href;
+            if (!existingUrls.has(fullUrl)) {
+              try {
+                await permanentCache.add(file);
+                console.log('✅ Permanent cached:', file);
+              } catch (e) {
+                console.warn('❌ Permanent cache failed:', file, e);
+              }
+            } else {
+              console.log('🔵 Already in permanent cache:', file);
+            }
+          })
+        );
+      }),
 
-        const audioFiles = [
-          '/assets/aum.mp3',
-          '/assets/bell.m4a',
-          '/assets/harmony-bell.m4a',
-          '/assets/tao-chi-gong.mp3',
-          '/assets/tamtam-gong.m4a',
-          '/assets/music4.m4a',
-          '/assets/meditation-eternal.m4a'
-        ];
-
-        const allFiles = [...regularFiles, ...audioFiles];
-
-        // Cache files one by one (skip failures)
-        for (const file of allFiles) {
-          try {
-            await cache.add(file);
-            console.log('✅ Cached:', file);
-          } catch (e) {
-            console.warn('❌ Failed to cache:', file, e);
-          }
-        }
+      // App cache: always update
+      caches.open(CACHE_NAME).then(async (appCache) => {
+        await Promise.all(
+          APP_FILES.map(async (file) => {
+            try {
+              await appCache.add(file);
+              console.log('✅ App cached:', file);
+            } catch (e) {
+              console.warn('❌ App cache failed:', file, e);
+            }
+          })
+        );
       })
-      .then(() => {
-        console.log('Service Worker: Installed');
-        return self.skipWaiting();
-      })
-      .catch((error) => {
-        console.error('Service Worker: Installation failed', error);
-      })
+    ])
+    .then(() => {
+      console.log('Service Worker: All caches installed');
+      return self.skipWaiting();
+    })
+    .catch((error) => {
+      console.error('Service Worker: Installation failed', error);
+    })
   );
 });
 
-// Activate event - clean up ALL old caches
+// ACTIVATE EVENT
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activated');
 
@@ -78,70 +101,101 @@ self.addEventListener('activate', (event) => {
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          // 1. Delete any old TrueYogi app caches (except current)
+          // 1️⃣ Delete any old TrueYogi App caches (except current)
           if (cacheName.startsWith('TrueYogi-App-') && cacheName !== CACHE_NAME) {
             console.log('🧹 Deleting old TrueYogi app cache:', cacheName);
             return caches.delete(cacheName);
           }
 
-          // 2. Delete ALL old TryeYogi caches (both app + permanent)
-          if (cacheName.startsWith('TryeYogi-')) {
-            console.log('🧹 Removing legacy TryeYogi cache:', cacheName);
+          // 2️⃣ Delete all old TrueYogi Permanent caches except current
+          if (cacheName.startsWith('TrueYogi-Permanent-') && cacheName !== PERMANENT_CACHE_NAME) {
+            console.log('🧹 Deleting old TrueYogi permanent cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
       );
     }).then(() => {
-      console.log('✅ Service Worker cleanup complete. Now ready to handle fetches.');
+      console.log('✅ Service Worker cleanup complete — ready to handle fetches.');
       return self.clients.claim();
     })
   );
 });
 
-// Fetch event - NETWORK FIRST strategy (keep your existing fetch logic)
+
+// FETCH EVENT
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
-    
+
   event.respondWith(
     fetch(event.request)
-      .then(networkResponse => {
-        if (networkResponse.status === 200) {
+      .then((networkResponse) => {
+        // Only cache successful non-HTML requests
+        if (networkResponse.status === 200 && event.request.destination !== 'document') {
           const responseToCache = networkResponse.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => {
-              cache.put(event.request, responseToCache);
-            });
+          const url = new URL(event.request.url);
+          const cacheName = isPermanentAsset(url.pathname)
+            ? PERMANENT_CACHE_NAME
+            : CACHE_NAME;
+
+          caches.open(cacheName).then((cache) => cache.put(event.request, responseToCache));
         }
         return networkResponse;
       })
-      .catch(error => {
-        console.log('🌐 Network failed, trying cache:', event.request.url);
-        return caches.match(event.request)
-          .then(cachedResponse => {
-            if (cachedResponse) {
-              return cachedResponse;
-            }
-            if (event.request.destination === 'document') {
-              return caches.match('/index.html');
-            }
-          });
+      .catch(() => {
+        console.log('🌐 Network failed, using cache for:', event.request.url);
+        return caches.match(event.request).then((cachedResponse) => {
+          if (cachedResponse) return cachedResponse;
+
+          // Offline fallback logic
+          if (event.request.destination === 'document') {
+            return caches.match('/index.html');
+          } else if (event.request.destination === 'image') {
+            return caches.match('/assets/spaceship.svg');
+          }
+        });
       })
   );
 });
 
-// Background sync example (optional)
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'background-sync') {
-    console.log('Service Worker: Background sync triggered');
-    // Handle background sync tasks here
+// HELPER — Safe permanent asset check
+function isPermanentAsset(pathname) {
+  pathname = pathname.replace(/\?.*$/, ''); // remove query params
+  return PERMANENT_ASSETS.some(asset => pathname.endsWith(asset));
+}
+
+// MESSAGE EVENTS
+self.addEventListener('message', (event) => {
+  if (!event.data) return;
+
+  if (event.data.type === 'UPDATE_PERMANENT_ASSETS') {
+    event.waitUntil(
+      caches.open(PERMANENT_CACHE_NAME).then(cache => {
+        const newAssets = event.data.assets || [];
+        return Promise.all(
+          newAssets.map(asset => cache.add(asset).catch(() => {}))
+        );
+      })
+    );
+  }
+
+  if (event.data.type === 'CLEAR_APP_CACHE') {
+    event.waitUntil(caches.delete(CACHE_NAME));
   }
 });
 
-// Push notification example (optional)
+// BACKGROUND SYNC
+self.addEventListener('sync', (event) => {
+  if (event.tag === 'background-sync') {
+    console.log('Service Worker: Background sync triggered');
+    // future: upload meditation progress, sync user state, etc.
+  }
+});
+
+// PUSH NOTIFICATIONS
 self.addEventListener('push', (event) => {
   if (!event.data) return;
-
   const data = event.data.json();
+
   const options = {
     body: data.body || 'New notification',
     icon: '/images/icon-192x192.png',
@@ -157,22 +211,20 @@ self.addEventListener('push', (event) => {
   );
 });
 
-// Notification click handler
+// NOTIFICATION CLICK HANDLER
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  
+
   event.waitUntil(
-    clients.matchAll({ type: 'window' })
-      .then((clientList) => {
-        // Focus existing window or open new one
-        for (const client of clientList) {
-          if (client.url === event.notification.data.url && 'focus' in client) {
-            return client.focus();
-          }
+    clients.matchAll({ type: 'window' }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url === event.notification.data.url && 'focus' in client) {
+          return client.focus();
         }
-        if (clients.openWindow) {
-          return clients.openWindow(event.notification.data.url);
-        }
-      })
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(event.notification.data.url);
+      }
+    })
   );
 });
