@@ -1,27 +1,30 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.1';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
-const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v3'; // Never changes
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v1'; // Never changes
 
 // Permanent assets that rarely change 13
-const PERMANENT_ASSETS = [
+const AUDIO_ASSETS = [
   '/assets/aum.mp3',
   '/assets/bell.m4a',
   '/assets/harmony-bell.m4a',
   '/assets/tao-chi-gong.mp3',
   '/assets/tamtam-gong.m4a',
   '/assets/meditation-eternal.m4a',
-  '/assets/yogi-avatar.gif',
-  '/assets/icrown3.png',
-  '/assets/lungs.svg',
   '/assets/music7.m4a',
   '/assets/music6.m4a',
   '/assets/music5.m4a',
   '/assets/music4.m4a',
   '/assets/music3.m4a',
   '/assets/music2.m4a',
-  '/assets/music1.m4a',
+  '/assets/music1.m4a'
+];
+
+const PERMANENT_ASSETS = [
+  '/assets/yogi-avatar.gif',
+  '/assets/icrown3.png',
+  '/assets/lungs.svg',
   '/assets/flowmeditate.svg',
   '/assets/truemeditate.svg'
 ];
@@ -47,13 +50,25 @@ const APP_FILES = [
   '/assets/spaceship.svg'
 ];
 
+// Helper: sequentially cache audio files
+async function cacheAudioFiles(cache) {
+  for (const file of AUDIO_ASSETS) {
+    try {
+      await cache.add(file);
+      console.log('✅ Audio cached:', file);
+    } catch (e) {
+      console.warn('❌ Audio cache failed:', file, e);
+    }
+  }
+}
+
 // INSTALL EVENT
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing caches', CACHE_NAME, PERMANENT_CACHE_NAME);
 
   event.waitUntil(
     Promise.all([
-      // Permanent cache: only add missing files
+      // Permanent cache: only add missing files (non-audio)
       caches.open(PERMANENT_CACHE_NAME).then(async (permanentCache) => {
         const existingKeys = await permanentCache.keys();
         const existingUrls = new Set(existingKeys.map(req => req.url));
@@ -73,6 +88,9 @@ self.addEventListener('install', (event) => {
             }
           })
         );
+
+        // Now cache audio files sequentially
+        await cacheAudioFiles(permanentCache);
       }),
 
       // App cache: always update
