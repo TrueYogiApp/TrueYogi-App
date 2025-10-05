@@ -1,6 +1,6 @@
 // service-worker.js
 
-const APP_VERSION = '1.3'; // Change this when you update your app
+const APP_VERSION = '1.4'; // Change this when you update your app
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 
 // Install event - cache essential files
@@ -22,29 +22,30 @@ self.addEventListener('install', (event) => {
           '/assets/icrown3.png',
           '/assets/flowmeditate.svg',
           '/assets/truemeditate.svg',
-          '/assets/quotes.en.json',
           '/assets/welcomeMessages.en.json',
+		  '/assets/welcomeMessages.te.json',
+		  '/assets/welcomeMessages.fr.json',
           '/assets/wisdom.en.json',
+		  '/assets/wisdom.te.json',
+		  '/assets/wisdom.fr.json',
           '/locales/en.json',
           '/locales/te.json',
-          '/locales/fr.json',
-          '/assets/lungs.svg',
-          '/privacy.html',  
-          '/terms.html',
-          '/whitepaper.html',
-          '/assets/lungs.svg',		  
-          '/assets/spaceship.svg',         
-          '/assets/quotes.en.json'
+          '/locales/fr.json',      
+          '/assets/quotes.en.json',
+		  '/assets/quotes.te.json',
+		  '/assets/quotes.fr.json',
+		  '/assets/lungs.svg',
+		  '/assets/spaceship.svg'
         ];
 
         const audioFiles = [
           '/assets/aum.mp3',
-          '/assets/bell.wav',
-          '/assets/harmony-bell.wav',
+          '/assets/bell.m4a',
+          '/assets/harmony-bell.m4a',
           '/assets/tao-chi-gong.mp3',
-          '/assets/tamtam-gong.wav',
-          '/assets/music4.mp3',
-          '/assets/meditation-eternal.wav'
+          '/assets/tamtam-gong.m4a',
+          '/assets/music4.m4a',
+          '/assets/meditation-eternal.m4a'
         ];
 
         const allFiles = [...regularFiles, ...audioFiles];
