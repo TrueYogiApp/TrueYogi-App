@@ -493,6 +493,7 @@
   text-shadow: 0 0 18px #fde68a88;
   z-index: 3;
 }
+
 /* FAQ Tab Styles */
 #faq-tab {
   position: fixed;
@@ -621,7 +622,7 @@
   transition: transform 0.3s ease;
 }
 
-  /* True Yogi Configuration Modal */
+  /* TrueYogi Configuration Modal */
 .config-modal {
   width: 95%;
   max-width: 420px;
@@ -1617,11 +1618,11 @@
     <div class="loader-spinner"></div>
     <div class="loader-overlay">
         <img src="/assets/cosmos.gif" class="cosmic-bg active" />
-		<img src="/assets/Merkaba.gif" class="cosmic-bg" />
+		<img src="/assets/Merkaba.gif" class="cosmic-bg" /> 
     </div>
 </div>
-  
-  <!-- Service Worker Status Indicator -->
+
+<!-- Service Worker Status Indicator -->
 <div id="sw-status" style="display: none;"></div>
 
 
@@ -1682,7 +1683,7 @@
         <i class="fas fa-exclamation-circle"></i>
       </div>
       <h2 class="text-xl font-semibold text-red-300 mb-2">End Meditation?</h2>
-      <p id="end-meditation-description" class="text-gray-200 mb-4">Are you sure you wish to end this session early? This time of Stillness won’t be recorded in your True Yogi journey.</p>
+      <p id="end-meditation-description" class="text-gray-200 mb-4">Are you sure you wish to end this session early? This time of Stillness won’t be recorded in your TrueYogi journey.</p>
       <div class="flex justify-center gap-4">
         <button onclick="confirmEndMeditation()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
           End Session
@@ -1757,7 +1758,7 @@
     <div class="text-red-400 text-5xl mb-4">
       <i class="fas fa-exclamation-triangle"></i>
     </div>
-    <h2 class="text-xl font-semibold text-red-300 mb-2">Reset True Yogi Stillness?</h2>
+    <h2 class="text-xl font-semibold text-red-300 mb-2">Reset TrueYogi Stillness?</h2>
     <p id="reset-description" class="text-gray-200 mb-4">The circle Resets. Are you sure you wish to Reset your 41-day Sacred Sits? All progress will be cleared, and a new Vibration must be chosen.</p>
     <div class="flex justify-center gap-4">
       <button onclick="confirmResetChallenge()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
@@ -1770,7 +1771,7 @@
   </div>
 </div>
 
-  <!-- True Yogi Configuration Modal -->
+  <!-- TrueYogi Configuration Modal -->
   <div id="yogi-config-modal" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true">
     <div class="config-modal max-w-md mx-4 p-6 rounded-xl text-center max-h-[80vh] overflow-y-auto relative">
 	
@@ -1781,7 +1782,7 @@
       <div class="text-yellow-400 text-4xl mb-2">
         <i class="fas fa-yin-yang mr-2" style="animation: smooth-rotate 6s linear infinite;"></i>
       </div>
-      <h2 class="text-xl font-semibold text-yellow-300 mb-1">Configure Your True Yogi Journey</h2>
+      <h2 class="text-xl font-semibold text-yellow-300 mb-1">Configure Your TrueYogi Journey</h2>
       <p id="yogi-config-modal-41" class="text-gray-300 text-sm">41 Days • 41 Sacred Sits</p>
     </div>
 
@@ -2017,7 +2018,7 @@
       <button id="yogi-mode-btn-select" onclick="selectMode('yogi')" class="mode-btn relative w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-start gap-4 cursor-pointer">
   <i id="yogi-sun-icon" class="fa-solid fa-sun"></i> <!-- Removed fa-spin here -->
   <div class="flex flex-col items-center text-center">
-    <span class="text-base leading-tight">True Yogi</span>
+    <span class="text-base leading-tight">TrueYogi</span>
     <span class="text-sm font-normal text-yellow-900">41 Days, 41 Sacred Sits</span>
   </div>
 </button>
@@ -2584,7 +2585,7 @@
         </button>
         <button id="yogi-mode-btn-app" class="mode-btn bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-full" 
                 onclick="setMode('yogi')">
-          True Yogi
+          TrueYogi
         </button>
       </div>
 
@@ -2722,7 +2723,7 @@
 <!-- Session Stats -->
 <div id="session-stats" class="mt-6 bg-gray-800 rounded-lg p-4">
 
-  <!-- True Yogi Stats -->
+  <!-- TrueYogi Stats -->
 <div id="yogi-stats" class="grid grid-cols-2 gap-4 text-center">
   <div>
     <p class="text-xl font-bold text-yellow-400" id="yogi-total-sessions">0</p>
@@ -2837,7 +2838,7 @@
 			animation: colorShift 5s infinite alternate, shimmer 2s infinite ease-in-out;
 			"></i>
         </div>
-        <p class="text-yellow-300 text-xl mb-2">Congratulations, True Yogi!</p>
+        <p class="text-yellow-300 text-xl mb-2">Congratulations, TrueYogi!</p>
         <p class="text-gray-300 mb-6">You have completed your 41-day journey of Stillness.</p>
         <button onclick="resetYogiJourney()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer">
           <i class="fas fa-om mr-2"></i>Start a New Journey
@@ -2975,7 +2976,7 @@
       white-space:normal;
       overflow:auto;
     ">
-      True Yogi Certificate of Stillness
+      TrueYogi Certificate of Stillness
     </h1>
     <p style="font-size:1.09em;color:#fde68a;font-weight:500;margin-bottom:1.1em;line-height:1.4;">
       In honor of completing the 41-day Sacred Stillness Challenge
@@ -3505,7 +3506,7 @@ window.viewCertificateModal = function(idx) {
         <div style="position:absolute; bottom:15px; right:15px; width:30px; height:30px; border-bottom:2px solid #eab308; border-right:2px solid #eab308;"></div>
 		
         <img src="assets/icrown3.png" alt="Cosmic Lotus" style="height:143px; display:block; margin:0 auto 10px auto;">
-        <h1 style="font-family:'Playfair Display',serif;font-size:1.3em;color:#eab308;margin-bottom:0.15em;letter-spacing:1.2px;text-shadow:0 0 8px #eab30888;">True Yogi Certificate of Stillness</h1>
+        <h1 style="font-family:'Playfair Display',serif;font-size:1.3em;color:#eab308;margin-bottom:0.15em;letter-spacing:1.2px;text-shadow:0 0 8px #eab30888;">TrueYogi Certificate of Stillness</h1>
         <p style="font-size:1.03em;color:#fde68a;font-weight:500;margin-bottom:1.1em;">
           In honor of completing the 41-day Sacred Stillness Challenge
         </p>
@@ -3938,7 +3939,7 @@ async function confirmFullReset() {
     console.error("Error during full reset:", e);
     alert("Reset failed. Please try again.");
   }
-} 
+}
 
     // Initialize the app
       document.addEventListener('DOMContentLoaded', async () => {
@@ -4679,7 +4680,7 @@ function enforceClaimBeforeProceeding() {
   updateBackButtonVisibility();
   updateLangSwitcherVisibility();
 
-// Hide FAQ tab when entering either Flow or True Yogi mode
+// Hide FAQ tab when entering either Flow or TrueYogi mode
   document.getElementById('faq-tab').style.display = 'none'; // Add this line
   
   // Use getElementById directly since you use these IDs
@@ -4794,7 +4795,7 @@ if (bgMusicPlayer) {
 }
 
   function setMode(mode) {
-  // Prevent mode switching during an active session in True Yogi mode
+  // Prevent mode switching during an active session in TrueYogi mode
   if (sessionActive && currentMode === 'yogi') {
     return;
   }
@@ -5442,7 +5443,7 @@ function updateNowDisplay() {
           completed => completed.time === session.time && completed.date === today
         );
         if (!isCompleted && Math.abs(sessionTime - currentTime) <= notificationWindow) {
-          new Notification('True Yogi Session Reminder', {
+          new Notification('TrueYogi Session Reminder', {
             body: `Your ${formatTime(session.time)} (${formatDuration(session.duration)}) meditation session is starting soon!`,
             icon: 'assets/favicon.ico'
           });
@@ -5782,6 +5783,7 @@ if (document.getElementById('music-toggle').checked) {
 	updateHideUiBtnVisibility();
 	updateHideUiButtonVisibility();
 	disableMobileAudioResume();
+	if ("vibrate" in navigator) navigator.vibrate(20);
   if (sessionCompletedWhileModalOpen) {
     document.getElementById('end-meditation-modal').classList.add('hidden');
     return;
@@ -6503,7 +6505,7 @@ function updateMeditationGuideImage(mode) {
 
   if (mode === 'yogi') {
     imgSrc = '/assets/truemeditate.svg';
-    altText = 'True Yogi Meditation';
+    altText = 'TrueYogi Meditation';
   } else if (mode === 'flow') {
     imgSrc = '/assets/flowmeditate.svg';
     altText = 'Flow Meditation';
@@ -8314,6 +8316,7 @@ dtStyle.textContent = `
 }`;
 document.head.appendChild(dtStyle);
 
+
 // Avatar music
 document.addEventListener('DOMContentLoaded', function() {
   const avatar = document.querySelector('.avatar-container');
@@ -8343,7 +8346,10 @@ document.addEventListener('DOMContentLoaded', function() {
           avatarSound.currentTime = 0;
           avatarSound.volume = 0.3;
           avatarSound.play().catch(()=>{});
-          avatarPlaying = true;         
+          avatarPlaying = true;
+          
+          // Visual feedback for avatar
+          showAvatarFeedback(centerX, centerY);
         } else {
           // Stop playing
           avatarSound.pause();
@@ -8444,7 +8450,6 @@ initializeLoaderImage();
 setInterval(initializeLoaderImage, 60000);
 
 
-// Offline detection
 // Enhanced offline detection
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
@@ -8567,7 +8572,7 @@ const swIndicator = new SWStatusIndicator();
 
 // Show indicator immediately when page loads (optional)
 swIndicator.show();
-setTimeout(() => swIndicator.hide(), 10000); // Hide after 10 seconds if no SW activity
+setTimeout(() => swIndicator.hide(), 10000); // Hide after 22 seconds if no SW activity
 
 
   </script>
