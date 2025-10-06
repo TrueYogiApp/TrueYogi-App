@@ -2,7 +2,7 @@
 
 const APP_VERSION = '1.3';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
-const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v1'; // Never changes
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v1'; 
 
 // Permanent assets that rarely change 13
 const AUDIO_ASSETS = [
@@ -119,27 +119,20 @@ self.addEventListener('install', (event) => {
 
 // ACTIVATE EVENT
 self.addEventListener('activate', (event) => {
-  console.log('Service Worker: Activated');
+  const cacheWhitelist = [CACHE_NAME, PERMANENT_CACHE_NAME];
 
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
         cacheNames.map((cacheName) => {
-          // 1️⃣ Delete any old TrueYogi App caches (except current)
-          if (cacheName.startsWith('TrueYogi-App-') && cacheName !== CACHE_NAME) {
-            console.log('🧹 Deleting old TrueYogi app cache:', cacheName);
-            return caches.delete(cacheName);
-          }
-
-          // 2️⃣ Delete all old TrueYogi Permanent caches except current
-          if (cacheName.startsWith('TrueYogi-Permanent-') && cacheName !== PERMANENT_CACHE_NAME) {
-            console.log('🧹 Deleting old TrueYogi permanent cache:', cacheName);
+          if (!cacheWhitelist.includes(cacheName)) {
+            console.log('🧹 Deleting unused cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
-      );
-    }).then(() => {
-      console.log('✅ Service Worker cleanup complete — ready to handle fetches.');
+      )
+    ).then(() => {
+      console.log('✅ Service Worker: Only whitelisted caches remain.');
       return self.clients.claim();
     })
   );
@@ -183,8 +176,8 @@ self.addEventListener('fetch', (event) => {
 
 // HELPER — Safe permanent asset check
 function isPermanentAsset(pathname) {
-  pathname = pathname.replace(/\?.*$/, ''); // remove query params
-  return PERMANENT_ASSETS.some(asset => pathname.endsWith(asset));
+  pathname = pathname.replace(/\?.*$/, ''); // Strip query params (e.g., ?v=123)
+  return PERMANENT_ASSETS.concat(AUDIO_ASSETS).some(asset => pathname.endsWith(asset));
 }
 
 // MESSAGE EVENTS
