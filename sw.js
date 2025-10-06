@@ -1,6 +1,6 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.3';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v1'; // Never changes
 
@@ -25,8 +25,12 @@ const PERMANENT_ASSETS = [
   '/assets/yogi-avatar.gif',
   '/assets/icrown3.png',
   '/assets/lungs.svg',
+  '/assets/spaceship.svg',
   '/assets/flowmeditate.svg',
-  '/assets/truemeditate.svg'
+  '/assets/truemeditate.svg',
+  '/assets/wisdom.en.json',
+  '/assets/wisdom.te.json',
+  '/assets/wisdom.fr.json'
 ];
 
 // App files that change more often
@@ -38,16 +42,12 @@ const APP_FILES = [
   '/assets/welcomeMessages.en.json',
   '/assets/welcomeMessages.te.json',
   '/assets/welcomeMessages.fr.json',
-  '/assets/wisdom.en.json',
-  '/assets/wisdom.te.json',
-  '/assets/wisdom.fr.json',
   '/locales/en.json',
   '/locales/te.json',
   '/locales/fr.json',      
   '/assets/quotes.en.json',
   '/assets/quotes.te.json',
-  '/assets/quotes.fr.json',
-  '/assets/spaceship.svg'
+  '/assets/quotes.fr.json'
 ];
 
 // Helper: sequentially cache audio files
