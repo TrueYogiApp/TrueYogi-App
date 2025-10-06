@@ -27,10 +27,7 @@ const PERMANENT_ASSETS = [
   '/assets/lungs.svg',
   '/assets/spaceship.svg',
   '/assets/flowmeditate.svg',
-  '/assets/truemeditate.svg',
-  '/assets/wisdom.en.json',
-  '/assets/wisdom.te.json',
-  '/assets/wisdom.fr.json'
+  '/assets/truemeditate.svg'
 ];
 
 // App files that change more often
@@ -47,7 +44,10 @@ const APP_FILES = [
   '/locales/fr.json',      
   '/assets/quotes.en.json',
   '/assets/quotes.te.json',
-  '/assets/quotes.fr.json'
+  '/assets/quotes.fr.json',
+  '/assets/wisdom.en.json',
+  '/assets/wisdom.te.json',
+  '/assets/wisdom.fr.json'
 ];
 
 // Helper: sequentially cache audio files

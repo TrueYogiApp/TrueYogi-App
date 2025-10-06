@@ -471,7 +471,7 @@
 }
 
 .cosmic-bg.active {
-  opacity: 0.23;
+  opacity: 0.33;
 }
 
 /* Mobile-specific fixes */
@@ -1592,6 +1592,26 @@
       inset 0 0 50px rgba(192, 132, 252, 0.3);
   }
 }
+
+
+.thruster-flame {
+  width: 2px;
+  height: 9px;
+  background: radial-gradient(circle at 50% 70%, #fff 70%, #fff 100%);
+  border-radius: 50% 50% 70% 70%;
+  position: absolute;
+  top: 11px;
+  opacity: 0.8;
+  z-index: 1;
+  animation: thrusterPulse 1.5s infinite;
+}
+.thruster-flame.left  { left: 4.4px; }
+.thruster-flame.right { left: 10.2px; }
+@keyframes thrusterPulse {
+  0%, 100% { opacity: 0.3; transform: scaleY(1); }
+  50% { opacity: 0.9; transform: scaleY(1.12); }
+}
+
 
 </style>
   
@@ -8477,7 +8497,11 @@ function isActuallyOnline() {
 // Create status element
 const statusElement = document.createElement('div');
 statusElement.id = 'online-status';
-statusElement.innerHTML = '<img src="/assets/spaceship.svg" width="16" height="16">';
+statusElement.innerHTML = `
+  <img src="/assets/spaceship.svg" width="16" height="16" />
+    <div class="thruster-flame left"></div>
+    <div class="thruster-flame right"></div>
+`;
 statusElement.style.cssText = `
   position: fixed;
   top: 15px;
@@ -8487,9 +8511,13 @@ statusElement.style.cssText = `
   display: none;
   box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   cursor: help;
+  width: 24px;
+  height: 30px;
+  background: transparent;
 `;
 statusElement.title = 'Offline Mode - App working locally';
 document.body.appendChild(statusElement);
+
 
 // Listen for online/offline events
 window.addEventListener('online', updateOnlineStatus);
