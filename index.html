@@ -450,15 +450,6 @@
   50% { width: 20px; height: 20px; opacity: 0.8; }
   100% { width: 0px; height: 0px; opacity: 1; }
 }
-/* Force the loader to be hidden when it has the hidden class */
-#app-loader.hidden {
-  display: none !important;
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-/* Ensure the loader doesn't block scroll when hidden */
 .loader-overlay {
   position: fixed;
   inset: 0;
@@ -467,13 +458,6 @@
   justify-content: center;
   align-items: center;
   z-index: 2;
-  /* Add these to prevent blocking */
-  pointer-events: none;
-}
-
-/* When loader is active, it can block */
-#app-loader:not(.hidden) .loader-overlay {
-  pointer-events: auto;
 }
 
 .cosmic-bg {
