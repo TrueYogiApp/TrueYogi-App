@@ -474,16 +474,6 @@
   opacity: 0.33;
 }
 
-/* Mobile-specific fixes */
-@media (max-width: 768px) {
-  .loader-overlay {
-    height: 100dvh; /* Use dynamic viewport height */
-  }
-  
-  .cosmic-bg {
-    height: 100dvh; /* Use dynamic viewport height */
-  }
-}
 .cosmic-quote {
   font-family: 'Playfair Display', serif;
   color: #fde68a;
@@ -492,22 +482,6 @@
   margin-top: 4em;
   text-shadow: 0 0 18px #fde68a88;
   z-index: 3;
-}
-
-/* Immediate fix - add to your style section */
-html {
-  overflow: auto !important;
-}
-
-body {
-  position: relative !important;
-  overflow-y: scroll !important;
-  -webkit-overflow-scrolling: touch !important;
-}
-
-/* Remove any transform that might be causing issues */
-.transform {
-  /* Check if this is causing the issue */
 }
 
 /* FAQ Tab Styles */
