@@ -494,32 +494,20 @@
   z-index: 3;
 }
 
-/* Fix for scroll and header issues */
+/* Immediate fix - add to your style section */
+html {
+  overflow: auto !important;
+}
+
 body {
-  position: relative;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
+  position: relative !important;
+  overflow-y: scroll !important;
+  -webkit-overflow-scrolling: touch !important;
 }
 
-#app-interface {
-  position: relative;
-  min-height: 100vh;
-}
-
-/* Ensure modals don't block scroll when hidden */
-.hidden {
-  display: none !important;
-}
-
-/* Fix for iOS Safari */
-@supports (-webkit-touch-callout: none) {
-  body {
-    height: -webkit-fill-available;
-  }
-  
-  .min-h-screen {
-    min-height: -webkit-fill-available;
-  }
+/* Remove any transform that might be causing issues */
+.transform {
+  /* Check if this is causing the issue */
 }
 
 /* FAQ Tab Styles */
