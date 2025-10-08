@@ -3765,12 +3765,6 @@ function updateYogiIcon() {
   sunIcon.style.color = '#f59e0b'; // gold
 }
 
-//function showConnectWalletRequiredModal() {
- // document.getElementById('connect-wallet-required-modal').classList.remove('hidden');
-//}
-//function closeConnectWalletRequiredModal() {
-//  document.getElementById('connect-wallet-required-modal').classList.add('hidden');
-//}
 
 function showStartOnChainJourneyModal(walletPublicKey) {
   window.pendingJourneyWallet = walletPublicKey;
@@ -7282,11 +7276,12 @@ document.addEventListener('visibilitychange', async function() {
           updateBackButtonVisibility();
 		  showCompletionStats();
 		  // --- FIX: STOP MUSIC ---
-	      if (backgroundAudio) {
-		  backgroundAudio.pause();
-		  backgroundAudio.currentTime = 0;
+		const bgMusicPlayer = document.getElementById('bg-music-player');
+		if (bgMusicPlayer) {
+		  bgMusicPlayer.pause();
+		  bgMusicPlayer.currentTime = 0;
 		  backgroundAudio = null;
-		  }
+		}
 	      // --- END FIX ---	  
           const bell = document.getElementById('bell');
           if (bell) {
@@ -8591,7 +8586,7 @@ const swIndicator = new SWStatusIndicator();
 
 // Show indicator immediately when page loads (optional)
 swIndicator.show();
-setTimeout(() => swIndicator.hide(), 10000); // Hide after 22 seconds if no SW activity
+setTimeout(() => swIndicator.hide(), 22000); // Hide after 20 seconds if no SW activity
 
 
   </script>
