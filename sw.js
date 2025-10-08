@@ -9,9 +9,10 @@ const AUDIO_ASSETS = [
   '/assets/aum.mp3',
   '/assets/bell.m4a',
   '/assets/harmony-bell.m4a',
-  '/assets/tao-chi-gong.mp3',
+  '/assets/tao-chi-gong.m4a',
   '/assets/tamtam-gong.m4a',
   '/assets/meditation-eternal.m4a',
+  '/assets/meditation-end.mp3', 
   '/assets/music7.m4a',
   '/assets/music6.m4a',
   '/assets/music5.m4a',
@@ -27,7 +28,8 @@ const PERMANENT_ASSETS = [
   '/assets/lungs.svg',
   '/assets/spaceship.svg',
   '/assets/flowmeditate.svg',
-  '/assets/truemeditate.svg'
+  '/assets/truemeditate.svg',
+  '/assets/groupmeditate.svg'
 ];
 
 // App files that change more often
