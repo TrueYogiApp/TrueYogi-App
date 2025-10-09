@@ -8591,6 +8591,93 @@ swIndicator.show();
 setTimeout(() => swIndicator.hide(), 22000); // Hide after 20 seconds if no SW activity
 
 
+// 7 Chakra sound files and icons (bottom to top)
+const chakraSounds = [
+  { sound: '/assets/root_lam_396hz.mp3',   icon: '🔴', name: 'chakra.root' },
+  { sound: '/assets/sacral_vam_417hz.mp3', icon: '🟠', name: 'chakra.sacral' },
+  { sound: '/assets/solar_ram_528hz.mp3',  icon: '🟡', name: 'chakra.solar' },
+  { sound: '/assets/heart_yam_639hz.mp3',  icon: '🟢', name: 'chakra.heart' },
+  { sound: '/assets/throat_ham_741hz.mp3', icon: '🔵', name: 'chakra.throat' },
+  { sound: '/assets/thirdeye_om_852hz.mp3',icon: '🟣', name: 'chakra.thirdeye' },
+  { sound: '/assets/crown_aum_963hz.mp3',  icon: '⚪', name: 'chakra.crown' }
+];
+
+let lastSessionTap = 0;
+
+document.addEventListener('touchend', function(e) {
+  // Only run this if sessionActive is true and timer-section is visible
+  if (!(typeof sessionActive !== "undefined" && sessionActive)) return;
+  const timerSection = document.getElementById('timer-section');
+  if (!timerSection || timerSection.classList.contains('hidden')) return;
+
+  // Ignore if tap is on avatar, logo, or UI buttons
+  const avatarEl = document.querySelector('.avatar-container');
+  if (avatarEl && avatarEl.contains(e.target)) return;
+  const logoEl = document.getElementById('logo-sacred');
+  if (logoEl && logoEl.contains(e.target)) return;
+
+  // Double-tap logic
+  const currentTime = new Date().getTime();
+  const tapLength = currentTime - lastSessionTap;
+
+  if (tapLength < 200 && tapLength > 0) {
+    e.preventDefault();
+
+// Determine which vertical zone was tapped (7 zones, bottom to top)
+const y = e.changedTouches[0].clientY;
+const screenHeight = window.innerHeight;
+const zoneHeight = screenHeight / 7;
+const zone = 6 - Math.floor(y / zoneHeight); // Now 0 is bottom, 6 is top
+
+    // Play chakra sound
+    playChakraSound(zone);
+
+    // Show chakra icon and name
+    showChakraIcon(e.changedTouches[0].clientX, y, zone);
+  }
+  lastSessionTap = currentTime;
+});
+
+// Play the appropriate chakra sound
+function playChakraSound(zone) {
+  if (chakraSounds[zone]) {
+    audioManager.playSound(chakraSounds[zone].sound, 0.9);
+  }
+}
+
+// Show chakra icon and name
+function showChakraIcon(x, y, zone) {
+  if (!chakraSounds[zone]) return;
+  const iconDiv = document.createElement('div');
+  iconDiv.textContent = chakraSounds[zone].icon + ' ' + t(chakraSounds[zone].name);
+  console.log('Translating:', chakraSounds[zone].name);
+console.log('Result:', t(chakraSounds[zone].name));
+  iconDiv.style.cssText = `
+    position: fixed;
+    left: ${x}px;
+    top: ${y-40}px;
+    transform: translate(-50%, 0);
+    font-size: 1.1em;
+    background: #222;
+    color: #fde68a;
+    border-radius: 24px;
+    padding: 6px 18px;
+    z-index: 9999;
+    box-shadow: 0 0 24px #fde68a55;
+    text-shadow: 0 0 14px #fde68a;
+    border: 2px solid #fde68a;
+    pointer-events: none;
+    opacity: 0;
+    animation: dtMusicFloat 1s forwards;
+    font-weight: 600;
+  `;
+  document.body.appendChild(iconDiv);
+  setTimeout(() => {
+    if (iconDiv.parentNode) iconDiv.parentNode.removeChild(iconDiv);
+  }, 1000);
+}
+
+
   </script>
 	
  <script>
@@ -10677,3 +10764,4 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
+ 

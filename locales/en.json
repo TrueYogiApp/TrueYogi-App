@@ -285,5 +285,12 @@
   "almost_empty": "Almost empty...",
   "final_exhale": "Final exhale...",
   "hold_breath_countdown": "Hold your breath... {countdown}",
-  "breath_out_slow": "Breathe out slowly..."  
+  "breath_out_slow": "Breathe out slowly...",
+  "chakra.root": "Root",
+  "chakra.sacral": "Sacral",
+  "chakra.solar": "Solar Plexus",
+  "chakra.heart": "Heart",
+  "chakra.throat": "Throat",
+  "chakra.thirdeye": "Third Eye",
+  "chakra.crown": "Crown"  
 }

@@ -285,5 +285,12 @@
   "almost_empty": "Presque vide...",
   "final_exhale": "Dernière expiration...", 
   "hold_breath_countdown": "Retenez votre souffle... {countdown}",
-  "breath_out_slow": "Expirez lentement..."  
+  "breath_out_slow": "Expirez lentement...",
+  "chakra.root": "Racine",
+  "chakra.sacral": "Sacré",
+  "chakra.solar": "du Plexus Solaire",
+  "chakra.heart": "du Cœur",
+  "chakra.throat": "de la Gorge",
+  "chakra.thirdeye": "du Troisième Œil",
+  "chakra.crown": "Couronne"  
 }

@@ -284,5 +284,13 @@
   "almost_empty": "దాదాపు ఖాళీ...",
   "final_exhale": "పూర్తిగా శ్వాసను వదలండి ...",  
   "hold_breath_countdown": "శ్వాసను నిలుపుకోండి... {countdown}",
-  "breath_out_slow": "నెమ్మదిగా ఊపిరి విడిచండి..."  
+  "breath_out_slow": "నెమ్మదిగా ఊపిరి విడిచండి...",
+  "chakra.root": "మూలాధార",
+  "chakra.sacral": "స్వాధిష్ఠాన",
+  "chakra.solar": "మణిపూరక",
+  "chakra.heart": "ఆనాహత",
+  "chakra.throat": "విశుద్ధ",
+  "chakra.thirdeye": "ఆజ్ఞా",
+  "chakra.crown": "సహస్రార"
+  
 }
