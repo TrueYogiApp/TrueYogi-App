@@ -8593,13 +8593,13 @@ setTimeout(() => swIndicator.hide(), 22000); // Hide after 20 seconds if no SW a
 
 // 7 Chakra sound files and icons (bottom to top)
 const chakraSounds = [
-  { sound: '/assets/root_lam_396hz.mp3',   icon: '🔴', name: 'chakra.root' },
-  { sound: '/assets/sacral_vam_417hz.mp3', icon: '🟠', name: 'chakra.sacral' },
-  { sound: '/assets/solar_ram_528hz.mp3',  icon: '🟡', name: 'chakra.solar' },
-  { sound: '/assets/heart_yam_639hz.mp3',  icon: '🟢', name: 'chakra.heart' },
-  { sound: '/assets/throat_ham_741hz.mp3', icon: '🔵', name: 'chakra.throat' },
-  { sound: '/assets/thirdeye_om_852hz.mp3',icon: '🟣', name: 'chakra.thirdeye' },
-  { sound: '/assets/crown_aum_963hz.mp3',  icon: '⚪', name: 'chakra.crown' }
+  { sound: '/assets/root_lam_396hz.mp3',   icon: '🔴', name: '' },
+  { sound: '/assets/sacral_vam_417hz.mp3', icon: '🟠', name: '' },
+  { sound: '/assets/solar_ram_528hz.mp3',  icon: '🟡', name: '' },
+  { sound: '/assets/heart_yam_639hz.mp3',  icon: '🟢', name: '' },
+  { sound: '/assets/throat_ham_741hz.mp3', icon: '🔵', name: '' },
+  { sound: '/assets/thirdeye_om_852hz.mp3',  icon: '🟣', name: '' },
+  { sound: '/assets/crown_aum_963hz.mp3',  icon: '⚪', name: '' }
 ];
 
 let lastSessionTap = 0;
@@ -8649,9 +8649,7 @@ function playChakraSound(zone) {
 function showChakraIcon(x, y, zone) {
   if (!chakraSounds[zone]) return;
   const iconDiv = document.createElement('div');
-  iconDiv.textContent = chakraSounds[zone].icon + ' ' + t(chakraSounds[zone].name);
-  console.log('Translating:', chakraSounds[zone].name);
-console.log('Result:', t(chakraSounds[zone].name));
+  iconDiv.textContent = chakraSounds[zone].icon + ' ' + chakraSounds[zone].name;
   iconDiv.style.cssText = `
     position: fixed;
     left: ${x}px;

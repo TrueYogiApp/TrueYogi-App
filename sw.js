@@ -2,7 +2,7 @@
 
 const APP_VERSION = '1.3';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
-const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2'; 
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v3'; 
 
 // Permanent assets that rarely change 13
 const AUDIO_ASSETS = [
@@ -19,7 +19,14 @@ const AUDIO_ASSETS = [
   '/assets/music4.m4a',
   '/assets/music3.m4a',
   '/assets/music2.m4a',
-  '/assets/music1.m4a'
+  '/assets/music1.m4a',
+  '/assets/crown_aum_963hz.m4a',
+  '/assets/thirdeye_om_852hz.m4a',
+  '/assets/throat_ham_741hz.m4a',
+  '/assets/heart_yam_639hz.m4a',
+  '/assets/solar_ram_528hz.m4a',
+  '/assets/sacral_vam_417hz.m4a',
+  '/assets/root_lam_396hz.m4a'
 ];
 
 const PERMANENT_ASSETS = [
