@@ -8621,7 +8621,7 @@ document.addEventListener('touchend', function(e) {
   const currentTime = new Date().getTime();
   const tapLength = currentTime - lastSessionTap;
 
-  if (tapLength < 200 && tapLength > 0) {
+  if (tapLength < 250 && tapLength > 0) {
     e.preventDefault();
 
 // Determine which vertical zone was tapped (7 zones, bottom to top)
