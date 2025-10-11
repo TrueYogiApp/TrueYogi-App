@@ -1642,7 +1642,7 @@
 
 
   <!-- Welcome Message Modal -->
-  <div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true">
+  <div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="welcome-heading">
   <div class="welcome-message max-w-md mx-4 p-6 rounded-xl text-center">
     <div class="text-yellow-400 text-5xl mb-4">
       <i class="fas fa-lotus"></i>
@@ -2903,7 +2903,7 @@
   
   <div id="lang-switch-container">
   <i class="fas fa-globe-asia"></i>
-  <select id="lang-switch" onchange="setLanguage(this.value)">
+  <select id="lang-switch" onchange="setLanguage(this.value)" aria-label="Select language">
     <option value="en">EN</option>
     <option value="te">TE</option>
 	<option value="fr">FR</option>
