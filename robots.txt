@@ -1,6 +1,5 @@
 User-agent: *
 Allow: /
-Content-signal: search=yes,ai-train=no
 
 # Cloudflare managed bot blocks
 User-agent: Amazonbot
