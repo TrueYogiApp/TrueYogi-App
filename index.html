@@ -1624,15 +1624,17 @@
   <button onclick="promptVerifyAndSync()" style="background:#eab308; color:#222; margin-left:1em; font-weight:bold; border-radius:6px; padding:0.4em 1.2em; cursor:pointer;">Verify Now</button>
 </div>
 
-  <div id="app-loader" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50"> <!-- 24 -->
-    <div class="loader-spinner"></div>
-    <div class="loader-overlay">
-        <img src="https://assets.trueyogi.app/assets/cosmos.mp4" class="cosmic-bg active" />
-		<img src="https://assets.trueyogi.app/assets/merkaba.mp4" class="cosmic-bg" /> 
-		<img src="https://assets.trueyogi.app/assets/floweroflife.gif" class="cosmic-bg" />
-		<img src="https://assets.trueyogi.app/assets/sriyantra.mp4" class="cosmic-bg" />
-		<img src="https://assets.trueyogi.app/assets/mandala.mp4" class="cosmic-bg" />	
-    </div>
+<div id="app-loader" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
+  <div class="loader-spinner"></div>
+  <div class="loader-overlay">
+    <!-- Video backgrounds -->
+    <video src="https://assets.trueyogi.app/assets/cosmos.mp4" class="cosmic-bg active" autoplay loop muted playsinline preload="none"></video>
+    <video src="https://assets.trueyogi.app/assets/merkaba.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    <video src="https://assets.trueyogi.app/assets/sriyantra.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    <video src="https://assets.trueyogi.app/assets/mandala.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    <!-- Still using an image/gif -->
+    <img src="https://assets.trueyogi.app/assets/floweroflife.gif" class="cosmic-bg" loading="lazy" />
+  </div>
 </div>
 
 <!-- Service Worker Status Indicator -->
@@ -8418,45 +8420,65 @@ setAuraColor();
 setInterval(setAuraColor, 1000); // update every minute (no need for every second)
 
 
-// Array of image elements
-const loaderImages = document.querySelectorAll('.cosmic-bg');
+// Select all loader backgrounds (videos or images)
+const loaderMedia = document.querySelectorAll('.cosmic-bg');
 const HOUR_IN_MS = 3600000; // 1 hour
 
-function switchLoaderImage() {
-    // Remove active class from all images
-    loaderImages.forEach(img => img.classList.remove('active'));
-    
-    // Pick a random image
-    const randomIndex = Math.floor(Math.random() * loaderImages.length);
-    loaderImages[randomIndex].classList.add('active');
-    
-    // Save the time we made this change
+function switchLoaderMedia() {
+    loaderMedia.forEach((el) => {
+        el.classList.remove('active');
+        if (el.tagName === 'VIDEO') {
+            el.pause();
+            el.currentTime = 0;
+            el.preload = "none";
+        }
+    });
+
+    // Pick a random media element
+    const randomIndex = Math.floor(Math.random() * loaderMedia.length);
+    const selected = loaderMedia[randomIndex];
+    selected.classList.add('active');
+
+    if (selected.tagName === 'VIDEO') {
+        selected.preload = "auto";
+        selected.play().catch(() => {});
+    }
+
     localStorage.setItem('lastImageSwitch', Date.now());
     localStorage.setItem('currentImageIndex', randomIndex);
 }
 
-function initializeLoaderImage() {
+function initializeLoaderMedia() {
     const lastSwitch = localStorage.getItem('lastImageSwitch');
     const savedIndex = localStorage.getItem('currentImageIndex');
     const now = Date.now();
-    
-    // If it's been more than 1 hour since last switch, OR no saved data
+
     if (!lastSwitch || (now - lastSwitch) >= HOUR_IN_MS) {
-        // Time for a new random image
-        switchLoaderImage();
+        switchLoaderMedia();
     } else {
-        // Still within the 1 hour - show the saved image
-        loaderImages.forEach(img => img.classList.remove('active'));
-        const index = savedIndex ? parseInt(savedIndex) : 0;
-        loaderImages[index].classList.add('active');
+        loaderMedia.forEach((el) => {
+            el.classList.remove('active');
+            if (el.tagName === 'VIDEO') {
+                el.pause();
+                el.currentTime = 0;
+                el.preload = "none";
+            }
+        });
+        const index = savedIndex ? parseInt(savedIndex, 10) : 0;
+        const selected = loaderMedia[index];
+        selected.classList.add('active');
+        if (selected.tagName === 'VIDEO') {
+            selected.preload = "auto";
+            selected.play().catch(() => {});
+        }
     }
 }
 
 // Initialize on page load
-initializeLoaderImage();
+initializeLoaderMedia();
 
 // Check every minute if it's time to switch
-setInterval(initializeLoaderImage, 60000);
+setInterval(initializeLoaderMedia, 60000);
 
 
 // Enhanced offline detection
