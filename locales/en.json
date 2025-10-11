@@ -176,7 +176,7 @@
   "app_faq_q1": "What is this App?",
   "app_faq_a1": "This App combines meditation tracking with blockchain technology to create a unique spiritual journey.",
   "app_faq_q2": "How does the App work?",
-  "app_faq_a2": "The App tracks your meditation progress when you click 'Start Meditation' and syncs with the blockchain when you connect your wallet.",
+  "app_faq_a2": "The App gently tracks your meditation progress when you click 'Start Meditation,' and connects with your wallet to record milestones and offer rewards through the blockchain.",
   "app_faq_q3": "What's the difference between Flow and TrueYogi modes?",
   "app_faq_a3": "Flow mode is flexible meditation anytime. TrueYogi is a structured 41-day challenge with scheduled sessions.",
   "app_faq_q4": "Why can't I start a session outside my scheduled time?",
@@ -286,11 +286,11 @@
   "final_exhale": "Final exhale...",
   "hold_breath_countdown": "Hold your breath... {countdown}",
   "breath_out_slow": "Breathe out slowly...",
-  "chakra.root": "Root",
-  "chakra.sacral": "Sacral",
-  "chakra.solar": "Solar Plexus",
-  "chakra.heart": "Heart",
-  "chakra.throat": "Throat",
-  "chakra.thirdeye": "Third Eye",
-  "chakra.crown": "Crown"  
+  "chakra.root": "Root 396hz",
+  "chakra.sacral": "Sacral 417hz",
+  "chakra.solar": "Solar Plexus 528hz",
+  "chakra.heart": "Heart 639hz",
+  "chakra.throat": "Throat 741hz",
+  "chakra.thirdeye": "Third Eye 852hz",
+  "chakra.crown": "Crown 963hz"  
 }

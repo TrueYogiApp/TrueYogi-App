@@ -1,8 +1,8 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.3';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
-const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v1'; 
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2'; 
 
 // Permanent assets that rarely change 13
 const AUDIO_ASSETS = [
@@ -36,7 +36,8 @@ const PERMANENT_ASSETS = [
   '/assets/spaceship.svg',
   '/assets/flowmeditate.svg',
   '/assets/truemeditate.svg',
-  '/assets/groupmeditate.svg'
+  '/assets/groupmeditate.svg',
+  '/assets/cosmos.gif'
 ];
 
 // App files that change more often
