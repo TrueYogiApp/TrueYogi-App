@@ -2,6 +2,7 @@
   "name": "TrueYogi",
   "short_name": "TrueYogi",
   "start_url": "/",
+  "id": "trueyogi.app",
   "display": "standalone",
   "background_color": "#1e293b",
   "theme_color": "#1e293b",
@@ -9,6 +10,9 @@
   "scope": "/",
   "description": "Spiritual App",
   "categories": ["Spirituality", "Consciousness", "Truth", "Cosmos"],
+  "display_override": ["standalone", "browser"],
+  "lang": "en",
+  "dir": "ltr",
   "icons": [
     {
       "src": "/assets/android-chrome-192x192.png",
@@ -31,5 +35,22 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ]
+  ],
+  "screenshots": [
+  {
+    "src": "/assets/screenshot1.jpg",
+    "sizes": "1125x2330",
+    "type": "image/jpeg"
+  },
+  {
+    "src": "/assets/screenshot2.jpg",
+    "sizes": "1125x2105",
+    "type": "image/jpeg"
+  },
+    {
+    "src": "/assets/screenshot3.jpg",
+    "sizes": "1125x2221",
+    "type": "image/jpeg"
+  }
+]
 }

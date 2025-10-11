@@ -62,12 +62,20 @@ const APP_FILES = [
 
 // Helper: sequentially cache audio files
 async function cacheAudioFiles(cache) {
+  const existingKeys = await cache.keys();
+  const existingUrls = new Set(existingKeys.map(req => req.url));
+
   for (const file of AUDIO_ASSETS) {
-    try {
-      await cache.add(file);
-      console.log('✅ Audio cached:', file);
-    } catch (e) {
-      console.warn('❌ Audio cache failed:', file, e);
+    const fullUrl = new URL(file, self.location.origin).href;
+    if (!existingUrls.has(fullUrl)) {
+      try {
+        await cache.add(file);
+        console.log('✅ Audio cached:', file);
+      } catch (e) {
+        console.warn('❌ Audio cache failed:', file, e);
+      }
+    } else {
+      console.log('🔵 Already in permanent cache:', file);
     }
   }
 }
