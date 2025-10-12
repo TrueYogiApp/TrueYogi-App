@@ -2517,6 +2517,23 @@
   </div>
 </div>
 
+<!-- Wisdom Like Wallet Modal -->
+<div id="wisdom-wallet-required-modal" class="hidden fixed inset-0 flex items-center justify-center z-50">
+  <div class="confirmation-modal max-w-md mx-4 p-6 rounded-xl text-center">
+    <div class="text-yellow-400 text-5xl mb-4">
+      <i class="fas fa-wallet"></i>
+    </div>
+    <h2 class="text-xl font-semibold text-yellow-300 mb-2">Wallet Needed</h2>
+    <p class="text-gray-200 mb-4">
+      <span>Please connect your wallet and engage with wisdom.</span><br>
+      <span>Every ‘love’ you send honors wisdom, records your presence on-chain.</span>
+    </p>
+    <button onclick="closeWisdomWalletRequiredModal()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
+      OK
+    </button>
+  </div>
+</div>
+
 <!-- Connect Journey Wallet for Verification Modal -->
 <div id="connect-journey-wallet-required-modal" class="hidden fixed inset-0 flex items-center justify-center z-50">
   <div class="confirmation-modal max-w-md mx-4 p-6 rounded-xl text-center">
@@ -4178,6 +4195,13 @@ function showConnectWalletRequiredModal() {
 }
 function closeConnectWalletRequiredModal() {
   document.getElementById('connect-wallet-required-modal').classList.add('hidden');
+}
+
+function showWisdomWalletRequiredModal() {
+  document.getElementById('wisdom-wallet-required-modal').classList.remove('hidden');
+}
+function closeWisdomWalletRequiredModal() {
+  document.getElementById('wisdom-wallet-required-modal').classList.add('hidden');
 }
 
 function showConnectJourneyWalletRequiredModal(wallet) {
@@ -8781,7 +8805,7 @@ async function updateWisdomLikeUI(wisdomId) {
 async function toggleWisdomLike() {
   if (!window.walletPublicKey) {
     // Show wallet modal!
-    showConnectWalletRequiredModal();
+    showWisdomWalletRequiredModal();
     return;
   }
   const wisdomId = getCurrentWisdomId(); // Your way of getting it
@@ -8796,7 +8820,6 @@ async function toggleWisdomLike() {
   });
   await updateWisdomLikeUI(wisdomId);
 }
-
 
 
   </script>
