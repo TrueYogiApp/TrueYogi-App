@@ -37,7 +37,8 @@ const PERMANENT_ASSETS = [
   '/assets/flowmeditate.svg',
   '/assets/truemeditate.svg',
   '/assets/groupmeditate.svg',
-  '/assets/cosmos.mp4'
+  '/assets/cosmos.mp4',
+  '/assets/floweroflife.mp4'
 ];
 
 // App files that change more often
