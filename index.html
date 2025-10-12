@@ -2826,14 +2826,28 @@
         <p id="youaresecret" class="text-gray-300 mb-6 text-2xl font-playfair tracking-wider" style="font-family: 'Playfair Display', serif; letter-spacing: 0.2em; text-transform: uppercase; text-shadow: 0 0 10px rgba(234, 179, 8, 0.5);">'YOU ARE YOUR SECRET'</p>
 		
         <!-- Enhanced Wisdom Section -->
-<div id="wisdom-section" class="mt-6 p-6 rounded-lg bg-gradient-to-br from-gray-800 to-gray-900 border border-yellow-800 shadow-lg hidden transition-all duration-500 ease-in-out">
+<div id="wisdom-section" class="relative mt-6 p-6 rounded-lg ...">
   <div class="flex items-center mb-4">
     <div class="text-yellow-300 text-xl mr-2">
       <i class="fas fa-quote-left"></i>
     </div>
     <p class="text-yellow-300 text-lg font-medium" id="wisdom-section-heading"></p>
   </div>
-  <p id="wisdom-text" class="text-gray-100 text-base leading-relaxed pl-6 border-l-2 border-yellow-700 transition-opacity duration-700"></p>
+  <div class="flex items-center justify-between mt-2">
+    <p id="wisdom-text" class="text-gray-100 text-base leading-relaxed pl-6 border-l-2 border-yellow-700 transition-opacity duration-700 mb-0"></p>
+    <!-- WRAP the button in this new div: -->
+    <div id="wisdom-like-container" style="display:none;">
+      <button id="wisdom-like-btn"
+              type="button"
+              class="ml-3 flex items-center gap-1 px-3 py-1 bg-gray-900/80 rounded-full shadow hover:bg-yellow-900/40 transition cursor-pointer"
+              style="z-index: 10;"
+              aria-label="Like this wisdom"
+              onclick="toggleWisdomLike()">
+       <i id="wisdom-like-icon" class="fa-regular fa-heart text-yellow-200 text-lg transition"></i>
+       <span id="wisdom-like-count" class="text-yellow-200 font-semibold text-sm ml-2">0</span>
+      </button>
+    </div>
+  </div>
 </div>
 
 <!-- Enhanced Wisdom Button -->
@@ -4793,6 +4807,9 @@ if (bgMusicPlayer) {
   backgroundAudio = null;
 }
 
+  localStorage.removeItem('finalSectionActive');
+  localStorage.removeItem('wisdomShownCount');
+  localStorage.removeItem('wisdomOrder');
   localStorage.removeItem('lastVisit');
   currentMode = null;
   currentSessionTime = null;
@@ -6036,6 +6053,11 @@ document.getElementById('show-wisdom').style.display = ""; // Make button visibl
   updateBackButtonVisibility();
 } else {
     document.getElementById('final-section').classList.remove('hidden');
+		  // Save final section state
+    localStorage.setItem('finalSectionActive', 'true');
+    localStorage.setItem('wisdomShownCount', wisdomShownCount);
+    localStorage.setItem('wisdomOrder', JSON.stringify(wisdomOrder));
+	
     document.getElementById('yogi-progress').classList.toggle('hidden', currentMode !== 'yogi');
     document.getElementById('session-timing-display').classList.toggle('hidden', currentMode !== 'yogi');
 	document.getElementById('faq-tab').style.display = 'none';
@@ -7723,6 +7745,9 @@ async function loadWisdoms() {
 }
 
 function showNextWisdom() {
+  // 🟢 Always hide the like button at start
+  document.getElementById('wisdom-like-container').style.display = 'none';
+
   const wisdomSection = document.getElementById('wisdom-section');
   const wisdomTextEl = document.getElementById('wisdom-text');
   const wisdomBtn = document.getElementById('show-wisdom');
@@ -7738,8 +7763,31 @@ function showNextWisdom() {
   }
 
   if (wisdomShownCount < Math.min(13, wisdomOrder.length)) {
-    wisdomTextEl.textContent = wisdomOrder[wisdomShownCount];
+    const wisdomText = wisdomOrder[wisdomShownCount];
+    wisdomTextEl.textContent = wisdomText;
     wisdomSection.classList.remove('hidden');
+
+    // 🟢 Show the like button now, since a wisdom is actually displayed:
+    document.getElementById('wisdom-like-container').style.display = '';
+
+    // Find its index in the original array and store as currentWisdomId
+    currentWisdomId = wisdoms.indexOf(wisdomText);
+
+    // 🟡 --- ADD THIS BLOCK TO RESET LIKE UI ---
+    const icon = document.getElementById('wisdom-like-icon');
+    const count = document.getElementById('wisdom-like-count');
+    if (icon) {
+      icon.classList.remove('fa-solid', 'text-pink-500');
+      icon.classList.add('fa-regular');
+    }
+    if (count) {
+      count.textContent = '0';
+    }
+    // 🟡 --- END BLOCK ---
+
+    // 🟡 Fetch and render the actual like state for the new wisdom
+    updateWisdomLikeUI(currentWisdomId);
+
     wisdomShownCount++;
     wisdomBtn.textContent = wisdomShownCount < Math.min(13, wisdomOrder.length)
       ? t('revealAnotherWisdom')
@@ -7747,7 +7795,13 @@ function showNextWisdom() {
   } else {
     wisdomTextEl.textContent = t('wisdomJourneyContinues');
     wisdomBtn.style.display = "none";
+    // 🟢 Optionally hide like button if journey is over:
+    document.getElementById('wisdom-like-container').style.display = 'none';
   }
+}
+
+function getCurrentWisdomId() {
+  return currentWisdomId;
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -8698,6 +8752,51 @@ function showChakraIcon(x, y, zone) {
     if (iconDiv.parentNode) iconDiv.parentNode.removeChild(iconDiv);
   }, 1000);
 }
+
+
+// Called when the wisdom is revealed
+async function renderWisdom(wisdomId) {
+  // ...existing wisdom display logic...
+  await updateWisdomLikeUI(wisdomId);
+}
+
+// Fetch like count and status for this wisdom
+async function updateWisdomLikeUI(wisdomId) {
+  // Fetch from backend: {count, liked (true/false)}
+  const resp = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/wisdom-likes?wisdomId=${wisdomId}&wallet=${window.walletPublicKey || ''}`);
+  const {count, liked} = await resp.json();
+
+  document.getElementById('wisdom-like-count').textContent = count;
+  const icon = document.getElementById('wisdom-like-icon');
+  if (liked) {
+    icon.classList.remove('fa-regular');
+    icon.classList.add('fa-solid', 'text-pink-500');
+  } else {
+    icon.classList.remove('fa-solid', 'text-pink-500');
+    icon.classList.add('fa-regular');
+  }
+}
+
+// Called when user clicks the heart
+async function toggleWisdomLike() {
+  if (!window.walletPublicKey) {
+    // Show wallet modal!
+    showConnectWalletRequiredModal();
+    return;
+  }
+  const wisdomId = getCurrentWisdomId(); // Your way of getting it
+  const icon = document.getElementById('wisdom-like-icon');
+  const liked = icon.classList.contains('fa-solid');
+  const method = liked ? 'DELETE' : 'POST';
+
+  await fetch('https://trueyogi-backend-knkq.onrender.com/api/wisdom-likes', {
+    method,
+    headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')},
+    body: JSON.stringify({wisdomId})
+  });
+  await updateWisdomLikeUI(wisdomId);
+}
+
 
 
   </script>
