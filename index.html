@@ -4832,7 +4832,7 @@ if (bgMusicPlayer) {
 
   localStorage.removeItem('finalSectionActive');
   localStorage.removeItem('wisdomShownCount');
-  localStorage.removeItem('wisdomOrder');
+  localStorage.removeItem('quoteOrder');
   localStorage.removeItem('lastVisit');
   currentMode = null;
   currentSessionTime = null;
@@ -6028,7 +6028,7 @@ if (window.walletPublicKey && localStorage.getItem('jwtToken')) {
 
   // Wisdom reset here:
 wisdomShownCount = 0;
-wisdomOrder = yogiQuotes.slice().sort(() => Math.random() - 0.5); // Or your wisdoms array
+quoteOrder = yogiQuotes.slice().sort(() => Math.random() - 0.5); // Or your wisdoms array
 document.getElementById('show-wisdom').textContent = t('revealTodaysWisdom');
 document.getElementById('show-wisdom').style.display = ""; // Make button visible
   
@@ -6079,7 +6079,7 @@ document.getElementById('show-wisdom').style.display = ""; // Make button visibl
 		  // Save final section state
     localStorage.setItem('finalSectionActive', 'true');
     localStorage.setItem('wisdomShownCount', wisdomShownCount);
-    localStorage.setItem('wisdomOrder', JSON.stringify(wisdomOrder));
+    localStorage.setItem('quoteOrder', JSON.stringify(quoteOrder));
 	
     document.getElementById('yogi-progress').classList.toggle('hidden', currentMode !== 'yogi');
     document.getElementById('session-timing-display').classList.toggle('hidden', currentMode !== 'yogi');
@@ -7648,9 +7648,9 @@ document.getElementById('mobile-yogi-modal-heading').textContent = t('mobileYogi
 document.getElementById('mobile-yogi-modal-paragraph').innerHTML = t('mobileYogi_paragraph');
 document.getElementById('mobile-yogi-modal-button').textContent = t('mobileYogi_button');
 
-  document.getElementById('wisdom-wallet-modal').textContent = t('wisdomWallet');
-  document.getElementById('wisdom-wallet-line1').textContent = t('wisdomWalletL1'); 
-  document.getElementById('wisdom-wallet-line2').textContent = t('wisdomWalletL2');
+document.getElementById('wisdom-wallet-modal').textContent = t('wisdomWallet');
+document.getElementById('wisdom-wallet-line1').textContent = t('wisdomWalletL1'); 
+document.getElementById('wisdom-wallet-line2').textContent = t('wisdomWalletL2');
 
 }
 
@@ -7755,7 +7755,7 @@ function updateHideUiBtnVisibility() {
 
 let wisdoms = [];
 let wisdomShownCount = 0;
-let wisdomOrder = [];
+let quoteOrder = [];
 
 async function loadWisdoms() {
   const lang = localStorage.getItem('lang') || 'en';
@@ -7812,13 +7812,13 @@ function showNextWisdom() {
       .sort(() => Math.random() - 0.5);
 
     // Take first 13 from the shuffled candidate pool
-    wisdomOrder = candidatePool
+    quoteOrder = candidatePool
       .slice(0, Math.min(13, candidatePool.length))
       .map(item => item.text);
   }
 
-  if (wisdomShownCount < Math.min(13, wisdomOrder.length)) {
-    const wisdomText = wisdomOrder[wisdomShownCount];
+  if (wisdomShownCount < Math.min(13, quoteOrder.length)) {
+    const wisdomText = quoteOrder[wisdomShownCount];
     wisdomTextEl.textContent = wisdomText;
     wisdomSection.classList.remove('hidden');
 
@@ -7850,7 +7850,7 @@ function showNextWisdom() {
     localStorage.setItem('wisdomStats', JSON.stringify(wisdomStats));
 
     wisdomShownCount++;
-    wisdomBtn.textContent = wisdomShownCount < Math.min(13, wisdomOrder.length)
+    wisdomBtn.textContent = wisdomShownCount < Math.min(13, quoteOrder.length)
       ? t('revealAnotherWisdom')
       : t('meditateToUnlockWisdom');
   } else {
