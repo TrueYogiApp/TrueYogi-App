@@ -2850,21 +2850,20 @@
     </div>
     <p class="text-yellow-300 text-lg font-medium" id="wisdom-section-heading"></p>
   </div>
-  <div class="flex items-center justify-between mt-2">
-    <p id="wisdom-text" class="text-gray-100 text-base leading-relaxed pl-6 border-l-2 border-yellow-700 transition-opacity duration-700 mb-0"></p>
-    <!-- WRAP the button in this new div: -->
-    <div id="wisdom-like-container" style="display:none;">
-      <button id="wisdom-like-btn"
-              type="button"
-              class="ml-3 flex items-center gap-1 px-3 py-1 bg-gray-900/80 rounded-full shadow hover:bg-yellow-900/40 transition cursor-pointer"
-              style="z-index: 10;"
-              aria-label="Like this wisdom"
-              onclick="toggleWisdomLike()">
-       <i id="wisdom-like-icon" class="fa-regular fa-heart text-yellow-200 text-lg transition"></i>
-       <span id="wisdom-like-count" class="text-yellow-200 font-semibold text-sm ml-2">0</span>
-      </button>
-    </div>
+<div class="mt-2 flex flex-col items-center">
+  <p id="wisdom-text" class="text-gray-100 text-base leading-relaxed pl-6 border-l-2 border-yellow-700 transition-opacity duration-700 mb-2 text-center"></p>
+  <div id="wisdom-like-container" style="display:none; margin-top: 8px;">
+    <button id="wisdom-like-btn"
+            type="button"
+            class="flex items-center gap-1 px-3 py-1 bg-gray-900/80 rounded-full shadow hover:bg-yellow-900/40 transition cursor-pointer"
+            style="z-index: 10;"
+            aria-label="Like this wisdom"
+            onclick="toggleWisdomLike()">
+     <i id="wisdom-like-icon" class="fa-regular fa-heart text-yellow-200 text-lg transition"></i>
+     <span id="wisdom-like-count" class="text-yellow-200 font-semibold text-sm ml-2">0</span>
+    </button>
   </div>
+</div>
 </div>
 
 <!-- Enhanced Wisdom Button -->
