@@ -7785,7 +7785,36 @@ function showNextWisdom() {
   }
 
   if (wisdomShownCount === 0) {
-    wisdomOrder = wisdoms.slice().sort(() => Math.random() - 0.5);
+    // Get wisdom statistics from localStorage
+    const wisdomStats = JSON.parse(localStorage.getItem('wisdomStats') || '{}');
+    
+    // Create array with wisdom text and its show count
+    const wisdomsWithStats = wisdoms.map((wisdom, index) => ({
+      text: wisdom,
+      index: index,
+      showCount: wisdomStats[index] || 0,
+      lastSeen: wisdomStats[`lastSeen_${index}`] || 0 // Track when last seen
+    }));
+
+    // Sort by show count (least shown first) and then randomize
+    wisdomsWithStats.sort((a, b) => {
+      // Primary: show count (prefer less shown)
+      if (a.showCount !== b.showCount) {
+        return a.showCount - b.showCount;
+      }
+      // Secondary: randomness for ties
+      return Math.random() - 0.5;
+    });
+
+    // Take top 20 least shown wisdoms and shuffle them properly
+    const candidatePool = wisdomsWithStats
+      .slice(0, Math.min(20, wisdoms.length))
+      .sort(() => Math.random() - 0.5);
+
+    // Take first 13 from the shuffled candidate pool
+    wisdomOrder = candidatePool
+      .slice(0, Math.min(13, candidatePool.length))
+      .map(item => item.text);
   }
 
   if (wisdomShownCount < Math.min(13, wisdomOrder.length)) {
@@ -7813,6 +7842,12 @@ function showNextWisdom() {
 
     // 🟡 Fetch and render the actual like state for the new wisdom
     updateWisdomLikeUI(currentWisdomId);
+
+    // Update wisdom statistics
+    const wisdomStats = JSON.parse(localStorage.getItem('wisdomStats') || '{}');
+    wisdomStats[currentWisdomId] = (wisdomStats[currentWisdomId] || 0) + 1;
+    wisdomStats[`lastSeen_${currentWisdomId}`] = Date.now(); // Track when seen
+    localStorage.setItem('wisdomStats', JSON.stringify(wisdomStats));
 
     wisdomShownCount++;
     wisdomBtn.textContent = wisdomShownCount < Math.min(13, wisdomOrder.length)
