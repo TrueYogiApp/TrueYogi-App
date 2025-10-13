@@ -292,5 +292,8 @@
   "chakra.heart": "du Cœur",
   "chakra.throat": "de la Gorge",
   "chakra.thirdeye": "du Troisième Œil",
-  "chakra.crown": "Couronne"  
+  "chakra.crown": "Couronne",
+  "wisdomWallet": "Portefeuille requis",
+  "wisdomWalletL1": "Veuillez connecter votre portefeuille pour vous engager avec sagesse.",
+  "wisdomWalletL2": "Chaque « amour » que vous envoyez honore la sagesse et enregistre votre présence avec votre portefeuille."
 }

@@ -239,7 +239,7 @@
   "wisdomNone": "No wisdom available. Please add wisdoms to wisdom.json!",
   "revealTodaysWisdom": "Today's Wisdom Pearl 🦢",
   "revealAnotherWisdom": "Next Wisdom Pearl 📿",
-  "meditateToUnlockWisdom": "Meditate more to unlock more wisdom!",
+  "meditateToUnlockWisdom": "Meditate again to unlock more wisdom!",
   "wisdomJourneyContinues": "🌱 Your journey to Wisdom continues—Meditate again to unlock more!",
   "chooseBackgroundMusic": "Select Music:",
   "mobileReminder_heading": "Unlock WEB3",
@@ -292,5 +292,8 @@
   "chakra.heart": "Heart 639hz",
   "chakra.throat": "Throat 741hz",
   "chakra.thirdeye": "Third Eye 852hz",
-  "chakra.crown": "Crown 963hz"  
+  "chakra.crown": "Crown 963hz",
+  "wisdomWallet": "Wallet Needed",
+  "wisdomWalletL1": "Please connect your wallet to engage with wisdom.",
+  "wisdomWalletL2": "Every ‘love’ you send honors wisdom and records your presence with your wallet."
 }

@@ -2523,10 +2523,10 @@
     <div class="text-yellow-400 text-5xl mb-4">
       <i class="fas fa-wallet"></i>
     </div>
-    <h2 class="text-xl font-semibold text-yellow-300 mb-2">Wallet Needed</h2>
+    <h2 id="wisdom-wallet-modal" class="text-xl font-semibold text-yellow-300 mb-2">Wallet Needed</h2>
     <p class="text-gray-200 mb-4">
-      <span>Please connect your wallet to engage with wisdom.</span><br>
-      <span>Every ‘love’ you send honors wisdom and records your presence on-chain.</span>
+      <span id="wisdom-wallet-line1">Please connect your wallet to engage with wisdom.</span><br>
+      <span id="wisdom-wallet-line2">Every ‘love’ you send honors wisdom and records your presence with your wallet.</span>
     </p>
     <button onclick="closeWisdomWalletRequiredModal()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
       OK
@@ -7649,6 +7649,9 @@ document.getElementById('mobile-yogi-modal-heading').textContent = t('mobileYogi
 document.getElementById('mobile-yogi-modal-paragraph').innerHTML = t('mobileYogi_paragraph');
 document.getElementById('mobile-yogi-modal-button').textContent = t('mobileYogi_button');
 
+  document.getElementById('wisdom-wallet-modal').textContent = t('wisdomWallet');
+  document.getElementById('wisdom-wallet-line1').textContent = t('wisdomWalletL1'); 
+  document.getElementById('wisdom-wallet-line2').textContent = t('wisdomWalletL2');
 
 }
 
