@@ -8804,14 +8804,21 @@ async function updateWisdomLikeUI(wisdomId) {
 // Called when user clicks the heart
 async function toggleWisdomLike() {
   if (!window.walletPublicKey) {
-    // Show wallet modal!
     showWisdomWalletRequiredModal();
     return;
   }
-  const wisdomId = getCurrentWisdomId(); // Your way of getting it
+
+  const wisdomId = getCurrentWisdomId();
   const icon = document.getElementById('wisdom-like-icon');
   const liked = icon.classList.contains('fa-solid');
   const method = liked ? 'DELETE' : 'POST';
+
+  // ADD THIS: Vibration
+  if (navigator.vibrate) navigator.vibrate(50);
+  
+  // ADD THIS: Heart animation
+  icon.style.transform = 'scale(1.3)';
+  setTimeout(() => { icon.style.transform = 'scale(1)'; }, 200);
 
   await fetch('https://trueyogi-backend-knkq.onrender.com/api/wisdom-likes', {
     method,
@@ -8820,7 +8827,6 @@ async function toggleWisdomLike() {
   });
   await updateWisdomLikeUI(wisdomId);
 }
-
 
   </script>
 	
