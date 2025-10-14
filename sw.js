@@ -232,8 +232,19 @@ self.addEventListener('message', (event) => {
   }
 
   if (event.data.type === 'CLEAR_APP_CACHE') {
-    event.waitUntil(caches.delete(CACHE_NAME));
-  }
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME && cacheName !== PERMANENT_CACHE_NAME) {
+            // Delete any cache that isn't the current app or permanent cache
+            return caches.delete(cacheName);
+          }
+        }).concat(caches.delete(CACHE_NAME)) // Also delete the app cache itself
+      );
+    })
+  );
+}
 });
 
 // BACKGROUND SYNC

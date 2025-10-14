@@ -296,11 +296,11 @@
   "wisdomWallet": "Wallet Needed",
   "wisdomWalletL1": "Please connect your wallet to engage with wisdom.",
   "wisdomWalletL2": "Every ‘love’ you send honors wisdom and records your presence.",
-  "clearCacheModalHeading": "Confirm Cache Clear",
+  "clearCacheModalHeading": "Confirm Cache Reload",
   "clearCacheModalDescription": "This will remove downloaded app data and reload the latest content.<br><span class=\"text-yellow-400 font-bold\">Your Meditation Stats are not affected.</span><br><br>Are you sure you want to continue?",
   "clearCacheModalButtonConfirm": "Yes, Clear & Reload",
   "clearCacheModalButtonCancel": "Cancel",
-  "faqClearCacheHeading": "Clear App Cache",
-  "faqClearCacheDescription": "Clear downloaded app data and reload fresh content. Use this to refresh your app experience.",
+  "faqClearCacheHeading": "Reload App Cache",
+  "faqClearCacheDescription": "Reload the app cache to get the latest and missing content. Useful for offline experience.",
   "faqClearCacheButton": "Clear Cache & Reload"
 }
