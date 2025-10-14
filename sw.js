@@ -138,20 +138,37 @@ self.addEventListener('install', (event) => {
 
 // ACTIVATE EVENT
 self.addEventListener('activate', (event) => {
-  const cacheWhitelist = [CACHE_NAME, PERMANENT_CACHE_NAME];
+  const expectedCaches = [CACHE_NAME, PERMANENT_CACHE_NAME];
 
   event.waitUntil(
-    caches.keys().then((cacheNames) =>
-      Promise.all(
+    caches.keys().then((cacheNames) => {
+      // Log all cache names for debugging
+      console.log('All cache names on activate:', cacheNames);
+      return Promise.all(
         cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
-            console.log('🧹 Deleting unused cache:', cacheName);
+          // Delete any cache that matches our app's naming pattern but is not current
+          if (
+            (
+              cacheName.startsWith('TrueYogi-App-') && cacheName !== CACHE_NAME
+            ) ||
+            (
+              cacheName.startsWith('TrueYogi-Permanent') && cacheName !== PERMANENT_CACHE_NAME
+            )
+          ) {
+            console.log('🧹 Aggressively deleting old or duplicate cache:', cacheName);
             return caches.delete(cacheName);
           }
+          // Also delete anything not in the expected list (paranoia)
+          if (!expectedCaches.includes(cacheName)) {
+            console.log('🧹 Deleting non-whitelisted cache:', cacheName);
+            return caches.delete(cacheName);
+          }
+          // Otherwise, keep it
+          return Promise.resolve();
         })
-      )
-    ).then(() => {
-      console.log('✅ Service Worker: Only whitelisted caches remain.');
+      );
+    }).then(() => {
+      console.log('✅ Service Worker: Only current caches remain.');
       return self.clients.claim();
     })
   );
@@ -263,4 +280,5 @@ self.addEventListener('notificationclick', (event) => {
       }
     })
   );
+
 });
