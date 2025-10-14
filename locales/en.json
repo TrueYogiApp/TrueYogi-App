@@ -301,6 +301,6 @@
   "clearCacheModalButtonConfirm": "Yes, Clear & Reload",
   "clearCacheModalButtonCancel": "Cancel",
   "faqClearCacheHeading": "Reload App Cache",
-  "faqClearCacheDescription": "Reload the app cache to get the latest and missing content. Useful for offline experience.",
+  "faqClearCacheDescription": "Reload the app cache to get the latest and missing content if necessary. Useful for offline experience.",
   "faqClearCacheButton": "Reload App Cache"
 }
