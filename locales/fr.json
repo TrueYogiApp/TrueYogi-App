@@ -302,5 +302,5 @@
   "clearCacheModalButtonCancel": "Annuler",
   "faqClearCacheHeading": "Recharger le cache de l'application",
   "faqClearCacheDescription": "Rechargez le cache de l'application pour obtenir le contenu le plus récent et manquant. Utile pour une expérience hors ligne.",
-  "faqClearCacheButton": "Vider le cache & recharger"
+  "faqClearCacheButton": "recharger App cache"
 }
