@@ -7792,33 +7792,51 @@ function showNextWisdom() {
     const wisdomsWithStats = wisdoms.map((wisdom, index) => ({
       text: wisdom,
       index: index,
-      showCount: wisdomStats[index] || 0,
-      lastSeen: wisdomStats[`lastSeen_${index}`] || 0 // Track when last seen
+      showCount: wisdomStats[index] || 0
     }));
 
-    // Sort by show count (least shown first) and then randomize
-    wisdomsWithStats.sort((a, b) => {
-      // Primary: show count (prefer less shown)
-      if (a.showCount !== b.showCount) {
-        return a.showCount - b.showCount;
-      }
-      // Secondary: randomness for ties
-      return Math.random() - 0.5;
-    });
+    // Separate wisdoms into two groups:
+    // - Never shown (showCount === 0)
+    // - Already shown (showCount >= 1)
+    const neverShown = wisdomsWithStats.filter(w => w.showCount === 0);
+    const alreadyShown = wisdomsWithStats.filter(w => w.showCount >= 1);
 
-    // Take top 20 least shown wisdoms and shuffle them properly
-    const candidatePool = wisdomsWithStats
-      .slice(0, Math.min(20, wisdoms.length))
-      .sort(() => Math.random() - 0.5);
+    let selectedWisdoms = [];
 
-    // Take first 13 from the shuffled candidate pool
-    quoteOrder = candidatePool
-      .slice(0, Math.min(13, candidatePool.length))
+    // 1. Add 11 never-shown wisdoms (or all if less than 11 available)
+    if (neverShown.length > 0) {
+      const newOnes = neverShown
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 11);
+      selectedWisdoms.push(...newOnes);
+    }
+
+    // 2. Add 2 random already-shown wisdoms (repeats)
+    if (alreadyShown.length > 0) {
+      const repeats = alreadyShown
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 2);
+      selectedWisdoms.push(...repeats);
+    }
+
+    // 3. If we don't have enough wisdoms (less than 13 total), fill with random
+    if (selectedWisdoms.length < 13) {
+      const needed = 13 - selectedWisdoms.length;
+      const remaining = wisdomsWithStats
+        .filter(w => !selectedWisdoms.includes(w))
+        .sort(() => Math.random() - 0.5)
+        .slice(0, needed);
+      selectedWisdoms.push(...remaining);
+    }
+
+    // Final shuffle to mix new and repeated wisdoms
+    wisdomOrder = selectedWisdoms
+      .sort(() => Math.random() - 0.5)
       .map(item => item.text);
   }
 
-  if (wisdomShownCount < Math.min(13, quoteOrder.length)) {
-    const wisdomText = quoteOrder[wisdomShownCount];
+  if (wisdomShownCount < Math.min(13, wisdomOrder.length)) {
+    const wisdomText = wisdomOrder[wisdomShownCount];
     wisdomTextEl.textContent = wisdomText;
     wisdomSection.classList.remove('hidden');
 
@@ -7846,11 +7864,11 @@ function showNextWisdom() {
     // Update wisdom statistics
     const wisdomStats = JSON.parse(localStorage.getItem('wisdomStats') || '{}');
     wisdomStats[currentWisdomId] = (wisdomStats[currentWisdomId] || 0) + 1;
-    wisdomStats[`lastSeen_${currentWisdomId}`] = Date.now(); // Track when seen
+    wisdomStats[`lastSeen_${currentWisdomId}`] = Date.now();
     localStorage.setItem('wisdomStats', JSON.stringify(wisdomStats));
 
     wisdomShownCount++;
-    wisdomBtn.textContent = wisdomShownCount < Math.min(13, quoteOrder.length)
+    wisdomBtn.textContent = wisdomShownCount < Math.min(13, wisdomOrder.length)
       ? t('revealAnotherWisdom')
       : t('meditateToUnlockWisdom');
   } else {
