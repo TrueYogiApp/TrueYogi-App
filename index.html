@@ -2402,12 +2402,12 @@
   </div>
   
      <div class="faq-item">
-  <h3 class="text-yellow-200 font-medium">Clear App Cache</h3>
-  <p class="text-gray-300 mt-1">
+  <h3 id="faq-clear-cache-heading" class="text-yellow-200 font-medium">Clear App Cache</h3>
+  <p id="faq-clear-cache-description" class="text-gray-300 mt-1">
     Clear downloaded app data and reload fresh content. Useful if app has issues.
   </p>
   <div class="mt-4">
-    <button onclick="showClearCacheModal()" class="w-full bg-blue-400 hover:bg-blue-500 text-white py-2 rounded-lg font-medium cursor-pointer">
+    <button id="faq-clear-cache-btn" onclick="showClearCacheModal()" class="w-full bg-blue-400 hover:bg-blue-500 text-white py-2 rounded-lg font-medium cursor-pointer">
       <i class="fas fa-broom mr-2"></i> Clear Cache & Reload
     </button>
   </div>
@@ -2619,18 +2619,18 @@
     <div class="text-blue-400 text-5xl mb-4">
       <i class="fas fa-broom"></i>
     </div>
-    <h2 class="text-xl font-semibold text-blue-300 mb-2">Confirm Cache Clear</h2>
-    <p class="text-gray-200 mb-4">
+    <h2 id="clear-cache-heading" class="text-xl font-semibold text-blue-300 mb-2">Confirm Cache Clear</h2>
+    <p id="clear-cache-description" class="text-gray-200 mb-4">
       This will remove downloaded app data and reload the latest content.<br>
       <span class="text-yellow-400 font-bold">Your Meditation Stats are not affected.</span>
       <br><br>
       Are you sure you want to continue?
     </p>
     <div class="flex justify-center gap-4 mt-4">
-      <button onclick="clearAppCache()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button id="clear-cache-confirm-btn" onclick="clearAppCache()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         <i class="fas fa-broom mr-1"></i> Yes, Clear & Reload
       </button>
-      <button onclick="hideClearCacheModal()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button id="clear-cache-cancel-btn" onclick="hideClearCacheModal()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         Cancel
       </button>
     </div>
@@ -7712,6 +7712,15 @@ document.getElementById('mobile-yogi-modal-button').textContent = t('mobileYogi_
 document.getElementById('wisdom-wallet-modal').textContent = t('wisdomWallet');
 document.getElementById('wisdom-wallet-line1').textContent = t('wisdomWalletL1'); 
 document.getElementById('wisdom-wallet-line2').textContent = t('wisdomWalletL2');
+
+document.getElementById('clear-cache-heading').textContent = t('clearCacheModalHeading');
+document.getElementById('clear-cache-description').innerHTML = t('clearCacheModalDescription');
+document.getElementById('clear-cache-confirm-btn').innerHTML = `<i class="fas fa-broom mr-1"></i> ${t('clearCacheModalButtonConfirm')}`;
+document.getElementById('clear-cache-cancel-btn').textContent = t('clearCacheModalButtonCancel');
+
+document.getElementById('faq-clear-cache-heading').textContent = t('faqClearCacheHeading');
+document.getElementById('faq-clear-cache-description').textContent = t('faqClearCacheDescription');
+document.getElementById('faq-clear-cache-btn').innerHTML = `<i class="fas fa-broom mr-2"></i> ${t('faqClearCacheButton')}`;
 
 }
 
