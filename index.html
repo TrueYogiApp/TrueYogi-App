@@ -8148,7 +8148,7 @@ async function sendHeartbeat() {
 
 function startHeartbeat() {
   sendHeartbeat(); // send once immediately
-  heartbeatInterval = setInterval(sendHeartbeat, 15000); // every 15 seconds
+  heartbeatInterval = setInterval(sendHeartbeat, 600000); // every 10 minutes
 }
 
 function stopHeartbeat() {
