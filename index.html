@@ -1604,6 +1604,44 @@
   50% { opacity: 0.9; transform: scaleY(1.12); }
 }
 
+.om-counter {
+  display: block;
+  margin: 18px auto 0 auto;
+  text-align: center;
+  color: #fde68a;
+  font-family: 'Playfair Display', serif;
+  font-size: 2.4em;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-shadow: 0 2px 12px #fde68a77, 0 0 1px #fff;
+  opacity: 1;
+  transition: opacity .4s, color .3s;
+  background: none;
+  padding: 0.1em 0.5em;
+  border-radius: 1em;
+  min-width: 1.5em;
+  min-height: 1.2em;
+  /* box-shadow: 0 0 16px #fde68a22; */
+  /* Optional: subtle glowing animation */
+  animation: omSimpleGlow 3s infinite alternate;
+}
+
+.om-counter.hidden {
+  display: none !important;
+}
+
+.om-counter.red         { color: #FF1A1A; text-shadow: 0 0 16px #FF1A1A99; }
+.om-counter.orange      { color: #FF8800; text-shadow: 0 0 16px #FF880099; }
+.om-counter.yellow      { color: #FFD600; text-shadow: 0 0 16px #FFD60099; }
+.om-counter.green       { color: #29D884; text-shadow: 0 0 16px #29D88499; }
+.om-counter.blue        { color: #3B82F6; text-shadow: 0 0 16px #3B82F6EE; }
+.om-counter.indigo      { color: #4338CA; text-shadow: 0 0 16px #4338CAEE; }
+.om-counter.violet      { color: #C026D3; text-shadow: 0 0 16px #C026D3EE; }
+.om-counter.gold        { color: #FFD700; text-shadow: 0 0 16px #FFD700DD; }
+.om-counter.silver      { color: #BFC9CA; text-shadow: 0 0 16px #BFC9CA99; }
+.om-counter.sapphire    { color: #1a4fcc; text-shadow: 0 0 16px #1a4fccee; }
+.om-counter.dark-silver { color: #333333; text-shadow: 0 0 16px #333333EE; }
+.om-counter.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
 
 </style>
   
@@ -2039,6 +2077,8 @@
   </div>
 </button>
     </div>
+
+<div id="om-counter" class="om-counter"></div>
 
 <!-- Desktop-only Mobile Reminder Card -->
 <div id="mobile-reminder-card" class="auth-card hidden" style="margin: 1.5em auto 0 auto; max-width: 330px; text-align: center;">
@@ -4228,6 +4268,7 @@ if (musicChoiceEl) {
 	  updateFAQVisibility();
 	  updateYogiIcon();
 	  updateLangSwitcherVisibility();
+	  updateCount();
     // Hide loader when app is ready
     document.getElementById('app-loader').classList.add('hidden');
     });
@@ -7986,6 +8027,7 @@ window.addEventListener('focus', () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+  const counterEl = document.getElementById('om-counter');
   const logo = document.getElementById('logo-sacred');
   const om = document.getElementById('om-sound');
   let isPlaying = false;
@@ -8012,16 +8054,108 @@ document.addEventListener('DOMContentLoaded', function() {
           om.volume = 0.7;
           om.play().catch(()=>{});
           isPlaying = true;
+		  addCount();
         } else {
           // Stop playing
           om.pause();
           om.currentTime = 0;
           isPlaying = false;
+		  removeCount();
         }
       }
     });
   }
 });
+
+// === create the small counter display ===
+const counterEl = document.getElementById('om-counter');
+// === helper functions for live Om counter ===
+let omPresenceId = localStorage.getItem('omPresenceId');
+
+async function addCount() {
+if (omPresenceId) return;
+  try {
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    omPresenceId = data.id;
+	localStorage.setItem('omPresenceId', omPresenceId);
+    updateCount();
+	startHeartbeat();
+  } catch (err) { console.error(err); }
+}
+
+async function removeCount() {
+  if (!omPresenceId) return;
+  try {
+    await fetch('https://trueyogi-backend-knkq.onrender.com/leave-om', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: omPresenceId })
+    });
+	localStorage.removeItem('omPresenceId');
+    omPresenceId = null;
+    updateCount();
+	stopHeartbeat();
+  } catch (err) { console.error(err); }
+}
+
+async function updateCount() {
+  try {
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
+    const data = await res.json();
+
+    if (data.count > 0) {
+      counterEl.textContent = (typeof data.count === "number") ? data.count : "0";
+      counterEl.classList.remove('hidden');
+      counterEl.style.opacity = 1;
+    } else {
+      // Hide completely if count is zero
+      counterEl.classList.add('hidden');
+      counterEl.innerHTML = '';
+    }
+  } catch (err) {
+    counterEl.classList.add('hidden');
+    counterEl.innerHTML = '';
+    console.error(err);
+  }
+}
+
+// clear user when closing page
+// clear user when closing page
+window.addEventListener('beforeunload', () => {
+  removeCount();
+  stopHeartbeat(); // <--- add this
+});
+
+setInterval(updateCount, 9000); // every 3 seconds
+
+
+let heartbeatInterval = null;
+
+async function sendHeartbeat() {
+  if (!omPresenceId) return;
+  try {
+    await fetch('https://trueyogi-backend-knkq.onrender.com/om-heartbeat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: omPresenceId })
+    });
+  } catch (err) { /* Optional: handle error */ }
+}
+
+function startHeartbeat() {
+  sendHeartbeat(); // send once immediately
+  heartbeatInterval = setInterval(sendHeartbeat, 15000); // every 15 seconds
+}
+
+function stopHeartbeat() {
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  heartbeatInterval = null;
+}
+
 
 function isModeSelectionVisible() {
   const modeSelection = document.getElementById('mode-selection');
@@ -8593,35 +8727,39 @@ const auraColors = [
   "white"        // 12 (2:30–4:30am)
 ];
 
-// Returns 0–11 for slot, 1–12 for display
+// Returns 0–11 for slot
 function getAuraIndex() {
   const now = new Date();
   const localHour = now.getHours();
   const localMin = now.getMinutes();
-
-  // Calculate minutes since 4:30am
   let minutesSinceStart = (localHour * 60 + localMin) - (4 * 60 + 30);
-
-  // Wrap negative times to next day
   if (minutesSinceStart < 0) minutesSinceStart += 24 * 60;
-
-  const slot = Math.floor(minutesSinceStart / 120); // 120 mins per slot
-  return slot % 12; // 0–11
+  const slot = Math.floor(minutesSinceStart / 120);
+  return slot % 12;
 }
 
 function setAuraColor() {
-  const auraClass = auraColors[getAuraIndex()];
+  // Card aura
   const card = document.querySelector('.card-aura');
-  if (!card) return;
-  auraColors.forEach(c => card.classList.remove(c));
-  card.classList.add(auraClass);
+  // OM counter
+  const omCounter = document.getElementById('om-counter');
+  if (!omCounter) return;
 
-  // If you want to display slot number (1–12):
-  // card.setAttribute("data-aura-slot", getAuraIndex() + 1);
+  const auraClass = auraColors[getAuraIndex()];
+  // Remove old classes from OM counter
+  auraColors.forEach(c => omCounter.classList.remove(c));
+  omCounter.classList.add(auraClass);
+
+  // For the card, keep your existing logic.
+  if (card) {
+    auraColors.forEach(c => card.classList.remove(c));
+    card.classList.add(auraClass);
+  }
 }
 
+// Run once and then every minute
 setAuraColor();
-setInterval(setAuraColor, 1000); // update every minute (no need for every second)
+setInterval(setAuraColor, 10000); // update every 10 second)
 
 
 // Select all loader backgrounds (videos or images)
@@ -8668,13 +8806,16 @@ function initializeLoaderMedia() {
                 el.preload = "none";
             }
         });
-        const index = savedIndex ? parseInt(savedIndex, 10) : 0;
-        const selected = loaderMedia[index];
-        selected.classList.add('active');
-        if (selected.tagName === 'VIDEO') {
-            selected.preload = "auto";
-            selected.play().catch(() => {});
-        }
+let index = savedIndex ? parseInt(savedIndex, 10) : 0;
+if (isNaN(index) || index < 0 || index >= loaderMedia.length) index = 0;
+const selected = loaderMedia[index];
+if (selected) {
+    selected.classList.add('active');
+    if (selected.tagName === 'VIDEO') {
+        selected.preload = "auto";
+        selected.play().catch(() => {});
+    }
+}
     }
 }
 
