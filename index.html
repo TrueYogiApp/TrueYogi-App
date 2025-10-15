@@ -10640,7 +10640,7 @@ supabase
     { event: '*', schema: 'public', table: 'om_presence' },
     payload => {
       // payload.eventType: INSERT, UPDATE, DELETE
-	  console.log('Realtime event:', payload);
+	  // console.log('Realtime event:', payload);
       updateCount(); // or update UI inline, or re-fetch count if needed
     }
   )
