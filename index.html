@@ -4955,6 +4955,7 @@ if (bgMusicPlayer) {
   updateYogiIcon();
   updateLangSwitcherVisibility();
   updateHideUiBtnVisibility();
+  updateCount();
 }
 
   function setMode(mode) {
@@ -6724,6 +6725,7 @@ function handleVisibilityChange() {
 		showCompletionStats();
 		updateHideUiBtnVisibility();
 		disableMobileAudioResume();
+		updateCount();
         const bell = document.getElementById('bell');
         if (bell) {
           bell.muted = false;
@@ -8125,26 +8127,24 @@ async function updateCount() {
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
-    if (data.count > 0) {
-      counterEl.textContent = (typeof data.count === "number") ? data.count : "0";
+    const count = (typeof data.count === "number") ? data.count : 0;
+    if (count > 0) {
+      counterEl.textContent = count;
       counterEl.classList.remove('hidden');
       counterEl.style.opacity = 1;
-
-      // Only show glow if this user has valid omPresenceId (== counted)
-      if (omPresenceId) {
-        counterEl.classList.add('active');
-      } else {
-        counterEl.classList.remove('active');
-      }
     } else {
       counterEl.classList.add('hidden');
-      counterEl.innerHTML = '';
+      counterEl.textContent = '';
+    }
+
+    // Per-user glow
+    if (omPresenceId) {
+      counterEl.classList.add('active');
+    } else {
       counterEl.classList.remove('active');
     }
   } catch (err) {
-    counterEl.classList.add('hidden');
-    counterEl.innerHTML = '';
-    counterEl.classList.remove('active');
+    // On error, do NOT hide the counter if it was previously visible, just log error.
     console.error(err);
   }
 }
