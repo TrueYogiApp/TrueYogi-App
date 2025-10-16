@@ -1626,6 +1626,10 @@
   animation: omSimpleGlow 3s infinite alternate;
 }
 
+.om-counter.hidden {
+  display: none !important;
+}
+
 .om-counter.red         { color: #FF1A1A; text-shadow: 0 0 16px #FF1A1A99; }
 .om-counter.orange      { color: #FF8800; text-shadow: 0 0 16px #FF880099; }
 .om-counter.yellow      { color: #FFD600; text-shadow: 0 0 16px #FFD60099; }
@@ -1639,15 +1643,6 @@
 .om-counter.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
 .om-counter.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
 
-.om-counter.active {
-  text-shadow: 0 0 10px #fde68a99, 0 0 2px #fffbe6;
-  animation: omActiveGlowText 1.4s infinite alternate;
-}
-
-@keyframes omActiveGlowText {
-  0%   { text-shadow: 0 0 7px #fde68a77, 0 0 2px #fffbe6; }
-  100% { text-shadow: 0 0 15px #fde68aee, 0 0 4px #fffbe6; }
-}
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -2083,7 +2078,7 @@
 </button>
     </div>
 
-<!--  <div id="om-counter" class="om-counter"></div>
+<!-- <div id="om-counter" class="om-counter"></div> -->
 
 <!-- Desktop-only Mobile Reminder Card -->
 <div id="mobile-reminder-card" class="auth-card hidden" style="margin: 1.5em auto 0 auto; max-width: 330px; text-align: center;">
@@ -8078,7 +8073,7 @@ const counterEl = document.getElementById('om-counter');
 let omPresenceId = localStorage.getItem('omPresenceId');
 
 async function addCount() {
-  if (omPresenceId) return;
+if (omPresenceId) return;
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
       method: 'POST',
@@ -8086,17 +8081,12 @@ async function addCount() {
     });
     const data = await res.json();
     omPresenceId = data.id;
-    localStorage.setItem('omPresenceId', omPresenceId);
-
-    // ➤ Mark as active (glow) after presence is set
-    const counterEl = document.getElementById('om-counter');
-    if (counterEl) counterEl.classList.add('active');
+	localStorage.setItem('omPresenceId', omPresenceId);
     updateCount();
-    startHeartbeat();
+	startHeartbeat();
   } catch (err) { console.error(err); }
 }
 
-// Remove glow on leave
 async function removeCount() {
   if (!omPresenceId) return;
   try {
@@ -8105,40 +8095,30 @@ async function removeCount() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: omPresenceId })
     });
-    localStorage.removeItem('omPresenceId');
+	localStorage.removeItem('omPresenceId');
     omPresenceId = null;
     updateCount();
-    stopHeartbeat();
-    // ➤ Remove active glow
-    const counterEl = document.getElementById('om-counter');
-    if (counterEl) counterEl.classList.remove('active');
+	stopHeartbeat();
   } catch (err) { console.error(err); }
 }
 
 async function updateCount() {
-  const counterEl = document.getElementById('om-counter');
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
-    const count = (typeof data.count === "number") ? data.count : 0;
 
-    // ALWAYS show the counter
-    counterEl.classList.remove('hidden');
-    counterEl.style.opacity = 1;
-    counterEl.textContent = count; // Show "0" if count is zero
-
-    // Only show glow if this user is present
-    if (omPresenceId) {
-      counterEl.classList.add('active');
+    if (data.count > 0) {
+      counterEl.textContent = (typeof data.count === "number") ? data.count : "0";
+      counterEl.classList.remove('hidden');
+      counterEl.style.opacity = 1;
     } else {
-      counterEl.classList.remove('active');
+      // Hide completely if count is zero
+      counterEl.classList.add('hidden');
+      counterEl.innerHTML = '';
     }
   } catch (err) {
-    // On error, just show "?" and do not hide counter
-    counterEl.classList.remove('hidden');
-    counterEl.style.opacity = 1;
-    counterEl.textContent = "?";
-    counterEl.classList.remove('active');
+    counterEl.classList.add('hidden');
+    counterEl.innerHTML = '';
     console.error(err);
   }
 }
@@ -8150,7 +8130,7 @@ window.addEventListener('beforeunload', () => {
   stopHeartbeat(); // <--- add this
 });
 
-setInterval(updateCount, 9000); // every 3 seconds
+//setInterval(updateCount, 9000); // every 3 seconds
 
 
 let heartbeatInterval = null;
@@ -10653,6 +10633,18 @@ if (jwtToken && supabase && supabase.auth && supabase.auth.setSession) {
 }
 // console.log('Supabase current session:', await supabase.auth.getSession());
 
+supabase
+  .channel('om-presence')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'om_presence' },
+    payload => {
+      // payload.eventType: INSERT, UPDATE, DELETE
+	  // console.log('Realtime event:', payload);
+      updateCount(); // or update UI inline, or re-fetch count if needed
+    }
+  )
+  .subscribe();
   
   // Utility: Generate unique session_id for each session
   function generateSessionId(walletPublicKey, date, time, mode) {
