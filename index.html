@@ -1643,6 +1643,19 @@
 .om-counter.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
 .om-counter.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
 
+.om-counter-pulse {
+  animation: omCounterPulse 0.7s;
+  will-change: transform;
+}
+
+@keyframes omCounterPulse {
+  0%   { transform: scale(1); text-shadow: none; }
+  40%  { transform: scale(1.25); text-shadow: 0 0 12px #fde68a; }
+  60%  { transform: scale(0.92); text-shadow: 0 0 12px #fde68a; }
+  80%  { transform: scale(1.12); text-shadow: none; }
+  100% { transform: scale(1); text-shadow: none; }
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -8117,23 +8130,36 @@ async function removeCount() {
   } catch (err) { console.error(err); }
 }
 
+let lastCount = null; // Place this at the top (outside the function)
+
 async function updateCount() {
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
+    const newCount = (typeof data.count === "number") ? data.count : 0;
 
-    if (data.count > 0) {
-      counterEl.textContent = (typeof data.count === "number") ? data.count : "0";
+    if (newCount > 0) {
+      counterEl.textContent = newCount;
       counterEl.classList.remove('hidden');
       counterEl.style.opacity = 1;
+
+      // Animate if the count changed
+      if (lastCount !== null && newCount !== lastCount) {
+        counterEl.classList.add('om-counter-pulse');
+        setTimeout(() => counterEl.classList.remove('om-counter-pulse'), 700);
+      }
+
+      lastCount = newCount;
     } else {
       // Hide completely if count is zero
       counterEl.classList.add('hidden');
       counterEl.innerHTML = '';
+      lastCount = 0;
     }
   } catch (err) {
     counterEl.classList.add('hidden');
     counterEl.innerHTML = '';
+    lastCount = 0;
     console.error(err);
   }
 }
