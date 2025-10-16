@@ -1630,6 +1630,16 @@
   display: none !important;
 }
 
+.om-counter.active {
+  text-shadow: 0 0 10px #fde68a99, 0 0 2px #fffbe6;
+  animation: omActiveGlowText 1.4s infinite alternate;
+}
+
+@keyframes omActiveGlowText {
+  0%   { text-shadow: 0 0 7px #fde68a77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #fde68aee, 0 0 4px #fffbe6; }
+}
+
 .om-counter.red         { color: #FF1A1A; text-shadow: 0 0 16px #FF1A1A99; }
 .om-counter.orange      { color: #FF8800; text-shadow: 0 0 16px #FF880099; }
 .om-counter.yellow      { color: #FFD600; text-shadow: 0 0 16px #FFD60099; }
@@ -8073,7 +8083,7 @@ const counterEl = document.getElementById('om-counter');
 let omPresenceId = localStorage.getItem('omPresenceId');
 
 async function addCount() {
-if (omPresenceId) return;
+  if (omPresenceId) return;
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
       method: 'POST',
@@ -8081,12 +8091,17 @@ if (omPresenceId) return;
     });
     const data = await res.json();
     omPresenceId = data.id;
-	localStorage.setItem('omPresenceId', omPresenceId);
+    localStorage.setItem('omPresenceId', omPresenceId);
+
+    // ➤ Mark as active (glow) after presence is set
+    const counterEl = document.getElementById('om-counter');
+    if (counterEl) counterEl.classList.add('active');
     updateCount();
-	startHeartbeat();
+    startHeartbeat();
   } catch (err) { console.error(err); }
 }
 
+// Remove glow on leave
 async function removeCount() {
   if (!omPresenceId) return;
   try {
@@ -8095,30 +8110,41 @@ async function removeCount() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: omPresenceId })
     });
-	localStorage.removeItem('omPresenceId');
+    localStorage.removeItem('omPresenceId');
     omPresenceId = null;
     updateCount();
-	stopHeartbeat();
+    stopHeartbeat();
+    // ➤ Remove active glow
+    const counterEl = document.getElementById('om-counter');
+    if (counterEl) counterEl.classList.remove('active');
   } catch (err) { console.error(err); }
 }
 
 async function updateCount() {
+  const counterEl = document.getElementById('om-counter');
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
-
     if (data.count > 0) {
       counterEl.textContent = (typeof data.count === "number") ? data.count : "0";
       counterEl.classList.remove('hidden');
       counterEl.style.opacity = 1;
+
+      // Only show glow if this user has valid omPresenceId (== counted)
+      if (omPresenceId) {
+        counterEl.classList.add('active');
+      } else {
+        counterEl.classList.remove('active');
+      }
     } else {
-      // Hide completely if count is zero
       counterEl.classList.add('hidden');
       counterEl.innerHTML = '';
+      counterEl.classList.remove('active');
     }
   } catch (err) {
     counterEl.classList.add('hidden');
     counterEl.innerHTML = '';
+    counterEl.classList.remove('active');
     console.error(err);
   }
 }
