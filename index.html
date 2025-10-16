@@ -8145,6 +8145,11 @@ window.addEventListener('beforeunload', () => {
   stopHeartbeat(); // <--- add this
 });
 
+window.addEventListener('pagehide', () => {
+  removeCount();
+  stopHeartbeat();
+});
+
 setInterval(updateCount, 9000); // every 9 seconds
 
 
