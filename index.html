@@ -8130,7 +8130,7 @@ window.addEventListener('beforeunload', () => {
   stopHeartbeat(); // <--- add this
 });
 
-//setInterval(updateCount, 9000); // every 3 seconds
+setInterval(updateCount, 9000); // every 9 seconds
 
 
 let heartbeatInterval = null;
@@ -10632,19 +10632,6 @@ if (jwtToken && supabase && supabase.auth && supabase.auth.setSession) {
   await supabase.auth.setSession({ access_token: jwtToken, refresh_token: "" });
 }
 // console.log('Supabase current session:', await supabase.auth.getSession());
-
-supabase
-  .channel('om-presence')
-  .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'om_presence' },
-    payload => {
-      // payload.eventType: INSERT, UPDATE, DELETE
-	  // console.log('Realtime event:', payload);
-      updateCount(); // or update UI inline, or re-fetch count if needed
-    }
-  )
-  .subscribe();
   
   // Utility: Generate unique session_id for each session
   function generateSessionId(walletPublicKey, date, time, mode) {
