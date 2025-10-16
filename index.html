@@ -2077,7 +2077,7 @@
   </div>
 </button>
     </div>
-
+	
 <div id="om-counter" class="om-counter"></div>
 
 <!-- Desktop-only Mobile Reminder Card -->
@@ -2116,10 +2116,9 @@
       <!-- Status Message -->
       <div id="wallet-status" class="wallet-status-message" aria-live="polite"></div>
       </div>
-	  
-
     </div>
   </div>
+  
   </div>
 </div>
 
@@ -3051,16 +3050,16 @@
 </button>
 
   <!-- Sound elements -->
-  <audio id="bell" src="/assets/meditation-end.mp3" preload="auto" muted></audio>
-  <audio id="om-sound" src="/assets/aum.mp3" preload="auto"></audio>
+  <audio id="bell" src="https://trueyogi.app/assets/meditation-end.mp3" preload="auto" muted></audio>
+  <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
-  <audio id="sound-bell" src="/assets/bell.m4a" preload="auto"></audio>
-  <audio id="avatar-sound" src="/assets/meditation-eternal.m4a" preload="auto"></audio>
+  <audio id="sound-bell" src="https://assets.trueyogi.app/assets/bell.m4a" preload="auto"></audio>
+  <audio id="avatar-sound" src="https://assets.trueyogi.app/assets/meditation-eternal.m4a" preload="auto"></audio>
 
   <!-- Add these 3 new sounds -->
-<audio id="sound-chimes" src="assets/tamtam-gong.m4a" preload="auto"></audio>
-<audio id="sound-gong" src="assets/tao-chi-gong.m4a" preload="auto"></audio>
-<audio id="sound-bowl" src="assets/harmony-bell.m4a" preload="auto"></audio>
+<audio id="sound-chimes" src="https://assets.trueyogi.app/assets/tamtam-gong.m4a" preload="auto"></audio>
+<audio id="sound-gong" src="https://assets.trueyogi.app/assets/tao-chi-gong.m4a" preload="auto"></audio>
+<audio id="sound-bowl" src="https://assets.trueyogi.app/assets/harmony-bell.m4a" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -3153,8 +3152,7 @@
     </div>
   </div>
 </div>
-
-
+	
   <script>
     // State Management
     let endTime = 0;
@@ -3191,6 +3189,7 @@
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
+
 
 function showClearCacheModal() {
   document.getElementById('clearCacheModal').classList.remove('hidden');
@@ -3296,7 +3295,6 @@ function releaseWakeLock() {
     console.log('Screen Wake Lock released');
   }
 }
-
 
 // Load the language JSON file dynamically
 async function loadLanguage(lang) {
@@ -3901,7 +3899,6 @@ function updateYogiIcon() {
   sunIcon.classList.add('fa-spin');
   sunIcon.style.color = '#f59e0b'; // gold
 }
-
 
 function showStartOnChainJourneyModal(walletPublicKey) {
   window.pendingJourneyWallet = walletPublicKey;
@@ -4742,7 +4739,7 @@ function showYellowIndicator(duration = 1500) {
 
       if (document.getElementById('music-toggle').checked) {
         const bgMusicPlayer = document.getElementById('bg-music-player');
-		bgMusicPlayer.src = '/assets/' + selectedMusicFile;
+		bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
 		bgMusicPlayer.currentTime = 0;
 		bgMusicPlayer.loop = true;
 		bgMusicPlayer.volume = 0.5;
@@ -4931,7 +4928,6 @@ if (bgMusicPlayer) {
   bgMusicPlayer.currentTime = 0;
   backgroundAudio = null;
 }
-
   localStorage.removeItem('finalSectionActive');
   localStorage.removeItem('wisdomShownCount');
   localStorage.removeItem('quoteOrder');
@@ -5865,7 +5861,7 @@ async function beginMeditationSession() {
 
 if (document.getElementById('music-toggle').checked) {
   const bgMusicPlayer = document.getElementById('bg-music-player');
-  bgMusicPlayer.src = '/assets/' + selectedMusicFile;
+  bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
   bgMusicPlayer.currentTime = 0;
   bgMusicPlayer.loop = true;
   bgMusicPlayer.volume = 0.5;
@@ -6178,7 +6174,7 @@ document.getElementById('show-wisdom').style.display = ""; // Make button visibl
   updateBackButtonVisibility();
 } else {
     document.getElementById('final-section').classList.remove('hidden');
-		  // Save final section state
+			  // Save final section state
     localStorage.setItem('finalSectionActive', 'true');
     localStorage.setItem('wisdomShownCount', wisdomShownCount);
     localStorage.setItem('quoteOrder', JSON.stringify(quoteOrder));
@@ -7767,6 +7763,8 @@ document.getElementById('faq-clear-cache-btn').innerHTML = `<i class="fas fa-bro
 
 document.addEventListener('DOMContentLoaded', updateUILanguage);
 document.addEventListener('visibilitychange', handleVisibilityChange);
+// ADD THIS ONE LINE FOR PWA SUPPORT
+document.addEventListener('visibilitychange', requestWakeLock);
 
    // Add to Homescreen functionality
     function showHomescreenPrompt() {
@@ -8130,7 +8128,7 @@ window.addEventListener('beforeunload', () => {
   stopHeartbeat(); // <--- add this
 });
 
-setInterval(updateCount, 9000); // every 9 seconds
+setInterval(updateCount, 9000); // every 3 seconds
 
 
 let heartbeatInterval = null;
@@ -8148,7 +8146,7 @@ async function sendHeartbeat() {
 
 function startHeartbeat() {
   sendHeartbeat(); // send once immediately
-  heartbeatInterval = setInterval(sendHeartbeat, 600000); // every 10 minutes
+  heartbeatInterval = setInterval(sendHeartbeat, 15000); // every 15 seconds
 }
 
 function stopHeartbeat() {
@@ -8531,10 +8529,10 @@ let lastTap = 0;
 
 // Define 4 different sounds (add these audio elements to your HTML)
 const zoneSounds = {
-  'top-left': '/assets/bell.m4a',      
-  'top-right': '/assets/harmony-bell.m4a',
-  'bottom-left': '/assets/tamtam-gong.m4a',  
-  'bottom-right': '/assets/tao-chi-gong.m4a'
+  'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',      
+  'top-right': 'https://assets.trueyogi.app/assets/harmony-bell.m4a',
+  'bottom-left': 'https://assets.trueyogi.app/assets/tamtam-gong.m4a',  
+  'bottom-right': 'https://assets.trueyogi.app/assets/tao-chi-gong.m4a'
 };
 
 const zoneIcons = {
@@ -8594,10 +8592,10 @@ function getTapZone(x, y) {
 // Play zone-specific sound - UPDATED VERSION
 function playZoneSound(zone) {
   const soundFiles = {
-    'top-left': '/assets/bell.m4a',
-    'top-right': '/assets/harmony-bell.m4a', 
-    'bottom-left': '/assets/tamtam-gong.m4a',
-    'bottom-right': '/assets/tao-chi-gong.m4a'
+    'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',
+    'top-right': 'https://assets.trueyogi.app/assets/harmony-bell.m4a', 
+    'bottom-left': 'https://assets.trueyogi.app/assets/tamtam-gong.m4a',
+    'bottom-right': 'https://assets.trueyogi.app/assets/tao-chi-gong.m4a'
   };
   
   const volumes = {
@@ -8956,7 +8954,7 @@ const swIndicator = new SWStatusIndicator();
 
 // Show indicator immediately when page loads (optional)
 swIndicator.show();
-setTimeout(() => swIndicator.hide(), 22000); // Hide after 20 seconds if no SW activity
+setTimeout(() => swIndicator.hide(), 22000); // Hide after 22 seconds if no SW activity
 
 
 // 7 Chakra sound files and icons (bottom to top)
@@ -10562,6 +10560,7 @@ else if (challengeData.currentDay >= 8) unlockedStrands = 2;
     updateNeurons();
     drawNeurons();
     drawBiophotons();
+    requestWakeLock();
 
     // 🌌 Draw aurora waves
 for (let i = 0; i < 3; i++) {
@@ -10626,13 +10625,13 @@ for (let i = 0; i < 3; i++) {
   const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
   const supabase = createClient(supabaseUrl, supabaseKey);
-
+  
 const jwtToken = localStorage.getItem('jwtToken');
 if (jwtToken && supabase && supabase.auth && supabase.auth.setSession) {
   await supabase.auth.setSession({ access_token: jwtToken, refresh_token: "" });
 }
 // console.log('Supabase current session:', await supabase.auth.getSession());
-  
+
   // Utility: Generate unique session_id for each session
   function generateSessionId(walletPublicKey, date, time, mode) {
     return `${walletPublicKey}_${date}_${time || 'flow'}_${mode}`;
@@ -11036,6 +11035,7 @@ window.addEventListener('online', () => {
   window.authenticateWithWallet = authenticateWithWallet;
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
+  
 </script>
 
  <div id="start-date-display" class="end-date-display hidden">
@@ -11180,4 +11180,4 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
- 
+
