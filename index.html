@@ -8165,16 +8165,15 @@ async function updateCount() {
 }
 
 // clear user when closing page
-// clear user when closing page
 window.addEventListener('beforeunload', () => {
   removeCount();
   stopHeartbeat(); // <--- add this
 });
 
-window.addEventListener('pagehide', () => {
-  removeCount();
-  stopHeartbeat();
-});
+//window.addEventListener('pagehide', () => {
+//  removeCount();
+//  stopHeartbeat();
+//});
 
 setInterval(updateCount, 9000); // every 9 seconds
 
