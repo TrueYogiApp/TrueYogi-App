@@ -1626,20 +1626,6 @@
   animation: omSimpleGlow 3s infinite alternate;
 }
 
-.om-counter.hidden {
-  display: none !important;
-}
-
-.om-counter.active {
-  text-shadow: 0 0 10px #fde68a99, 0 0 2px #fffbe6;
-  animation: omActiveGlowText 1.4s infinite alternate;
-}
-
-@keyframes omActiveGlowText {
-  0%   { text-shadow: 0 0 7px #fde68a77, 0 0 2px #fffbe6; }
-  100% { text-shadow: 0 0 15px #fde68aee, 0 0 4px #fffbe6; }
-}
-
 .om-counter.red         { color: #FF1A1A; text-shadow: 0 0 16px #FF1A1A99; }
 .om-counter.orange      { color: #FF8800; text-shadow: 0 0 16px #FF880099; }
 .om-counter.yellow      { color: #FFD600; text-shadow: 0 0 16px #FFD60099; }
@@ -1653,6 +1639,15 @@
 .om-counter.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
 .om-counter.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
 
+.om-counter.active {
+  text-shadow: 0 0 10px #fde68a99, 0 0 2px #fffbe6;
+  animation: omActiveGlowText 1.4s infinite alternate;
+}
+
+@keyframes omActiveGlowText {
+  0%   { text-shadow: 0 0 7px #fde68a77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #fde68aee, 0 0 4px #fffbe6; }
+}
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -4955,7 +4950,6 @@ if (bgMusicPlayer) {
   updateYogiIcon();
   updateLangSwitcherVisibility();
   updateHideUiBtnVisibility();
-  updateCount();
 }
 
   function setMode(mode) {
@@ -6725,7 +6719,6 @@ function handleVisibilityChange() {
 		showCompletionStats();
 		updateHideUiBtnVisibility();
 		disableMobileAudioResume();
-		updateCount();
         const bell = document.getElementById('bell');
         if (bell) {
           bell.muted = false;
@@ -8128,23 +8121,24 @@ async function updateCount() {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
     const count = (typeof data.count === "number") ? data.count : 0;
-    if (count > 0) {
-      counterEl.textContent = count;
-      counterEl.classList.remove('hidden');
-      counterEl.style.opacity = 1;
-    } else {
-      counterEl.classList.add('hidden');
-      counterEl.textContent = '';
-    }
 
-    // Per-user glow
+    // ALWAYS show the counter
+    counterEl.classList.remove('hidden');
+    counterEl.style.opacity = 1;
+    counterEl.textContent = count; // Show "0" if count is zero
+
+    // Only show glow if this user is present
     if (omPresenceId) {
       counterEl.classList.add('active');
     } else {
       counterEl.classList.remove('active');
     }
   } catch (err) {
-    // On error, do NOT hide the counter if it was previously visible, just log error.
+    // On error, just show "?" and do not hide counter
+    counterEl.classList.remove('hidden');
+    counterEl.style.opacity = 1;
+    counterEl.textContent = "?";
+    counterEl.classList.remove('active');
     console.error(err);
   }
 }
