@@ -4084,6 +4084,7 @@ async function confirmFullReset() {
       document.addEventListener('DOMContentLoaded', async () => {
 	  cleanUpLocalSessions();
 	  setupFAQTabs();
+	  await validateOmPresence();
       document.addEventListener('click', initAudioContext, { once: true });
       document.addEventListener('touchstart', initAudioContext, { once: true });
       document.addEventListener('keydown', initAudioContext, { once: true });
@@ -8071,18 +8072,34 @@ const counterEl = document.getElementById('om-counter');
 let omPresenceId = localStorage.getItem('omPresenceId');
 
 async function addCount() {
-if (omPresenceId) return;
-  try {
-    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
+  let id = localStorage.getItem('omPresenceId');
+  if (id) {
+    // Validate it with backend
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
     });
     const data = await res.json();
-    omPresenceId = data.id;
-	localStorage.setItem('omPresenceId', omPresenceId);
-    updateCount();
-	startHeartbeat();
-  } catch (err) { console.error(err); }
+    if (!data.exists) {
+      localStorage.removeItem('omPresenceId');
+      id = null;
+    }
+  }
+  if (!id) {
+    // Now, add presence
+    try {
+      const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      localStorage.setItem('omPresenceId', data.id);
+      omPresenceId = data.id;
+      updateCount();
+      startHeartbeat();
+    } catch (err) { console.error(err); }
+  }
 }
 
 async function removeCount() {
@@ -8154,6 +8171,23 @@ function stopHeartbeat() {
   heartbeatInterval = null;
 }
 
+// Validate OM presence against the backend
+async function validateOmPresence() {
+  let omPresenceId = localStorage.getItem('omPresenceId');
+  if (!omPresenceId) return;
+
+  const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: omPresenceId })
+  });
+  const data = await res.json();
+  if (!data.exists) {
+    localStorage.removeItem('omPresenceId');
+    omPresenceId = null;
+    // Now safe to call addCount() again when user plays
+  }
+}
 
 function isModeSelectionVisible() {
   const modeSelection = document.getElementById('mode-selection');
