@@ -8128,7 +8128,7 @@ window.addEventListener('beforeunload', () => {
   stopHeartbeat(); // <--- add this
 });
 
-setInterval(updateCount, 9000); // every 3 seconds
+setInterval(updateCount, 9000); // every 9 seconds
 
 
 let heartbeatInterval = null;
@@ -8146,7 +8146,7 @@ async function sendHeartbeat() {
 
 function startHeartbeat() {
   sendHeartbeat(); // send once immediately
-  heartbeatInterval = setInterval(sendHeartbeat, 15000); // every 15 seconds
+  heartbeatInterval = setInterval(sendHeartbeat, 30 * 60 * 1000); // every 30 minutes
 }
 
 function stopHeartbeat() {
