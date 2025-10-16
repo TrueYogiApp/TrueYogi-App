@@ -1630,18 +1630,125 @@
   display: none !important;
 }
 
-.om-counter.red         { color: #FF1A1A; text-shadow: 0 0 16px #FF1A1A99; }
-.om-counter.orange      { color: #FF8800; text-shadow: 0 0 16px #FF880099; }
-.om-counter.yellow      { color: #FFD600; text-shadow: 0 0 16px #FFD60099; }
-.om-counter.green       { color: #29D884; text-shadow: 0 0 16px #29D88499; }
-.om-counter.blue        { color: #3B82F6; text-shadow: 0 0 16px #3B82F6EE; }
-.om-counter.indigo      { color: #4338CA; text-shadow: 0 0 16px #4338CAEE; }
-.om-counter.violet      { color: #C026D3; text-shadow: 0 0 16px #C026D3EE; }
-.om-counter.gold        { color: #FFD700; text-shadow: 0 0 16px #FFD700DD; }
-.om-counter.silver      { color: #BFC9CA; text-shadow: 0 0 16px #BFC9CA99; }
-.om-counter.sapphire    { color: #1a4fcc; text-shadow: 0 0 16px #1a4fccee; }
-.om-counter.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
-.om-counter.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
+.om-counter.red.active {
+  color: #FF1A1A;
+  text-shadow: 0 0 10px #FF1A1A99, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextRed 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextRed {
+  0%   { text-shadow: 0 0 7px #FF1A1A77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #FF1A1Aee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.orange.active {
+  color: #FF8800;
+  text-shadow: 0 0 10px #FF880099, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextOrange 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextOrange {
+  0%   { text-shadow: 0 0 7px #FF880077, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #FF8800ee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.yellow.active {
+  color: #FFD600;
+  text-shadow: 0 0 10px #FFD60099, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextYellow 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextYellow {
+  0%   { text-shadow: 0 0 7px #FFD60077, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #FFD600ee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.green.active {
+  color: #29D884;
+  text-shadow: 0 0 10px #29D88499, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextGreen 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextGreen {
+  0%   { text-shadow: 0 0 7px #29D88477, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #29D884ee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.blue.active {
+  color: #3B82F6;
+  text-shadow: 0 0 10px #3B82F6EE, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextBlue 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextBlue {
+  0%   { text-shadow: 0 0 7px #3B82F677, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #3B82F6ee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.indigo.active {
+  color: #4338CA;
+  text-shadow: 0 0 10px #4338CAEE, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextIndigo 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextIndigo {
+  0%   { text-shadow: 0 0 7px #4338CA77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #4338CAee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.violet.active {
+  color: #C026D3;
+  text-shadow: 0 0 10px #C026D3EE, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextViolet 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextViolet {
+  0%   { text-shadow: 0 0 7px #C026D377, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #C026D3ee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.gold.active {
+  color: #FFD700;
+  text-shadow: 0 0 10px #FFD700DD, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextGold 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextGold {
+  0%   { text-shadow: 0 0 7px #FFD70077, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #FFD700ee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.silver.active {
+  color: #BFC9CA;
+  text-shadow: 0 0 10px #BFC9CA99, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextSilver 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextSilver {
+  0%   { text-shadow: 0 0 7px #BFC9CA77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #BFC9CAee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.sapphire.active {
+  color: #1a4fcc;
+  text-shadow: 0 0 10px #1a4fccee, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextSapphire 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextSapphire {
+  0%   { text-shadow: 0 0 7px #1a4fcc77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #1a4fccee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.dark-silver.active {
+  color: #606060;
+  text-shadow: 0 0 10px #606060EE, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextDarkSilver 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextDarkSilver {
+  0%   { text-shadow: 0 0 7px #60606077, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #606060ee, 0 0 4px #fffbe6; }
+}
+
+.om-counter.white.active {
+  color: #FFFFFF;
+  text-shadow: 0 0 10px #FFFFFFCC, 0 0 2px #fffbe6;
+  animation: omActiveGlowTextWhite 1.4s infinite alternate;
+}
+@keyframes omActiveGlowTextWhite {
+  0%   { text-shadow: 0 0 7px #FFFFFF77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #FFFFFFee, 0 0 4px #fffbe6; }
+}
 
 </style>
   
@@ -8071,7 +8178,7 @@ const counterEl = document.getElementById('om-counter');
 let omPresenceId = localStorage.getItem('omPresenceId');
 
 async function addCount() {
-if (omPresenceId) return;
+  if (omPresenceId) return;
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
       method: 'POST',
@@ -8079,12 +8186,17 @@ if (omPresenceId) return;
     });
     const data = await res.json();
     omPresenceId = data.id;
-	localStorage.setItem('omPresenceId', omPresenceId);
+    localStorage.setItem('omPresenceId', omPresenceId);
+
+    // ➤ Mark as active (glow) after presence is set
+    const counterEl = document.getElementById('om-counter');
+    if (counterEl) counterEl.classList.add('active');
     updateCount();
-	startHeartbeat();
+    startHeartbeat();
   } catch (err) { console.error(err); }
 }
 
+// Remove glow on leave
 async function removeCount() {
   if (!omPresenceId) return;
   try {
@@ -8093,30 +8205,41 @@ async function removeCount() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: omPresenceId })
     });
-	localStorage.removeItem('omPresenceId');
+    localStorage.removeItem('omPresenceId');
     omPresenceId = null;
     updateCount();
-	stopHeartbeat();
+    stopHeartbeat();
+    // ➤ Remove active glow
+    const counterEl = document.getElementById('om-counter');
+    if (counterEl) counterEl.classList.remove('active');
   } catch (err) { console.error(err); }
 }
 
 async function updateCount() {
+  const counterEl = document.getElementById('om-counter');
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
-
     if (data.count > 0) {
       counterEl.textContent = (typeof data.count === "number") ? data.count : "0";
       counterEl.classList.remove('hidden');
       counterEl.style.opacity = 1;
+
+      // Only show glow if this user has valid omPresenceId (== counted)
+      if (omPresenceId) {
+        counterEl.classList.add('active');
+      } else {
+        counterEl.classList.remove('active');
+      }
     } else {
-      // Hide completely if count is zero
       counterEl.classList.add('hidden');
       counterEl.innerHTML = '';
+      counterEl.classList.remove('active');
     }
   } catch (err) {
     counterEl.classList.add('hidden');
     counterEl.innerHTML = '';
+    counterEl.classList.remove('active');
     console.error(err);
   }
 }
