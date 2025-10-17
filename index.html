@@ -8119,9 +8119,18 @@ async function addCount() {
       const data = await res.json();
       localStorage.setItem('omPresenceId', data.id);
       omPresenceId = data.id;
-	      // ➤ Mark as active (glow) after presence is set
-    const counterEl = document.getElementById('om-counter');
-    if (counterEl) counterEl.classList.add('active');
+
+      // --- Pulse, then restore glow ---
+      counterEl.classList.remove('active');
+      counterEl.classList.remove('om-counter-pulse');
+      void counterEl.offsetWidth;
+      counterEl.classList.add('om-counter-pulse');
+      setTimeout(() => {
+        counterEl.classList.remove('om-counter-pulse');
+        counterEl.classList.add('active');
+      }, 700);
+      // ---
+
       updateCount();
       startHeartbeat();
     } catch (err) { console.error(err); }
@@ -8149,12 +8158,7 @@ async function removeCount() {
 let lastCount = null; // Place this at the top (outside the function)
 
 async function updateCount() {
-  // Extra sure: set or remove 'active' class based on omPresenceId
-  if (localStorage.getItem('omPresenceId')) {
-    counterEl.classList.add('active');
-  } else {
-    counterEl.classList.remove('active');
-  }
+ 
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
