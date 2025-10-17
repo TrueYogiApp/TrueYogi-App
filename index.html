@@ -1545,9 +1545,9 @@
 .card-aura.sapphire {
   box-shadow: 0 0 35px 0 #1a4fccee, 0 0 10px 3px #1a4fccaa;
 }
-/* 11. Iron Shadow - platinum dark silver */
+/* 11. Iron Shadow - heavy metallic */
 .card-aura.dark-silver {
-  box-shadow: 0 0 28px 0 #606060EE, 0 0 10px 3px #F0F0F099;
+  box-shadow: 0 0 28px 0 #333333EE, 0 0 10px 3px #94949499;
 }
 /* 12. White: pure, radiant white */
 .card-aura.white {
@@ -1604,57 +1604,6 @@
   50% { opacity: 0.9; transform: scaleY(1.12); }
 }
 
-.om-counter {
-  display: block;
-  margin: 18px auto 0 auto;
-  text-align: center;
-  color: #fde68a;
-  font-family: 'Playfair Display', serif;
-  font-size: 2.4em;
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  text-shadow: 0 2px 12px #fde68a77, 0 0 1px #fff;
-  opacity: 1;
-  transition: opacity .4s, color .3s;
-  background: none;
-  padding: 0.1em 0.5em;
-  border-radius: 1em;
-  min-width: 1.5em;
-  min-height: 1.2em;
-  /* box-shadow: 0 0 16px #fde68a22; */
-  /* Optional: subtle glowing animation */
-  animation: omSimpleGlow 3s infinite alternate;
-}
-
-.om-counter.hidden {
-  display: none !important;
-}
-
-.om-counter.red         { color: #FF1A1A; text-shadow: 0 0 16px #FF1A1A99; }
-.om-counter.orange      { color: #FF8800; text-shadow: 0 0 16px #FF880099; }
-.om-counter.yellow      { color: #FFD600; text-shadow: 0 0 16px #FFD60099; }
-.om-counter.green       { color: #29D884; text-shadow: 0 0 16px #29D88499; }
-.om-counter.blue        { color: #3B82F6; text-shadow: 0 0 16px #3B82F6EE; }
-.om-counter.indigo      { color: #4338CA; text-shadow: 0 0 16px #4338CAEE; }
-.om-counter.violet      { color: #C026D3; text-shadow: 0 0 16px #C026D3EE; }
-.om-counter.gold        { color: #FFD700; text-shadow: 0 0 16px #FFD700DD; }
-.om-counter.silver      { color: #BFC9CA; text-shadow: 0 0 16px #BFC9CA99; }
-.om-counter.sapphire    { color: #1a4fcc; text-shadow: 0 0 16px #1a4fccee; }
-.om-counter.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
-.om-counter.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
-
-.om-counter-pulse {
-  animation: omCounterPulse 0.7s;
-  will-change: transform;
-}
-
-@keyframes omCounterPulse {
-  0%   { transform: scale(1); text-shadow: none; }
-  40%  { transform: scale(1.25); text-shadow: 0 0 12px #fde68a; }
-  60%  { transform: scale(0.92); text-shadow: 0 0 12px #fde68a; }
-  80%  { transform: scale(1.12); text-shadow: none; }
-  100% { transform: scale(1); text-shadow: none; }
-}
 
 </style>
   
@@ -2090,8 +2039,6 @@
   </div>
 </button>
     </div>
-	
-<div id="om-counter" class="om-counter"></div>
 
 <!-- Desktop-only Mobile Reminder Card -->
 <div id="mobile-reminder-card" class="auth-card hidden" style="margin: 1.5em auto 0 auto; max-width: 330px; text-align: center;">
@@ -2129,9 +2076,10 @@
       <!-- Status Message -->
       <div id="wallet-status" class="wallet-status-message" aria-live="polite"></div>
       </div>
+	  
+
     </div>
   </div>
-  
   </div>
 </div>
 
@@ -2452,18 +2400,6 @@
       </button>
     </div>
   </div>
-  
-     <div class="faq-item">
-  <h3 id="faq-clear-cache-heading" class="text-yellow-200 font-medium">Clear App Cache</h3>
-  <p id="faq-clear-cache-description" class="text-gray-300 mt-1">
-    Clear downloaded app data and reload fresh content. Useful if app has issues.
-  </p>
-  <div class="mt-4">
-    <button id="faq-clear-cache-btn" onclick="showClearCacheModal()" class="w-full bg-blue-400 hover:bg-blue-500 text-white py-2 rounded-lg font-medium cursor-pointer">
-      <i class="fas fa-broom mr-2"></i> Clear Cache & Reload
-    </button>
-  </div>
-</div>
 </div>
 
 <!-- Certificate  Content -->
@@ -2587,10 +2523,10 @@
     <div class="text-yellow-400 text-5xl mb-4">
       <i class="fas fa-wallet"></i>
     </div>
-    <h2 id="wisdom-wallet-modal" class="text-xl font-semibold text-yellow-300 mb-2">Wallet Needed</h2>
+    <h2 class="text-xl font-semibold text-yellow-300 mb-2">Wallet Needed</h2>
     <p class="text-gray-200 mb-4">
-      <span id="wisdom-wallet-line1">Please connect your wallet to engage with wisdom.</span><br>
-      <span id="wisdom-wallet-line2">Every ‘love’ you send honors wisdom and records your presence with your wallet.</span>
+      <span>Please connect your wallet to engage with wisdom.</span><br>
+      <span>Every ‘love’ you send honors wisdom and records your presence on-chain.</span>
     </p>
     <button onclick="closeWisdomWalletRequiredModal()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
       OK
@@ -2659,30 +2595,6 @@
         <i class="fas fa-trash-alt mr-1"></i> Reset Everything
       </button>
       <button id="reset-confirm-cancel" onclick="closeFullResetConfirmation()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
-        Cancel
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Clear Cache Confirm Modal -->
-<div id="clearCacheModal" class="hidden fixed inset-0 flex items-center justify-center z-50">
-  <div class="confirmation-modal max-w-md mx-4 p-6 rounded-xl text-center">
-    <div class="text-blue-400 text-5xl mb-4">
-      <i class="fas fa-broom"></i>
-    </div>
-    <h2 id="clear-cache-heading" class="text-xl font-semibold text-blue-300 mb-2">Confirm Cache Clear</h2>
-    <p id="clear-cache-description" class="text-gray-200 mb-4">
-      This will remove downloaded app data and reload the latest content.<br>
-      <span class="text-yellow-400 font-bold">Your Meditation Stats are not affected.</span>
-      <br><br>
-      Are you sure you want to continue?
-    </p>
-    <div class="flex justify-center gap-4 mt-4">
-      <button id="clear-cache-confirm-btn" onclick="clearAppCache()" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
-        <i class="fas fa-broom mr-1"></i> Yes, Clear & Reload
-      </button>
-      <button id="clear-cache-cancel-btn" onclick="hideClearCacheModal()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         Cancel
       </button>
     </div>
@@ -2938,20 +2850,21 @@
     </div>
     <p class="text-yellow-300 text-lg font-medium" id="wisdom-section-heading"></p>
   </div>
-<div class="mt-2 flex flex-col items-center">
-  <p id="wisdom-text" class="text-gray-100 text-base leading-relaxed pl-6 border-l-2 border-yellow-700 transition-opacity duration-700 mb-2 text-center"></p>
-  <div id="wisdom-like-container" style="display:none; margin-top: 8px;">
-    <button id="wisdom-like-btn"
-            type="button"
-            class="flex items-center gap-1 px-3 py-1 bg-gray-900/80 rounded-full shadow hover:bg-yellow-900/40 transition cursor-pointer"
-            style="z-index: 10;"
-            aria-label="Like this wisdom"
-            onclick="toggleWisdomLike()">
-     <i id="wisdom-like-icon" class="fa-regular fa-heart text-yellow-200 text-lg transition"></i>
-     <span id="wisdom-like-count" class="text-yellow-200 font-semibold text-sm ml-2">0</span>
-    </button>
+  <div class="flex items-center justify-between mt-2">
+    <p id="wisdom-text" class="text-gray-100 text-base leading-relaxed pl-6 border-l-2 border-yellow-700 transition-opacity duration-700 mb-0"></p>
+    <!-- WRAP the button in this new div: -->
+    <div id="wisdom-like-container" style="display:none;">
+      <button id="wisdom-like-btn"
+              type="button"
+              class="ml-3 flex items-center gap-1 px-3 py-1 bg-gray-900/80 rounded-full shadow hover:bg-yellow-900/40 transition cursor-pointer"
+              style="z-index: 10;"
+              aria-label="Like this wisdom"
+              onclick="toggleWisdomLike()">
+       <i id="wisdom-like-icon" class="fa-regular fa-heart text-yellow-200 text-lg transition"></i>
+       <span id="wisdom-like-count" class="text-yellow-200 font-semibold text-sm ml-2">0</span>
+      </button>
+    </div>
   </div>
-</div>
 </div>
 
 <!-- Enhanced Wisdom Button -->
@@ -3063,16 +2976,16 @@
 </button>
 
   <!-- Sound elements -->
-  <audio id="bell" src="https://trueyogi.app/assets/meditation-end.mp3" preload="auto" muted></audio>
-  <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
+  <audio id="bell" src="/assets/meditation-end.mp3" preload="auto" muted></audio>
+  <audio id="om-sound" src="/assets/aum.mp3" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
-  <audio id="sound-bell" src="https://assets.trueyogi.app/assets/bell.m4a" preload="auto"></audio>
-  <audio id="avatar-sound" src="https://assets.trueyogi.app/assets/meditation-eternal.m4a" preload="auto"></audio>
+  <audio id="sound-bell" src="/assets/bell.m4a" preload="auto"></audio>
+  <audio id="avatar-sound" src="/assets/meditation-eternal.m4a" preload="auto"></audio>
 
   <!-- Add these 3 new sounds -->
-<audio id="sound-chimes" src="https://assets.trueyogi.app/assets/tamtam-gong.m4a" preload="auto"></audio>
-<audio id="sound-gong" src="https://assets.trueyogi.app/assets/tao-chi-gong.m4a" preload="auto"></audio>
-<audio id="sound-bowl" src="https://assets.trueyogi.app/assets/harmony-bell.m4a" preload="auto"></audio>
+<audio id="sound-chimes" src="assets/tamtam-gong.m4a" preload="auto"></audio>
+<audio id="sound-gong" src="assets/tao-chi-gong.m4a" preload="auto"></audio>
+<audio id="sound-bowl" src="assets/harmony-bell.m4a" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -3165,7 +3078,8 @@
     </div>
   </div>
 </div>
-	
+
+
   <script>
     // State Management
     let endTime = 0;
@@ -3202,32 +3116,6 @@
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
-
-
-function showClearCacheModal() {
-  document.getElementById('clearCacheModal').classList.remove('hidden');
-}
-function hideClearCacheModal() {
-  document.getElementById('clearCacheModal').classList.add('hidden');
-}
-
-function clearAppCache() {
-  hideClearCacheModal();
-  // Send a message to the SW to clear caches
-  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_APP_CACHE' });
-  }
-  // Optionally, also unregister the SW for a total reset
-  navigator.serviceWorker.getRegistration().then(function(reg) {
-    if (reg) {
-      reg.unregister().then(function() {
-        window.location.reload(true); // Force reload, bypass cache
-      });
-    } else {
-      window.location.reload(true);
-    }
-  });
-}
 
 function enableMobileAudioResume() {
   // Find all elements that could be touched during meditation
@@ -3308,6 +3196,7 @@ function releaseWakeLock() {
     console.log('Screen Wake Lock released');
   }
 }
+
 
 // Load the language JSON file dynamically
 async function loadLanguage(lang) {
@@ -3913,6 +3802,7 @@ function updateYogiIcon() {
   sunIcon.style.color = '#f59e0b'; // gold
 }
 
+
 function showStartOnChainJourneyModal(walletPublicKey) {
   window.pendingJourneyWallet = walletPublicKey;
   // Persist modal state
@@ -4097,7 +3987,6 @@ async function confirmFullReset() {
       document.addEventListener('DOMContentLoaded', async () => {
 	  cleanUpLocalSessions();
 	  setupFAQTabs();
-	  await validateOmPresence();
       document.addEventListener('click', initAudioContext, { once: true });
       document.addEventListener('touchstart', initAudioContext, { once: true });
       document.addEventListener('keydown', initAudioContext, { once: true });
@@ -4279,7 +4168,6 @@ if (musicChoiceEl) {
 	  updateFAQVisibility();
 	  updateYogiIcon();
 	  updateLangSwitcherVisibility();
-	  updateCount();
     // Hide loader when app is ready
     document.getElementById('app-loader').classList.add('hidden');
     });
@@ -4753,7 +4641,7 @@ function showYellowIndicator(duration = 1500) {
 
       if (document.getElementById('music-toggle').checked) {
         const bgMusicPlayer = document.getElementById('bg-music-player');
-		bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
+		bgMusicPlayer.src = '/assets/' + selectedMusicFile;
 		bgMusicPlayer.currentTime = 0;
 		bgMusicPlayer.loop = true;
 		bgMusicPlayer.volume = 0.5;
@@ -4942,9 +4830,10 @@ if (bgMusicPlayer) {
   bgMusicPlayer.currentTime = 0;
   backgroundAudio = null;
 }
+
   localStorage.removeItem('finalSectionActive');
   localStorage.removeItem('wisdomShownCount');
-  localStorage.removeItem('quoteOrder');
+  localStorage.removeItem('wisdomOrder');
   localStorage.removeItem('lastVisit');
   currentMode = null;
   currentSessionTime = null;
@@ -5875,7 +5764,7 @@ async function beginMeditationSession() {
 
 if (document.getElementById('music-toggle').checked) {
   const bgMusicPlayer = document.getElementById('bg-music-player');
-  bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
+  bgMusicPlayer.src = '/assets/' + selectedMusicFile;
   bgMusicPlayer.currentTime = 0;
   bgMusicPlayer.loop = true;
   bgMusicPlayer.volume = 0.5;
@@ -6140,7 +6029,7 @@ if (window.walletPublicKey && localStorage.getItem('jwtToken')) {
 
   // Wisdom reset here:
 wisdomShownCount = 0;
-quoteOrder = yogiQuotes.slice().sort(() => Math.random() - 0.5); // Or your wisdoms array
+wisdomOrder = yogiQuotes.slice().sort(() => Math.random() - 0.5); // Or your wisdoms array
 document.getElementById('show-wisdom').textContent = t('revealTodaysWisdom');
 document.getElementById('show-wisdom').style.display = ""; // Make button visible
   
@@ -6188,10 +6077,10 @@ document.getElementById('show-wisdom').style.display = ""; // Make button visibl
   updateBackButtonVisibility();
 } else {
     document.getElementById('final-section').classList.remove('hidden');
-			  // Save final section state
+		  // Save final section state
     localStorage.setItem('finalSectionActive', 'true');
     localStorage.setItem('wisdomShownCount', wisdomShownCount);
-    localStorage.setItem('quoteOrder', JSON.stringify(quoteOrder));
+    localStorage.setItem('wisdomOrder', JSON.stringify(wisdomOrder));
 	
     document.getElementById('yogi-progress').classList.toggle('hidden', currentMode !== 'yogi');
     document.getElementById('session-timing-display').classList.toggle('hidden', currentMode !== 'yogi');
@@ -7760,25 +7649,11 @@ document.getElementById('mobile-yogi-modal-heading').textContent = t('mobileYogi
 document.getElementById('mobile-yogi-modal-paragraph').innerHTML = t('mobileYogi_paragraph');
 document.getElementById('mobile-yogi-modal-button').textContent = t('mobileYogi_button');
 
-document.getElementById('wisdom-wallet-modal').textContent = t('wisdomWallet');
-document.getElementById('wisdom-wallet-line1').textContent = t('wisdomWalletL1'); 
-document.getElementById('wisdom-wallet-line2').textContent = t('wisdomWalletL2');
-
-document.getElementById('clear-cache-heading').textContent = t('clearCacheModalHeading');
-document.getElementById('clear-cache-description').innerHTML = t('clearCacheModalDescription');
-document.getElementById('clear-cache-confirm-btn').innerHTML = `<i class="fas fa-broom mr-1"></i> ${t('clearCacheModalButtonConfirm')}`;
-document.getElementById('clear-cache-cancel-btn').textContent = t('clearCacheModalButtonCancel');
-
-document.getElementById('faq-clear-cache-heading').textContent = t('faqClearCacheHeading');
-document.getElementById('faq-clear-cache-description').textContent = t('faqClearCacheDescription');
-document.getElementById('faq-clear-cache-btn').innerHTML = `<i class="fas fa-broom mr-2"></i> ${t('faqClearCacheButton')}`;
 
 }
 
 document.addEventListener('DOMContentLoaded', updateUILanguage);
 document.addEventListener('visibilitychange', handleVisibilityChange);
-// ADD THIS ONE LINE FOR PWA SUPPORT
-document.addEventListener('visibilitychange', requestWakeLock);
 
    // Add to Homescreen functionality
     function showHomescreenPrompt() {
@@ -7878,7 +7753,7 @@ function updateHideUiBtnVisibility() {
 
 let wisdoms = [];
 let wisdomShownCount = 0;
-let quoteOrder = [];
+let wisdomOrder = [];
 
 async function loadWisdoms() {
   const lang = localStorage.getItem('lang') || 'en';
@@ -7908,54 +7783,7 @@ function showNextWisdom() {
   }
 
   if (wisdomShownCount === 0) {
-    // Get wisdom statistics from localStorage
-    const wisdomStats = JSON.parse(localStorage.getItem('wisdomStats') || '{}');
-    
-    // Create array with wisdom text and its show count
-    const wisdomsWithStats = wisdoms.map((wisdom, index) => ({
-      text: wisdom,
-      index: index,
-      showCount: wisdomStats[index] || 0
-    }));
-
-    // Separate wisdoms into two groups:
-    // - Never shown (showCount === 0)
-    // - Already shown (showCount >= 1)
-    const neverShown = wisdomsWithStats.filter(w => w.showCount === 0);
-    const alreadyShown = wisdomsWithStats.filter(w => w.showCount >= 1);
-
-    let selectedWisdoms = [];
-
-    // 1. Add 11 never-shown wisdoms (or all if less than 11 available)
-    if (neverShown.length > 0) {
-      const newOnes = neverShown
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 11);
-      selectedWisdoms.push(...newOnes);
-    }
-
-    // 2. Add 2 random already-shown wisdoms (repeats)
-    if (alreadyShown.length > 0) {
-      const repeats = alreadyShown
-        .sort(() => Math.random() - 0.5)
-        .slice(0, 2);
-      selectedWisdoms.push(...repeats);
-    }
-
-    // 3. If we don't have enough wisdoms (less than 13 total), fill with random
-    if (selectedWisdoms.length < 13) {
-      const needed = 13 - selectedWisdoms.length;
-      const remaining = wisdomsWithStats
-        .filter(w => !selectedWisdoms.includes(w))
-        .sort(() => Math.random() - 0.5)
-        .slice(0, needed);
-      selectedWisdoms.push(...remaining);
-    }
-
-    // Final shuffle to mix new and repeated wisdoms
-    wisdomOrder = selectedWisdoms
-      .sort(() => Math.random() - 0.5)
-      .map(item => item.text);
+    wisdomOrder = wisdoms.slice().sort(() => Math.random() - 0.5);
   }
 
   if (wisdomShownCount < Math.min(13, wisdomOrder.length)) {
@@ -7983,12 +7811,6 @@ function showNextWisdom() {
 
     // 🟡 Fetch and render the actual like state for the new wisdom
     updateWisdomLikeUI(currentWisdomId);
-
-    // Update wisdom statistics
-    const wisdomStats = JSON.parse(localStorage.getItem('wisdomStats') || '{}');
-    wisdomStats[currentWisdomId] = (wisdomStats[currentWisdomId] || 0) + 1;
-    wisdomStats[`lastSeen_${currentWisdomId}`] = Date.now();
-    localStorage.setItem('wisdomStats', JSON.stringify(wisdomStats));
 
     wisdomShownCount++;
     wisdomBtn.textContent = wisdomShownCount < Math.min(13, wisdomOrder.length)
@@ -8039,7 +7861,6 @@ window.addEventListener('focus', () => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-  const counterEl = document.getElementById('om-counter');
   const logo = document.getElementById('logo-sacred');
   const om = document.getElementById('om-sound');
   let isPlaying = false;
@@ -8066,158 +7887,16 @@ document.addEventListener('DOMContentLoaded', function() {
           om.volume = 0.7;
           om.play().catch(()=>{});
           isPlaying = true;
-		  addCount();
         } else {
           // Stop playing
           om.pause();
           om.currentTime = 0;
           isPlaying = false;
-		  removeCount();
         }
       }
     });
   }
 });
-
-// === create the small counter display ===
-const counterEl = document.getElementById('om-counter');
-// === helper functions for live Om counter ===
-let omPresenceId = localStorage.getItem('omPresenceId');
-
-async function addCount() {
-  let id = localStorage.getItem('omPresenceId');
-  if (id) {
-    // Validate it with backend
-    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id })
-    });
-    const data = await res.json();
-    if (!data.exists) {
-      localStorage.removeItem('omPresenceId');
-      id = null;
-    }
-  }
-  if (!id) {
-    // Now, add presence
-    try {
-      const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await res.json();
-      localStorage.setItem('omPresenceId', data.id);
-      omPresenceId = data.id;
-      updateCount();
-      startHeartbeat();
-    } catch (err) { console.error(err); }
-  }
-}
-
-async function removeCount() {
-  if (!omPresenceId) return;
-  try {
-    await fetch('https://trueyogi-backend-knkq.onrender.com/leave-om', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: omPresenceId })
-    });
-	localStorage.removeItem('omPresenceId');
-    omPresenceId = null;
-    updateCount();
-	stopHeartbeat();
-  } catch (err) { console.error(err); }
-}
-
-let lastCount = null; // Place this at the top (outside the function)
-
-async function updateCount() {
-  try {
-    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
-    const data = await res.json();
-    const newCount = (typeof data.count === "number") ? data.count : 0;
-
-    if (newCount > 0) {
-      counterEl.textContent = newCount;
-      counterEl.classList.remove('hidden');
-      counterEl.style.opacity = 1;
-
-      // Animate if the count changed
-      if (lastCount !== null && newCount !== lastCount) {
-        counterEl.classList.add('om-counter-pulse');
-        setTimeout(() => counterEl.classList.remove('om-counter-pulse'), 700);
-      }
-
-      lastCount = newCount;
-    } else {
-      // Hide completely if count is zero
-      counterEl.classList.add('hidden');
-      counterEl.innerHTML = '';
-      lastCount = 0;
-    }
-  } catch (err) {
-    counterEl.classList.add('hidden');
-    counterEl.innerHTML = '';
-    lastCount = 0;
-    console.error(err);
-  }
-}
-
-// clear user when closing page
-window.addEventListener('beforeunload', () => {
-  removeCount();
-  stopHeartbeat(); // <--- add this
-});
-
-//window.addEventListener('pagehide', () => {
-//  removeCount();
-//  stopHeartbeat();
-//});
-
-setInterval(updateCount, 9000); // every 9 seconds
-
-
-let heartbeatInterval = null;
-
-async function sendHeartbeat() {
-  if (!omPresenceId) return;
-  try {
-    await fetch('https://trueyogi-backend-knkq.onrender.com/om-heartbeat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: omPresenceId })
-    });
-  } catch (err) { /* Optional: handle error */ }
-}
-
-function startHeartbeat() {
-  sendHeartbeat(); // send once immediately
-  heartbeatInterval = setInterval(sendHeartbeat, 30 * 60 * 1000); // every 30 minutes
-}
-
-function stopHeartbeat() {
-  if (heartbeatInterval) clearInterval(heartbeatInterval);
-  heartbeatInterval = null;
-}
-
-// Validate OM presence against the backend
-async function validateOmPresence() {
-  let omPresenceId = localStorage.getItem('omPresenceId');
-  if (!omPresenceId) return;
-
-  const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id: omPresenceId })
-  });
-  const data = await res.json();
-  if (!data.exists) {
-    localStorage.removeItem('omPresenceId');
-    omPresenceId = null;
-    // Now safe to call addCount() again when user plays
-  }
-}
 
 function isModeSelectionVisible() {
   const modeSelection = document.getElementById('mode-selection');
@@ -8593,10 +8272,10 @@ let lastTap = 0;
 
 // Define 4 different sounds (add these audio elements to your HTML)
 const zoneSounds = {
-  'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',      
-  'top-right': 'https://assets.trueyogi.app/assets/harmony-bell.m4a',
-  'bottom-left': 'https://assets.trueyogi.app/assets/tamtam-gong.m4a',  
-  'bottom-right': 'https://assets.trueyogi.app/assets/tao-chi-gong.m4a'
+  'top-left': '/assets/bell.m4a',      
+  'top-right': '/assets/harmony-bell.m4a',
+  'bottom-left': '/assets/tamtam-gong.m4a',  
+  'bottom-right': '/assets/tao-chi-gong.m4a'
 };
 
 const zoneIcons = {
@@ -8656,10 +8335,10 @@ function getTapZone(x, y) {
 // Play zone-specific sound - UPDATED VERSION
 function playZoneSound(zone) {
   const soundFiles = {
-    'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',
-    'top-right': 'https://assets.trueyogi.app/assets/harmony-bell.m4a', 
-    'bottom-left': 'https://assets.trueyogi.app/assets/tamtam-gong.m4a',
-    'bottom-right': 'https://assets.trueyogi.app/assets/tao-chi-gong.m4a'
+    'top-left': '/assets/bell.m4a',
+    'top-right': '/assets/harmony-bell.m4a', 
+    'bottom-left': '/assets/tamtam-gong.m4a',
+    'bottom-right': '/assets/tao-chi-gong.m4a'
   };
   
   const volumes = {
@@ -8789,39 +8468,35 @@ const auraColors = [
   "white"        // 12 (2:30–4:30am)
 ];
 
-// Returns 0–11 for slot
+// Returns 0–11 for slot, 1–12 for display
 function getAuraIndex() {
   const now = new Date();
   const localHour = now.getHours();
   const localMin = now.getMinutes();
+
+  // Calculate minutes since 4:30am
   let minutesSinceStart = (localHour * 60 + localMin) - (4 * 60 + 30);
+
+  // Wrap negative times to next day
   if (minutesSinceStart < 0) minutesSinceStart += 24 * 60;
-  const slot = Math.floor(minutesSinceStart / 120);
-  return slot % 12;
+
+  const slot = Math.floor(minutesSinceStart / 120); // 120 mins per slot
+  return slot % 12; // 0–11
 }
 
 function setAuraColor() {
-  // Card aura
-  const card = document.querySelector('.card-aura');
-  // OM counter
-  const omCounter = document.getElementById('om-counter');
-  if (!omCounter) return;
-
   const auraClass = auraColors[getAuraIndex()];
-  // Remove old classes from OM counter
-  auraColors.forEach(c => omCounter.classList.remove(c));
-  omCounter.classList.add(auraClass);
+  const card = document.querySelector('.card-aura');
+  if (!card) return;
+  auraColors.forEach(c => card.classList.remove(c));
+  card.classList.add(auraClass);
 
-  // For the card, keep your existing logic.
-  if (card) {
-    auraColors.forEach(c => card.classList.remove(c));
-    card.classList.add(auraClass);
-  }
+  // If you want to display slot number (1–12):
+  // card.setAttribute("data-aura-slot", getAuraIndex() + 1);
 }
 
-// Run once and then every minute
 setAuraColor();
-setInterval(setAuraColor, 10000); // update every 10 second)
+setInterval(setAuraColor, 1000); // update every minute (no need for every second)
 
 
 // Select all loader backgrounds (videos or images)
@@ -8868,16 +8543,13 @@ function initializeLoaderMedia() {
                 el.preload = "none";
             }
         });
-let index = savedIndex ? parseInt(savedIndex, 10) : 0;
-if (isNaN(index) || index < 0 || index >= loaderMedia.length) index = 0;
-const selected = loaderMedia[index];
-if (selected) {
-    selected.classList.add('active');
-    if (selected.tagName === 'VIDEO') {
-        selected.preload = "auto";
-        selected.play().catch(() => {});
-    }
-}
+        const index = savedIndex ? parseInt(savedIndex, 10) : 0;
+        const selected = loaderMedia[index];
+        selected.classList.add('active');
+        if (selected.tagName === 'VIDEO') {
+            selected.preload = "auto";
+            selected.play().catch(() => {});
+        }
     }
 }
 
@@ -9018,7 +8690,7 @@ const swIndicator = new SWStatusIndicator();
 
 // Show indicator immediately when page loads (optional)
 swIndicator.show();
-setTimeout(() => swIndicator.hide(), 22000); // Hide after 22 seconds if no SW activity
+setTimeout(() => swIndicator.hide(), 22000); // Hide after 20 seconds if no SW activity
 
 
 // 7 Chakra sound files and icons (bottom to top)
@@ -10624,7 +10296,6 @@ else if (challengeData.currentDay >= 8) unlockedStrands = 2;
     updateNeurons();
     drawNeurons();
     drawBiophotons();
-    requestWakeLock();
 
     // 🌌 Draw aurora waves
 for (let i = 0; i < 3; i++) {
@@ -10689,7 +10360,7 @@ for (let i = 0; i < 3; i++) {
   const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
   const supabase = createClient(supabaseUrl, supabaseKey);
-  
+
 const jwtToken = localStorage.getItem('jwtToken');
 if (jwtToken && supabase && supabase.auth && supabase.auth.setSession) {
   await supabase.auth.setSession({ access_token: jwtToken, refresh_token: "" });
@@ -11099,7 +10770,6 @@ window.addEventListener('online', () => {
   window.authenticateWithWallet = authenticateWithWallet;
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
-  
 </script>
 
  <div id="start-date-display" class="end-date-display hidden">
@@ -11244,3 +10914,4 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
+ 
