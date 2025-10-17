@@ -1640,8 +1640,31 @@
 .om-counter.gold        { color: #FFD700; text-shadow: 0 0 16px #FFD700DD; }
 .om-counter.silver      { color: #BFC9CA; text-shadow: 0 0 16px #BFC9CA99; }
 .om-counter.sapphire    { color: #1a4fcc; text-shadow: 0 0 16px #1a4fccee; }
-.om-counter.dark-silver { color: #333333; text-shadow: 0 0 16px #333333EE; }
+.om-counter.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
 .om-counter.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
+
+.om-counter-pulse {
+  animation: omCounterPulse 0.7s;
+  will-change: transform;
+}
+
+@keyframes omCounterPulse {
+  0%   { transform: scale(1); text-shadow: none; }
+  40%  { transform: scale(1.25); text-shadow: 0 0 12px #fde68a; }
+  60%  { transform: scale(0.92); text-shadow: 0 0 12px #fde68a; }
+  80%  { transform: scale(1.12); text-shadow: none; }
+  100% { transform: scale(1); text-shadow: none; }
+}
+
+.om-counter.active {
+  text-shadow: 0 0 10px #fde68a99, 0 0 2px #fffbe6;
+  animation: omActiveGlowText 3.3s infinite alternate;
+}
+
+@keyframes omActiveGlowText {
+  0%   { text-shadow: 0 0 7px #fde68a77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #fde68aee, 0 0 4px #fffbe6; }
+}
 
 </style>
   
@@ -8054,18 +8077,88 @@ document.addEventListener('DOMContentLoaded', function() {
           om.volume = 0.7;
           om.play().catch(()=>{});
           isPlaying = true;
-		  addCount();
+		  safeAddCount()
         } else {
           // Stop playing
           om.pause();
           om.currentTime = 0;
           isPlaying = false;
-		  removeCount();
+		  safeRemoveCount()
         }
       }
     });
   }
 });
+
+// --- OM play/stop rate limit logic ---
+let omActionTimestamps = []; // Array of Date.now()
+let omLockUntil = 0; // timestamp when lock ends
+
+const OM_RATE_LIMIT = 10; // max allowed in window
+const OM_RATE_WINDOW = 60 * 1000; // 1 min window in ms
+const OM_LOCK_TIME = 30 * 60 * 1000; // 30 min lock in ms
+
+function canPerformOmAction() {
+  const now = Date.now();
+  // If locked, return false if still locked
+  if (omLockUntil && now < omLockUntil) return false;
+
+  // Remove timestamps older than 1 min
+  omActionTimestamps = omActionTimestamps.filter(ts => now - ts < OM_RATE_WINDOW);
+
+  // Allow if under limit
+  if (omActionTimestamps.length < OM_RATE_LIMIT) return true;
+
+  // Otherwise, lock out for 30 min
+  omLockUntil = now + OM_LOCK_TIME;
+  // Optionally, store in localStorage to persist across reloads:
+  localStorage.setItem('omLockUntil', omLockUntil.toString());
+  return false;
+}
+
+// Call this in safeAddCount and safeRemoveCount
+function recordOmAction() {
+  const now = Date.now();
+  omActionTimestamps.push(now);
+  // Optionally, can store in localStorage for persistence
+}
+
+// On page load, restore lock from storage if needed:
+document.addEventListener('DOMContentLoaded', () => {
+  const savedLock = localStorage.getItem('omLockUntil');
+  if (savedLock) omLockUntil = parseInt(savedLock, 10) || 0;
+});
+
+let lastOmAction = 0;
+
+function safeAddCount() {
+  const now = Date.now();
+  if (now - lastOmAction < 500) return;
+  if (!canPerformOmAction()) {
+    //showOmLockNotice(); // Optional: show a message
+    return;
+  }
+  lastOmAction = now;
+  recordOmAction();
+  addCount();
+}
+
+function safeRemoveCount() {
+  const now = Date.now();
+  if (now - lastOmAction < 500) return;
+  if (!canPerformOmAction()) {
+    //showOmLockNotice(); // Optional: show a message
+    return;
+  }
+  lastOmAction = now;
+  recordOmAction();
+  removeCount();
+}
+
+//function showOmLockNotice() {
+  // You can use a modal, toast, or just console log:
+//  alert("You've played OM too frequently. Please wait 30 minutes before joining again. This is to keep our space peaceful.");
+//}
 
 // === create the small counter display ===
 const counterEl = document.getElementById('om-counter');
@@ -8073,18 +8166,46 @@ const counterEl = document.getElementById('om-counter');
 let omPresenceId = localStorage.getItem('omPresenceId');
 
 async function addCount() {
-if (omPresenceId) return;
-  try {
-    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
+  let id = localStorage.getItem('omPresenceId');
+  if (id) {
+    // Validate it with backend
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id })
     });
     const data = await res.json();
-    omPresenceId = data.id;
-	localStorage.setItem('omPresenceId', omPresenceId);
-    updateCount();
-	startHeartbeat();
-  } catch (err) { console.error(err); }
+    if (!data.exists) {
+      localStorage.removeItem('omPresenceId');
+      id = null;
+    }
+  }
+  if (!id) {
+    // Now, add presence
+    try {
+      const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      });
+      const data = await res.json();
+      localStorage.setItem('omPresenceId', data.id);
+      omPresenceId = data.id;
+
+      // --- Pulse, then restore glow ---
+      counterEl.classList.remove('active');
+      counterEl.classList.remove('om-counter-pulse');
+      void counterEl.offsetWidth;
+      counterEl.classList.add('om-counter-pulse');
+      setTimeout(() => {
+        counterEl.classList.remove('om-counter-pulse');
+        counterEl.classList.add('active');
+      }, 700);
+      // ---
+
+      updateCount();
+      startHeartbeat();
+    } catch (err) { console.error(err); }
+  }
 }
 
 async function removeCount() {
@@ -8099,38 +8220,60 @@ async function removeCount() {
     omPresenceId = null;
     updateCount();
 	stopHeartbeat();
+	    // ➤ Remove active glow
+    const counterEl = document.getElementById('om-counter');
+    if (counterEl) counterEl.classList.remove('active');
   } catch (err) { console.error(err); }
 }
 
+let lastCount = null; // Place this at the top (outside the function)
+
 async function updateCount() {
+ 
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
+    const newCount = (typeof data.count === "number") ? data.count : 0;
 
-    if (data.count > 0) {
-      counterEl.textContent = (typeof data.count === "number") ? data.count : "0";
+    if (newCount > 0) {
+      counterEl.textContent = newCount;
       counterEl.classList.remove('hidden');
       counterEl.style.opacity = 1;
+
+      // Animate if the count changed
+      if (lastCount !== null && newCount !== lastCount) {
+        counterEl.classList.add('om-counter-pulse');
+        setTimeout(() => counterEl.classList.remove('om-counter-pulse'), 700);
+		showMeditatorFloat();
+      }
+
+      lastCount = newCount;
     } else {
       // Hide completely if count is zero
       counterEl.classList.add('hidden');
       counterEl.innerHTML = '';
+      lastCount = 0;
     }
   } catch (err) {
     counterEl.classList.add('hidden');
     counterEl.innerHTML = '';
+    lastCount = 0;
     console.error(err);
   }
 }
 
 // clear user when closing page
-// clear user when closing page
-window.addEventListener('beforeunload', () => {
-  removeCount();
-  stopHeartbeat(); // <--- add this
-});
+//window.addEventListener('beforeunload', () => {
+//  removeCount();
+//  stopHeartbeat(); // <--- add this
+//});
 
-//setInterval(updateCount, 9000); // every 3 seconds
+//window.addEventListener('pagehide', () => {
+//  removeCount();
+//  stopHeartbeat();
+//});
+
+setInterval(updateCount, 9000); // every 9 seconds
 
 
 let heartbeatInterval = null;
@@ -8148,12 +8291,81 @@ async function sendHeartbeat() {
 
 function startHeartbeat() {
   sendHeartbeat(); // send once immediately
-  heartbeatInterval = setInterval(sendHeartbeat, 600000); // every 10 minutes
+  heartbeatInterval = setInterval(sendHeartbeat, 30 * 60 * 1000); // every 30 minutes
 }
 
 function stopHeartbeat() {
   if (heartbeatInterval) clearInterval(heartbeatInterval);
   heartbeatInterval = null;
+}
+
+// Validate OM presence against the backend
+async function validateOmPresence() {
+  let omPresenceId = localStorage.getItem('omPresenceId');
+  if (!omPresenceId) return;
+
+  const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ id: omPresenceId })
+  });
+  const data = await res.json();
+  if (!data.exists) {
+    localStorage.removeItem('omPresenceId');
+    omPresenceId = null;
+    // Now safe to call addCount() again when user plays
+  }
+}
+
+let meditateSVGContent = null;
+
+async function showMeditatorFloat() {
+  // 1. Fetch SVG if not already loaded
+  if (!meditateSVGContent) {
+    const resp = await fetch('/assets/ommeditate.svg');
+    meditateSVGContent = await resp.text();
+  }
+
+  // 2. Get aura color
+  const auraClass = Array.from(counterEl.classList).find(c => auraColors.includes(c)) || "yellow";
+  const auraColorMap = {
+    red: "#FF1A1A", orange: "#FF8800", yellow: "#FFD600", green: "#29D884",
+    blue: "#3B82F6", indigo: "#4338CA", violet: "#C026D3", gold: "#FFD700",
+    silver: "#BFC9CA", sapphire: "#1a4fcc", "dark-silver": "#606060EE", white: "#FFFFFF"
+  };
+  const color = auraColorMap[auraClass] || "#FFD600";
+
+  // 3. Replace color in SVG (adjust regex if needed)
+  let svgColored = meditateSVGContent.replace(/fill="[^"]*"/g, `fill="${color}"`);
+
+  // 4. Position: get OM counter center
+  const rect = counterEl.getBoundingClientRect();
+  const svgSize = 0.1; // px, adjust if needed
+  const centerX = rect.left + rect.width / 2 - svgSize / 2;
+  const centerY = rect.top + rect.height / 2 - svgSize / 2;
+
+  // 5. Create floating div for SVG
+  const float = document.createElement("div");
+  float.innerHTML = svgColored;
+  float.style.position = "fixed";
+  float.style.left = `${centerX}px`;
+  float.style.top = `${centerY}px`;
+  float.style.width = `${svgSize}px`;
+  float.style.height = `${svgSize}px`;
+  float.style.pointerEvents = "none";
+  float.style.zIndex = 9999;
+  float.style.transition = "opacity 0.8s, transform 0.8s";
+  float.style.opacity = "1";
+  float.style.transform = "translateY(0)";
+  float.style.filter = `drop-shadow(0 0 12px ${color}88)`;
+
+  document.body.appendChild(float);
+
+  setTimeout(() => {
+    float.style.opacity = "0";
+    float.style.transform = "translateY(-36px) scale(1.15)";
+  }, 50);
+  setTimeout(() => float.remove(), 950);
 }
 
 
@@ -10633,18 +10845,6 @@ if (jwtToken && supabase && supabase.auth && supabase.auth.setSession) {
 }
 // console.log('Supabase current session:', await supabase.auth.getSession());
 
-supabase
-  .channel('om-presence')
-  .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'om_presence' },
-    payload => {
-      // payload.eventType: INSERT, UPDATE, DELETE
-	  // console.log('Realtime event:', payload);
-      updateCount(); // or update UI inline, or re-fetch count if needed
-    }
-  )
-  .subscribe();
   
   // Utility: Generate unique session_id for each session
   function generateSessionId(walletPublicKey, date, time, mode) {
