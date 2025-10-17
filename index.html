@@ -8173,6 +8173,7 @@ async function updateCount() {
       if (lastCount !== null && newCount !== lastCount) {
         counterEl.classList.add('om-counter-pulse');
         setTimeout(() => counterEl.classList.remove('om-counter-pulse'), 700);
+		showMeditatorFloat();
       }
 
       lastCount = newCount;
@@ -8243,6 +8244,57 @@ async function validateOmPresence() {
     omPresenceId = null;
     // Now safe to call addCount() again when user plays
   }
+}
+
+let meditateSVGContent = null;
+
+async function showMeditatorFloat() {
+  // 1. Fetch SVG if not already loaded
+  if (!meditateSVGContent) {
+    const resp = await fetch('/assets/ommeditate.svg');
+    meditateSVGContent = await resp.text();
+  }
+
+  // 2. Get aura color
+  const auraClass = Array.from(counterEl.classList).find(c => auraColors.includes(c)) || "yellow";
+  const auraColorMap = {
+    red: "#FF1A1A", orange: "#FF8800", yellow: "#FFD600", green: "#29D884",
+    blue: "#3B82F6", indigo: "#4338CA", violet: "#C026D3", gold: "#FFD700",
+    silver: "#BFC9CA", sapphire: "#1a4fcc", "dark-silver": "#606060EE", white: "#FFFFFF"
+  };
+  const color = auraColorMap[auraClass] || "#FFD600";
+
+  // 3. Replace color in SVG (adjust regex if needed)
+  let svgColored = meditateSVGContent.replace(/fill="[^"]*"/g, `fill="${color}"`);
+
+  // 4. Position: get OM counter center
+  const rect = counterEl.getBoundingClientRect();
+  const svgSize = 0.1; // px, adjust if needed
+  const centerX = rect.left + rect.width / 2 - svgSize / 2;
+  const centerY = rect.top + rect.height / 2 - svgSize / 2;
+
+  // 5. Create floating div for SVG
+  const float = document.createElement("div");
+  float.innerHTML = svgColored;
+  float.style.position = "fixed";
+  float.style.left = `${centerX}px`;
+  float.style.top = `${centerY}px`;
+  float.style.width = `${svgSize}px`;
+  float.style.height = `${svgSize}px`;
+  float.style.pointerEvents = "none";
+  float.style.zIndex = 9999;
+  float.style.transition = "opacity 0.8s, transform 0.8s";
+  float.style.opacity = "1";
+  float.style.transform = "translateY(0)";
+  float.style.filter = `drop-shadow(0 0 12px ${color}88)`;
+
+  document.body.appendChild(float);
+
+  setTimeout(() => {
+    float.style.opacity = "0";
+    float.style.transform = "translateY(-36px) scale(1.15)";
+  }, 50);
+  setTimeout(() => float.remove(), 950);
 }
 
 function isModeSelectionVisible() {
