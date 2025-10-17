@@ -8076,18 +8076,88 @@ document.addEventListener('DOMContentLoaded', function() {
           om.volume = 0.7;
           om.play().catch(()=>{});
           isPlaying = true;
-		  addCount();
+		  safeAddCount()
         } else {
           // Stop playing
           om.pause();
           om.currentTime = 0;
           isPlaying = false;
-		  removeCount();
+		  safeRemoveCount()
         }
       }
     });
   }
 });
+
+// --- OM play/stop rate limit logic ---
+let omActionTimestamps = []; // Array of Date.now()
+let omLockUntil = 0; // timestamp when lock ends
+
+const OM_RATE_LIMIT = 10; // max allowed in window
+const OM_RATE_WINDOW = 60 * 1000; // 1 min window in ms
+const OM_LOCK_TIME = 30 * 60 * 1000; // 30 min lock in ms
+
+function canPerformOmAction() {
+  const now = Date.now();
+  // If locked, return false if still locked
+  if (omLockUntil && now < omLockUntil) return false;
+
+  // Remove timestamps older than 1 min
+  omActionTimestamps = omActionTimestamps.filter(ts => now - ts < OM_RATE_WINDOW);
+
+  // Allow if under limit
+  if (omActionTimestamps.length < OM_RATE_LIMIT) return true;
+
+  // Otherwise, lock out for 30 min
+  omLockUntil = now + OM_LOCK_TIME;
+  // Optionally, store in localStorage to persist across reloads:
+  localStorage.setItem('omLockUntil', omLockUntil.toString());
+  return false;
+}
+
+// Call this in safeAddCount and safeRemoveCount
+function recordOmAction() {
+  const now = Date.now();
+  omActionTimestamps.push(now);
+  // Optionally, can store in localStorage for persistence
+}
+
+// On page load, restore lock from storage if needed:
+document.addEventListener('DOMContentLoaded', () => {
+  const savedLock = localStorage.getItem('omLockUntil');
+  if (savedLock) omLockUntil = parseInt(savedLock, 10) || 0;
+});
+
+let lastOmAction = 0;
+
+function safeAddCount() {
+  const now = Date.now();
+  if (now - lastOmAction < 500) return;
+  if (!canPerformOmAction()) {
+    //showOmLockNotice(); // Optional: show a message
+    return;
+  }
+  lastOmAction = now;
+  recordOmAction();
+  addCount();
+}
+
+function safeRemoveCount() {
+  const now = Date.now();
+  if (now - lastOmAction < 500) return;
+  if (!canPerformOmAction()) {
+    //showOmLockNotice(); // Optional: show a message
+    return;
+  }
+  lastOmAction = now;
+  recordOmAction();
+  removeCount();
+}
+
+//function showOmLockNotice() {
+  // You can use a modal, toast, or just console log:
+//  alert("You've played OM too frequently. Please wait 30 minutes before joining again. This is to keep our space peaceful.");
+//}
 
 // === create the small counter display ===
 const counterEl = document.getElementById('om-counter');
@@ -8296,6 +8366,7 @@ async function showMeditatorFloat() {
   }, 50);
   setTimeout(() => float.remove(), 950);
 }
+
 
 function isModeSelectionVisible() {
   const modeSelection = document.getElementById('mode-selection');
