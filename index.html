@@ -1656,6 +1656,16 @@
   100% { transform: scale(1); text-shadow: none; }
 }
 
+.om-counter.active {
+  text-shadow: 0 0 10px #fde68a99, 0 0 2px #fffbe6;
+  animation: omActiveGlowText 3.3s infinite alternate;
+}
+
+@keyframes omActiveGlowText {
+  0%   { text-shadow: 0 0 7px #fde68a77, 0 0 2px #fffbe6; }
+  100% { text-shadow: 0 0 15px #fde68aee, 0 0 4px #fffbe6; }
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -8109,6 +8119,9 @@ async function addCount() {
       const data = await res.json();
       localStorage.setItem('omPresenceId', data.id);
       omPresenceId = data.id;
+	      // ➤ Mark as active (glow) after presence is set
+    const counterEl = document.getElementById('om-counter');
+    if (counterEl) counterEl.classList.add('active');
       updateCount();
       startHeartbeat();
     } catch (err) { console.error(err); }
@@ -8127,12 +8140,21 @@ async function removeCount() {
     omPresenceId = null;
     updateCount();
 	stopHeartbeat();
+	    // ➤ Remove active glow
+    const counterEl = document.getElementById('om-counter');
+    if (counterEl) counterEl.classList.remove('active');
   } catch (err) { console.error(err); }
 }
 
 let lastCount = null; // Place this at the top (outside the function)
 
 async function updateCount() {
+  // Extra sure: set or remove 'active' class based on omPresenceId
+  if (localStorage.getItem('omPresenceId')) {
+    counterEl.classList.add('active');
+  } else {
+    counterEl.classList.remove('active');
+  }
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
