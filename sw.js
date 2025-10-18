@@ -1,6 +1,6 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.4';
+const APP_VERSION = '1.5';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2'; 
 
