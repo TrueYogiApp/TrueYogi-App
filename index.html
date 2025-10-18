@@ -1545,7 +1545,7 @@
 .card-aura.sapphire {
   box-shadow: 0 0 35px 0 #1a4fccee, 0 0 10px 3px #1a4fccaa;
 }
-/* 11. Iron Shadow - heavy metallic */
+/* 11. Iron Shadow - platinum dark silver */
 .card-aura.dark-silver {
   box-shadow: 0 0 28px 0 #606060EE, 0 0 10px 3px #606060EE;
 }
@@ -1666,6 +1666,20 @@
   100% { text-shadow: 0 0 15px #fde68aee, 0 0 4px #fffbe6; }
 }
 
+.session-time-block {
+  background: rgba(30,41,59,0.92);         /* Slightly lighter than modal */
+  border: 1.5px solid #eab30833;           /* Subtle gold border */
+  border-radius: 10px;
+  box-shadow: 0 2px 10px #eab30811;        /* Gentle shadow */
+  padding: 0.75em 0.8em;
+  margin-bottom: 1em;                      /* Spacing between blocks */
+  transition: box-shadow 0.18s, border 0.18s;
+}
+
+.session-time-block:hover, .session-time-block:focus-within {
+  box-shadow: 0 4px 16px #eab30822;
+  border-color: #eab30899;
+}
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -1906,7 +1920,7 @@
       
       <div id="session-times-inputs" class="mb-2">
 	    <label id="session-times-label" class="block text-sm text-gray-400 mb-2"></label>
-        <div id="session-time-1" class="flex flex-col sm:flex-row gap-2 mb-3">
+        <div id="session-time-1" class="session-time-block flex flex-col sm:flex-row gap-2 mb-3">
           <input type="time" class="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg" required>
           <select id="duration-1" class="flex-1 bg-gray-800 text-white px-4 py-2 rounded-lg">
             <option value="60">1 min</option>
@@ -4291,6 +4305,7 @@ if (musicChoiceEl) {
 	  updateFAQVisibility();
 	  updateYogiIcon();
 	  updateLangSwitcherVisibility();
+	  await validateOmPresence();
 	  updateCount();
     // Hide loader when app is ready
     document.getElementById('app-loader').classList.add('hidden');
@@ -5183,7 +5198,7 @@ function getLocalTimeString() {
 
   // Create new session input
   const newInput = document.createElement('div');
-  newInput.className = 'mb-2 flex items-center gap-2 flex-col sm:flex-row';
+  newInput.className = 'session-time-block flex items-center gap-2 flex-col sm:flex-row';
   newInput.id = `session-time-${inputs + 1}`;
   newInput.innerHTML = `
     <input type="time" class="w-full bg-gray-800 text-white px-4 py-2 rounded-lg" value="${newTime}" required>
