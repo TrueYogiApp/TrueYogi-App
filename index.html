@@ -2067,6 +2067,18 @@
       <img src="/assets/lungs.svg" alt="Lungs Icon" width="40" height="40" class="breathing-lungs">
     </div>
 <div class="w-32 h-32 rounded-full overflow-hidden shadow-md glow" style="position:relative;">
+<div id="om-mute-toggle" style="
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  cursor: pointer;
+  background: transparent;
+  z-index: 10;
+"></div>
   <img id="logo-sacred" src="/assets/icrown3.png" alt="Sacred Symbol" class="w-full h-full object-cover" style="display:block;">
 <div id="lotus-eye-flare"
      style="
@@ -8084,7 +8096,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
       
       // Only toggle sound if click is within 47px of center (radius)
-      if (dist < 47) {
+      if (dist < 33) {
         if (!isPlaying) {
           // Start playing
           om.muted = false;
@@ -9329,6 +9341,28 @@ async function toggleWisdomLike() {
   });
   await updateWisdomLikeUI(wisdomId);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+  const omMuteToggle = document.getElementById('om-mute-toggle');
+  const omAudio = document.getElementById('om-sound');
+  let omIsMuted = localStorage.getItem('omIsMuted') === 'true';
+
+  // Set initial mute state
+  if (omAudio) omAudio.muted = omIsMuted;
+
+  if (omMuteToggle) {
+    omMuteToggle.addEventListener('click', (e) => {
+      // Only allow if user is present in OM (i.e. has omPresenceId)
+      const omPresenceId = localStorage.getItem('omPresenceId');
+      if (!omPresenceId) return;
+
+      omIsMuted = !omIsMuted;
+      if (omAudio) omAudio.muted = omIsMuted;
+      localStorage.setItem('omIsMuted', omIsMuted);
+      // No icon or visual update needed
+    });
+  }
+});
 
   </script>
 	
