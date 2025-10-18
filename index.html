@@ -1713,10 +1713,10 @@
   </div>
 </div>
 
-<!-- Service Worker Status Indicator --->
+<!-- Service Worker Status Indicator -->
 <div id="sw-status" style="display: none;"></div>
 
- 
+
   <!-- Welcome Message Modal -->
   <div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="welcome-heading">
   <div class="welcome-message max-w-md mx-4 p-6 rounded-xl text-center">
@@ -8383,6 +8383,15 @@ async function showMeditatorFloat() {
   setTimeout(() => float.remove(), 950);
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  const omPresenceId = localStorage.getItem('omPresenceId');
+  const counterEl = document.getElementById('om-counter');
+  if (omPresenceId && counterEl) {
+    counterEl.classList.add('active'); // Show OM glow immediately
+  } else if (counterEl) {
+    counterEl.classList.remove('active'); // Remove glow if not present
+  }
+});
 
 function isModeSelectionVisible() {
   const modeSelection = document.getElementById('mode-selection');
