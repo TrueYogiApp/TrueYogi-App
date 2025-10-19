@@ -1703,7 +1703,14 @@
 
   <div id="app-loader" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50"> <!-- 24 -->
     <div class="loader-spinner"></div>
-
+    <div class="loader-overlay">
+    <!-- Video backgrounds -->
+    <video src="/assets/cosmos.mp4" class="cosmic-bg active" autoplay loop muted playsinline preload="none"></video>
+    <video src="/assets/merkaba.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    <video src="/assets/sriyantra.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    <video src="/assets/mandala.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    <video src="/assets/floweroflife.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    </div>
 </div>	
 <!-- Service Worker Status Indicator -->
 <div id="sw-status" style="display: none;"></div>
@@ -8995,6 +9002,70 @@ function setAuraColor() {
 // Run once and then every minute
 setAuraColor();
 setInterval(setAuraColor, 1000);
+
+
+// Select all loader backgrounds (videos or images)
+const loaderMedia = document.querySelectorAll('.cosmic-bg');
+const HOUR_IN_MS = 3600000; // 1 hour
+
+function switchLoaderMedia() {
+    loaderMedia.forEach((el) => {
+        el.classList.remove('active');
+        if (el.tagName === 'VIDEO') {
+            el.pause();
+            el.currentTime = 0;
+            el.preload = "none";
+        }
+    });
+
+    // Pick a random media element
+    const randomIndex = Math.floor(Math.random() * loaderMedia.length);
+    const selected = loaderMedia[randomIndex];
+    selected.classList.add('active');
+
+    if (selected.tagName === 'VIDEO') {
+        selected.preload = "auto";
+        selected.play().catch(() => {});
+    }
+
+    localStorage.setItem('lastImageSwitch', Date.now());
+    localStorage.setItem('currentImageIndex', randomIndex);
+}
+
+function initializeLoaderMedia() {
+    const lastSwitch = localStorage.getItem('lastImageSwitch');
+    const savedIndex = localStorage.getItem('currentImageIndex');
+    const now = Date.now();
+
+    if (!lastSwitch || (now - lastSwitch) >= HOUR_IN_MS) {
+        switchLoaderMedia();
+    } else {
+        loaderMedia.forEach((el) => {
+            el.classList.remove('active');
+            if (el.tagName === 'VIDEO') {
+                el.pause();
+                el.currentTime = 0;
+                el.preload = "none";
+            }
+        });
+let index = savedIndex ? parseInt(savedIndex, 10) : 0;
+if (isNaN(index) || index < 0 || index >= loaderMedia.length) index = 0;
+const selected = loaderMedia[index];
+if (selected) {
+    selected.classList.add('active');
+    if (selected.tagName === 'VIDEO') {
+        selected.preload = "auto";
+        selected.play().catch(() => {});
+    }
+}
+    }
+}
+
+// Initialize on page load
+initializeLoaderMedia();
+
+// Check every minute if it's time to switch
+setInterval(initializeLoaderMedia, 60000);
 
 
 // Enhanced offline detection
