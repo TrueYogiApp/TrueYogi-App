@@ -26,7 +26,7 @@ const AUDIO_ASSETS = [
   '/assets/solar_ram_528hz.mp3',
   '/assets/sacral_vam_417hz.mp3',
   '/assets/root_lam_396hz.mp3',
-  '/assets/meditation-end.mp3',
+  '/assets/meditation-end.mp3'
 ];
 
 const PERMANENT_ASSETS = [
