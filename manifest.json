@@ -10,7 +10,6 @@
   "scope": "/",
   "description": "Meditation App",
   "categories": ["Spirituality", "Consciousness", "Truth", "Universe", "Cosmos"],
-  "display_override": ["standalone", "browser"],
   "lang": "en",
   "dir": "ltr",
   "icons": [
