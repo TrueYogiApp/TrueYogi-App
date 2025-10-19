@@ -179,33 +179,70 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
+  // Handle navigation requests (HTML pages) specifically
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then((networkResponse) => {
+          // Cache the HTML for future offline use
+          if (networkResponse.status === 200) {
+            const responseToCache = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => 
+              cache.put(event.request, responseToCache)
+            );
+          }
+          return networkResponse;
+        })
+        .catch(() => {
+          console.log('🌐 Network failed for navigation, serving cached index.html');
+          return caches.match('/index.html')
+            .then((cachedResponse) => {
+              if (cachedResponse) {
+                return cachedResponse;
+              }
+              // Ultimate fallback
+              return new Response('Offline - please check your connection');
+            });
+        })
+    );
+    return;
+  }
+
+  // Handle all other requests (assets, CSS, JS, etc.)
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Only cache successful non-HTML requests
-        if (networkResponse.status === 200 && event.request.destination !== 'document') {
+        // Only cache successful non-navigation requests
+        if (networkResponse.status === 200) {
           const responseToCache = networkResponse.clone();
           const url = new URL(event.request.url);
           const cacheName = isPermanentAsset(url.pathname)
             ? PERMANENT_CACHE_NAME
             : CACHE_NAME;
 
-          caches.open(cacheName).then((cache) => cache.put(event.request, responseToCache));
+          caches.open(cacheName).then((cache) => 
+            cache.put(event.request, responseToCache)
+          );
         }
         return networkResponse;
       })
       .catch(() => {
         console.log('🌐 Network failed, using cache for:', event.request.url);
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
-
-          // Offline fallback logic
-          if (event.request.destination === 'document') {
-            return caches.match('/index.html');
-          } else if (event.request.destination === 'image') {
-            return caches.match('/assets/spaceship.svg');
-          }
-        });
+        return caches.match(event.request)
+          .then((cachedResponse) => {
+            if (cachedResponse) return cachedResponse;
+            
+            // Image fallback
+            if (event.request.destination === 'image') {
+              return caches.match('/assets/spaceship.svg');
+            }
+            
+            // Ultimate fallback for other failed requests
+            return new Response('', { 
+              status: 408, 
+              statusText: 'Offline' 
+            });
+          });
       })
   );
 });
