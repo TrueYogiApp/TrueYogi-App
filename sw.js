@@ -1,6 +1,6 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.3';
+const APP_VERSION = '1.3.1';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2'; 
 
@@ -47,7 +47,7 @@ const APP_FILES = [
   '/index.html',
   '/output.css',
   '/sw.js',
-  '/assets/manifest.json',
+  '/manifest.json',
   '/assets/welcomeMessages.en.json',
   '/assets/welcomeMessages.te.json',
   '/assets/welcomeMessages.fr.json',
