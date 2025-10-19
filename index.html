@@ -1680,6 +1680,7 @@
   box-shadow: 0 4px 16px #eab30822;
   border-color: #eab30899;
 }
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -1701,18 +1702,17 @@
   <button onclick="promptVerifyAndSync()" style="background:#eab308; color:#222; margin-left:1em; font-weight:bold; border-radius:6px; padding:0.4em 1.2em; cursor:pointer;">Verify Now</button>
 </div>
 
-<div id="app-loader" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50">
-  <div class="loader-spinner"></div>
-  <div class="loader-overlay">
+  <div id="app-loader" class="fixed inset-0 flex items-center justify-center bg-gray-900 bg-opacity-80 z-50"> <!-- 24 -->
+    <div class="loader-spinner"></div>
+    <div class="loader-overlay">
     <!-- Video backgrounds -->
     <video src="/assets/cosmos.mp4" class="cosmic-bg active" autoplay loop muted playsinline preload="none"></video>
     <video src="/assets/merkaba.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
     <video src="/assets/sriyantra.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
     <video src="/assets/mandala.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
     <video src="/assets/floweroflife.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
-  </div>
-</div>
-
+    </div>
+</div>	
 <!-- Service Worker Status Indicator -->
 <div id="sw-status" style="display: none;"></div>
 
@@ -2125,7 +2125,7 @@
   </div>
 </button>
     </div>
-
+	
 <div id="om-counter" class="om-counter"></div>
 
 <!-- Desktop-only Mobile Reminder Card -->
@@ -2164,10 +2164,9 @@
       <!-- Status Message -->
       <div id="wallet-status" class="wallet-status-message" aria-live="polite"></div>
       </div>
-	  
-
     </div>
   </div>
+  
   </div>
 </div>
 
@@ -3099,16 +3098,16 @@
 </button>
 
   <!-- Sound elements -->
-  <audio id="bell" src="/assets/meditation-end.mp3" preload="auto" muted></audio>
-  <audio id="om-sound" src="/assets/aum.mp3" preload="auto"></audio>
+  <audio id="bell" src="https://trueyogi.app/assets/meditation-end.mp3" preload="auto" muted></audio>
+  <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
-  <audio id="sound-bell" src="/assets/bell.m4a" preload="auto"></audio>
-  <audio id="avatar-sound" src="/assets/meditation-eternal.m4a" preload="auto"></audio>
+  <audio id="sound-bell" src="https://assets.trueyogi.app/assets/bell.m4a" preload="auto"></audio>
+  <audio id="avatar-sound" src="https://assets.trueyogi.app/assets/meditation-eternal.m4a" preload="auto"></audio>
 
   <!-- Add these 3 new sounds -->
-<audio id="sound-chimes" src="/assets/tamtam-gong.m4a" preload="auto"></audio>
-<audio id="sound-gong" src="/assets/tao-chi-gong.m4a" preload="auto"></audio>
-<audio id="sound-bowl" src="/assets/harmony-bell.m4a" preload="auto"></audio>
+<audio id="sound-chimes" src="https://assets.trueyogi.app/assets/tamtam-gong.m4a" preload="auto"></audio>
+<audio id="sound-gong" src="https://assets.trueyogi.app/assets/tao-chi-gong.m4a" preload="auto"></audio>
+<audio id="sound-bowl" src="https://assets.trueyogi.app/assets/harmony-bell.m4a" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -3201,8 +3200,7 @@
     </div>
   </div>
 </div>
-
-
+	
   <script>
     // State Management
     let endTime = 0;
@@ -3344,7 +3342,6 @@ function releaseWakeLock() {
     console.log('Screen Wake Lock released');
   }
 }
-
 
 // Load the language JSON file dynamically
 async function loadLanguage(lang) {
@@ -3949,7 +3946,6 @@ function updateYogiIcon() {
   sunIcon.classList.add('fa-spin');
   sunIcon.style.color = '#f59e0b'; // gold
 }
-
 
 function showStartOnChainJourneyModal(walletPublicKey) {
   window.pendingJourneyWallet = walletPublicKey;
@@ -4791,7 +4787,7 @@ function showYellowIndicator(duration = 1500) {
 
       if (document.getElementById('music-toggle').checked) {
         const bgMusicPlayer = document.getElementById('bg-music-player');
-		bgMusicPlayer.src = '/assets/' + selectedMusicFile;
+		bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
 		bgMusicPlayer.currentTime = 0;
 		bgMusicPlayer.loop = true;
 		bgMusicPlayer.volume = 0.5;
@@ -4980,7 +4976,6 @@ if (bgMusicPlayer) {
   bgMusicPlayer.currentTime = 0;
   backgroundAudio = null;
 }
-
   localStorage.removeItem('finalSectionActive');
   localStorage.removeItem('wisdomShownCount');
   localStorage.removeItem('quoteOrder');
@@ -5914,7 +5909,7 @@ async function beginMeditationSession() {
 
 if (document.getElementById('music-toggle').checked) {
   const bgMusicPlayer = document.getElementById('bg-music-player');
-  bgMusicPlayer.src = '/assets/' + selectedMusicFile;
+  bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
   bgMusicPlayer.currentTime = 0;
   bgMusicPlayer.loop = true;
   bgMusicPlayer.volume = 0.5;
@@ -6227,7 +6222,7 @@ document.getElementById('show-wisdom').style.display = ""; // Make button visibl
   updateBackButtonVisibility();
 } else {
     document.getElementById('final-section').classList.remove('hidden');
-		  // Save final section state
+			  // Save final section state
     localStorage.setItem('finalSectionActive', 'true');
     localStorage.setItem('wisdomShownCount', wisdomShownCount);
     localStorage.setItem('quoteOrder', JSON.stringify(quoteOrder));
@@ -7816,6 +7811,8 @@ document.getElementById('faq-clear-cache-btn').innerHTML = `<i class="fas fa-bro
 
 document.addEventListener('DOMContentLoaded', updateUILanguage);
 document.addEventListener('visibilitychange', handleVisibilityChange);
+// ADD THIS ONE LINE FOR PWA SUPPORT
+document.addEventListener('visibilitychange', requestWakeLock);
 
    // Add to Homescreen functionality
     function showHomescreenPrompt() {
@@ -8404,6 +8401,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+
 function isModeSelectionVisible() {
   const modeSelection = document.getElementById('mode-selection');
   const faqModal = document.getElementById('faq-modal');
@@ -8778,10 +8776,10 @@ let lastTap = 0;
 
 // Define 4 different sounds (add these audio elements to your HTML)
 const zoneSounds = {
-  'top-left': '/assets/bell.m4a',      
-  'top-right': '/assets/harmony-bell.m4a',
-  'bottom-left': '/assets/tamtam-gong.m4a',  
-  'bottom-right': '/assets/tao-chi-gong.m4a'
+  'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',      
+  'top-right': 'https://assets.trueyogi.app/assets/harmony-bell.m4a',
+  'bottom-left': 'https://assets.trueyogi.app/assets/tamtam-gong.m4a',  
+  'bottom-right': 'https://assets.trueyogi.app/assets/tao-chi-gong.m4a'
 };
 
 const zoneIcons = {
@@ -8841,10 +8839,10 @@ function getTapZone(x, y) {
 // Play zone-specific sound - UPDATED VERSION
 function playZoneSound(zone) {
   const soundFiles = {
-    'top-left': '/assets/bell.m4a',
-    'top-right': '/assets/harmony-bell.m4a', 
-    'bottom-left': '/assets/tamtam-gong.m4a',
-    'bottom-right': '/assets/tao-chi-gong.m4a'
+    'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',
+    'top-right': 'https://assets.trueyogi.app/assets/harmony-bell.m4a', 
+    'bottom-left': 'https://assets.trueyogi.app/assets/tamtam-gong.m4a',
+    'bottom-right': 'https://assets.trueyogi.app/assets/tao-chi-gong.m4a'
   };
   
   const volumes = {
@@ -9006,7 +9004,7 @@ function setAuraColor() {
 
 // Run once and then every minute
 setAuraColor();
-setInterval(setAuraColor, 1000); // update every 1 second)
+setInterval(setAuraColor, 1000);
 
 
 // Select all loader backgrounds (videos or images)
@@ -10895,14 +10893,13 @@ for (let i = 0; i < 3; i++) {
   const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
   const supabase = createClient(supabaseUrl, supabaseKey);
-
+  
 const jwtToken = localStorage.getItem('jwtToken');
 if (jwtToken && supabase && supabase.auth && supabase.auth.setSession) {
   await supabase.auth.setSession({ access_token: jwtToken, refresh_token: "" });
 }
 // console.log('Supabase current session:', await supabase.auth.getSession());
 
-  
   // Utility: Generate unique session_id for each session
   function generateSessionId(walletPublicKey, date, time, mode) {
     return `${walletPublicKey}_${date}_${time || 'flow'}_${mode}`;
@@ -11306,6 +11303,7 @@ window.addEventListener('online', () => {
   window.authenticateWithWallet = authenticateWithWallet;
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
+  
 </script>
 
  <div id="start-date-display" class="end-date-display hidden">
@@ -11450,4 +11448,4 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
- 
+

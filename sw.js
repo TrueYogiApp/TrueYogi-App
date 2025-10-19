@@ -1,25 +1,24 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.2';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
-const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2.2; 
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2.1'; 
 
 // Permanent assets that rarely change 13
 const AUDIO_ASSETS = [
-  '/assets/aum.mp3',
-  '/assets/bell.m4a',
-  '/assets/harmony-bell.m4a',
-  '/assets/tao-chi-gong.m4a',
-  '/assets/tamtam-gong.m4a',
-  '/assets/meditation-eternal.m4a',
-  '/assets/meditation-end.mp3', 
-  '/assets/music7.m4a',
-  '/assets/music6.m4a',
-  '/assets/music5.m4a',
-  '/assets/music4.m4a',
-  '/assets/music3.m4a',
-  '/assets/music2.m4a',
-  '/assets/music1.m4a',
+  'https://assets.trueyogi.app/assets/aum.m4a',
+  'https://assets.trueyogi.app/assets/bell.m4a',
+  'https://assets.trueyogi.app/assets/harmony-bell.m4a',
+  'https://assets.trueyogi.app/assets/tao-chi-gong.m4a',
+  'https://assets.trueyogi.app/assets/tamtam-gong.m4a',
+  'https://assets.trueyogi.app/assets/meditation-eternal.m4a',
+  'https://assets.trueyogi.app/assets/music7.m4a',
+  'https://assets.trueyogi.app/assets/music6.m4a',
+  'https://assets.trueyogi.app/assets/music5.m4a',
+  'https://assets.trueyogi.app/assets/music4.m4a',
+  'https://assets.trueyogi.app/assets/music3.m4a',
+  'https://assets.trueyogi.app/assets/music2.m4a',
+  'https://assets.trueyogi.app/assets/music1.m4a',
   '/assets/crown_aum_963hz.mp3',
   '/assets/thirdeye_om_852hz.mp3',
   '/assets/throat_ham_741hz.mp3',
@@ -35,8 +34,7 @@ const PERMANENT_ASSETS = [
   '/assets/lungs.svg',
   '/assets/spaceship.svg',
   '/assets/flowmeditate.svg',
-  '/assets/truemeditate.svg',
-  '/assets/groupmeditate.svg'
+  '/assets/truemeditate.svg'
 ];
 
 // App files that change more often
@@ -180,7 +178,6 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Cache successful non-document requests (e.g., assets, audio, etc.)
         if (networkResponse.status === 200 && event.request.destination !== 'document') {
           const responseToCache = networkResponse.clone();
           const url = new URL(event.request.url);
@@ -195,33 +192,25 @@ self.addEventListener('fetch', (event) => {
         console.log('🌐 Network failed, using cache for:', event.request.url);
         const url = new URL(event.request.url);
 
-        // Try matching different forms (Request, full URL, pathname)
+        // Try matching different forms
         return caches.match(event.request)
           .then(response => response || caches.match(event.request.url))
           .then(response => response || caches.match(url.pathname))
           .then(response => {
             if (response) return response;
-
-            // Navigation fallback (for PWA/standalone, deep links, etc)
-            if (
-              event.request.mode === 'navigate' ||
-              event.request.destination === 'document'
-            ) {
-              // Always serve index.html for navigation requests
+            // Document fallback
+            if (event.request.destination === 'document') {
               return caches.match('/index.html');
             }
-
             // Image fallback
             if (event.request.destination === 'image') {
               return caches.match('/assets/spaceship.svg');
             }
-
-            // Audio/video fallback (optional)
+            // Audio/video fallback (optional, you can customize)
             if (['audio', 'video'].includes(event.request.destination)) {
-              // You can provide a silent fallback or a default audio/video
+              // You can provide a silent fallback or a default audio
               return new Response('', { status: 404, statusText: 'Audio/Video not cached' });
             }
-
             // Ultimate fallback
             return new Response('', { status: 408, statusText: 'Offline' });
           });
@@ -310,5 +299,4 @@ self.addEventListener('notificationclick', (event) => {
       }
     })
   );
-
 });
