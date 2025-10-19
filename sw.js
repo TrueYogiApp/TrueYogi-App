@@ -183,30 +183,42 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
-        // Only cache successful non-HTML requests
         if (networkResponse.status === 200 && event.request.destination !== 'document') {
           const responseToCache = networkResponse.clone();
           const url = new URL(event.request.url);
           const cacheName = isPermanentAsset(url.pathname)
             ? PERMANENT_CACHE_NAME
             : CACHE_NAME;
-
           caches.open(cacheName).then((cache) => cache.put(event.request, responseToCache));
         }
         return networkResponse;
       })
       .catch(() => {
         console.log('🌐 Network failed, using cache for:', event.request.url);
-        return caches.match(event.request).then((cachedResponse) => {
-          if (cachedResponse) return cachedResponse;
+        const url = new URL(event.request.url);
 
-          // Offline fallback logic
-          if (event.request.destination === 'document') {
-            return caches.match('/index.html');
-          } else if (event.request.destination === 'image') {
-            return caches.match('/assets/spaceship.svg');
-          }
-        });
+        // Try matching different forms
+        return caches.match(event.request)
+          .then(response => response || caches.match(event.request.url))
+          .then(response => response || caches.match(url.pathname))
+          .then(response => {
+            if (response) return response;
+            // Document fallback
+            if (event.request.destination === 'document') {
+              return caches.match('/index.html');
+            }
+            // Image fallback
+            if (event.request.destination === 'image') {
+              return caches.match('/assets/spaceship.svg');
+            }
+            // Audio/video fallback (optional, you can customize)
+            if (['audio', 'video'].includes(event.request.destination)) {
+              // You can provide a silent fallback or a default audio
+              return new Response('', { status: 404, statusText: 'Audio/Video not cached' });
+            }
+            // Ultimate fallback
+            return new Response('', { status: 408, statusText: 'Offline' });
+          });
       })
   );
 });
