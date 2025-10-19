@@ -177,12 +177,14 @@ self.addEventListener('activate', (event) => {
 
 
 // FETCH EVENT
+// FETCH EVENT
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
+        // Cache successful non-document requests (e.g., assets, audio, etc.)
         if (networkResponse.status === 200 && event.request.destination !== 'document') {
           const responseToCache = networkResponse.clone();
           const url = new URL(event.request.url);
@@ -197,25 +199,33 @@ self.addEventListener('fetch', (event) => {
         console.log('🌐 Network failed, using cache for:', event.request.url);
         const url = new URL(event.request.url);
 
-        // Try matching different forms
+        // Try matching different forms (Request, full URL, pathname)
         return caches.match(event.request)
           .then(response => response || caches.match(event.request.url))
           .then(response => response || caches.match(url.pathname))
           .then(response => {
             if (response) return response;
-            // Document fallback
-            if (event.request.destination === 'document') {
+
+            // Navigation fallback (for PWA/standalone, deep links, etc)
+            if (
+              event.request.mode === 'navigate' ||
+              event.request.destination === 'document'
+            ) {
+              // Always serve index.html for navigation requests
               return caches.match('/index.html');
             }
+
             // Image fallback
             if (event.request.destination === 'image') {
               return caches.match('/assets/spaceship.svg');
             }
-            // Audio/video fallback (optional, you can customize)
+
+            // Audio/video fallback (optional)
             if (['audio', 'video'].includes(event.request.destination)) {
-              // You can provide a silent fallback or a default audio
+              // You can provide a silent fallback or a default audio/video
               return new Response('', { status: 404, statusText: 'Audio/Video not cached' });
             }
+
             // Ultimate fallback
             return new Response('', { status: 408, statusText: 'Offline' });
           });
