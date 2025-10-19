@@ -36,9 +36,7 @@ const PERMANENT_ASSETS = [
   '/assets/spaceship.svg',
   '/assets/flowmeditate.svg',
   '/assets/truemeditate.svg',
-  '/assets/groupmeditate.svg',
-  'https://assets.trueyogi.app/assets/cosmos.mp4',
-  'https://assets.trueyogi.app/assets/floweroflife.mp4'
+  '/assets/groupmeditate.svg'
 ];
 
 // App files that change more often
