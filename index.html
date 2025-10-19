@@ -24,11 +24,10 @@
   gtag('config', 'G-DP6NV4804Z');
 </script>
   <link rel="manifest" href="/manifest.json">
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <link href="./output.css" rel="stylesheet">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Lexend:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Lexend', sans-serif;
@@ -3098,7 +3097,7 @@
 </button>
 
   <!-- Sound elements -->
-  <audio id="bell" src="https://trueyogi.app/assets/meditation-end.mp3" preload="auto" muted></audio>
+  <audio id="bell" src="/assets/meditation-end.mp3" preload="auto" muted></audio>
   <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
   <audio id="sound-bell" src="https://assets.trueyogi.app/assets/bell.m4a" preload="auto"></audio>
@@ -8942,8 +8941,6 @@ document.addEventListener('DOMContentLoaded', function() {
           avatarSound.play().catch(()=>{});
           avatarPlaying = true;
           
-          // Visual feedback for avatar
-          showAvatarFeedback(centerX, centerY);
         } else {
           // Stop playing
           avatarSound.pause();

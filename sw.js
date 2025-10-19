@@ -1,8 +1,8 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.2';
+const APP_VERSION = '1.3';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
-const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2.1'; 
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2.2'; 
 
 // Permanent assets that rarely change 13
 const AUDIO_ASSETS = [
@@ -25,7 +25,8 @@ const AUDIO_ASSETS = [
   '/assets/heart_yam_639hz.mp3',
   '/assets/solar_ram_528hz.mp3',
   '/assets/sacral_vam_417hz.mp3',
-  '/assets/root_lam_396hz.mp3'
+  '/assets/root_lam_396hz.mp3',
+  '/assets/meditation-end.mp3',
 ];
 
 const PERMANENT_ASSETS = [
