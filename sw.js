@@ -1,8 +1,8 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.3.1';
+const APP_VERSION = '1.3.2';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
-const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2'; 
+const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2.1'; 
 
 // Permanent assets that rarely change 13
 const AUDIO_ASSETS = [
@@ -37,8 +37,8 @@ const PERMANENT_ASSETS = [
   '/assets/flowmeditate.svg',
   '/assets/truemeditate.svg',
   '/assets/groupmeditate.svg',
-  '/assets/cosmos.mp4',
-  '/assets/floweroflife.mp4'
+  'https://assets.trueyogi.app/assets/cosmos.mp4',
+  'https://assets.trueyogi.app/assets/floweroflife.mp4'
 ];
 
 // App files that change more often
@@ -176,7 +176,6 @@ self.addEventListener('activate', (event) => {
 });
 
 
-// FETCH EVENT
 // FETCH EVENT
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;

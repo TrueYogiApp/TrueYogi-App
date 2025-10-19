@@ -8717,7 +8717,7 @@ document.addEventListener('touchend', function(e) {
 class AudioManager {
   constructor() {
     this.audioElements = new Map();
-    this.maxSimultaneous = 8;
+    this.maxSimultaneous = 9;
   }
 
   playSound(src, volume = 1.0, loop = false) {
@@ -9006,7 +9006,7 @@ function setAuraColor() {
 
 // Run once and then every minute
 setAuraColor();
-setInterval(setAuraColor, 10000); // update every 10 second)
+setInterval(setAuraColor, 1000); // update every 1 second)
 
 
 // Select all loader backgrounds (videos or images)
@@ -9203,7 +9203,7 @@ const swIndicator = new SWStatusIndicator();
 
 // Show indicator immediately when page loads (optional)
 swIndicator.show();
-setTimeout(() => swIndicator.hide(), 22000); // Hide after 20 seconds if no SW activity
+setTimeout(() => swIndicator.hide(), 22000); // Hide after 22 seconds if no SW activity
 
 
 // 7 Chakra sound files and icons (bottom to top)
