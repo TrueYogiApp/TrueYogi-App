@@ -3464,25 +3464,27 @@ function disableMobileAudioResume() {
 }
 
 // Function to request screen wake lock
+// Function to request screen wake lock
 async function requestWakeLock() {
   try {
-    if (isWakeLockSupported) {
+    if (isWakeLockSupported && document.visibilityState === 'visible') {
       wakeLock = await navigator.wakeLock.request('screen');
       console.log('Screen Wake Lock is active');
-      
-      // Listen for release event
       wakeLock.addEventListener('release', () => {
         console.log('Screen Wake Lock was released');
-        // Try to reacquire if we're still in a session
-        if (sessionActive) {
+        // Try to reacquire if we're still in a session and tab is visible
+        if (sessionActive && document.visibilityState === 'visible') {
           setTimeout(requestWakeLock, 1000);
         }
       });
     }
   } catch (err) {
-    console.error(`Error acquiring wake lock: ${err.message}`);
-    // Try again after a delay if we're in a session
-    if (sessionActive) {
+    // Only log unexpected errors
+    if (!(err && err.message && err.message.includes('not visible'))) {
+      console.error(`Error acquiring wake lock: ${err.message}`);
+    }
+    // Don't retry if the page is not visible
+    if (sessionActive && document.visibilityState === 'visible') {
       setTimeout(requestWakeLock, 2000);
     }
   }
@@ -4950,15 +4952,26 @@ function showYellowIndicator(duration = 1500) {
           const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
           backgroundAudio.currentTime = Math.min(elapsedTime, backgroundAudio.duration || Infinity);
           
-          const playAudio = async () => {
-            try {
-              await audioContext.resume();
-              await backgroundAudio.play();
-            } catch (e) {
-              console.log("Restore play error:", e);
-              setTimeout(playAudio, 200);
-            }
-          };
+      const playAudio = async () => {
+        try {
+          // Only resume if audioContext exists and has resume function
+          if (audioContext && typeof audioContext.resume === 'function') {
+            await audioContext.resume();
+          }
+          // Only play if backgroundAudio exists and has play function
+          if (backgroundAudio && typeof backgroundAudio.play === 'function') {
+            await backgroundAudio.play();
+          }
+        } catch (e) {
+          // Silently ignore errors about null resume/play
+          // Optionally log only unexpected errors:
+          if (!(e && e.message && e.message.includes('resume'))) {
+            console.log("Restore play error:", e);
+          }
+          // Optionally, do not retry if audioContext is missing
+          // Or: setTimeout(playAudio, 200);
+        }
+      };
           playAudio();
         }
       }
@@ -8800,7 +8813,7 @@ document.addEventListener('touchstart', function(e) {
       messageEl.style.opacity = '0';
     }
   }
-});
+}, { passive: false });
 
 document.addEventListener('touchmove', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
@@ -8826,7 +8839,7 @@ document.addEventListener('touchmove', function(e) {
     spinner.classList.remove('show');
     spinner.style.opacity = '0';
   }
-});
+}, { passive: false });
 
 document.addEventListener('touchend', function(e) {
   if (!isDragging || !isModeSelectionVisible()) return;
@@ -8861,7 +8874,7 @@ document.addEventListener('touchend', function(e) {
   isDragging = false;
   startY = 0;
   currentY = 0;
-});
+}, { passive: false });
 
 // === ADD THIS NEW CODE AT THE BOTTOM OF YOUR FILE ===
 
@@ -9592,15 +9605,17 @@ class ElementalSwipe {
 document.addEventListener('touchstart', (e) => {
   if (!canShowSwipeEffect(e)) return;
   this.handleStart(e);
-});
+}, { passive: false });
+
 document.addEventListener('touchmove', (e) => {
   if (!this.isTouching || !canShowSwipeEffect(e)) return;
   this.handleMove(e);
-});
+}, { passive: false });
+
 document.addEventListener('touchend', (e) => {
   if (!this.isTouching || !canShowSwipeEffect(e)) return;
   this.handleEnd(e);
-});
+}, { passive: false });
     
     // Mouse events for desktop testing
     document.addEventListener('mousedown', (e) => this.handleStart(e));
