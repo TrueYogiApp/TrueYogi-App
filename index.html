@@ -3119,6 +3119,7 @@
   <!-- Sound elements -->
   <audio id="bell" src="https://trueyogi.app/assets/meditation-end.mp3" preload="auto" muted></audio>
   <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
+  <audio id="moon-sound" src="https://assets.trueyogi.app/assets/healing.m4a" preload="auto"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
   <audio id="sound-bell" src="https://assets.trueyogi.app/assets/bell.m4a" preload="auto"></audio>
   <audio id="avatar-sound" src="https://assets.trueyogi.app/assets/meditation-eternal.m4a" preload="auto"></audio>
@@ -9377,6 +9378,51 @@ initializeLoaderMedia();
 
 // Check every minute if it's time to switch
 setInterval(initializeLoaderMedia, 60000);
+
+
+// Moon icon music functionality
+document.addEventListener('DOMContentLoaded', function() {
+  const moonIcon = document.querySelector('.moon-icon');
+  const moonSound = document.getElementById('moon-sound'); // Add this audio element to your HTML
+  let moonPlaying = false;
+
+  if (moonIcon && moonSound) {
+    // Set audio properties
+    moonSound.loop = true;
+    
+    moonIcon.addEventListener('click', function(e) {
+      // Get moon icon position and click coordinates
+      const rect = moonIcon.getBoundingClientRect();
+      const centerX = rect.left + rect.width / 2;
+      const centerY = rect.top + rect.height / 2;
+      const clickX = e.clientX;
+      const clickY = e.clientY;
+      const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
+      
+      // Set moon radius - adjust this value as needed
+      const moonRadius = Math.min(rect.width, rect.height) / 1.5;
+      
+      // Only toggle sound if click is within the moon radius
+      if (dist < moonRadius) {
+        if (!moonPlaying) {
+          // Start playing moon sound
+          moonSound.muted = false;
+          moonSound.currentTime = 0;
+          moonSound.volume = 0.4;
+          moonSound.play().catch(()=>{});
+          moonPlaying = true;
+          moonIcon.style.textShadow = "0 0 15px rgba(255, 255, 100, 0.8)";
+        } else {
+          // Stop playing
+          moonSound.pause();
+          moonSound.currentTime = 0;
+          moonPlaying = false;
+          moonIcon.style.textShadow = "none";
+        }
+      }
+    });
+  }
+});
 
   </script>
 	
