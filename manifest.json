@@ -4,6 +4,7 @@
   "start_url": "/",
   "id": "trueyogi.app",
   "display": "standalone",
+  "display_override": ["standalone", "browser"],
   "background_color": "#1e293b",
   "theme_color": "#1e293b",
   "orientation": "any",

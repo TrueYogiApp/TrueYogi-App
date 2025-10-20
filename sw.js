@@ -173,7 +173,6 @@ self.addEventListener('activate', (event) => {
 
 
 // FETCH EVENT
-// FETCH EVENT
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
