@@ -1697,6 +1697,137 @@
   border-color: #eab30899;
 }
 
+
+/* Container for swipe effects */
+/* General container for effects */
+#swipe-effects {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Base element style */
+.element-swipe {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.85;
+  transform: translate(-50%, -50%) scale(0.8);
+  animation: fadeOut 2s ease-out forwards;
+  mix-blend-mode: screen;
+}
+
+/* Trail elements fade quicker */
+.swipe-trail {
+  opacity: 0.6;
+  animation: fadeOutTrail 1.5s ease-out forwards;
+}
+
+/* ===== ELEMENT THEMES ===== */
+
+/* 🌊 Water — flowing blue waves */
+.swipe-water {
+  background: radial-gradient(circle, rgba(0,170,255,0.9), rgba(0,90,255,0.2));
+  box-shadow: 0 0 20px rgba(0,160,255,0.8), 0 0 60px rgba(0,200,255,0.4);
+  animation: ripple 2s ease-out forwards;
+}
+
+/* 🔥 Fire — fiery pulse */
+.swipe-fire {
+  background: radial-gradient(circle, rgba(255,100,0,0.9), rgba(255,0,0,0.3));
+  box-shadow: 0 0 20px rgba(255,80,0,0.9), 0 0 60px rgba(255,200,0,0.6);
+  animation: flame 2s ease-out forwards;
+}
+
+/* 💨 Air — light white swirl */
+.swipe-air {
+  background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(200,255,255,0.3));
+  box-shadow: 0 0 25px rgba(255,255,255,0.8), 0 0 60px rgba(180,255,255,0.4);
+  animation: swirl 2s ease-out forwards;
+}
+
+/* 🌍 Earth — grounding dust */
+.swipe-earth {
+  background: radial-gradient(circle, rgba(120, 72, 32, 0.95), rgba(80, 45, 20, 0.4));
+  box-shadow:
+    0 0 15px rgba(120, 72, 32, 0.8),
+    0 0 45px rgba(139, 69, 19, 0.5),
+    inset 0 0 8px rgba(255, 235, 200, 0.15);
+  animation: ripple 2s ease-out forwards;
+}
+
+/* ⚡ Lightning — energetic spark */
+.swipe-lightning {
+  background: radial-gradient(circle, rgba(255,255,0,0.95), rgba(255,255,255,0.3));
+  box-shadow: 0 0 25px rgba(255,255,0,0.9), 0 0 80px rgba(255,255,150,0.6);
+  animation: spark 1.8s ease-out forwards;
+}
+
+/* ===== ANIMATIONS ===== */
+
+/* Soft disappearance */
+@keyframes fadeOut {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+
+@keyframes fadeOutTrail {
+  0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0.7; }
+  100% { transform: translate(-50%, -50%) scale(1.4); opacity: 0; }
+}
+
+/* Element-specific magic */
+@keyframes ripple {
+  0% { transform: translate(-50%, -50%) scale(0.8); }
+  50% { transform: translate(-50%, -50%) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+}
+
+@keyframes flame {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  25% { transform: translate(-50%, -50%) scale(1.2) rotate(10deg); }
+  50% { transform: translate(-50%, -50%) scale(0.9) rotate(-10deg); }
+  75% { transform: translate(-50%, -50%) scale(1.3) rotate(6deg); }
+}
+
+@keyframes swirl {
+  0% { transform: translate(-50%, -50%) scale(0.6) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) scale(1.6) rotate(180deg); opacity: 0; }
+}
+
+patchiness */
+@keyframes crumble {
+  0% {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 1;
+    filter: blur(0);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.05);
+    opacity: 0.9;
+    filter: blur(0.5px);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.25);
+    opacity: 0;
+    filter: blur(1.5px);
+  }
+}
+
+@keyframes spark {
+  0% { transform: translate(-50%, -50%) scale(0.8); opacity: 1; }
+  50% { transform: translate(-50%, -50%) scale(1.4); opacity: 0.9; }
+  100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+}
+.element-swipe:not(.swipe-trail) {
+  width: 60px;
+  height: 60px;
+}
+
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -3220,6 +3351,9 @@
     </div>
   </div>
 </div>
+	
+	
+	<div id="swipe-effects"></div>
 	
   <script>
     // State Management
@@ -9423,6 +9557,141 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 });
+
+
+function canShowSwipeEffect(e) {
+  if (!(typeof sessionActive !== "undefined" && sessionActive)) return false;
+  const timerSection = document.getElementById('timer-section');
+  if (!timerSection || timerSection.classList.contains('hidden')) return false;
+
+  // Ignore if tap is on avatar, logo, or UI buttons
+  const avatarEl = document.querySelector('.avatar-container');
+  if (avatarEl && e && avatarEl.contains(e.target)) return false;
+  const logoEl = document.getElementById('logo-sacred');
+  if (logoEl && e && logoEl.contains(e.target)) return false;
+
+  return true;
+}
+
+class ElementalSwipe {
+  constructor() {
+    this.effectsContainer = document.getElementById('swipe-effects');
+    this.elements = ['water', 'fire', 'air', 'earth', 'lightning'];
+    this.currentElement = 0;
+    this.isTouching = false;
+    this.startX = 0;
+    this.startY = 0;
+    this.minSwipeDistance = 190; // Minimum pixels to move before activating
+    this.hasActivated = false;
+    
+    this.init();
+  }
+
+  init() {
+    // Touch events
+document.addEventListener('touchstart', (e) => {
+  if (!canShowSwipeEffect(e)) return;
+  this.handleStart(e);
+});
+document.addEventListener('touchmove', (e) => {
+  if (!this.isTouching || !canShowSwipeEffect(e)) return;
+  this.handleMove(e);
+});
+document.addEventListener('touchend', (e) => {
+  if (!this.isTouching || !canShowSwipeEffect(e)) return;
+  this.handleEnd(e);
+});
+    
+    // Mouse events for desktop testing
+    document.addEventListener('mousedown', (e) => this.handleStart(e));
+    document.addEventListener('mousemove', (e) => this.handleMove(e));
+    document.addEventListener('mouseup', () => this.handleEnd());
+    
+    // Cycle through elements every 20 seconds
+    setInterval(() => {
+      this.currentElement = (this.currentElement + 1) % this.elements.length;
+    }, 20000);
+  }
+
+  handleStart(e) {
+    this.isTouching = true;
+    this.hasActivated = false;
+    const point = this.getPoint(e);
+    this.startX = point.x;
+    this.startY = point.y;
+    
+    // Don't create effect immediately - wait for movement
+  }
+
+  handleMove(e) {
+    if (!this.isTouching) return;
+    
+    const point = this.getPoint(e);
+    const deltaX = point.x - this.startX;
+    const deltaY = point.y - this.startY;
+    const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+    
+    // Only activate after minimum swipe distance
+    if (!this.hasActivated && distance >= this.minSwipeDistance) {
+      this.hasActivated = true;
+      // Create the first/main effect at current position
+      this.createSwipeEffect(point.x, point.y, true);
+    }
+    
+    // Continue creating trail effects if activated
+    if (this.hasActivated) {
+      e.preventDefault();
+      this.createSwipeEffect(point.x, point.y, false);
+    }
+  }
+
+  handleEnd() {
+    this.isTouching = false;
+    this.hasActivated = false;
+  }
+
+  getPoint(e) {
+    if (e.touches) {
+      return {
+        x: e.touches[0].clientX,
+        y: e.touches[0].clientY
+      };
+    } else {
+      return {
+        x: e.clientX,
+        y: e.clientY
+      };
+    }
+  }
+
+  createSwipeEffect(x, y, isMain) {
+    const elementType = this.elements[this.currentElement];
+    const effect = document.createElement('div');
+    
+    effect.className = `element-swipe swipe-${elementType} ${isMain ? '' : 'swipe-trail'}`;
+    effect.style.left = x + 'px';
+    effect.style.top = y + 'px';
+    
+    // Randomize size slightly for natural look
+    if (!isMain) {
+      const size = 18 + Math.random() * 18;
+      effect.style.width = size + 'px';
+      effect.style.height = size + 'px';
+    }
+    
+    this.effectsContainer.appendChild(effect);
+    
+    // Remove element after animation
+    setTimeout(() => {
+      if (effect.parentNode) {
+        effect.parentNode.removeChild(effect);
+      }
+    }, 2000);
+  }
+}
+
+// Initialize the swipe effects
+new ElementalSwipe();
 
   </script>
 	
