@@ -392,6 +392,23 @@
   /* Same as .end-date-display otherwise */
 }
 
+/* Auto-hide loader after 3 seconds */
+#app-loader {
+  animation: hideLoader 3s forwards;
+}
+
+@keyframes hideLoader {
+  0%, 70% {
+    opacity: 1;
+    visibility: visible;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
 /* Loader spinner for app loader only */
 #app-loader .loader-spinner {
   background: conic-gradient(from 0deg, transparent, #eab308, transparent);
