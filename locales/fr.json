@@ -301,6 +301,6 @@
   "clearCacheModalButtonConfirm": "Oui, effacer et recharger",
   "clearCacheModalButtonCancel": "Annuler",
   "faqClearCacheHeading": "Recharger le cache de l'application",
-  "faqClearCacheDescription": "Rechargez les données de l'application pour obtenir le dernier contenu si nécessaire. Utile pour une expérience hors ligne",
+  "faqClearCacheDescription": "Rechargez les données de l'application pour obtenir le dernier contenu si nécessaire. Utile pour une expérience hors ligne.",
   "faqClearCacheButton": "recharger App cache"
 }

@@ -8373,10 +8373,17 @@ async function addCount() {
   if (!id) {
     // Now, add presence
     try {
+	const localTimeString = new Date().toLocaleString();
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  
       const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
+        headers: { 'Content-Type': 'application/json' },
+		    body: JSON.stringify({
+      timezone,
+      local_joined_at: localTimeString // Or use localTimeString if you want human readable
+    })
+  });
       const data = await res.json();
       localStorage.setItem('omPresenceId', data.id);
       omPresenceId = data.id;
