@@ -297,10 +297,10 @@
   "wisdomWalletL1": "Veuillez connecter votre portefeuille pour vous engager avec sagesse.",
   "wisdomWalletL2": "Chaque 'amour' que vous envoyez honore la sagesse et enregistre votre présence.",
   "clearCacheModalHeading": "Confirmer le rechargement du cache",
-  "clearCacheModalDescription": "Cela rechargera avec le contenu mis à jour.<br><span class=\"text-yellow-400 font-bold\">Vos statistiques de méditation ne seront pas affectées.</span><br><br>Êtes-vous sûr de vouloir continuer ?",
+  "clearCacheModalDescription": "Cela rechargera l'application avec le contenu mis à jour.<br><span class=\"text-yellow-400 font-bold\">Vos statistiques de méditation ne seront pas affectées.</span><br><br>Êtes-vous sûr de vouloir continuer ?",
   "clearCacheModalButtonConfirm": "Oui, effacer et recharger",
   "clearCacheModalButtonCancel": "Annuler",
   "faqClearCacheHeading": "Recharger le cache de l'application",
-  "faqClearCacheDescription": "Rechargez le cache de l'application pour obtenir le contenu le plus récent et manquant si nécessaire. Utile pour une expérience hors ligne.",
+  "faqClearCacheDescription": "Rechargez les données de l'application pour obtenir le dernier contenu si nécessaire. Utile pour une expérience hors ligne",
   "faqClearCacheButton": "recharger App cache"
 }
