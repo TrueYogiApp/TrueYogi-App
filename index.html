@@ -9998,7 +9998,7 @@ function showZonePopup(zone, x, y) {
 
   // If zone is an object, display zone.zone and zone.count
   if (typeof zone === 'object' && zone !== null && zone.zone) {
-    popup.textContent = `${zone.zone.replace(/_/g, ' ')} (${zone.count})`;
+    popup.textContent = `${zone.zone.replace(/_/g, ' ')} 👥 ${zone.count}`;
   } else if (typeof zone === 'string') {
     popup.textContent = zone.replace(/_/g, ' ');
   } else {
