@@ -9548,9 +9548,16 @@ document.addEventListener('DOMContentLoaded', function() {
   let moonPlaying = false;
 
   if (moonIcon && moonSound) {
-    // Set audio properties
-    moonSound.loop = true;
-    
+    // Play only once
+    moonSound.loop = false;
+
+    // Reset state when sound ends naturally
+    moonSound.addEventListener('ended', () => {
+      moonPlaying = false;
+      moonIcon.style.textShadow = 'none';
+      moonSound.currentTime = 0;
+    });
+
     moonIcon.addEventListener('click', function(e) {
       // Get moon icon position and click coordinates
       const rect = moonIcon.getBoundingClientRect();
@@ -9566,7 +9573,7 @@ document.addEventListener('DOMContentLoaded', function() {
       // Only toggle sound if click is within the moon radius
       if (dist < moonRadius) {
         if (!moonPlaying) {
-          // Start playing moon sound
+          // Start playing moon sound once
           moonSound.muted = false;
           moonSound.currentTime = 0;
           moonSound.volume = 0.4;
@@ -9574,7 +9581,7 @@ document.addEventListener('DOMContentLoaded', function() {
           moonPlaying = true;
           moonIcon.style.textShadow = "0 0 15px rgba(255, 255, 100, 0.8)";
         } else {
-          // Stop playing
+          // Stop playing early (if user taps to stop)
           moonSound.pause();
           moonSound.currentTime = 0;
           moonPlaying = false;
@@ -9631,12 +9638,7 @@ document.addEventListener('touchend', (e) => {
   this.handleEnd(e);
 }, { passive: false });
     
-    // Mouse events for desktop testing
-    document.addEventListener('mousedown', (e) => this.handleStart(e));
-    document.addEventListener('mousemove', (e) => this.handleMove(e));
-    document.addEventListener('mouseup', () => this.handleEnd());
-    
-    // Cycle through elements every 20 seconds
+    //  Cycle through elements every 20 seconds
     setInterval(() => {
       this.currentElement = (this.currentElement + 1) % this.elements.length;
     }, 20000);
@@ -9794,16 +9796,49 @@ label.style.cssText = `
       const radius = 120;
       const dots = [];
 
-// Add starfield background first
-for (let i = 0; i < 50; i++) {
+// Layered starfield (three layers: small, mid, rare large glows)
+const starLayers = [
+  { count: 60, minR: 0.2, maxR: 1.1, minA: 0.35, maxA: 0.75 }, // small bright stars
+  { count: 26, minR: 1.0, maxR: 2.4, minA: 0.10, maxA: 0.26 }, // mid-size softer stars
+  { count: 8,  minR: 2.8, maxR: 5.0, minA: 0.05, maxA: 0.12 }  // rare large glows
+];
+
+for (const layer of starLayers) {
+  for (let i = 0; i < layer.count; i++) {
     const starX = Math.random() * canvas.width;
     const starY = Math.random() * canvas.height;
-    const size = Math.random() * 1.5;
-    
+    const size = layer.minR + Math.random() * (layer.maxR - layer.minR);
+    const alpha = layer.minA + Math.random() * (layer.maxA - layer.minA);
+
+    // core
+    ctx.save();
+    ctx.globalAlpha = alpha;
     ctx.beginPath();
+    ctx.fillStyle = '#ffffff';
     ctx.arc(starX, starY, size, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
     ctx.fill();
+
+    // gentle halo for mid/large stars
+    if (size > 1.2) {
+      ctx.beginPath();
+      ctx.fillStyle = `rgba(255,240,200,${Math.min(0.08, alpha * 0.18)})`;
+      ctx.arc(starX, starY, size * 3.5, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    // tiny soft shadow for medium stars (gives slight glow)
+    if (size > 0.9 && size <= 2.5) {
+      ctx.shadowColor = 'rgba(255, 220, 170, 0.08)';
+      ctx.shadowBlur = size * 4;
+      ctx.beginPath();
+      ctx.fillStyle = '#ffffff';
+      ctx.arc(starX, starY, 0.6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.shadowBlur = 0;
+    }
+
+    ctx.restore();
+  }
 }
 
 // Fetch ALL countries with real coordinates
@@ -9978,11 +10013,11 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
       };
 
       label.innerHTML = zones.length > 0 
-        ? `⚡ ${zones.length} Active • Global Resonance Field`
+        ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} Active • Global Resonance Field`
         : 'No active resonance detected';
     });
 
-  // Fade out after 10s (auto) Power Nodes
+  // Fade out after 10s (auto) 
   setTimeout(() => closeEarthGrid(), 300000);
 
   function closeEarthGrid() {
