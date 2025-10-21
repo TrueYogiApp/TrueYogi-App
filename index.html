@@ -9714,6 +9714,312 @@ document.addEventListener('touchend', (e) => {
 // Initialize the swipe effects
 new ElementalSwipe();
 
+// ========== 🌍 ENHANCED WORLD GRID WITH LOCATION TAPS ==========
+function showEarthGrid() {
+  let container = document.getElementById('earthGridContainer');
+  if (!container) {
+    container = document.createElement('div');
+    container.id = 'earthGridContainer';
+    container.style.cssText = `
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.55);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      transition: opacity 1s ease;
+    `;
+    document.body.appendChild(container);
+  }
+
+  let canvas = document.getElementById('earthGrid');
+  if (!canvas) {
+    canvas = document.createElement('canvas');
+    canvas.id = 'earthGrid';
+    canvas.width = 320;
+    canvas.height = 320;
+    canvas.style.cssText = `
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #001a33, #000);
+      box-shadow: 0 0 35px rgba(255,255,255,0.3);
+      cursor: pointer;
+    `;
+    container.appendChild(canvas);
+  }
+
+  let label = document.getElementById('gridLabel');
+  if (!label) {
+    label = document.createElement('div');
+    label.id = 'gridLabel';
+label.style.cssText = `
+  position: absolute;
+  bottom: 3%;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+  color: #fde68a;
+  opacity: 0.9;
+  text-shadow: 0 0 8px #fde68a;
+  background: rgba(0,0,0,0.3);
+  padding: 8px 16px;
+  border-radius: 20px;
+  backdrop-filter: blur(5px);
+`;
+    container.appendChild(label);
+  }
+
+  const ctx = canvas.getContext('2d');
+  container.style.display = 'flex';
+  setTimeout(() => container.style.opacity = 1, 10);
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // Fetch active timezones from backend
+  fetch('https://trueyogi-backend-knkq.onrender.com/active-countries')
+    .then(res => res.json())
+    .then(data => {
+      const zones = data.zones || [];
+      const baseX = canvas.width / 2;
+      const baseY = canvas.height / 2;
+      const radius = 120;
+      const dots = [];
+
+// Add starfield background first
+for (let i = 0; i < 50; i++) {
+    const starX = Math.random() * canvas.width;
+    const starY = Math.random() * canvas.height;
+    const size = Math.random() * 1.5;
+    
+    ctx.beginPath();
+    ctx.arc(starX, starY, size, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(255, 255, 255, ${0.5 + Math.random() * 0.5})`;
+    ctx.fill();
+}
+
+// Fetch ALL countries with real coordinates
+fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
+  .then(res => res.json())
+  .then(allCountries => {
+    const flagPromises = [];
+    
+    zones.forEach((z, i) => {
+      const zoneName = typeof z === 'object' ? z.zone : z;
+      let coords;
+      
+      // Try to find country in the real data
+      const country = allCountries.find(c => 
+        c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+        c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+        c.cca2 === zoneName ||
+        c.cca3 === zoneName
+      );
+      
+      if (country && country.latlng) {
+        // Use real country coordinates
+        coords = { 
+          lat: country.latlng[0], 
+          lon: country.latlng[1] 
+        };
+      } else {
+        // Fallback: distribute evenly around the globe
+        const angle = (i / zones.length) * 2 * Math.PI;
+        coords = {
+          lat: Math.sin(angle) * 60,
+          lon: (angle / Math.PI) * 180
+        };
+        console.log('Not found:', zoneName, 'using fallback');
+      }
+
+      // Convert lat/lon to canvas coordinates
+      const x = baseX + (coords.lon / 180) * radius * 0.9;
+      const y = baseY - (coords.lat / 90) * radius * 0.45;
+      
+      const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
+      
+      // Get country code for flag
+      let countryCode = 'un'; // Default to UN flag
+      if (country && country.cca2) {
+        countryCode = country.cca2.toLowerCase();
+      } else {
+        // Fallback mapping for common countries
+        const codeMap = {
+          'USA': 'us', 'US': 'us', 'United_States': 'us',
+          'India': 'in', 'IN': 'in',
+          'China': 'cn', 'CN': 'cn',
+          'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
+          'Australia': 'au', 'AU': 'au',
+          'Brazil': 'br', 'BR': 'br',
+          'Russia': 'ru', 'RU': 'ru',
+          'Japan': 'jp', 'JP': 'jp',
+          'Canada': 'ca', 'CA': 'ca',
+          'Mexico': 'mx', 'MX': 'mx',
+          'South_Africa': 'za', 'ZA': 'za',
+          'Egypt': 'eg', 'EG': 'eg',
+          'Indonesia': 'id', 'ID': 'id',
+          'Argentina': 'ar', 'AR': 'ar'
+        };
+        countryCode = codeMap[zoneName] || 'un';
+      }
+      
+      // Load flag image
+      const flagImg = new Image();
+      flagImg.crossOrigin = "anonymous";
+      const flagPromise = new Promise((resolve) => {
+        flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color });
+        flagImg.onerror = () => {
+          resolve({ img: null, x, y, zone: z, color });
+        };
+        flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
+      });
+      
+      flagPromises.push(flagPromise);
+      dots.push({ x, y, zone: z, color });
+    });
+
+    // Wait for all flags to load, then draw them
+    Promise.all(flagPromises).then(flags => {
+      flags.forEach(({ img, x, y, zone, color }) => {
+        if (img) {
+          // Draw flag
+          ctx.drawImage(img, x - 6, y - 4, 12, 9);
+        } else {
+          // Fallback to colored dot
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.shadowColor = color;
+          ctx.shadowBlur = 15;
+          ctx.fill();
+          
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.strokeStyle = color + '40';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      });
+    });
+  })
+  .catch(error => {
+    console.log('API failed, using manual fallback', error);
+    // If API fails, use your original manual coordinates as backup
+    const regionCoordinates = {
+      'USA': { lat: 40, lon: -100 }, 'US': { lat: 40, lon: -100 },
+      'United_States': { lat: 40, lon: -100 }, 'United_States_of_America': { lat: 40, lon: -100 },
+      'India': { lat: 20, lon: 78 }, 'IN': { lat: 20, lon: 78 },
+      'China': { lat: 35, lon: 105 }, 'CN': { lat: 35, lon: 105 },
+      // ... include all your manual coordinates here as backup
+    };
+    
+    zones.forEach((z, i) => {
+      const zoneName = typeof z === 'object' ? z.zone : z;
+      let coords = regionCoordinates[zoneName];
+      
+      if (!coords) {
+        const angle = (i / zones.length) * 2 * Math.PI;
+        coords = {
+          lat: Math.sin(angle) * 60,
+          lon: (angle / Math.PI) * 180
+        };
+      }
+
+      const x = baseX + (coords.lon / 180) * radius * 0.9;
+      const y = baseY - (coords.lat / 90) * radius * 0.45;
+      
+      const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
+      dots.push({ x, y, zone: z, color });
+
+      ctx.beginPath();
+      ctx.arc(x, y, 6, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.shadowColor = color;
+      ctx.shadowBlur = 15;
+      ctx.fill();
+      
+      ctx.beginPath();
+      ctx.arc(x, y, 10, 0, Math.PI * 2);
+      ctx.strokeStyle = color + '40';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    });
+  });
+
+// KEEP EVERYTHING ELSE EXACTLY THE SAME AFTER THIS
+
+      // --- Handle tap on canvas ---
+      canvas.onclick = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        const clickX = e.clientX - rect.left;
+        const clickY = e.clientY - rect.top;
+        let found = null;
+
+        for (const d of dots) {
+          const dist = Math.sqrt((clickX - d.x) ** 2 + (clickY - d.y) ** 2);
+          if (dist < 10) { found = d; break; }
+        }
+
+        if (found) {
+          // Show temporary floating label
+          showZonePopup(found.zone, e.clientX, e.clientY, found.count);
+        } else {
+          // Tap outside dots → close grid
+          closeEarthGrid();
+        }
+      };
+
+      label.innerHTML = zones.length > 0 
+        ? `⚡ ${zones.length} Active • Global Resonance Field`
+        : 'No active resonance detected';
+    });
+
+  // Fade out after 10s (auto) Power Nodes
+  setTimeout(() => closeEarthGrid(), 300000);
+
+  function closeEarthGrid() {
+    container.style.opacity = 0;
+    setTimeout(() => container.style.display = 'none', 1000);
+  }
+}
+
+// --- Floating zone popup ---
+function showZonePopup(zone, x, y) {
+  //console.log('zone:', zone, typeof zone);
+  const popup = document.createElement('div');
+
+  // If zone is an object, display zone.zone and zone.count
+  if (typeof zone === 'object' && zone !== null && zone.zone) {
+    popup.textContent = `${zone.zone.replace(/_/g, ' ')} (${zone.count})`;
+  } else if (typeof zone === 'string') {
+    popup.textContent = zone.replace(/_/g, ' ');
+  } else {
+    popup.textContent = String(zone);
+  }
+
+  popup.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y}px;
+    transform: translate(-50%, -120%);
+    background: rgba(0,0,0,0.75);
+    color: #fde68a;
+    font-size: 0.85rem;
+    padding: 6px 10px;
+    border-radius: 6px;
+    box-shadow: 0 0 8px #fde68a66;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 10000;
+  `;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.style.opacity = 1, 10);
+  setTimeout(() => {
+    popup.style.opacity = 0;
+    setTimeout(() => popup.remove(), 900);
+  }, 2000);
+}
+
   </script>
 	
  <script>
