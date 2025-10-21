@@ -8425,14 +8425,13 @@ async function removeCount() {
 let lastCount = null; // Place this at the top (outside the function)
 
 async function updateCount() {
- 
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
     const data = await res.json();
     const newCount = (typeof data.count === "number") ? data.count : 0;
 
     if (newCount > 0) {
-      counterEl.textContent = newCount;
+      counterEl.innerHTML = `<span class="om-number">${newCount}</span>`;
       counterEl.classList.remove('hidden');
       counterEl.style.opacity = 1;
 
@@ -8440,10 +8439,19 @@ async function updateCount() {
       if (lastCount !== null && newCount !== lastCount) {
         counterEl.classList.add('om-counter-pulse');
         setTimeout(() => counterEl.classList.remove('om-counter-pulse'), 700);
-		showMeditatorFloat();
+        showMeditatorFloat();
       }
-
       lastCount = newCount;
+
+      // --------- ADD THIS BLOCK ---------
+      const omNumber = counterEl.querySelector('.om-number');
+      if (omNumber) {
+        omNumber.onclick = function(e) {
+          showEarthGrid();
+          e.stopPropagation();
+        };
+      }
+      // --------- END BLOCK ---------
     } else {
       // Hide completely if count is zero
       counterEl.classList.add('hidden');
