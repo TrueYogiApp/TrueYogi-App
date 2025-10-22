@@ -8426,9 +8426,13 @@ let lastCount = null; // Place this at the top (outside the function)
 
 async function updateCount() {
   try {
-    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
-    const data = await res.json();
-    const newCount = (typeof data.count === "number") ? data.count : 0;
+    // Get the up-to-date count directly from Supabase
+    const { count, error } = await supabase
+      .from('om_presence')
+      .select('*', { count: 'exact', head: true });
+    if (error) throw error;
+
+    const newCount = (typeof count === "number") ? count : 0;
 
     if (newCount > 0) {
       counterEl.innerHTML = `<span class="om-number">${newCount}</span>`;
@@ -8443,7 +8447,7 @@ async function updateCount() {
       }
       lastCount = newCount;
 
-      // --------- ADD THIS BLOCK ---------
+      // --------- KEEP THIS BLOCK ---------
       const omNumber = counterEl.querySelector('.om-number');
       if (omNumber) {
         omNumber.onclick = function(e) {
@@ -8471,14 +8475,11 @@ async function updateCount() {
 //  removeCount();
 //  stopHeartbeat(); // <--- add this
 //});
-
 //window.addEventListener('pagehide', () => {
 //  removeCount();
 //  stopHeartbeat();
 //});
-
-setInterval(updateCount, 9000); // every 9 seconds
-
+//setInterval(updateCount, 9000); // every 9 seconds
 
 let heartbeatInterval = null;
 
@@ -11616,6 +11617,20 @@ for (let i = 0; i < 3; i++) {
   const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
   const supabase = createClient(supabaseUrl, supabaseKey);
+  
+  const channel = supabase
+  .channel('om-presence')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'om_presence' },
+    payload => {
+      // console.log('Realtime event:', payload);  
+      updateCount();
+    }
+  )
+  .subscribe(status => {
+    // console.log('Channel status:', status);
+  });
   
 const jwtToken = localStorage.getItem('jwtToken');
 if (jwtToken && supabase && supabase.auth && supabase.auth.setSession) {
