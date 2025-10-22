@@ -9750,6 +9750,81 @@ let earthGridOpen = false;
 let gridChannel = null;
 let livePresenceRows = [];
 
+// Example: Fetch country stats on Earth Grid open
+async function fetchCountryStats() {
+  // Aggregate duration_seconds by country
+  let { data, error } = await supabase
+    .from('om_sessions')
+    .select('country, duration_seconds')
+    .not('ended_at', 'is', null);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  // Sum durations per country
+  const countryTotals = {};
+  for (const s of data) {
+    if (!s.country) continue;
+    countryTotals[s.country] = (countryTotals[s.country] || 0) + (s.duration_seconds || 0);
+  }
+  // Return array for display, sorted by total time descending
+  return Object.entries(countryTotals)
+    .map(([country, totalSeconds]) => ({ country, totalSeconds }))
+    .sort((a, b) => b.totalSeconds - a.totalSeconds);
+}
+
+function formatDuration(seconds) {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hrs > 0) return `${hrs} hr${hrs > 1 ? 's' : ''} ${mins} min${mins !== 1 ? 's' : ''}`;
+  return `${mins} min${mins !== 1 ? 's' : ''}`;
+}
+
+
+async function showCountryStatsOnEarthGrid() {
+  const stats = await fetchCountryStats();
+  const statsLabel = document.getElementById('gridStatsLabel');
+  if (!statsLabel) return; // Defensive: ensure the label exists
+  if (stats.length === 0) {
+    statsLabel.innerHTML = "No Power Node hours recorded yet.";
+    return;
+  }
+statsLabel.innerHTML = stats.map(stat => {
+  // Map country names to 2-letter codes for flagcdn
+  const codeMap = {
+    "United States": "us",
+    "USA": "us",
+    "Canada": "ca",
+    "India": "in",
+    "United Kingdom": "gb",
+    "UK": "gb",
+    "Australia": "au",
+    "China": "cn",
+    "Japan": "jp",
+    "Brazil": "br",
+    "Russia": "ru",
+    "France": "fr",
+    "Germany": "de",
+    "Italy": "it",
+    "Mexico": "mx",
+    // Add more if needed
+  };
+  const code = codeMap[stat.country] || stat.country.slice(0,2).toLowerCase();
+
+  return `
+    <span style="display:inline-block;vertical-align:middle;">
+      <img src="https://flagcdn.com/w20/${code}.png" 
+           style="vertical-align:middle;width:20px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+    </span>
+    <span style="display:inline-block;vertical-align:middle;font-weight:bold;font-size:0.9em;padding-left:6px;">
+      : ${formatDuration(stat.totalSeconds)}
+    </span>
+  `;
+}).join(' &nbsp; | &nbsp; ');
+}
+
+
 // Always fetch latest data when grid opens
 async function fetchPresenceRowsAndRender() {
   // Adjust field names based on your om_presence schema!
@@ -9851,6 +9926,32 @@ function renderEarthGrid() {
     `;
     container.appendChild(label);
   }
+
+// Create or get the top stats label
+let statsLabel = document.getElementById('gridStatsLabel');
+if (!statsLabel) {
+  statsLabel = document.createElement('div');
+  statsLabel.id = 'gridStatsLabel';
+  statsLabel.style.cssText = `
+    position: absolute;
+    top: 5%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1rem;
+    color: #fde68a;
+    background: rgba(0,0,0,0.35);
+    padding: 6px 16px;
+    border-radius: 18px;
+    text-shadow: 0 0 4px #111;
+    z-index: 10001;
+    pointer-events: none;
+    white-space: nowrap;
+  `;
+  container.appendChild(statsLabel);
+}
+
+showCountryStatsOnEarthGrid(); 
 
   const ctx = canvas.getContext('2d');
   setTimeout(() => container.style.opacity = 1, 10);
