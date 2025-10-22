@@ -9726,7 +9726,55 @@ document.addEventListener('touchend', (e) => {
 new ElementalSwipe();
 
 // ========== 🌍 ENHANCED WORLD GRID WITH LOCATION TAPS ==========
+let earthGridOpen = false;
+let gridChannel = null;
+let livePresenceRows = [];
+
+// Always fetch latest data when grid opens
+async function fetchPresenceRowsAndRender() {
+  // Adjust field names based on your om_presence schema!
+  const { data, error } = await supabase.from('om_presence').select('*');
+  if (!error) {
+    livePresenceRows = data;
+    if (earthGridOpen) renderEarthGrid();
+  }
+}
+
 function showEarthGrid() {
+  earthGridOpen = true;
+  fetchPresenceRowsAndRender(); // Always get fresh data
+
+  // If already subscribed, don't re-subscribe
+  if (!gridChannel) {
+    gridChannel = supabase
+      .channel('earthgrid-realtime')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'om_presence' },
+        payload => {
+          // On any change, refresh data and re-render if open
+          fetchPresenceRowsAndRender();
+        }
+      )
+      .subscribe();
+  }
+}
+
+function closeEarthGrid() {
+  earthGridOpen = false;
+  const container = document.getElementById('earthGridContainer');
+  if (container) {
+    container.style.opacity = 0;
+    setTimeout(() => container.style.display = 'none', 1000);
+  }
+  // Optionally, you could unsubscribe here if you want to save bandwidth
+   gridChannel?.unsubscribe();
+   gridChannel = null;
+}
+
+// --- Main renderer (called whenever data changes or grid opens) ---
+function renderEarthGrid() {
+  // --- Setup container, canvas, and label ---
   let container = document.getElementById('earthGridContainer');
   if (!container) {
     container = document.createElement('div');
@@ -9744,6 +9792,8 @@ function showEarthGrid() {
       transition: opacity 1s ease;
     `;
     document.body.appendChild(container);
+  } else {
+    container.style.display = 'flex';
   }
 
   let canvas = document.getElementById('earthGrid');
@@ -9765,129 +9815,106 @@ function showEarthGrid() {
   if (!label) {
     label = document.createElement('div');
     label.id = 'gridLabel';
-label.style.cssText = `
-  position: absolute;
-  bottom: 9%;
-  font-family: 'Poppins', sans-serif;
-  font-size: 0.9rem;
-  letter-spacing: 1px;
-  color: #fde68a;
-  opacity: 0.9;
-  text-shadow: 0 0 8px #fde68a;
-  background: rgba(0,0,0,0.3);
-  padding: 8px 16px;
-  border-radius: 20px;
-  backdrop-filter: blur(5px);
-`;
+    label.style.cssText = `
+      position: absolute;
+      bottom: 9%;
+      font-family: 'Poppins', sans-serif;
+      font-size: 0.9rem;
+      letter-spacing: 1px;
+      color: #fde68a;
+      opacity: 0.9;
+      text-shadow: 0 0 8px #fde68a;
+      background: rgba(0,0,0,0.3);
+      padding: 8px 16px;
+      border-radius: 20px;
+      backdrop-filter: blur(5px);
+    `;
     container.appendChild(label);
   }
 
   const ctx = canvas.getContext('2d');
-  container.style.display = 'flex';
   setTimeout(() => container.style.opacity = 1, 10);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // Fetch active timezones from backend
-  fetch('https://trueyogi-backend-knkq.onrender.com/active-countries')
-    .then(res => res.json())
-    .then(data => {
-      const zones = data.zones || [];
-      const baseX = canvas.width / 2;
-      const baseY = canvas.height / 2;
-      const radius = 120;
-      const dots = [];
-
-// Layered starfield (three layers: small, mid, rare large glows)
-const starLayers = [
-  { count: 60, minR: 0.2, maxR: 1.1, minA: 0.35, maxA: 0.75 }, // small bright stars
-  { count: 26, minR: 1.0, maxR: 2.4, minA: 0.10, maxA: 0.26 }, // mid-size softer stars
-  { count: 8,  minR: 2.8, maxR: 5.0, minA: 0.05, maxA: 0.12 }  // rare large glows
-];
-
-for (const layer of starLayers) {
-  for (let i = 0; i < layer.count; i++) {
-    const starX = Math.random() * canvas.width;
-    const starY = Math.random() * canvas.height;
-    const size = layer.minR + Math.random() * (layer.maxR - layer.minR);
-    const alpha = layer.minA + Math.random() * (layer.maxA - layer.minA);
-
-    // core
-    ctx.save();
-    ctx.globalAlpha = alpha;
-    ctx.beginPath();
-    ctx.fillStyle = '#ffffff';
-    ctx.arc(starX, starY, size, 0, Math.PI * 2);
-    ctx.fill();
-
-    // gentle halo for mid/large stars
-    if (size > 1.2) {
-      ctx.beginPath();
-      ctx.fillStyle = `rgba(255,240,200,${Math.min(0.08, alpha * 0.18)})`;
-      ctx.arc(starX, starY, size * 3.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    // tiny soft shadow for medium stars (gives slight glow)
-    if (size > 0.9 && size <= 2.5) {
-      ctx.shadowColor = 'rgba(255, 220, 170, 0.08)';
-      ctx.shadowBlur = size * 4;
+  // --- Layered starfield (unchanged) ---
+  const starLayers = [
+    { count: 60, minR: 0.2, maxR: 1.1, minA: 0.35, maxA: 0.75 },
+    { count: 26, minR: 1.0, maxR: 2.4, minA: 0.10, maxA: 0.26 },
+    { count: 8,  minR: 2.8, maxR: 5.0, minA: 0.05, maxA: 0.12 }
+  ];
+  for (const layer of starLayers) {
+    for (let i = 0; i < layer.count; i++) {
+      const starX = Math.random() * canvas.width;
+      const starY = Math.random() * canvas.height;
+      const size = layer.minR + Math.random() * (layer.maxR - layer.minR);
+      const alpha = layer.minA + Math.random() * (layer.maxA - layer.minA);
+      ctx.save();
+      ctx.globalAlpha = alpha;
       ctx.beginPath();
       ctx.fillStyle = '#ffffff';
-      ctx.arc(starX, starY, 0.6, 0, Math.PI * 2);
+      ctx.arc(starX, starY, size, 0, Math.PI * 2);
       ctx.fill();
-      ctx.shadowBlur = 0;
-    }
-
-    ctx.restore();
-  }
-}
-
-// Fetch ALL countries with real coordinates
-fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
-  .then(res => res.json())
-  .then(allCountries => {
-    const flagPromises = [];
-    
-    zones.forEach((z, i) => {
-      const zoneName = typeof z === 'object' ? z.zone : z;
-      let coords;
-      
-      // Try to find country in the real data
-      const country = allCountries.find(c => 
-        c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
-        c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
-        c.cca2 === zoneName ||
-        c.cca3 === zoneName
-      );
-      
-      if (country && country.latlng) {
-        // Use real country coordinates
-        coords = { 
-          lat: country.latlng[0], 
-          lon: country.latlng[1] 
-        };
-      } else {
-        // Fallback: distribute evenly around the globe
-        const angle = (i / zones.length) * 2 * Math.PI;
-        coords = {
-          lat: Math.sin(angle) * 60,
-          lon: (angle / Math.PI) * 180
-        };
-        console.log('Not found:', zoneName, 'using fallback');
+      if (size > 1.2) {
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(255,240,200,${Math.min(0.08, alpha * 0.18)})`;
+        ctx.arc(starX, starY, size * 3.5, 0, Math.PI * 2);
+        ctx.fill();
       }
+      if (size > 0.9 && size <= 2.5) {
+        ctx.shadowColor = 'rgba(255, 220, 170, 0.08)';
+        ctx.shadowBlur = size * 4;
+        ctx.beginPath();
+        ctx.fillStyle = '#ffffff';
+        ctx.arc(starX, starY, 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.shadowBlur = 0;
+      }
+      ctx.restore();
+    }
+  }
 
-      // Convert lat/lon to canvas coordinates
-      const x = baseX + (coords.lon / 180) * radius * 0.9;
-      const y = baseY - (coords.lat / 90) * radius * 0.45;
-      
-      const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
-      
-      // Get country code for flag
-      let countryCode = 'un'; // Default to UN flag
-      if (country && country.cca2) {
-        countryCode = country.cca2.toLowerCase();
-      } else {
-        // Fallback mapping for common countries
+  // ---- LIVE ZONE/COUNTRY CALCULATION ----
+  // Group livePresenceRows by country/zone field
+  const countryCounts = {};
+  livePresenceRows.forEach(row => {
+    const zone = row.country || row.zone || row.region; // use your field!
+    if (!zone) return;
+    countryCounts[zone] = (countryCounts[zone] || 0) + 1;
+  });
+  const zones = Object.keys(countryCounts).map(zone => ({
+    zone,
+    count: countryCounts[zone]
+  }));
+
+  // --- Draw flags and dots for each active zone/country ---
+  const baseX = canvas.width / 2;
+  const baseY = canvas.height / 2;
+  const radius = 120;
+  const dots = [];
+  fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
+    .then(res => res.json())
+    .then(allCountries => {
+      const flagPromises = [];
+      zones.forEach((z, i) => {
+        const zoneName = typeof z === 'object' ? z.zone : z;
+        let coords;
+        const country = allCountries.find(c => 
+          c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+          c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+          c.cca2 === zoneName ||
+          c.cca3 === zoneName
+        );
+        if (country && country.latlng) {
+          coords = { lat: country.latlng[0], lon: country.latlng[1] };
+        } else {
+          const angle = (i / zones.length) * 2 * Math.PI;
+          coords = { lat: Math.sin(angle) * 60, lon: (angle / Math.PI) * 180 };
+        }
+        const x = baseX + (coords.lon / 180) * radius * 0.9;
+        const y = baseY - (coords.lat / 90) * radius * 0.45;
+        const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
+        let countryCode = 'un';
+        if (country && country.cca2) countryCode = country.cca2.toLowerCase();
         const codeMap = {
           'USA': 'us', 'US': 'us', 'United_States': 'us',
           'India': 'in', 'IN': 'in',
@@ -9904,155 +9931,83 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
           'Indonesia': 'id', 'ID': 'id',
           'Argentina': 'ar', 'AR': 'ar'
         };
-        countryCode = codeMap[zoneName] || 'un';
-      }
-      
-      // Load flag image
-      const flagImg = new Image();
-      flagImg.crossOrigin = "anonymous";
-      const flagPromise = new Promise((resolve) => {
-        flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color });
-        flagImg.onerror = () => {
-          resolve({ img: null, x, y, zone: z, color });
-        };
-        flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
+        countryCode = codeMap[zoneName] || countryCode;
+        const flagImg = new Image();
+        flagImg.crossOrigin = "anonymous";
+        const flagPromise = new Promise((resolve) => {
+          flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color });
+          flagImg.onerror = () => resolve({ img: null, x, y, zone: z, color });
+          flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
+        });
+        flagPromises.push(flagPromise);
+        dots.push({ x, y, zone: z, color });
       });
-      
-      flagPromises.push(flagPromise);
-      dots.push({ x, y, zone: z, color });
-    });
-
-    // Wait for all flags to load, then draw them
-    Promise.all(flagPromises).then(flags => {
-      flags.forEach(({ img, x, y, zone, color }) => {
-        if (img) {
-          // Draw flag
-          ctx.drawImage(img, x - 6, y - 4, 12, 9);
-        } else {
-          // Fallback to colored dot
-          ctx.beginPath();
-          ctx.arc(x, y, 4, 0, Math.PI * 2);
-          ctx.fillStyle = color;
-          ctx.shadowColor = color;
-          ctx.shadowBlur = 15;
-          ctx.fill();
-          
-          ctx.beginPath();
-          ctx.arc(x, y, 6, 0, Math.PI * 2);
-          ctx.strokeStyle = color + '40';
-          ctx.lineWidth = 1;
-          ctx.stroke();
-        }
+      Promise.all(flagPromises).then(flags => {
+        flags.forEach(({ img, x, y, zone, color }) => {
+          if (img) {
+            ctx.drawImage(img, x - 6, y - 4, 12, 9);
+          } else {
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.strokeStyle = color + '40';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        });
       });
     });
-  })
-  .catch(error => {
-    console.log('API failed, using manual fallback', error);
-    // If API fails, use your original manual coordinates as backup
-    const regionCoordinates = {
-      'USA': { lat: 40, lon: -100 }, 'US': { lat: 40, lon: -100 },
-      'United_States': { lat: 40, lon: -100 }, 'United_States_of_America': { lat: 40, lon: -100 },
-      'India': { lat: 20, lon: 78 }, 'IN': { lat: 20, lon: 78 },
-      'China': { lat: 35, lon: 105 }, 'CN': { lat: 35, lon: 105 },
-      // ... include all your manual coordinates here as backup
-    };
-    
-    zones.forEach((z, i) => {
-      const zoneName = typeof z === 'object' ? z.zone : z;
-      let coords = regionCoordinates[zoneName];
-      
-      if (!coords) {
-        const angle = (i / zones.length) * 2 * Math.PI;
-        coords = {
-          lat: Math.sin(angle) * 60,
-          lon: (angle / Math.PI) * 180
-        };
-      }
 
-      const x = baseX + (coords.lon / 180) * radius * 0.9;
-      const y = baseY - (coords.lat / 90) * radius * 0.45;
-      
-      const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
-      dots.push({ x, y, zone: z, color });
+  // --- Power Node Label ---
+  label.innerHTML = zones.length > 0 
+    ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} • Global Resonance Field`
+    : 'No active resonance detected';
 
-      ctx.beginPath();
-      ctx.arc(x, y, 6, 0, Math.PI * 2);
-      ctx.fillStyle = color;
-      ctx.shadowColor = color;
-      ctx.shadowBlur = 15;
-      ctx.fill();
-      
-      ctx.beginPath();
-      ctx.arc(x, y, 10, 0, Math.PI * 2);
-      ctx.strokeStyle = color + '40';
-      ctx.lineWidth = 1;
-      ctx.stroke();
-    });
-  });
+  // --- Canvas events and popups (unchanged) ---
+  let popupTimer = null;
+  let lastZone = null;
+  canvas.onpointermove = function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    let found = null;
+    for (const d of dots) {
+      const dist = Math.sqrt((x - d.x) ** 2 + (y - d.y) ** 2);
+      if (dist < 10) { found = d; break; }
+    }
+    if (found && (lastZone !== found.zone)) {
+      showZonePopup(found.zone, e.clientX, e.clientY, found.count);
+      lastZone = found.zone;
+      if (popupTimer) clearTimeout(popupTimer);
+      popupTimer = setTimeout(() => { lastZone = null; }, 1000); // prevents popup spam
+    }
+  };
+  canvas.onpointerleave = function() { lastZone = null; };
+  canvas.onclick = function(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    let found = null;
+    for (const d of dots) {
+      const dist = Math.sqrt((x - d.x) ** 2 + (y - d.y) ** 2);
+      if (dist < 10) { found = d; break; }
+    }
+    if (!found) { closeEarthGrid(); }
+  };
 
-// KEEP EVERYTHING ELSE EXACTLY THE SAME AFTER THIS
-
-      // --- Handle tap on canvas ---
-let popupTimer = null;
-let lastZone = null;
-
-canvas.addEventListener('pointermove', function(e) {
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  let found = null;
-
-  for (const d of dots) {
-    const dist = Math.sqrt((x - d.x) ** 2 + (y - d.y) ** 2);
-    if (dist < 10) { found = d; break; }
-  }
-
-  if (found && (lastZone !== found.zone)) {
-    showZonePopup(found.zone, e.clientX, e.clientY, found.count);
-    lastZone = found.zone;
-    if (popupTimer) clearTimeout(popupTimer);
-    popupTimer = setTimeout(() => { lastZone = null; }, 1000); // prevents popup spam
-  }
-});
-
-canvas.addEventListener('pointerleave', function() {
-  lastZone = null;
-});
-canvas.addEventListener('click', function(e) {
-  const rect = canvas.getBoundingClientRect();
-  const x = e.clientX - rect.left;
-  const y = e.clientY - rect.top;
-  let found = null;
-
-  for (const d of dots) {
-    const dist = Math.sqrt((x - d.x) ** 2 + (y - d.y) ** 2);
-    if (dist < 10) { found = d; break; }
-  }
-
-  if (!found) {
-    closeEarthGrid();
-  }
-});
-
-      label.innerHTML = zones.length > 0 
-        ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} • Global Resonance Field`
-        : 'No active resonance detected';
-    });
-
-  // Fade out after 10s (auto) 
+  // --- Fade out after X seconds (unchanged) ---
   setTimeout(() => closeEarthGrid(), 300000);
-
-  function closeEarthGrid() {
-    container.style.opacity = 0;
-    setTimeout(() => container.style.display = 'none', 1000);
-  }
 }
 
-// --- Floating zone popup ---
+// --- Popup function (unchanged) ---
 function showZonePopup(zone, x, y) {
   const popup = document.createElement('div');
   const svgImg = `<img src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
-
   if (typeof zone === 'object' && zone !== null && zone.zone) {
     popup.innerHTML = `
       <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
@@ -10064,7 +10019,6 @@ function showZonePopup(zone, x, y) {
   } else {
     popup.textContent = String(zone);
   }
-
   popup.style.cssText = `
     position: fixed;
     left: ${x}px; top: ${y}px;
@@ -10079,14 +10033,23 @@ function showZonePopup(zone, x, y) {
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: 10000;
-    white-space: nowrap; /* Prevent line breaks */
+    white-space: nowrap;
   `;
   document.body.appendChild(popup);
   setTimeout(() => popup.style.opacity = 1, 10);
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 900);
-  }, 3000);
+  }, 6000);
+}
+
+function closeEarthGrid() {
+  earthGridOpen = false;
+  const container = document.getElementById('earthGridContainer');
+  if (container) {
+    container.style.opacity = 0;
+    setTimeout(() => container.style.display = 'none', 1000);
+  }
 }
 
   </script>
