@@ -2263,7 +2263,7 @@ patchiness */
       <button id="flow-mode-btn-select" onclick="selectMode('flow')" class="mode-btn relative w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-start gap-4 cursor-pointer">
         <i class="fa-solid fa-water fa-fade"></i>
         <div class="flex flex-col items-center text-center">
-          <span class="text-base leading-tight">Flow Mode</span>
+          <span class="text-base leading-tight">Flow</span>
           <span class="text-sm font-normal text-blue-200">Meditate Anytime Freely</span>
         </div>
       </button>
@@ -2879,7 +2879,7 @@ patchiness */
       <!-- Back Button -->
       <div id="back-to-mode-container" class="flex justify-start mb-4">
         <button id="back-to-mode" onclick="returnToModeSelection()" class="text-gray-400 hover:text-white flex items-center cursor-pointer">
-          <i class="fas fa-arrow-left mr-2"></i> Back to Modes
+          <i class="fas fa-arrow-left mr-2"></i> Back
         </button>
       </div>
 
@@ -2887,7 +2887,7 @@ patchiness */
       <div class="flex justify-center space-x-4 mb-6">
         <button id="flow-mode-btn-app" class="mode-btn bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full" 
                 onclick="setMode('flow')">
-          Flow Mode
+          Flow
         </button>
         <button id="yogi-mode-btn-app" class="mode-btn bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-full" 
                 onclick="setMode('yogi')">
@@ -3049,7 +3049,7 @@ patchiness */
   </div>
 </div>
 
-  <!-- Flow Mode Stats -->
+  <!-- Flow Stats -->
   <div id="flow-stats" class="grid grid-cols-2 gap-4 text-center mb-4">
     <div>
       <p class="text-xl font-bold text-blue-400" id="flow-total-sessions">0</p>
@@ -3060,7 +3060,7 @@ patchiness */
       <p class="text-xs text-gray-400">Flow Minutes</p>
     </div>
   </div>
-    <!-- Only show in Flow mode -->
+    <!-- Only show in Flow -->
   <div id="shared-stats" class="grid grid-cols-2 gap-4 text-center mt-4">
     <div>
       <p class="text-xl font-bold text-blue-400" id="current-streak">0</p>
@@ -5928,7 +5928,7 @@ if (
   return;
 }
 
-  // Flow mode check (EXACT same logic)
+  // Flow check (EXACT same logic)
 if (
   currentMode === 'flow' &&
   journeyWallet &&
@@ -6021,7 +6021,7 @@ if (
     targetDuration = selectedSession.duration;
     currentSessionTime = selectedSession.time;
   } else {
-    // Flow mode - get duration from dropdown
+    // Flow - get duration from dropdown
     targetDuration = parseInt(document.getElementById('duration').value);
     currentSessionTime = null;
   }
