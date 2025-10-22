@@ -9992,25 +9992,46 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
 // KEEP EVERYTHING ELSE EXACTLY THE SAME AFTER THIS
 
       // --- Handle tap on canvas ---
-      canvas.onclick = (e) => {
-        const rect = canvas.getBoundingClientRect();
-        const clickX = e.clientX - rect.left;
-        const clickY = e.clientY - rect.top;
-        let found = null;
+let popupTimer = null;
+let lastZone = null;
 
-        for (const d of dots) {
-          const dist = Math.sqrt((clickX - d.x) ** 2 + (clickY - d.y) ** 2);
-          if (dist < 10) { found = d; break; }
-        }
+canvas.addEventListener('pointermove', function(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  let found = null;
 
-        if (found) {
-          // Show temporary floating label
-          showZonePopup(found.zone, e.clientX, e.clientY, found.count);
-        } else {
-          // Tap outside dots → close grid
-          closeEarthGrid();
-        }
-      };
+  for (const d of dots) {
+    const dist = Math.sqrt((x - d.x) ** 2 + (y - d.y) ** 2);
+    if (dist < 10) { found = d; break; }
+  }
+
+  if (found && (lastZone !== found.zone)) {
+    showZonePopup(found.zone, e.clientX, e.clientY, found.count);
+    lastZone = found.zone;
+    if (popupTimer) clearTimeout(popupTimer);
+    popupTimer = setTimeout(() => { lastZone = null; }, 1000); // prevents popup spam
+  }
+});
+
+canvas.addEventListener('pointerleave', function() {
+  lastZone = null;
+});
+canvas.addEventListener('click', function(e) {
+  const rect = canvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  let found = null;
+
+  for (const d of dots) {
+    const dist = Math.sqrt((x - d.x) ** 2 + (y - d.y) ** 2);
+    if (dist < 10) { found = d; break; }
+  }
+
+  if (!found) {
+    closeEarthGrid();
+  }
+});
 
       label.innerHTML = zones.length > 0 
         ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} • Global Resonance Field`
