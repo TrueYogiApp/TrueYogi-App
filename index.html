@@ -10050,12 +10050,15 @@ canvas.addEventListener('click', function(e) {
 
 // --- Floating zone popup ---
 function showZonePopup(zone, x, y) {
-  //console.log('zone:', zone, typeof zone);
   const popup = document.createElement('div');
+  const svgImg = `<img src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
 
-  // If zone is an object, display zone.zone and zone.count
   if (typeof zone === 'object' && zone !== null && zone.zone) {
-    popup.textContent = `${zone.zone.replace(/_/g, ' ')} 👥 ${zone.count}`;
+    popup.innerHTML = `
+      <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
+      <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
+      <span style="display:inline-block;vertical-align:middle;">${zone.count}</span>
+    `;
   } else if (typeof zone === 'string') {
     popup.textContent = zone.replace(/_/g, ' ');
   } else {
@@ -10076,6 +10079,7 @@ function showZonePopup(zone, x, y) {
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: 10000;
+    white-space: nowrap; /* Prevent line breaks */
   `;
   document.body.appendChild(popup);
   setTimeout(() => popup.style.opacity = 1, 10);
