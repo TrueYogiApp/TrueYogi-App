@@ -9934,8 +9934,8 @@ if (!statsLabel) {
   statsLabel.id = 'gridStatsLabel';
   statsLabel.style.cssText = `
     position: absolute;
-    top: 5%;
-    left: 50%;
+    top: 12%;
+    left: 5%;
     transform: translateX(-50%);
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
@@ -9949,6 +9949,33 @@ if (!statsLabel) {
     white-space: nowrap;
   `;
   container.appendChild(statsLabel);
+}
+
+// Create NEW heading for Global Resonance Field at top center
+let globalHeading = document.getElementById('globalHeading');
+if (!globalHeading) {
+  globalHeading = document.createElement('div');
+  globalHeading.id = 'globalHeading';
+  globalHeading.style.cssText = `
+    position: absolute;
+    top: 3%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.1rem;
+    letter-spacing: 1.5px;
+    color: #fde68a;
+    opacity: 0.9;
+    text-shadow: 0 0 8px #fde68a;
+    background: rgba(0,0,0,0.3);
+    padding: 10px 20px;
+    border-radius: 20px;
+    backdrop-filter: blur(5px);
+    white-space: nowrap;
+    z-index: 10001;
+  `;
+  globalHeading.innerHTML = 'Global Resonance Field';
+  container.appendChild(globalHeading);
 }
 
 showCountryStatsOnEarthGrid(); 
