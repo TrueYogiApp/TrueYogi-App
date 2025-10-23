@@ -9934,8 +9934,8 @@ if (!statsLabel) {
   statsLabel.id = 'gridStatsLabel';
   statsLabel.style.cssText = `
     position: absolute;
-    top: 12%;
-    left: 5%;
+    top: 9%;
+    left: 15%;
     transform: translateX(-50%);
     font-family: 'Poppins', sans-serif;
     font-size: 1rem;
@@ -10113,7 +10113,7 @@ showCountryStatsOnEarthGrid();
 
   // --- Power Node Label ---
   label.innerHTML = zones.length > 0 
-    ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} • Global Resonance Field`
+    ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} Active`
     : 'No active resonance detected';
 
   // --- Canvas events and popups (unchanged) ---
