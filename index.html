@@ -3396,6 +3396,8 @@ patchiness */
     let selectedMusicFile = localStorage.getItem('selectedMusicFile') || 'music4.m4a';
 	let wakeLock = null;
     let isWakeLockSupported = 'wakeLock' in navigator;	
+	let omUserId = localStorage.getItem('omUserId');
+
 	
     // Challenge Data
     let challengeData = {
@@ -4313,6 +4315,11 @@ async function confirmFullReset() {
 	const syncDot = document.getElementById('sync-dot');
 	const syncTooltip = document.getElementById('sync-tooltip');
 
+    if (!omUserId) {
+	omUserId = crypto.randomUUID();   // or use any UUID generator
+	localStorage.setItem('omUserId', omUserId);
+	}
+	
 	if (!isMobile()) {
 	document.querySelector('.auth-section-container').style.display = 'none';
 	document.getElementById('mobile-reminder-card').classList.remove('hidden');
@@ -8400,6 +8407,7 @@ async function addCount() {
         headers: { 'Content-Type': 'application/json' },
 		    body: JSON.stringify({
       timezone,
+	  user_id: omUserId,
       local_joined_at: localTimeString // Or use localTimeString if you want human readable
     })
   });
@@ -9754,34 +9762,37 @@ let livePresenceRows = [];
 async function fetchCountryStats() {
   let { data, error } = await supabase
     .from('om_sessions')
-    .select('country, countryCode, duration_seconds')
+    .select('country, countryCode, user_id, duration_seconds')
     .not('ended_at', 'is', null);
 
   if (error) {
     console.error(error);
     return [];
   }
-  // Sum durations per countryCode
+  // Group by countryCode
   const countryTotals = {};
   for (const s of data) {
     if (!s.countryCode) continue;
-    // Group by countryCode
     if (!countryTotals[s.countryCode]) {
       countryTotals[s.countryCode] = {
         country: s.country,
+        users: new Set(),
         totalSeconds: 0
       };
     }
+    // Add user_id to set for counting souls
+    if (s.user_id) countryTotals[s.countryCode].users.add(s.user_id);
     countryTotals[s.countryCode].totalSeconds += (s.duration_seconds || 0);
   }
-  // Return array for display, sorted by total time descending
+  // Build the array with souls and total_seconds fields
   return Object.entries(countryTotals)
     .map(([countryCode, val]) => ({
       countryCode,
       country: val.country,
-      totalSeconds: val.totalSeconds
+      souls: val.users.size,
+      total_seconds: val.totalSeconds
     }))
-    .sort((a, b) => b.totalSeconds - a.totalSeconds);
+    .sort((a, b) => b.total_seconds - a.total_seconds);
 }
 
 function formatDuration(seconds) {
@@ -9790,6 +9801,7 @@ function formatDuration(seconds) {
   if (hrs > 0) return `${hrs} hr${hrs > 1 ? 's' : ''} ${mins} min${mins !== 1 ? 's' : ''}`;
   return `${mins} min${mins !== 1 ? 's' : ''}`;
 }
+
 
 async function showCountryStatsOnEarthGrid() {
   const stats = await fetchCountryStats();
@@ -9805,16 +9817,15 @@ async function showCountryStatsOnEarthGrid() {
   const content = stats.map(stat => {
     // Use the correct field name!
     const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
-    return `
-      <span style="display:inline-flex;align-items:center;margin:0 15px;cursor:pointer;"
-	  title="${stat.country}">
-        <img src="https://flagcdn.com/w20/${code}.png"
-             style="width:25px;height:18px;border-radius:2px;box-shadow:0 0 2px #000;">
-        <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
-          ${formatDuration(stat.totalSeconds)}
-        </span>
-      </span>
-    `;
+return `
+  <span style="display:inline-flex;align-items:center;margin:0 15px;cursor:pointer;" title="${stat.country}">
+    <img src="https://flagcdn.com/w20/${code}.png"
+         style="width:25px;height:18px;border-radius:2px;box-shadow:0 0 2px #000;">
+    <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
+       ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} ${formatDuration(stat.total_seconds)}
+    </span>
+  </span>
+`;
   }).join('');
 
   statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
