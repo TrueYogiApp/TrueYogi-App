@@ -9806,6 +9806,7 @@ const content = stats.map(stat => {
     "France": "fr",
     "Germany": "de",
     "Italy": "it",
+	"Pakistan": "pk",
     "Mexico": "mx",
     // Add more if needed
   };
@@ -9814,7 +9815,7 @@ const content = stats.map(stat => {
 return `
   <span style="display:inline-flex;align-items:center;margin:0 15px;">
     <img src="https://flagcdn.com/w20/${code}.png" 
-         style="width:20px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+         style="width:30px;height:21px;border-radius:2px;box-shadow:0 0 2px #000;">
     <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
       ${formatDuration(stat.totalSeconds)}
     </span>
@@ -9828,8 +9829,8 @@ statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker
 const style = document.createElement('style');
 style.textContent = `
   @keyframes scrollTicker {
-    0% { transform: translateX(100%); }
-    100% { transform: translateX(-100%); }
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
 `;
 document.head.appendChild(style);
@@ -9950,7 +9951,7 @@ statsLabel.style.cssText = `
   font-family: 'Poppins', sans-serif;
   font-size: 1rem;
   color: #fde68a;
-  // background: rgba(0,0,0,0.35);
+  //background: rgba(0,0,0,0.35);
   padding: 4px 12px;
   border-radius: 18px;
   text-shadow: 0 0 4px #111;
