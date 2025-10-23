@@ -9781,7 +9781,6 @@ function formatDuration(seconds) {
   return `${mins} min${mins !== 1 ? 's' : ''}`;
 }
 
-
 async function showCountryStatsOnEarthGrid() {
   const stats = await fetchCountryStats();
   const statsLabel = document.getElementById('gridStatsLabel');
@@ -9790,12 +9789,12 @@ async function showCountryStatsOnEarthGrid() {
     statsLabel.innerHTML = "No Power Node hours recorded yet.";
     return;
   }
-statsLabel.innerHTML = stats.map(stat => {
+const content = stats.map(stat => {
   // Map country names to 2-letter codes for flagcdn
   const codeMap = {
     "United States": "us",
     "USA": "us",
-    "Canada": "ca",
+    "Canada": "ca", 
     "India": "in",
     "United Kingdom": "gb",
     "UK": "gb",
@@ -9812,18 +9811,29 @@ statsLabel.innerHTML = stats.map(stat => {
   };
   const code = codeMap[stat.country] || stat.country.slice(0,2).toLowerCase();
 
-  return `
-    <span style="display:inline-block;vertical-align:middle;">
-      <img src="https://flagcdn.com/w20/${code}.png" 
-           style="vertical-align:middle;width:20px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+return `
+  <span style="display:inline-flex;align-items:center;margin:0 15px;">
+    <img src="https://flagcdn.com/w20/${code}.png" 
+         style="width:20px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+    <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
+      ${formatDuration(stat.totalSeconds)}
     </span>
-    <span style="display:inline-block;vertical-align:middle;font-weight:bold;font-size:0.9em;padding-left:6px;">
-      : ${formatDuration(stat.totalSeconds)}
-    </span>
-  `;
-}).join('<br>');  // Use line breaks instead of horizontal separators
-}
+  </span>
+`;
+}).join('');
 
+statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
+
+// Add CSS for scrolling animation
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes scrollTicker {
+    0% { transform: translateX(100%); }
+    100% { transform: translateX(-100%); }
+  }
+`;
+document.head.appendChild(style);
+}
 
 // Always fetch latest data when grid opens
 async function fetchPresenceRowsAndRender() {
@@ -9932,22 +9942,24 @@ let statsLabel = document.getElementById('gridStatsLabel');
 if (!statsLabel) {
   statsLabel = document.createElement('div');
   statsLabel.id = 'gridStatsLabel';
-  statsLabel.style.cssText = `
-    position: absolute;
-    top: 8%;
-    left: 20%;
-    transform: translateX(-50%);
-    font-family: 'Poppins', sans-serif;
-    font-size: 1rem;
-    color: #fde68a;
-    background: rgba(0,0,0,0.35);
-    padding: 4px 12px;
-    border-radius: 18px;
-    text-shadow: 0 0 4px #111;
-    z-index: 10001;
-    pointer-events: none;
-    white-space: normal;
-  `;
+statsLabel.style.cssText = `
+  position: absolute;
+  top: 11%;
+  left: 5%;                    // Changed from 20% to 5%
+  transform: none;             // REMOVED translateX(-50%)
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  color: #fde68a;
+  background: rgba(0,0,0,0.35);
+  padding: 4px 12px;
+  border-radius: 18px;
+  text-shadow: 0 0 4px #111;
+  z-index: 10001;
+  pointer-events: none;
+  white-space: nowrap;
+  overflow: hidden;
+  width: 80%;
+`;
   container.appendChild(statsLabel);
 }
 
