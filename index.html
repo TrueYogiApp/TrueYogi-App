@@ -9752,25 +9752,35 @@ let livePresenceRows = [];
 
 // Example: Fetch country stats on Earth Grid open
 async function fetchCountryStats() {
-  // Aggregate duration_seconds by country
   let { data, error } = await supabase
     .from('om_sessions')
-    .select('country, duration_seconds')
+    .select('country, countryCode, duration_seconds')
     .not('ended_at', 'is', null);
 
   if (error) {
     console.error(error);
     return [];
   }
-  // Sum durations per country
+  // Sum durations per countryCode
   const countryTotals = {};
   for (const s of data) {
-    if (!s.country) continue;
-    countryTotals[s.country] = (countryTotals[s.country] || 0) + (s.duration_seconds || 0);
+    if (!s.countryCode) continue;
+    // Group by countryCode
+    if (!countryTotals[s.countryCode]) {
+      countryTotals[s.countryCode] = {
+        country: s.country,
+        totalSeconds: 0
+      };
+    }
+    countryTotals[s.countryCode].totalSeconds += (s.duration_seconds || 0);
   }
   // Return array for display, sorted by total time descending
   return Object.entries(countryTotals)
-    .map(([country, totalSeconds]) => ({ country, totalSeconds }))
+    .map(([countryCode, val]) => ({
+      countryCode,
+      country: val.country,
+      totalSeconds: val.totalSeconds
+    }))
     .sort((a, b) => b.totalSeconds - a.totalSeconds);
 }
 
@@ -9784,56 +9794,42 @@ function formatDuration(seconds) {
 async function showCountryStatsOnEarthGrid() {
   const stats = await fetchCountryStats();
   const statsLabel = document.getElementById('gridStatsLabel');
-  if (!statsLabel) return; // Defensive: ensure the label exists
+  if (!statsLabel) return;
   if (stats.length === 0) {
     statsLabel.innerHTML = "No Power Node hours recorded yet.";
     return;
   }
-const content = stats.map(stat => {
-  // Map country names to 2-letter codes for flagcdn
-  const codeMap = {
-    "United States": "us",
-    "USA": "us",
-    "Canada": "ca", 
-    "India": "in",
-    "United Kingdom": "gb",
-    "UK": "gb",
-    "Australia": "au",
-    "China": "cn",
-    "Japan": "jp",
-    "Brazil": "br",
-    "Russia": "ru",
-    "France": "fr",
-    "Germany": "de",
-    "Italy": "it",
-	"Pakistan": "pk",
-    "Mexico": "mx",
-    // Add more if needed
-  };
-  const code = codeMap[stat.country] || stat.country.slice(0,2).toLowerCase();
+  // Debug!
+  console.log(stats);
 
-return `
-  <span style="display:inline-flex;align-items:center;margin:0 15px;">
-    <img src="https://flagcdn.com/w20/${code}.png" 
-         style="width:25px;height:18px;border-radius:2px;box-shadow:0 0 2px #000;">
-    <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
-      ${formatDuration(stat.totalSeconds)}
-    </span>
-  </span>
-`;
-}).join('');
+  const content = stats.map(stat => {
+    // Use the correct field name!
+    const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
+    return `
+      <span style="display:inline-flex;align-items:center;margin:0 15px;">
+        <img src="https://flagcdn.com/w20/${code}.png"
+             style="width:25px;height:18px;border-radius:2px;box-shadow:0 0 2px #000;">
+        <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
+          ${formatDuration(stat.totalSeconds)}
+        </span>
+      </span>
+    `;
+  }).join('');
 
-statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
+  statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
 
-// Add CSS for scrolling animation
-const style = document.createElement('style');
-style.textContent = `
-  @keyframes scrollTicker {
-    0% { transform: translateX(-100%); }
-    100% { transform: translateX(100%); }
+  // Add CSS for scrolling animation (only once)
+  if (!document.getElementById('country-scroll-ticker-style')) {
+    const style = document.createElement('style');
+    style.id = 'country-scroll-ticker-style';
+    style.textContent = `
+      @keyframes scrollTicker {
+        0% { transform: translateX(-100%); }
+        100% { transform: translateX(100%); }
+      }
+    `;
+    document.head.appendChild(style);
   }
-`;
-document.head.appendChild(style);
 }
 
 // Always fetch latest data when grid opens
