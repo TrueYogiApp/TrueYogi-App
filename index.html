@@ -10132,8 +10132,8 @@ function showZonePopup(zone, x, y) {
   if (typeof zone === 'object' && zone !== null && zone.zone) {
     popup.innerHTML = `
       <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-      <span style="display:inline-block;vertical-align:middle;">${zone.count}</span>
       <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
+      <span style="display:inline-block;vertical-align:middle;">${zone.count}</span>
     `;
   } else if (typeof zone === 'string') {
     popup.textContent = zone.replace(/_/g, ' ');
