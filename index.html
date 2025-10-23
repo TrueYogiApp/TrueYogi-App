@@ -10047,95 +10047,118 @@ showCountryStatsOnEarthGrid();
     }
   }
 
-  // ---- LIVE ZONE/COUNTRY CALCULATION ----
-  // Group livePresenceRows by country/zone field
-  const countryCounts = {};
-  livePresenceRows.forEach(row => {
-    const zone = row.country || row.zone || row.region; // use your field!
-    if (!zone) return;
-    countryCounts[zone] = (countryCounts[zone] || 0) + 1;
-  });
-  const zones = Object.keys(countryCounts).map(zone => ({
-    zone,
-    count: countryCounts[zone]
-  }));
+// ---- LIVE ZONE/COUNTRY CALCULATION ----
+const countryCounts = {};
+let omPresenceId = localStorage.getItem('omPresenceId');
+livePresenceRows.forEach(row => {
+  const zone = row.country || row.zone || row.region;
+  if (!zone) return;
+  countryCounts[zone] = (countryCounts[zone] || 0) + 1;
+});
+const zones = Object.keys(countryCounts).map(zone => ({
+  zone,
+  count: countryCounts[zone]
+}));
 
-  // --- Draw flags and dots for each active zone/country ---
-  const baseX = canvas.width / 2;
-  const baseY = canvas.height / 2;
-  const radius = 120;
-  const dots = [];
-  fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
-    .then(res => res.json())
-    .then(allCountries => {
-      const flagPromises = [];
-      zones.forEach((z, i) => {
-        const zoneName = typeof z === 'object' ? z.zone : z;
-        let coords;
-        const country = allCountries.find(c => 
-          c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
-          c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
-          c.cca2 === zoneName ||
-          c.cca3 === zoneName
-        );
-        if (country && country.latlng) {
-          coords = { lat: country.latlng[0], lon: country.latlng[1] };
-        } else {
-          const angle = (i / zones.length) * 2 * Math.PI;
-          coords = { lat: Math.sin(angle) * 60, lon: (angle / Math.PI) * 180 };
-        }
-        const x = baseX + (coords.lon / 180) * radius * 0.9;
-        const y = baseY - (coords.lat / 90) * radius * 0.45;
-        const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
-        let countryCode = 'un';
-        if (country && country.cca2) countryCode = country.cca2.toLowerCase();
-        const codeMap = {
-          'USA': 'us', 'US': 'us', 'United_States': 'us',
-          'India': 'in', 'IN': 'in',
-          'China': 'cn', 'CN': 'cn',
-          'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
-          'Australia': 'au', 'AU': 'au',
-          'Brazil': 'br', 'BR': 'br',
-          'Russia': 'ru', 'RU': 'ru',
-          'Japan': 'jp', 'JP': 'jp',
-          'Canada': 'ca', 'CA': 'ca',
-          'Mexico': 'mx', 'MX': 'mx',
-          'South_Africa': 'za', 'ZA': 'za',
-          'Egypt': 'eg', 'EG': 'eg',
-          'Indonesia': 'id', 'ID': 'id',
-          'Argentina': 'ar', 'AR': 'ar'
-        };
-        countryCode = codeMap[zoneName] || countryCode;
-        const flagImg = new Image();
-        flagImg.crossOrigin = "anonymous";
-        const flagPromise = new Promise((resolve) => {
-          flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color });
-          flagImg.onerror = () => resolve({ img: null, x, y, zone: z, color });
-          flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
-        });
-        flagPromises.push(flagPromise);
-        dots.push({ x, y, zone: z, color });
+// --- Draw flags and dots for each active zone/country ---
+const baseX = canvas.width / 2;
+const baseY = canvas.height / 2;
+const radius = 120;
+const dots = [];
+fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
+  .then(res => res.json())
+  .then(allCountries => {
+    const flagPromises = [];
+    zones.forEach((z, i) => {
+      const zoneName = typeof z === 'object' ? z.zone : z;
+      let coords;
+      const country = allCountries.find(c => 
+        c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+        c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+        c.cca2 === zoneName ||
+        c.cca3 === zoneName
+      );
+      if (country && country.latlng) {
+        coords = { lat: country.latlng[0], lon: country.latlng[1] };
+      } else {
+        const angle = (i / zones.length) * 2 * Math.PI;
+        coords = { lat: Math.sin(angle) * 60, lon: (angle / Math.PI) * 180 };
+      }
+      const x = baseX + (coords.lon / 180) * radius * 0.9;
+      const y = baseY - (coords.lat / 90) * radius * 0.45;
+      const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
+      let countryCode = 'un';
+      if (country && country.cca2) countryCode = country.cca2.toLowerCase();
+      const codeMap = {
+        'USA': 'us', 'US': 'us', 'United_States': 'us',
+        'India': 'in', 'IN': 'in',
+        'China': 'cn', 'CN': 'cn',
+        'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
+        'Australia': 'au', 'AU': 'au',
+        'Brazil': 'br', 'BR': 'br',
+        'Russia': 'ru', 'RU': 'ru',
+        'Japan': 'jp', 'JP': 'jp',
+        'Canada': 'ca', 'CA': 'ca',
+        'Mexico': 'mx', 'MX': 'mx',
+        'South_Africa': 'za', 'ZA': 'za',
+        'Egypt': 'eg', 'EG': 'eg',
+        'Indonesia': 'id', 'ID': 'id',
+        'Argentina': 'ar', 'AR': 'ar'
+      };
+      countryCode = codeMap[zoneName] || countryCode;
+
+      // Only do the presenceRow lookup ONCE
+      const presenceRow = livePresenceRows.find(row => row.country === zoneName);
+      const id = presenceRow ? presenceRow.id : null;
+
+      const flagImg = new Image();
+      flagImg.crossOrigin = "anonymous";
+      const flagPromise = new Promise((resolve) => {
+        flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color, id });
+        flagImg.onerror = () => resolve({ img: null, x, y, zone: z, color, id });
+        flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
       });
-      Promise.all(flagPromises).then(flags => {
-        flags.forEach(({ img, x, y, zone, color }) => {
-          if (img) {
-            ctx.drawImage(img, x - 6, y - 4, 12, 9);
-          } else {
-            ctx.beginPath();
-            ctx.arc(x, y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.shadowColor = color;
-            ctx.shadowBlur = 15;
-            ctx.fill();
-            ctx.beginPath();
-            ctx.arc(x, y, 6, 0, Math.PI * 2);
-            ctx.strokeStyle = color + '40';
-            ctx.lineWidth = 1;
-            ctx.stroke();
-          }
-        });
+      flagPromises.push(flagPromise);
+
+      dots.push({ x, y, zone: z, color, id });
+    });
+
+    Promise.all(flagPromises).then(flags => {
+      flags.forEach(({ img, x, y, zone, color, id }) => {
+        // Compare this dot's id to your saved omPresenceId
+        if (id && omPresenceId && id.toString() === omPresenceId.toString()) {
+          // Draw shine/glow under your flag
+          ctx.save();
+          ctx.beginPath();
+          ctx.ellipse(x, y + 1, 9, 5, 0, 0, 1 * Math.PI);
+          ctx.fillStyle = '#fffde0';
+          ctx.globalAlpha = 0.38;
+          ctx.shadowColor = '#ffd700';
+          ctx.shadowBlur = 28;
+          ctx.fill();
+          ctx.restore();
+        }
+
+        // Draw the flag as usual
+        if (img) {
+          ctx.drawImage(img, x - 6, y - 4, 12, 9);
+        } else {
+          ctx.beginPath();
+          ctx.arc(x, y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = color;
+          ctx.shadowColor = color;
+          ctx.globalAlpha = 0.18;
+          ctx.shadowBlur = 15;
+          ctx.fill();
+          ctx.beginPath();
+          ctx.arc(x, y, 6, 0, Math.PI * 2);
+          ctx.strokeStyle = color + '40';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
       });
     });
+  });
 
   // --- Power Node Label ---
   label.innerHTML = zones.length > 0 
