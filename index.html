@@ -10187,9 +10187,42 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
   });
 
   // --- Power Node Label ---
-  label.innerHTML = zones.length > 0 
-    ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} Active`
-    : 'No active resonance detected';
+label.innerHTML = zones.length > 0 
+  ? `⚡ ${zones.length} ${zones.length === 1 ? 'Power Node' : 'Power Nodes'} Active`
+  : 'No active resonance detected';
+
+// Make it clickable to highlight all flags
+label.style.cursor = 'pointer';
+label.onclick = function(e) {
+  e.stopPropagation();
+  highlightAllPowerNodes();
+};
+
+function highlightAllPowerNodes() {
+  const ctx = canvas.getContext('2d');
+  
+  // Add gold glow around all flag positions
+  dots.forEach(dot => {
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(dot.x, dot.y, 10, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffd70033';
+    ctx.shadowColor = '#ffd700';
+    ctx.shadowBlur = 20;
+    ctx.fill();
+    
+    // Optional: add a gold border around the flag
+    ctx.strokeStyle = '#ffd700';
+    ctx.lineWidth = 1.5;
+    ctx.strokeRect(dot.x - 7, dot.y - 5, 14, 10);
+    ctx.restore();
+  });
+  
+  // Auto-remove after 2 seconds
+  setTimeout(() => {
+    renderEarthGrid();
+  }, 2000);
+}
 
   // --- Canvas events and popups (unchanged) ---
   let popupTimer = null;
