@@ -9821,7 +9821,7 @@ statsLabel.innerHTML = stats.map(stat => {
       : ${formatDuration(stat.totalSeconds)}
     </span>
   `;
-}).join(' &nbsp; | &nbsp; ');
+}).join('<br>');  // Use line breaks instead of horizontal separators
 }
 
 
@@ -9941,12 +9941,12 @@ if (!statsLabel) {
     font-size: 1rem;
     color: #fde68a;
     background: rgba(0,0,0,0.35);
-    padding: 6px 16px;
+    padding: 4px 12px;
     border-radius: 18px;
     text-shadow: 0 0 4px #111;
     z-index: 10001;
     pointer-events: none;
-    white-space: nowrap;
+    white-space: normal;
   `;
   container.appendChild(statsLabel);
 }
@@ -9968,7 +9968,7 @@ if (!globalHeading) {
     opacity: 0.9;
     text-shadow: 0 0 8px #fde68a;
     background: rgba(0,0,0,0.3);
-    padding: 10px 20px;
+    padding: 8px 16px;
     border-radius: 20px;
     backdrop-filter: blur(5px);
     white-space: nowrap;
