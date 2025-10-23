@@ -9944,7 +9944,7 @@ if (!statsLabel) {
   statsLabel.id = 'gridStatsLabel';
 statsLabel.style.cssText = `
   position: absolute;
-  top: 11%;
+  top: 22%;
   left: 5%;                    // Changed from 20% to 5%
   transform: none;             // REMOVED translateX(-50%)
   font-family: 'Poppins', sans-serif;
@@ -9970,7 +9970,7 @@ if (!globalHeading) {
   globalHeading.id = 'globalHeading';
   globalHeading.style.cssText = `
     position: absolute;
-    top: 3%;
+    top: 5%;
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Poppins', sans-serif;
@@ -9983,7 +9983,7 @@ if (!globalHeading) {
     box-shadow: 0 0 10px 2px #fde68a22, 0 0 20px 3px #fff1;
     padding: 8px 16px;
     border-radius: 20px;
-	border: 1px solid #fde68a33;
+	  border: 1px solid #fde68a33;
     backdrop-filter: blur(5px);
     white-space: nowrap;
     z-index: 10001;
@@ -9996,7 +9996,7 @@ globalHeading.innerHTML = `
   <span style="vertical-align:middle;display:inline-block;margin-right:7px;">
     <img src="/assets/global.svg" style="width:18px;height:18px;vertical-align:middle;">
   </span>
-  Global Resonance Field
+  Global Resonance Grid
 `;
   container.appendChild(globalHeading);
 }
