@@ -10118,11 +10118,11 @@ let closeBtn = document.getElementById('gridCloseBtn');
 if (!closeBtn) {
   closeBtn = document.createElement('button');
   closeBtn.id = 'gridCloseBtn';
-  closeBtn.innerHTML = '✕'; // You can use a Unicode cross, or SVG
-closeBtn.style.cssText = `
+  closeBtn.innerHTML = `<img src="/assets/gridclose.svg" alt="Close" style="width:18px;height:18px;display:block;">`;
+  closeBtn.style.cssText = `
   position: absolute;
   top: 26%;
-  right: 8%;
+  left: calc(50% + 180px);  // adjust based on grid radius and placement
   width: 22px;
   height: 22px;
   font-size: 1rem;
