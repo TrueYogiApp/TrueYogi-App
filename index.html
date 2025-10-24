@@ -10109,13 +10109,13 @@ if (!tooltip) {
     tooltip.style.opacity = 1;
   }, 500);
   
-  // Auto-fade out after 12 seconds
+  // Auto-fade out after 20 seconds
   setTimeout(() => {
     tooltip.style.opacity = 0;
     setTimeout(() => {
       if (tooltip.parentNode) tooltip.remove();
     }, 1000);
-  }, 12000);
+  }, 20000);
 }
 
   let canvas = document.getElementById('earthGrid');
