@@ -9753,6 +9753,7 @@ document.addEventListener('touchend', (e) => {
 // Initialize the swipe effects
 new ElementalSwipe();
 
+
 // ========== 🌍 ENHANCED WORLD GRID WITH LOCATION TAPS ==========
 let earthGridOpen = false;
 let gridChannel = null;
@@ -9910,6 +9911,46 @@ function renderEarthGrid() {
     container.style.display = 'flex';
   }
 
+// --- Add double-tap instruction tooltip ---
+let tooltip = document.getElementById('gridTooltip');
+if (!tooltip) {
+  tooltip = document.createElement('div');
+  tooltip.id = 'gridTooltip';
+  tooltip.innerHTML = 'Double tap above to close';
+  tooltip.style.cssText = `
+    position: absolute;
+    bottom: 23%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.75rem;
+    color: #fde68a;
+    background: rgba(0,0,0,0.6);
+    padding: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid #fde68a33;
+    backdrop-filter: blur(5px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 1s ease;
+    z-index: 10001;
+  `;
+  container.appendChild(tooltip);
+  
+  // Fade in after a short delay
+  setTimeout(() => {
+    tooltip.style.opacity = 1;
+  }, 500);
+  
+  // Auto-fade out after 12 seconds
+  setTimeout(() => {
+    tooltip.style.opacity = 0;
+    setTimeout(() => {
+      if (tooltip.parentNode) tooltip.remove();
+    }, 1000);
+  }, 12000);
+}
+
   let canvas = document.getElementById('earthGrid');
   if (!canvas) {
     canvas = document.createElement('canvas');
@@ -10010,7 +10051,7 @@ if (!globalHeading) {
     <span style="vertical-align:middle;display:inline-block;margin-right:7px;">
       <img src="assets/global.svg" style="width:24px;height:24px;vertical-align:middle;">
     </span>
-    Global Resonance Grid
+    Global Resonance Field
   `;
   container.appendChild(globalHeading);
 }
