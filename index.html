@@ -9976,7 +9976,7 @@ if (stats.length === 0) {
   const userInfo = await getUserCountryInfo();
   const code = userInfo.countryCode ? userInfo.countryCode.toLowerCase() : "un";
   bar.innerHTML = `
-    <span class="user-scroll-flag" data-country="${userInfo.country}" style="display:inline-flex;align-items:center;margin:0 14px;cursor:pointer;">
+    <span class="user-scroll-flag" data-country="${userInfo.country}" style="display:inline-flex;align-items:center;margin:0 14px;">
       <img src="https://flagcdn.com/w40/${code}.png"
            style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
       <span style="font-weight:bold;font-size:1em;padding-left:7px;">
@@ -10114,44 +10114,35 @@ function renderEarthGrid() {
     container.style.display = 'flex';
   }
 
-// --- Add double-tap instruction tooltip ---
-let tooltip = document.getElementById('gridTooltip');
-if (!tooltip) {
-  tooltip = document.createElement('div');
-  tooltip.id = 'gridTooltip';
-  tooltip.innerHTML = 'Double tap here to close';
-  tooltip.style.cssText = `
-    position: absolute;
-    bottom: 44%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-family: 'Poppins', sans-serif;
-    font-size: 0.75rem;
-    color: #fde68a;
-    background: rgba(0,0,0,0.6);
-    padding: 4px 10px;
-    border-radius: 12px;
-    border: 1px solid #fde68a33;
-    backdrop-filter: blur(5px);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 1s ease;
-    z-index: 10001;
-  `;
-  container.appendChild(tooltip);
-  
-  // Fade in after a short delay
-  setTimeout(() => {
-    tooltip.style.opacity = 1;
-  }, 500);
-  
-  // Auto-fade out after 20 seconds
-  setTimeout(() => {
-    tooltip.style.opacity = 0;
-    setTimeout(() => {
-      if (tooltip.parentNode) tooltip.remove();
-    }, 1000);
-  }, 20000);
+let closeBtn = document.getElementById('gridCloseBtn');
+if (!closeBtn) {
+  closeBtn = document.createElement('button');
+  closeBtn.id = 'gridCloseBtn';
+  closeBtn.innerHTML = '✕'; // You can use a Unicode cross, or SVG
+closeBtn.style.cssText = `
+  position: absolute;
+  top: 6%;
+  right: 8%;
+  width: 22px;
+  height: 22px;
+  font-size: 1rem;
+  color: #fde68a;
+  background: rgba(0,0,0,0.54);
+  border-radius: 50%;
+  border: 1.5px solid #fde68a33;
+  box-shadow: 0 0 6px #fde68a99;
+  cursor: pointer;
+  z-index: 10002;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  transition: background 0.2s;
+`;
+  closeBtn.onmouseenter = () => closeBtn.style.background = 'rgba(0,0,0,0.8)';
+  closeBtn.onmouseleave = () => closeBtn.style.background = 'rgba(0,0,0,0.54)';
+  closeBtn.onclick = () => closeEarthGrid();
+  container.appendChild(closeBtn);
 }
 
   let canvas = document.getElementById('earthGrid');
