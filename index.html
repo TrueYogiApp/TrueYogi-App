@@ -9812,24 +9812,31 @@ async function showCountryStatsOnEarthGrid() {
     statsLabel.innerHTML = "No Power Node hours recorded yet.";
     return;
   }
-  // Debug!
-  console.log(stats);
 
   const content = stats.map(stat => {
-    // Use the correct field name!
     const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
-return `
-  <span style="display:inline-flex;align-items:center;margin:0 15px;cursor:pointer;" title="${stat.country}">
-    <img src="https://flagcdn.com/w20/${code}.png"
-         style="width:25px;height:18px;border-radius:2px;box-shadow:0 0 2px #000;">
-    <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
-       ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} · ${formatDuration(stat.total_seconds)}
-    </span>
-  </span>
-`;
+    return `
+      <span class="scroll-flag" data-country="${stat.country}" style="display:inline-flex;align-items:center;margin:0 15px;">
+        <img src="https://flagcdn.com/w20/${code}.png"
+             style="width:25px;height:18px;border-radius:2px;box-shadow:0 0 2px #000;">
+        <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
+          ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} · ${formatDuration(stat.total_seconds)}
+        </span>
+      </span>
+    `;
   }).join('');
 
   statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
+
+  // Attach popup handlers for desktop and mobile **AFTER** innerHTML set
+  statsLabel.querySelectorAll('.scroll-flag').forEach(el => {
+    el.onclick = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e);
+    };
+    el.ontouchstart = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e);
+    };
+  });
 
   // Add CSS for scrolling animation (only once)
   if (!document.getElementById('country-scroll-ticker-style')) {
@@ -9887,6 +9894,148 @@ function closeEarthGrid() {
    gridChannel = null;
 }
 
+async function fetchUserCountryStats() {
+  const userId = localStorage.getItem('omUserId');
+  if (!userId) return [];
+  let { data, error } = await supabase
+    .from('om_sessions')
+    .select('country, countryCode, duration_seconds')
+    .eq('user_id', userId)
+    .not('ended_at', 'is', null);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  // Group by countryCode
+  const countryTotals = {};
+  for (const s of data) {
+    if (!s.countryCode) continue;
+    if (!countryTotals[s.countryCode]) {
+      countryTotals[s.countryCode] = {
+        country: s.country,
+        totalSeconds: 0
+      };
+    }
+    countryTotals[s.countryCode].totalSeconds += (s.duration_seconds || 0);
+  }
+  return Object.entries(countryTotals)
+    .map(([countryCode, val]) => ({
+      countryCode,
+      country: val.country,
+      total_seconds: val.totalSeconds
+    }))
+    .sort((a, b) => b.total_seconds - a.total_seconds);
+}
+
+async function showUserTravelBar() {
+  const stats = await fetchUserCountryStats();
+  let bar = document.getElementById('userTravelBar');
+  if (!bar) {
+    bar = document.createElement('div');
+    bar.id = 'userTravelBar';
+    bar.style.cssText = `
+      position: absolute;
+      bottom: 18%;
+      left: 50%;
+      transform: translateX(-50%);
+      min-width: 120px;
+      max-width: 95vw;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1rem;
+      color: #ffe;
+      border-radius: 18px;
+      text-shadow: 0 0 6px #ffd70099;
+      z-index: 10001;
+      white-space: nowrap;
+      overflow-x: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 16px;
+      gap: 18px;
+    `;
+    document.getElementById('earthGridContainer').appendChild(bar);
+  }
+
+  if (stats.length === 0) {
+    bar.innerHTML = "🌍 Play OM to begin your journey!";
+    return;
+  }
+
+  let content = `<span style="font-weight:600; margin-right:14px; letter-spacing:1px; color:#fde68a;"></span>`;
+  content += stats.map(stat => {
+    const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
+    return `
+      <span class="user-scroll-flag" data-country="${stat.country}" style="display:inline-flex;align-items:center;margin:0 6px;">
+        <img src="https://flagcdn.com/w20/${code}.png"
+             style="width:22px;height:16px;border-radius:2px;box-shadow:0 0 1px #000;">
+        <span style="font-weight:bold;font-size:0.92em;padding-left:4px;">
+          ${formatDuration(stat.total_seconds)}
+        </span>
+      </span>
+    `;
+  }).join('');
+
+  bar.innerHTML = content;
+
+  // Attach popup handlers for desktop and mobile
+  bar.querySelectorAll('.user-scroll-flag').forEach(el => {
+    el.onclick = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e);
+    };
+    el.ontouchstart = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e);
+    };
+  });
+}
+
+function showFlagPopup(country, event) {
+  // Remove any existing popup
+  const old = document.getElementById('flag-popup');
+  if (old) old.remove();
+
+  // Get event position (for touch or mouse)
+  let x = window.innerWidth / 2, y = 80; // Default to top center
+  if (event && event.touches && event.touches.length > 0) {
+    x = event.touches[0].clientX;
+    y = event.touches[0].clientY;
+  } else if (event && event.clientX !== undefined) {
+    x = event.clientX;
+    y = event.clientY;
+  }
+
+  // Create popup
+  const popup = document.createElement('div');
+  popup.id = 'flag-popup';
+  popup.textContent = country;
+  popup.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y - 36}px;
+    transform: translate(-50%, -100%);
+    background: rgba(0,0,0,0.85);
+    color: #fde68a;
+    font-size: 0.95rem;
+    font-family: 'Poppins', sans-serif;
+    padding: 8px 22px;
+    border-radius: 18px;
+    z-index: 10003;
+    box-shadow: 0 0 12px #fde68acc;
+    pointer-events: none;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.16s;
+  `;
+  document.body.appendChild(popup);
+  setTimeout(() => popup.style.opacity = 1, 10);
+
+  // Remove after 1.7s
+  setTimeout(() => {
+    popup.style.opacity = 0;
+    setTimeout(() => popup.remove(), 350);
+  }, 1700);
+}
+
 // --- Main renderer (called whenever data changes or grid opens) ---
 function renderEarthGrid() {
   // --- Setup container, canvas, and label ---
@@ -9916,10 +10065,10 @@ let tooltip = document.getElementById('gridTooltip');
 if (!tooltip) {
   tooltip = document.createElement('div');
   tooltip.id = 'gridTooltip';
-  tooltip.innerHTML = 'Double tap above to close';
+  tooltip.innerHTML = 'Double tap here to close';
   tooltip.style.cssText = `
     position: absolute;
-    bottom: 23%;
+    bottom: 44%;
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Poppins', sans-serif;
@@ -10057,6 +10206,7 @@ if (!globalHeading) {
 }
 
 showCountryStatsOnEarthGrid(); 
+showUserTravelBar();
 
   const ctx = canvas.getContext('2d');
   setTimeout(() => container.style.opacity = 1, 10);
