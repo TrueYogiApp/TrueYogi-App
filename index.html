@@ -8475,30 +8475,15 @@ async function updateCount() {
       }
       lastCount = newCount;
 
-      // --------- KEEP THIS BLOCK ---------
-const omNumber = counterEl.querySelector('.om-number');
-if (omNumber) {
-  let tapCount = 0;
-  let tapTimer;
-  
-  omNumber.onclick = function(e) {
-    tapCount++;
-    
-    if (tapCount === 1) {
-      // First tap - wait to see if second tap comes
-      tapTimer = setTimeout(() => {
-        tapCount = 0; // Reset if no second tap
-      }, 300);
-    } else if (tapCount === 2) {
-      // Double tap detected
-      clearTimeout(tapTimer);
-      showEarthGrid();
-      tapCount = 0;
-      e.stopPropagation();
-    }
-  };
-}
-// --------- END BLOCK ---------
+        // --------- KEEP THIS BLOCK ---------
+      const omNumber = counterEl.querySelector('.om-number');
+      if (omNumber) {
+        omNumber.onclick = function(e) {
+          showEarthGrid();
+          e.stopPropagation();
+        };
+      }
+      // --------- END BLOCK ---------
     } else {
       // Hide completely if count is zero
       counterEl.classList.add('hidden');
