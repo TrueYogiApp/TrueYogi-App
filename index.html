@@ -9928,6 +9928,20 @@ async function fetchUserCountryStats() {
     .sort((a, b) => b.total_seconds - a.total_seconds);
 }
 
+async function getUserCountryInfo() {
+  try {
+    // Fast, free, no API key needed
+    const res = await fetch('https://ipapi.co/json/');
+    const data = await res.json();
+    return {
+      country: data.country_name,
+      countryCode: data.country_code
+    };
+  } catch {
+    return { country: "Unknown", countryCode: "un" };
+  }
+}
+
 async function showUserTravelBar() {
   const stats = await fetchUserCountryStats();
   let bar = document.getElementById('userTravelBar');
@@ -9957,10 +9971,32 @@ async function showUserTravelBar() {
     document.getElementById('earthGridContainer').appendChild(bar);
   }
 
-  if (stats.length === 0) {
-    bar.innerHTML = "🌍 Play OM to begin your journey!";
-    return;
-  }
+if (stats.length === 0) {
+  // Get user's country info
+  const userInfo = await getUserCountryInfo();
+  const code = userInfo.countryCode ? userInfo.countryCode.toLowerCase() : "un";
+  bar.innerHTML = `
+    <span class="user-scroll-flag" data-country="${userInfo.country}" style="display:inline-flex;align-items:center;margin:0 14px;cursor:pointer;">
+      <img src="https://flagcdn.com/w40/${code}.png"
+           style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
+      <span style="font-weight:bold;font-size:1em;padding-left:7px;">
+        0 min
+      </span>
+    </span>
+  `;
+
+  // Optional: attach popup for country name (if you want)
+  bar.querySelectorAll('.user-scroll-flag').forEach(el => {
+    el.onclick = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e);
+    };
+    el.ontouchstart = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e);
+    };
+  });
+
+  return;
+}
 
   // Add keyframes for scrolling animation (only once)
   if (!document.getElementById('user-scroll-ticker-style')) {
