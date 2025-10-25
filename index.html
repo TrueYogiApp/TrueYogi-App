@@ -10555,11 +10555,14 @@ async function showZonePopup(zone, x, y) {
       countText = `${zone.count}${totalDurationText}`;
     }
 
-    popup.innerHTML = `
-      <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-      <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-      <span style="display:inline-block;vertical-align:middle;">${countText}</span>
-    `;
+popup.innerHTML = `
+  <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
+  <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
+  <span style="display:inline-block;vertical-align:middle;">${countText}</span>
+  <span style="margin-left:8px;font-weight:600;color:#ffe066;">
+    🕒 ${totalDurationText.replace(/[()]/g, '')}
+  </span>
+`;
   } else if (typeof zone === 'string') {
     popup.textContent = zone.replace(/_/g, ' ');
   } else {
