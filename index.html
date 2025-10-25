@@ -10492,9 +10492,9 @@ function showZonePopup(zone, x, y) {
   if (typeof zone === 'object' && zone !== null && zone.zone) {
     let countText;
     if (zone.count === 1) {
-      countText = 'you';
+      countText = 'You';
     } else {
-      countText = `you and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
+      countText = `You and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
     }
     
     popup.innerHTML = `
