@@ -1843,21 +1843,25 @@ patchiness */
   100% { opacity: 0.8; transform: translateY(0); }
 }
 
-.pulse-dot {
-  display:inline-block;
-  width:9px;
-  height:9px;
-  margin-right:5px;
-  border-radius:50%;
-  background:#32f482;
-  box-shadow:0 0 8px #32f48299;
-  animation:pulse 1s infinite;
-  vertical-align:middle;
+/* Only apply animation when user is active in their country! */
+#omusers-svg.rainbow {
+  animation: hue-rotate-rainbow 2.8s linear infinite;
+  filter:
+    hue-rotate(0deg)
+    saturate(2.5)
+    brightness(1.4)
+    drop-shadow(0 0 6px #fff2);
 }
-@keyframes pulse {
-  0% { box-shadow:0 0 2px #32f48299, 0 0 0px #32f48299;}
-  60% { box-shadow:0 0 8px #32f48299, 0 0 15px #32f48244;}
-  100% { box-shadow:0 0 2px #32f48299, 0 0 0px #32f48299;}
+
+@keyframes hue-rotate-rainbow {
+  0%   { filter: hue-rotate(0deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
+  14%  { filter: hue-rotate(52deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
+  28%  { filter: hue-rotate(104deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
+  42%  { filter: hue-rotate(156deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
+  57%  { filter: hue-rotate(208deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
+  71%  { filter: hue-rotate(260deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
+  85%  { filter: hue-rotate(312deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
+  100% { filter: hue-rotate(360deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
 }
 
 </style>
@@ -10523,10 +10527,21 @@ function formatTotalDuration(seconds) {
 }
 
 async function showZonePopup(zone, x, y) {
-  const popup = document.createElement('div');
-  const svgImg = `<img src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
+
+  // Get user's country info
+  const userCountryInfo = await getUserCountryInfo();
+  const isUsersCountry = (zone.zone === userCountryInfo.country);
+
+  // Set svgClass FIRST!
+  let svgClass = '';
+  if (isUserActive && isUsersCountry) {
+    svgClass = 'rainbow';
+  }
+
+  // NOW create svgImg using the class
+  const svgImg = `<img id="omusers-svg" class="${svgClass}" src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
 
   // Find all users in this zone
   let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
@@ -10544,20 +10559,12 @@ async function showZonePopup(zone, x, y) {
   }, 0);
   const totalDurationText = formatTotalDuration(totalSeconds);
 
-  // Get user's country info
-  const userCountryInfo = await getUserCountryInfo();
-  const isUsersCountry = (zone.zone === userCountryInfo.country);
-
   // Always show total count
   let countText = `${zone.count}`;
-  // Only show green dot if user is active and this is their country
-  let presenceDot = '';
-  if (isUserActive && isUsersCountry) {
-    presenceDot = `<span class="pulse-dot"></span>`;
-  }
 
-  popup.innerHTML = `
-    ${presenceDot}  
+  // Popup HTML
+  const popup = document.createElement('div');
+  popup.innerHTML = ` 
     <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
     <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
     <span style="display:inline-block;vertical-align:middle;">${countText}</span>
@@ -10584,7 +10591,7 @@ async function showZonePopup(zone, x, y) {
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 900);
-  }, 6000);
+  }, 9000);
 }
 
 function closeEarthGrid() {
