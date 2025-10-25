@@ -10512,10 +10512,18 @@ async function showZonePopup(zone, x, y) {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
 
+  let userDurationText = '';
   let totalDurationText = '';
 
   // Find all users in this zone
   let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
+
+  // Find your own presence in this zone
+  let userPresence = usersInZone.find(row => row.id && omPresenceId && row.id.toString() === omPresenceId.toString());
+
+  if (userPresence && userPresence.joined_at && userPresence.last_heartbeat) {
+    userDurationText = formatPopupDuration(userPresence.joined_at, userPresence.last_heartbeat);
+  }
 
   // Calculate total duration for all users in this zone
   let totalSeconds = usersInZone.reduce((sum, u) => {
@@ -10530,8 +10538,10 @@ async function showZonePopup(zone, x, y) {
   }, 0);
   totalDurationText = formatTotalDuration(totalSeconds);
 
-  const userCountryInfo = await getUserCountryInfo();
-  const isUsersCountry = (zone.zone === userCountryInfo.country);
+  if (typeof zone === 'object' && zone !== null && zone.zone) {
+ 
+    const userCountryInfo = await getUserCountryInfo();
+    const isUsersCountry = (zone.zone === userCountryInfo.country);
 
   let countText = `${zone.count}`;
   let presenceDot = '';
