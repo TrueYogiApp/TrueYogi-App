@@ -10512,18 +10512,10 @@ async function showZonePopup(zone, x, y) {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
 
-  let userDurationText = '';
   let totalDurationText = '';
 
   // Find all users in this zone
   let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
-
-  // Find your own presence in this zone
-  let userPresence = usersInZone.find(row => row.id && omPresenceId && row.id.toString() === omPresenceId.toString());
-
-  if (userPresence && userPresence.joined_at && userPresence.last_heartbeat) {
-    userDurationText = formatPopupDuration(userPresence.joined_at, userPresence.last_heartbeat);
-  }
 
   // Calculate total duration for all users in this zone
   let totalSeconds = usersInZone.reduce((sum, u) => {
@@ -10538,29 +10530,23 @@ async function showZonePopup(zone, x, y) {
   }, 0);
   totalDurationText = formatTotalDuration(totalSeconds);
 
-  if (typeof zone === 'object' && zone !== null && zone.zone) {
-    let countText;
-    const userCountryInfo = await getUserCountryInfo();
-    const isUsersCountry = (zone.zone === userCountryInfo.country);
+  const userCountryInfo = await getUserCountryInfo();
+  const isUsersCountry = (zone.zone === userCountryInfo.country);
 
-    if (isUserActive && isUsersCountry) {
-      // User is active AND this is their country
-      if (zone.count === 1) {
-        countText = `You${userDurationText}`;
-      } else {
-        countText = `You$ and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
-      }
-    } else {
-      // Not user's country, just show number and (total duration)
-      countText = `${zone.count}`;
-    }
+  let countText = `${zone.count}`;
+  let presenceDot = '';
 
-popup.innerHTML = `
-  <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-  <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-  <span style="display:inline-block;vertical-align:middle;">${countText}</span>
-  ${totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
-`;
+  if (isUserActive && isUsersCountry) {
+    presenceDot = `<span class="pulse-dot"></span>`;
+  }
+
+  popup.innerHTML = `
+    <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
+    <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
+    ${presenceDot}
+    <span style="display:inline-block;vertical-align:middle;">${countText}</span>
+    ${totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
+  `;
   } else if (typeof zone === 'string') {
     popup.textContent = zone.replace(/_/g, ' ');
   } else {
