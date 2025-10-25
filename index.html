@@ -10548,7 +10548,7 @@ async function showZonePopup(zone, x, y) {
       if (zone.count === 1) {
         countText = `You${userDurationText}`;
       } else {
-        countText = `You${userDurationText} and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}${totalDurationText}`;
+        countText = `You${userDurationText} and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
       }
     } else {
       // Not user's country, just show number and (total duration)
