@@ -10118,11 +10118,11 @@ let closeBtn = document.getElementById('gridCloseBtn');
 if (!closeBtn) {
   closeBtn = document.createElement('button');
   closeBtn.id = 'gridCloseBtn';
-  closeBtn.innerHTML = `<img src="/assets/gridclose.svg" alt="Close" style="width:18px;height:18px;display:block;">`;
+  closeBtn.innerHTML = `<img src="/assets/gridclose1.svg" alt="Close" style="width:18px;height:18px;display:block;">`;
   closeBtn.style.cssText = `
   position: absolute;
-  top: 26%;
-  right: 8%;
+  bottom: 3%;
+  right: 50%;
   width: 22px;
   height: 22px;
   font-size: 1rem;
@@ -10480,28 +10480,86 @@ function togglePowerNodesGlow() {
     if (!found) { closeEarthGrid(); }
   };
 
-  // --- Fade out after X seconds (unchanged) ---
+  // --- Fade out after 5 min (unchanged) ---
   setTimeout(() => closeEarthGrid(), 300000);
 }
 
-// --- Popup function (unchanged) ---
-function showZonePopup(zone, x, y) {
+function formatPopupDuration(joined_at, last_heartbeat) {
+  if (!joined_at || !last_heartbeat) return '';
+  const start = new Date(joined_at);
+  const end = new Date(last_heartbeat);
+  if (isNaN(start.getTime()) || isNaN(end.getTime())) return '';
+  const seconds = (end - start) / 1000;
+  if (seconds < 1800) return '';
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hrs > 0) return ` (${hrs} hr${hrs > 1 ? 's' : ''}${mins > 0 ? ' ' + mins + ' min' : ''})`;
+  return ` (${mins} min)`;
+}
+
+function formatTotalDuration(seconds) {
+  if (!seconds || seconds < 1800) return '';
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hrs > 0) return ` (${hrs} hr${hrs > 1 ? 's' : ''}${mins > 0 ? ' ' + mins + ' min' : ''})`;
+  return ` (${mins} min)`;
+}
+
+async function showZonePopup(zone, x, y) {
   const popup = document.createElement('div');
   const svgImg = `<img src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
-  
+  const omPresenceId = localStorage.getItem('omPresenceId');
+  const isUserActive = !!omPresenceId;
+
+  let userDurationText = '';
+  let totalDurationText = '';
+
+  // Find all users in this zone
+  let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
+
+  // Find your own presence in this zone
+  let userPresence = usersInZone.find(row => row.id && omPresenceId && row.id.toString() === omPresenceId.toString());
+
+  if (userPresence && userPresence.joined_at && userPresence.last_heartbeat) {
+    userDurationText = formatPopupDuration(userPresence.joined_at, userPresence.last_heartbeat);
+  }
+
+  // Calculate total duration for all users in this zone
+  let totalSeconds = usersInZone.reduce((sum, u) => {
+    if (u.joined_at && u.last_heartbeat) {
+      const start = new Date(u.joined_at);
+      const end = new Date(u.last_heartbeat);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        return sum + ((end - start) / 1000);
+      }
+    }
+    return sum;
+  }, 0);
+  totalDurationText = formatTotalDuration(totalSeconds);
+
   if (typeof zone === 'object' && zone !== null && zone.zone) {
     let countText;
-    if (zone.count === 1) {
-      countText = 'you';
+    const userCountryInfo = await getUserCountryInfo();
+    const isUsersCountry = (zone.zone === userCountryInfo.country);
+
+    if (isUserActive && isUsersCountry) {
+      // User is active AND this is their country
+      if (zone.count === 1) {
+        countText = `You${userDurationText}`;
+      } else {
+        countText = `You${userDurationText} and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}${totalDurationText}`;
+      }
     } else {
-      countText = `you and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
+      // Not user's country, just show number and (total duration)
+      countText = `${zone.count}`;
     }
-    
-    popup.innerHTML = `
-      <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-      <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-      <span style="display:inline-block;vertical-align:middle;">${countText}</span>
-    `;
+
+popup.innerHTML = `
+  <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
+  <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
+  <span style="display:inline-block;vertical-align:middle;">${countText}</span>
+  ${totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
+`;
   } else if (typeof zone === 'string') {
     popup.textContent = zone.replace(/_/g, ' ');
   } else {
@@ -10539,7 +10597,6 @@ function closeEarthGrid() {
     setTimeout(() => container.style.display = 'none', 1000);
   }
 }
-
 
   </script>
 	
