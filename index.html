@@ -10488,11 +10488,19 @@ function togglePowerNodesGlow() {
 function showZonePopup(zone, x, y) {
   const popup = document.createElement('div');
   const svgImg = `<img src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
+  
   if (typeof zone === 'object' && zone !== null && zone.zone) {
+    let countText;
+    if (zone.count === 1) {
+      countText = 'you';
+    } else {
+      countText = `you and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
+    }
+    
     popup.innerHTML = `
       <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
       <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-      <span style="display:inline-block;vertical-align:middle;">${zone.count}</span>
+      <span style="display:inline-block;vertical-align:middle;">${countText}</span>
     `;
   } else if (typeof zone === 'string') {
     popup.textContent = zone.replace(/_/g, ' ');
