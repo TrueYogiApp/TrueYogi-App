@@ -1843,23 +1843,6 @@ patchiness */
   100% { opacity: 0.8; transform: translateY(0); }
 }
 
-.pulse-dot {
-  display:inline-block;
-  width:9px;
-  height:9px;
-  margin-right:5px;
-  border-radius:50%;
-  background:#32f482;
-  box-shadow:0 0 8px #32f48299;
-  animation:pulse 1s infinite;
-  vertical-align:middle;
-}
-@keyframes pulse {
-  0% { box-shadow:0 0 2px #32f48299, 0 0 0px #32f48299;}
-  60% { box-shadow:0 0 8px #32f48299, 0 0 15px #32f48244;}
-  100% { box-shadow:0 0 2px #32f48299, 0 0 0px #32f48299;}
-}
-
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -10565,7 +10548,7 @@ async function showZonePopup(zone, x, y) {
       if (zone.count === 1) {
         countText = `You${userDurationText}`;
       } else {
-        countText = `You${userDurationText} and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}${totalDurationText}`;
+        countText = `You and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
       }
     } else {
       // Not user's country, just show number and (total duration)
@@ -10575,7 +10558,6 @@ async function showZonePopup(zone, x, y) {
 popup.innerHTML = `
   <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
   <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-  ${presenceDot}
   <span style="display:inline-block;vertical-align:middle;">${countText}</span>
   ${totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
 `;
