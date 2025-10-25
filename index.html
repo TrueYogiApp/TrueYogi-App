@@ -10488,13 +10488,22 @@ function togglePowerNodesGlow() {
 function showZonePopup(zone, x, y) {
   const popup = document.createElement('div');
   const svgImg = `<img src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
+  const omPresenceId = localStorage.getItem('omPresenceId');
+  const isUserActive = !!omPresenceId;
   
   if (typeof zone === 'object' && zone !== null && zone.zone) {
     let countText;
-    if (zone.count === 1) {
-      countText = 'You';
+    
+    if (isUserActive) {
+      // User is active in OM session
+      if (zone.count === 1) {
+        countText = 'you';
+      } else {
+        countText = `you and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
+      }
     } else {
-      countText = `You and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}`;
+      // User is not active - just show number only
+      countText = `${zone.count}`;
     }
     
     popup.innerHTML = `
