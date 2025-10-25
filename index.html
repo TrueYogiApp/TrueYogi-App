@@ -10498,6 +10498,14 @@ function formatPopupDuration(joined_at, last_heartbeat) {
   return ` (${mins} min)`;
 }
 
+function formatTotalDuration(seconds) {
+  if (!seconds || seconds < 1800) return '';
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hrs > 0) return ` (${hrs} hr${hrs > 1 ? 's' : ''}${mins > 0 ? ' ' + mins + ' min' : ''})`;
+  return ` (${mins} min)`;
+}
+
 async function showZonePopup(zone, x, y) {
   const popup = document.createElement('div');
   const svgImg = `<img src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
@@ -10505,8 +10513,7 @@ async function showZonePopup(zone, x, y) {
   const isUserActive = !!omPresenceId;
 
   let userDurationText = '';
-  let othersDurationText = '';
-  let longestDuration = 0;
+  let totalDurationText = '';
 
   // Find all users in this zone
   let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
@@ -10518,33 +10525,18 @@ async function showZonePopup(zone, x, y) {
     userDurationText = formatPopupDuration(userPresence.joined_at, userPresence.last_heartbeat);
   }
 
-  // For others: Find max duration among all users in this zone
-  if (usersInZone.length > 0) {
-    longestDuration = Math.max(...usersInZone.map(u => {
-      if (u.joined_at && u.last_heartbeat) {
-        const start = new Date(u.joined_at);
-        const end = new Date(u.last_heartbeat);
-        if (isNaN(start.getTime()) || isNaN(end.getTime())) return 0;
-        return (end - start) / 1000;
+  // Calculate total duration for all users in this zone
+  let totalSeconds = usersInZone.reduce((sum, u) => {
+    if (u.joined_at && u.last_heartbeat) {
+      const start = new Date(u.joined_at);
+      const end = new Date(u.last_heartbeat);
+      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
+        return sum + ((end - start) / 1000);
       }
-      return 0;
-    }));
-    othersDurationText = formatPopupDuration(
-      // Use the joined_at and last_heartbeat for the longest duration user
-      ...(() => {
-        const maxUser = usersInZone.find(u => {
-          if (u.joined_at && u.last_heartbeat) {
-            const start = new Date(u.joined_at);
-            const end = new Date(u.last_heartbeat);
-            return !isNaN(start.getTime()) && !isNaN(end.getTime()) &&
-              ((end - start) / 1000) === longestDuration;
-          }
-          return false;
-        });
-        return maxUser ? [maxUser.joined_at, maxUser.last_heartbeat] : [null, null];
-      })()
-    );
-  }
+    }
+    return sum;
+  }, 0);
+  totalDurationText = formatTotalDuration(totalSeconds);
 
   if (typeof zone === 'object' && zone !== null && zone.zone) {
     let countText;
@@ -10556,11 +10548,11 @@ async function showZonePopup(zone, x, y) {
       if (zone.count === 1) {
         countText = `You${userDurationText}`;
       } else {
-        countText = `You${userDurationText} and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}${othersDurationText}`;
+        countText = `You${userDurationText} and ${zone.count - 1} other${zone.count - 1 === 1 ? '' : 's'}${totalDurationText}`;
       }
     } else {
-      // Not user's country, just show number and (longest duration)
-      countText = `${zone.count}${othersDurationText}`;
+      // Not user's country, just show number and (total duration)
+      countText = `${zone.count}${totalDurationText}`;
     }
 
     popup.innerHTML = `
