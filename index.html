@@ -10586,7 +10586,7 @@ async function showZonePopup(zone, x, y) {
   }
 
   // NOW create svgImg using the class
-  const svgImg = `<img id="omusers-svg" class="${svgClass}" src="assets/omusers.svg" style="width:27px;height:27px;vertical-align:middle;display:inline-block;">`;
+  const svgImg = `<img id="omusers-svg" class="${svgClass}" src="assets/omusers.svg" style="width:33px;height:33px;vertical-align:middle;display:inline-block;">`;
 
   // Find all users in this zone
   let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
@@ -10637,7 +10637,7 @@ popup.innerHTML = `
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 900);
-  }, 6000);
+  }, 9000);
 }
 
 function closeEarthGrid() {
