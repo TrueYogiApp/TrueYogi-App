@@ -10464,7 +10464,7 @@ label.onclick = function(e) {
 
 function togglePowerNodesGlow() {
   const ctx = canvas.getContext('2d');
-  
+
   if (glowActive) {
     // Turn off glow - just redraw the grid normally
     renderEarthGrid();
@@ -10478,14 +10478,24 @@ function togglePowerNodesGlow() {
       ctx.shadowColor = '#ffd700';
       ctx.shadowBlur = 20;
       ctx.fill();
-      
+
       ctx.strokeStyle = '#ffd700';
       ctx.lineWidth = 1.5;
       ctx.strokeRect(dot.x - 7, dot.y - 5, 14, 10);
       ctx.restore();
+
+      // ---- NEW: Show zone popup for this flag/zone ----
+      const canvasRect = canvas.getBoundingClientRect();
+      // Prepare zone object for showZonePopup
+      const zoneObj = typeof dot.zone === 'object' ? dot.zone : { zone: dot.zone, count: dot.count };
+      showZonePopup(
+        zoneObj,
+        dot.x + canvasRect.left,
+        dot.y + canvasRect.top
+      );
     });
   }
-  
+
   glowActive = !glowActive;
 }
 
@@ -10611,7 +10621,7 @@ async function showZonePopup(zone, x, y) {
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 900);
-  }, 9000);
+  }, 6000);
 }
 
 function closeEarthGrid() {
