@@ -10613,11 +10613,11 @@ async function showZonePopup(zone, x, y) {
   // Popup HTML
 const popup = document.createElement('div');
 let showCount = zone.count !== null && zone.count !== undefined && zone.count > 0;
-popup.innerHTML = ` 
+popup.innerHTML = `
   <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-  <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-  ${showCount ? `<span style="display:inline-block;vertical-align:middle;">${countText}</span>` : ''}
-  ${showCount && totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
+  <span style="margin:0 8px 0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
+  ${showCount ? `<span style="display:inline-block;font-weight:600;color:#ffd700;vertical-align:middle;">${countText}</span>` : ''}
+  ${showCount && totalDurationText ? `<span style="margin-left:10px;font-weight:600;color:#ffe066;vertical-align:middle;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
 `;
   popup.style.cssText = `
     position: fixed;
