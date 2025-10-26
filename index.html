@@ -10426,23 +10426,39 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
         }
       });
     });
-	// zonepopup 
+// zonepopup 
 getUserCountryInfo().then(userCountryInfo => {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
 
+  // Try to find user's country among active nodes/dots
   const userZoneDot = dots.find(dot => {
     let zoneName = typeof dot.zone === 'object' ? dot.zone.zone : dot.zone;
     return zoneName === userCountryInfo.country;
   });
 
+  const canvasRect = canvas.getBoundingClientRect();
+
   if (userZoneDot) {
-    const canvasRect = canvas.getBoundingClientRect();
+    // Show normal popup (with count)
     showZonePopup(
       typeof userZoneDot.zone === 'object' ? userZoneDot.zone : { zone: userZoneDot.zone, count: userZoneDot.count },
       userZoneDot.x + canvasRect.left,
       userZoneDot.y + canvasRect.top
     );
+  } else {
+    // Show minimal popup at default flag location (center or calculated)
+    // Option 1: Center of canvas
+    const centerX = canvasRect.left + canvas.width / 2;
+    const centerY = canvasRect.top + canvas.height / 2;
+
+    // Option 2: Calculate flag position using restcountries lat/lng
+    // (if you want, but center is simplest fallback)
+
+    // Create a minimal zone object
+    const minimalZone = { zone: userCountryInfo.country, count: null };
+
+    showZonePopup(minimalZone, centerX, centerY);
   }
 });
   });
@@ -10592,13 +10608,14 @@ async function showZonePopup(zone, x, y) {
   let countText = `${zone.count}`;
 
   // Popup HTML
-  const popup = document.createElement('div');
-  popup.innerHTML = ` 
-    <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-    <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-    <span style="display:inline-block;vertical-align:middle;">${countText}</span>
-    ${totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
-  `;
+const popup = document.createElement('div');
+let showCount = zone.count !== null && zone.count !== undefined && zone.count > 0;
+popup.innerHTML = ` 
+  <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
+  <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
+  ${showCount ? `<span style="display:inline-block;vertical-align:middle;">${countText}</span>` : ''}
+  ${showCount && totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
+`;
   popup.style.cssText = `
     position: fixed;
     left: ${x}px; top: ${y}px;
