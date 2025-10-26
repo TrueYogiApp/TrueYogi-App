@@ -10427,10 +10427,9 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
       });
     });
 	// zonepopup 
-		getUserCountryInfo().then(userCountryInfo => {
+getUserCountryInfo().then(userCountryInfo => {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
-  if (!isUserActive) return;
 
   const userZoneDot = dots.find(dot => {
     let zoneName = typeof dot.zone === 'object' ? dot.zone.zone : dot.zone;
@@ -10438,7 +10437,7 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
   });
 
   if (userZoneDot) {
-  const canvasRect = canvas.getBoundingClientRect();
+    const canvasRect = canvas.getBoundingClientRect();
     showZonePopup(
       typeof userZoneDot.zone === 'object' ? userZoneDot.zone : { zone: userZoneDot.zone, count: userZoneDot.count },
       userZoneDot.x + canvasRect.left,
