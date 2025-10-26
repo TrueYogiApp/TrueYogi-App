@@ -3246,12 +3246,15 @@ patchiness */
     </div>
   </div>
   
-  <div id="lang-switch-container">
+<div id="lang-switch-container">
   <i class="fas fa-globe-asia"></i>
   <select id="lang-switch" onchange="setLanguage(this.value)" aria-label="Select language">
-    <option value="en">EN</option>
-    <option value="te">TE</option>
-	<option value="fr">FR</option>
+    <option value="en" data-fullname="English">EN</option>
+    <option value="te" data-fullname="Telugu">TE</option>
+    <option value="hi" data-fullname="Hindi">HI</option>
+    <option value="es" data-fullname="Spanish">ES</option>
+    <option value="fr" data-fullname="French">FR</option>
+    <option value="de" data-fullname="German">DE</option>
   </select>
 </div>
 
@@ -10648,6 +10651,42 @@ function closeEarthGrid() {
     setTimeout(() => container.style.display = 'none', 1000);
   }
 }
+
+// Add this to your existing JavaScript
+document.addEventListener('DOMContentLoaded', function() {
+  const langSwitch = document.getElementById('lang-switch');
+  
+  // Store original options with full names
+  const languageMap = {
+    'en': 'English',
+    'te': 'Telugu', 
+    'hi': 'Hindi',
+    'es': 'Spanish',
+    'fr': 'French',
+    'de': 'German'
+  };
+  
+  // Show full names when dropdown opens
+  langSwitch.addEventListener('mousedown', function() {
+    Array.from(this.options).forEach(option => {
+      option.textContent = languageMap[option.value];
+    });
+  });
+  
+  // Revert to codes when selection is made or dropdown closes
+  langSwitch.addEventListener('change', function() {
+    Array.from(this.options).forEach(option => {
+      option.textContent = option.value.toUpperCase();
+    });
+  });
+  
+  // Also revert if user clicks away without selecting
+  langSwitch.addEventListener('blur', function() {
+    Array.from(this.options).forEach(option => {
+      option.textContent = option.value.toUpperCase();
+    });
+  });
+});
 
   </script>
 	

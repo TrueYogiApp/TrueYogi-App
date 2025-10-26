@@ -48,15 +48,27 @@ const APP_FILES = [
   '/assets/welcomeMessages.en.json',
   '/assets/welcomeMessages.te.json',
   '/assets/welcomeMessages.fr.json',
+  '/assets/welcomeMessages.hi.json',
+  '/assets/welcomeMessages.es.json',
+  '/assets/welcomeMessages.de.json',
   '/locales/en.json',
   '/locales/te.json',
-  '/locales/fr.json',      
+  '/locales/fr.json',  
+  '/locales/hi.json',
+  '/locales/es.json',
+  '/locales/de.json',   
   '/assets/quotes.en.json',
   '/assets/quotes.te.json',
   '/assets/quotes.fr.json',
+  '/assets/quotes.hi.json',
+  '/assets/quotes.es.json',
+  '/assets/quotes.de.json',
   '/assets/wisdom.en.json',
   '/assets/wisdom.te.json',
-  '/assets/wisdom.fr.json'
+  '/assets/wisdom.fr.json',
+  '/assets/wisdom.hi.json',
+  '/assets/wisdom.es.json',
+  '/assets/wisdom.de.json'  
 ];
 
 // Helper: sequentially cache audio files
