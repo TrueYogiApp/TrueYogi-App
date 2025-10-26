@@ -10619,9 +10619,9 @@ popup.innerHTML = `
           display:inline-block;
           vertical-align:middle;
           font-weight:800;
-          color:#2c2c2c;                  /* Dark text for contrast */
+          color:#2c2c2c;
           font-size:1.25em;
-          background:#ffd700;              /* Solid yellow background */
+          background:#ffd700;
           border-radius:9px;
           box-shadow:0 0 6px #ffd70099;
           padding:2px 12px;
@@ -10630,24 +10630,40 @@ popup.innerHTML = `
   }
   <span style="margin:0 8px;display:inline-block;vertical-align:middle;">${svgImg}</span>
   <span style="display:inline-block;vertical-align:middle;font-weight:600;">${zone.zone.replace(/_/g, ' ')}</span>
-  ${showCount && totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
+  ${showCount && totalDurationText ? 
+    `<span style="
+        margin-left:12px;
+        font-weight:600;
+        color:#ffe066;
+        vertical-align:middle;
+        font-size:1em;
+        filter:drop-shadow(0 0 4px #ffe066aa);
+        max-width:50vw;
+        word-break:break-word;
+        overflow-wrap:anywhere;
+        display:inline-block;
+      ">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` 
+    : ''
+  }
 `;
-  popup.style.cssText = `
-    position: fixed;
-    left: ${x}px; top: ${y}px;
-    transform: translate(-50%, -120%);
-    background: rgba(0,0,0,0.75);
-    color: #fde68a;
-    font-size: 0.85rem;
-    padding: 6px 10px;
-    border-radius: 6px;
-    box-shadow: 0 0 8px #fde68a66;
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 10000;
-    white-space: nowrap;
-  `;
+popup.style.cssText = `
+  position: fixed;
+  left: ${x}px; top: ${y}px;
+  transform: translate(-50%, -120%);
+  background: rgba(0,0,0,0.75);
+  color: #fde68a;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  box-shadow: 0 0 8px #fde68a66;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 10000;
+  white-space: normal;
+  max-width: 88vw;
+  box-sizing: border-box;
+`;
   document.body.appendChild(popup);
   setTimeout(() => popup.style.opacity = 1, 10);
   setTimeout(() => {
