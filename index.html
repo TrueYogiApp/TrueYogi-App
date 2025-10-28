@@ -10750,6 +10750,9 @@ function showUserListPopup(users, parentPopup, x, y) {
   const oldList = document.getElementById('user-list-popup');
   if (oldList) oldList.remove();
 
+  // Get current user's ID
+  const currentUserId = localStorage.getItem('omUserId');
+
   // Create new popup
   const listPopup = document.createElement('div');
   listPopup.id = 'user-list-popup';
@@ -10770,25 +10773,27 @@ function showUserListPopup(users, parentPopup, x, y) {
     text-align: left;
   `;
 
-if (users.length === 0) {
-  listPopup.innerHTML = "<i>No users found.</i>";
-} else {
-  listPopup.innerHTML = users.map(u => {
-    let duration = "";
-    if (u.joined_at) {
-      const secs = (Date.now() - new Date(u.joined_at)) / 1000;
-      duration = formatDuration(secs);
-    }
-    return `
-      <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
-        <b>ID:</b>
-        <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
-        <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
-        <span style="color:#ffd700;">${duration}</span>
-      </div>
-    `;
-  }).join('');
-}
+  if (users.length === 0) {
+    listPopup.innerHTML = "<i>No users found.</i>";
+  } else {
+    listPopup.innerHTML = users.map(u => {
+      let duration = "";
+      if (u.joined_at) {
+        const secs = (Date.now() - new Date(u.joined_at)) / 1000;
+        duration = formatDuration(secs);
+      }
+      // Bold and highlight current user
+      const isCurrentUser = u.user_id === currentUserId;
+      return `
+        <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+          <b>ID:</b>
+          <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
+          <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
+          <span style="color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${duration}</span>
+        </div>
+      `;
+    }).join('');
+  }
 
   document.body.appendChild(listPopup);
 
