@@ -10321,6 +10321,49 @@ if (!userIdDisplay) {
 const userId = localStorage.getItem('omUserId');
 userIdDisplay.innerHTML = `Grid ID: <span style="font-family:monospace;font-size:1.05em;">${getShortUserId(userId)}</span>`;
 
+userIdDisplay.style.cursor = 'pointer'; // Show it's clickable
+
+userIdDisplay.onclick = function(e) {
+  // Get the user's ID and country
+  const userId = localStorage.getItem('omUserId');
+  const userRow = livePresenceRows.find(row => row.user_id === userId);
+  if (!userRow) return;
+
+  // Get user's country and all users in that country
+  const userCountry = userRow.country;
+  const usersInZone = livePresenceRows.filter(row => row.country === userCountry);
+  const zoneObj = {
+    zone: userCountry,
+    count: usersInZone.length
+  };
+
+  // Get canvas position (for popup placement)
+  const canvas = document.getElementById('earthGrid');
+  const canvasRect = canvas.getBoundingClientRect();
+  // Find the dot for the user's country
+  const dots = window.dots || [];
+  const userDot = dots.find(dot => {
+    let zoneName = typeof dot.zone === 'object' ? dot.zone.zone : dot.zone;
+    return zoneName === userCountry;
+  });
+
+  let popupX, popupY;
+  if (userDot) {
+    popupX = userDot.x + canvasRect.left;
+    popupY = userDot.y + canvasRect.top;
+  } else {
+    // fallback: center of canvas
+    popupX = canvasRect.left + canvas.width / 2;
+    popupY = canvasRect.top + canvas.height / 2;
+  }
+
+  // Show the zone popup at the user's country
+  showZonePopup(zoneObj, popupX, popupY);
+
+  // Show the user list popup immediately after
+  showUserListPopup(usersInZone, null, popupX, popupY);
+};
+
 showCountryStatsOnEarthGrid(); 
 showUserTravelBar();
 
@@ -10618,7 +10661,7 @@ async function showZonePopup(zone, x, y) {
 
   // Set svgClass FIRST!
   let svgClass = '';
-  if (isUserActive && isUsersCountry) {
+  if (isUserActive) {
     svgClass = 'rainbow';
   }
 
