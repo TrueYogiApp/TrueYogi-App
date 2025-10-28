@@ -10733,9 +10733,9 @@ if (u.joined_at) {
 }
 listPopup.innerHTML = `
   <div style="padding:4px 0;">
-    <b>ID:</b> <span style="font-family:monospace;">${getShortUserId(u.user_id)}</span>
+    <b>ID:</b> <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
     <span style="display:inline-block; width:18px;"></span>
-    <b>Duration:</b> <span style="color:#ffd700;">${duration}</span>
+    <b>🕒:</b> <span style="color:#ffd700;">${duration}</span>
   </div>
 `;
   } else {
@@ -10748,9 +10748,9 @@ listPopup.innerHTML = `
 }
       return `
         <div style="border-bottom:1px solid #333;padding:4px 0;">
-          <b>ID:</b> <span style="font-family:monospace;">${getShortUserId(u.user_id)}</span>
+          <b>ID:</b> <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
 		  <span style="display:inline-block; width:18px;"></span>
-          <b>Duration:</b> <span style="color:#ffd700;">${duration}</span>
+          <b>🕒:</b> <span style="color:#ffd700;">${duration}</span>
         </div>
       `;
     }).join('');
