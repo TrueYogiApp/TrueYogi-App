@@ -10112,6 +10112,11 @@ function showFlagPopup(country, event) {
   }, 1700);
 }
 
+function getShortUserId(id) {
+  if (!id || id.length < 6) return id || '';
+  return id.slice(0,3) + '...' + id.slice(-3);
+}
+
 // --- Main renderer (called whenever data changes or grid opens) ---
 function renderEarthGrid() {
   // --- Setup container, canvas, and label ---
@@ -10271,6 +10276,40 @@ if (!globalHeading) {
   `;
   container.appendChild(globalHeading);
 }
+
+// --- After globalHeading is created ---
+let userIdDisplay = document.getElementById('userIdDisplay');
+if (!userIdDisplay) {
+  userIdDisplay = document.createElement('div');
+  userIdDisplay.id = 'userIdDisplay';
+  userIdDisplay.style.cssText = `
+    position: absolute;
+    top: 8.2%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.98rem;
+    letter-spacing: 2px;
+    color: #ffd700;
+    opacity: 0.93;
+    text-shadow: 0 0 5px #ffd70055;
+    background: linear-gradient(90deg,#232526 0%, #ffd70022 100%);
+    border-radius: 16px;
+    padding: 4px 16px;
+    border: 1px solid #ffd70022;
+    z-index: 10001;
+    font-weight: 600;
+    margin-top: 4px;
+    box-shadow: 0 0 6px #ffd70033;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+  `;
+  container.appendChild(userIdDisplay);
+}
+
+// --- Set the text ---
+const userId = localStorage.getItem('omUserId');
+userIdDisplay.innerHTML = `Grid ID: <span style="font-family:monospace;font-size:1.05em;">${getShortUserId(userId)}</span>`;
 
 showCountryStatsOnEarthGrid(); 
 showUserTravelBar();
@@ -10630,18 +10669,99 @@ ${showCount
     padding: 6px 10px;
     border-radius: 6px;
     box-shadow: 0 0 8px #fde68a66;
-    pointer-events: none;
+    pointer-events: auto;
     opacity: 0;
     transition: opacity 0.4s ease;
     z-index: 10000;
     white-space: nowrap;
   `;
   document.body.appendChild(popup);
+  
+  // Attach event to SVG icon in popup
+const svgIcon = popup.querySelector('#omusers-svg');
+if (svgIcon) {
+  svgIcon.style.cursor = "pointer";
+  svgIcon.onpointerenter = function(e) {
+    showUserListPopup(usersInZone, popup, x, y);
+  };
+  svgIcon.onclick = function(e) {
+    showUserListPopup(usersInZone, popup, x, y);
+  };
+}
+
   setTimeout(() => popup.style.opacity = 1, 10);
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 900);
   }, 9000);
+}
+
+function showUserListPopup(users, parentPopup, x, y) {
+  // Remove any old user list popup
+  const oldList = document.getElementById('user-list-popup');
+  if (oldList) oldList.remove();
+
+  // Create new popup
+  const listPopup = document.createElement('div');
+  listPopup.id = 'user-list-popup';
+  listPopup.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y+32}px;
+    transform: translate(-50%, 0);
+    background: rgba(0,0,0,0.97);
+    color: #fde68a;
+    font-size: 0.96rem;
+    padding: 9px 18px;
+    border-radius: 10px;
+    box-shadow: 0 0 14px #fde68a66;
+    z-index: 10001;
+    min-width: 160px;
+    max-height: 320px;
+    overflow-y: auto;
+    text-align: left;
+  `;
+
+  if (users.length === 0) {
+    listPopup.innerHTML = "<i>No users found.</i>";
+  } else if (users.length === 1) {
+    // Just show single user's info
+    const u = users[0];
+let duration = "";
+if (u.joined_at) {
+  const secs = (Date.now() - new Date(u.joined_at)) / 1000;
+  duration = formatDuration(secs);
+}
+listPopup.innerHTML = `
+  <div style="padding:4px 0;">
+    <b>ID:</b> <span style="font-family:monospace;">${getShortUserId(u.user_id)}</span>
+    <span style="display:inline-block; width:18px;"></span>
+    <b>Duration:</b> <span style="color:#ffd700;">${duration}</span>
+  </div>
+`;
+  } else {
+    // List all users (shortened ID and duration)
+    listPopup.innerHTML = users.map(u => {
+      let duration = "";
+      if (u.joined_at) {
+  const secs = (Date.now() - new Date(u.joined_at)) / 1000;
+  duration = formatDuration(secs);
+}
+      return `
+        <div style="border-bottom:1px solid #333;padding:4px 0;">
+          <b>ID:</b> <span style="font-family:monospace;">${getShortUserId(u.user_id)}</span>
+		  <span style="display:inline-block; width:18px;"></span>
+          <b>Duration:</b> <span style="color:#ffd700;">${duration}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.body.appendChild(listPopup);
+
+  // Optional: Remove on mouse leave
+  listPopup.onmouseleave = () => listPopup.remove();
+  // Or remove after a timeout
+ // setTimeout(() => { listPopup.remove(); }, 9000);
 }
 
 function closeEarthGrid() {
