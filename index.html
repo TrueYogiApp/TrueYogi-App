@@ -1864,6 +1864,16 @@ patchiness */
   100% { filter: hue-rotate(360deg) saturate(2.5) brightness(1.4) drop-shadow(0 0 6px #fff2);}
 }
 
+.chakra-rotate {
+  animation: chakraSpin 6.2s linear infinite;
+  /* You can adjust duration for faster/slower spin */
+}
+
+@keyframes chakraSpin {
+  0% { transform: rotate(0deg);}
+  100% { transform: rotate(360deg);}
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -10648,7 +10658,7 @@ popup.innerHTML = `
     ${
       showCount && totalDurationText
       ? `<span style="font-weight:600;color:#ffe066;display: flex; align-items: center;">
-           <img src="/assets/clockchakra.svg" style="width:13px; height:13px; margin-right:5px;">
+           <img src="/assets/clockchakra.svg" class="chakra-rotate" style="width:18px; height:18px; margin-right:5px;">
            ${totalDurationText.replace(/[()]/g, '')}
          </span>`
       : ''
