@@ -10145,7 +10145,7 @@ let closeBtn = document.getElementById('gridCloseBtn');
 if (!closeBtn) {
   closeBtn = document.createElement('button');
   closeBtn.id = 'gridCloseBtn';
-  closeBtn.innerHTML = `<img src="/assets/gridclose1.svg" alt="Close" style="width:18px;height:18px;display:block;">`;
+  closeBtn.innerHTML = `<img src="/assets/gridclose.svg" alt="Close" style="width:18px;height:18px;display:block;">`;
   closeBtn.style.cssText = `
   position: absolute;
   bottom: 3%;
@@ -10732,28 +10732,30 @@ if (u.joined_at) {
   duration = formatDuration(secs);
 }
 listPopup.innerHTML = `
-  <div style="padding:4px 0;">
-    <b>ID:</b> <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
-    <span style="display:inline-block; width:1px;"></span>
-    <b>🕒:</b> <span style="color:#ffd700;">${duration}</span>
+  <div style="padding:4px 0; display: flex; align-items: center; gap: 14px;">
+    <b>ID:</b>
+    <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
+    <img src="assets/clock.svg" style="width:20px; height:20px; vertical-align:middle;">
+    <span style="color:#ffd700;">${duration}</span>
   </div>
 `;
   } else {
     // List all users (shortened ID and duration)
-    listPopup.innerHTML = users.map(u => {
-      let duration = "";
-      if (u.joined_at) {
-  const secs = (Date.now() - new Date(u.joined_at)) / 1000;
-  duration = formatDuration(secs);
-}
-      return `
-        <div style="border-bottom:1px solid #333;padding:4px 0;">
-          <b>ID:</b> <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
-		  <span style="display:inline-block; width:1px;"></span>
-          <b>🕒:</b> <span style="color:#ffd700;">${duration}</span>
-        </div>
-      `;
-    }).join('');
+listPopup.innerHTML = users.map(u => {
+  let duration = "";
+  if (u.joined_at) {
+    const secs = (Date.now() - new Date(u.joined_at)) / 1000;
+    duration = formatDuration(secs);
+  }
+  return `
+    <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
+      <b>ID:</b>
+      <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
+      <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
+      <span style="color:#ffd700;">${duration}</span>
+    </div>
+  `;
+}).join('');
   }
 
   document.body.appendChild(listPopup);
