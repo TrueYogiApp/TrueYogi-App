@@ -10145,7 +10145,7 @@ let closeBtn = document.getElementById('gridCloseBtn');
 if (!closeBtn) {
   closeBtn = document.createElement('button');
   closeBtn.id = 'gridCloseBtn';
-  closeBtn.innerHTML = `<img src="/assets/gridclose.svg" alt="Close" style="width:18px;height:18px;display:block;">`;
+  closeBtn.innerHTML = `<img src="/assets/gridclose1.svg" alt="Close" style="width:18px;height:18px;display:block;">`;
   closeBtn.style.cssText = `
   position: absolute;
   bottom: 3%;
@@ -10590,27 +10590,6 @@ function togglePowerNodesGlow() {
   setTimeout(() => closeEarthGrid(), 300000);
 }
 
-function formatPopupDuration(joined_at, last_heartbeat) {
-  if (!joined_at || !last_heartbeat) return '';
-  const start = new Date(joined_at);
-  const end = new Date(last_heartbeat);
-  if (isNaN(start.getTime()) || isNaN(end.getTime())) return '';
-  const seconds = (end - start) / 1000;
-  if (seconds < 1800) return '';
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  if (hrs > 0) return ` (${hrs} hr${hrs > 1 ? 's' : ''}${mins > 0 ? ' ' + mins + ' min' : ''})`;
-  return ` (${mins} min)`;
-}
-
-function formatTotalDuration(seconds) {
-  if (!seconds || seconds < 1800) return '';
-  const hrs = Math.floor(seconds / 3600);
-  const mins = Math.floor((seconds % 3600) / 60);
-  if (hrs > 0) return ` (${hrs} hr${hrs > 1 ? 's' : ''}${mins > 0 ? ' ' + mins + ' min' : ''})`;
-  return ` (${mins} min)`;
-}
-
 async function showZonePopup(zone, x, y) {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
@@ -10632,16 +10611,16 @@ async function showZonePopup(zone, x, y) {
   let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
 
   // Calculate total duration for all users in this zone
-  let totalSeconds = usersInZone.reduce((sum, u) => {
-    if (u.joined_at && u.last_heartbeat) {
-      const start = new Date(u.joined_at);
-      const end = new Date(u.last_heartbeat);
-      if (!isNaN(start.getTime()) && !isNaN(end.getTime())) {
-        return sum + ((end - start) / 1000);
-      }
+let totalSeconds = usersInZone.reduce((sum, u) => {
+  if (u.joined_at) {
+    const start = new Date(u.joined_at);
+    const end = Date.now(); // current time in ms
+    if (!isNaN(start.getTime())) {
+      return sum + ((end - start.getTime()) / 1000);
     }
-    return sum;
-  }, 0);
+  }
+  return sum;
+}, 0);
   const totalDurationText = formatTotalDuration(totalSeconds);
 
   // Always show total count
@@ -10650,14 +10629,23 @@ async function showZonePopup(zone, x, y) {
   // Popup HTML
 const popup = document.createElement('div');
 let showCount = zone.count !== null && zone.count !== undefined && zone.count > 0;
-popup.innerHTML = ` 
-${showCount 
-  ? `<span style="display:inline-block;vertical-align:middle;">${countText}</span><span style="display:inline-block;width:4px;"></span>`
-  : ''
-}
-  <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-  <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-  ${showCount && totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;"><img src="/assets/clock.svg" style="width:18px; height:18px; vertical-align:middle; margin-right:5px;">${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
+popup.innerHTML = `
+  <div style="display: flex; align-items: center; gap: 12px;">
+    ${showCount 
+      ? `<span>${countText}</span>` 
+      : ''
+    }
+    <span>${svgImg}</span>
+    <span>${zone.zone.replace(/_/g, ' ')}</span>
+    ${
+      showCount && totalDurationText
+      ? `<span style="font-weight:600;color:#ffe066;display: flex; align-items: center;">
+           <img src="/assets/clockchakra.svg" style="width:13px; height:13px; margin-right:5px;">
+           ${totalDurationText.replace(/[()]/g, '')}
+         </span>`
+      : ''
+    }
+  </div>
 `;
   popup.style.cssText = `
     position: fixed;
@@ -10735,7 +10723,7 @@ listPopup.innerHTML = `
   <div style="padding:4px 0; display: flex; align-items: center; gap: 14px;">
     <b>ID:</b>
     <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
-    <img src="assets/clock2.svg" style="width:24px; height:24px; vertical-align:middle;">
+    <img src="assets/clock.svg" style="width:24px; height:24px; vertical-align:middle;">
     <span style="color:#ffd700;">${duration}</span>
   </div>
 `;
@@ -10751,7 +10739,7 @@ listPopup.innerHTML = users.map(u => {
     <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
       <b>ID:</b>
       <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
-      <img src="assets/clock2.svg" style="width:24px; height:24px; vertical-align:middle;">
+      <img src="assets/clock.svg" style="width:24px; height:24px; vertical-align:middle;">
       <span style="color:#ffd700;">${duration}</span>
     </div>
   `;
@@ -10761,7 +10749,7 @@ listPopup.innerHTML = users.map(u => {
   document.body.appendChild(listPopup);
 
   // Optional: Remove on mouse leave
-  listPopup.onmouseleave = () => listPopup.remove();
+  //listPopup.onmouseleave = () => listPopup.remove();
   // Or remove after a timeout
   setTimeout(() => { listPopup.remove(); }, 12000);
 }
