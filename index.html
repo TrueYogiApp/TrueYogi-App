@@ -10590,6 +10590,14 @@ function togglePowerNodesGlow() {
   setTimeout(() => closeEarthGrid(), 300000);
 }
 
+function formatTotalDuration(seconds) {
+  if (!seconds) return '0 mins';
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hrs > 0) return `${hrs} hr${hrs > 1 ? 's' : ''} ${mins} min${mins !== 1 ? 's' : ''}`;
+  return `${mins} min${mins !== 1 ? 's' : ''}`;
+}
+
 async function showZonePopup(zone, x, y) {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
