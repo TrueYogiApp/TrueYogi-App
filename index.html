@@ -10656,8 +10656,8 @@ ${showCount
   : ''
 }
   <span style="margin:0 6px;display:inline-block;vertical-align:middle;">${svgImg}</span>
-<span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
-  ${showCount && totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;">🕒 ${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
+  <span style="display:inline-block;vertical-align:middle;">${zone.zone.replace(/_/g, ' ')}</span>
+  ${showCount && totalDurationText ? `<span style="margin-left:8px;font-weight:600;color:#ffe066;"><img src="/assets/clock.svg" style="width:18px; height:18px; vertical-align:middle; margin-right:5px;">${totalDurationText.replace(/[()]/g, '')}</span>` : ''}
 `;
   popup.style.cssText = `
     position: fixed;
@@ -10735,7 +10735,7 @@ listPopup.innerHTML = `
   <div style="padding:4px 0; display: flex; align-items: center; gap: 14px;">
     <b>ID:</b>
     <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
-    <img src="assets/clock.svg" style="width:20px; height:20px; vertical-align:middle;">
+    <img src="assets/clock2.svg" style="width:24px; height:24px; vertical-align:middle;">
     <span style="color:#ffd700;">${duration}</span>
   </div>
 `;
@@ -10751,7 +10751,7 @@ listPopup.innerHTML = users.map(u => {
     <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
       <b>ID:</b>
       <span style="font-family:monospace; color:#ffd700;">${getShortUserId(u.user_id)}</span>
-      <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
+      <img src="assets/clock2.svg" style="width:24px; height:24px; vertical-align:middle;">
       <span style="color:#ffd700;">${duration}</span>
     </div>
   `;
