@@ -10081,8 +10081,8 @@ function showFlagPopup(country, event) {
   const old = document.getElementById('flag-popup');
   if (old) old.remove();
 
-  // Get event position (for touch or mouse)
-  let x = window.innerWidth / 2, y = 80; // Default to top center
+  // Get event position
+  let x = window.innerWidth / 2, y = 80;
   if (event && event.touches && event.touches.length > 0) {
     x = event.touches[0].clientX;
     y = event.touches[0].clientY;
@@ -10107,7 +10107,7 @@ function showFlagPopup(country, event) {
     border-radius: 18px;
     z-index: 10003;
     box-shadow: 0 0 12px #fde68acc;
-    pointer-events: none;
+    pointer-events: auto; // Make sure it's clickable
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.16s;
@@ -10115,11 +10115,90 @@ function showFlagPopup(country, event) {
   document.body.appendChild(popup);
   setTimeout(() => popup.style.opacity = 1, 10);
 
-  // Remove after 1.7s
+popup.style.pointerEvents = 'auto'; // Make sure popup can be clicked
+
+
+  // --- ADD: Tap/click handler to show user list popup ---
+  popup.onclick = function(ev) {
+    showCountryUserListPopup(country, x, y);
+  };
+  popup.ontouchstart = function(ev) {
+    showCountryUserListPopup(country, x, y);
+  };
+
+  // Remove after 6s (instead of 1.7s)
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 350);
-  }, 1700);
+  }, 6000);
+}
+
+async function showCountryUserListPopup(country, x, y) {
+  // Remove any old user list popup
+  const oldList = document.getElementById('country-user-list-popup');
+  if (oldList) oldList.remove();
+
+  // Fetch all sessions for the country
+  let { data, error } = await supabase
+    .from('om_sessions')
+    .select('user_id, country, duration_seconds')
+    .eq('country', country);
+
+  if (error || !data) {
+    // fallback: show error
+    const listPopup = document.createElement('div');
+    listPopup.id = 'country-user-list-popup';
+    listPopup.innerHTML = "<i>Could not load user data.</i>";
+    document.body.appendChild(listPopup);
+    setTimeout(() => { listPopup.remove(); }, 9000);
+    return;
+  }
+
+  // Group and sum durations by user
+  const userDurations = {};
+  data.forEach(row => {
+    if (!row.user_id) return;
+    userDurations[row.user_id] = (userDurations[row.user_id] || 0) + (row.duration_seconds || 0);
+  });
+
+  // Prepare popup
+  const listPopup = document.createElement('div');
+  listPopup.id = 'country-user-list-popup';
+  listPopup.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y + 32}px;
+    transform: translate(-50%, 0);
+    background: rgba(0,0,0,0.97);
+    color: #fde68a;
+    font-size: 0.96rem;
+    padding: 9px 18px;
+    border-radius: 10px;
+    box-shadow: 0 0 14px #fde68a66;
+    z-index: 10004;
+    min-width: 160px;
+    max-height: 320px;
+    overflow-y: auto;
+    text-align: left;
+  `;
+
+  const userIds = Object.keys(userDurations);
+  if (userIds.length === 0) {
+    listPopup.innerHTML = "<i>No users found for this country.</i>";
+  } else {
+    listPopup.innerHTML = userIds.map(id => {
+      return `
+        <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
+          <b>ID:</b>
+          <span style="font-family:monospace; color:#ffd700;">${getShortUserId(id)}</span>
+          <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
+          <span style="color:#ffd700;">${formatDuration(userDurations[id])}</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  document.body.appendChild(listPopup);
+  setTimeout(() => { listPopup.remove(); }, 12000);
 }
 
 function getShortUserId(id) {
