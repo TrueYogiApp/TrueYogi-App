@@ -9835,7 +9835,6 @@ function formatDuration(seconds) {
   return `${mins} min${mins !== 1 ? 's' : ''}`;
 }
 
-
 async function showCountryStatsOnEarthGrid() {
   const stats = await fetchCountryStats();
   const statsLabel = document.getElementById('gridStatsLabel');
@@ -9849,7 +9848,7 @@ async function showCountryStatsOnEarthGrid() {
     const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
     return `
       <span class="scroll-flag" data-country="${stat.country}" style="display:inline-flex;align-items:center;margin:0 15px;">
-        <img src="https://flagcdn.com/w40/${code}.png"
+       <img src="https://flagcdn.com/w40/${code}.png"
            style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
         <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
           ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} · ${formatDuration(stat.total_seconds)}
@@ -9861,14 +9860,14 @@ async function showCountryStatsOnEarthGrid() {
   statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
 
   // Attach popup handlers for desktop and mobile **AFTER** innerHTML set
-  statsLabel.querySelectorAll('.scroll-flag').forEach(el => {
-    el.onclick = function(e) {
-      showFlagPopup(el.getAttribute('data-country'), e);
-    };
-    el.ontouchstart = function(e) {
-      showFlagPopup(el.getAttribute('data-country'), e);
-    };
-  });
+statsLabel.querySelectorAll('.scroll-flag').forEach(el => {
+  el.onclick = function(e) {
+    showFlagPopup(el.getAttribute('data-country'), e, true);
+  };
+  el.ontouchstart = function(e) {
+    showFlagPopup(el.getAttribute('data-country'), e, true);
+  };
+});
 
   // Add CSS for scrolling animation (only once)
   if (!document.getElementById('country-scroll-ticker-style')) {
@@ -10018,14 +10017,14 @@ if (stats.length === 0) {
   `;
 
   // Optional: attach popup for country name (if you want)
-  bar.querySelectorAll('.user-scroll-flag').forEach(el => {
-    el.onclick = function(e) {
-      showFlagPopup(el.getAttribute('data-country'), e);
-    };
-    el.ontouchstart = function(e) {
-      showFlagPopup(el.getAttribute('data-country'), e);
-    };
-  });
+bar.querySelectorAll('.user-scroll-flag').forEach(el => {
+  el.onclick = function(e) {
+    showFlagPopup(el.getAttribute('data-country'), e, false);
+  };
+  el.ontouchstart = function(e) {
+    showFlagPopup(el.getAttribute('data-country'), e, false);
+  };
+});
 
   return;
 }
@@ -10076,7 +10075,7 @@ if (stats.length === 0) {
   }
 }
 
-function showFlagPopup(country, event) {
+function showFlagPopup(country, event, allowUserList = false) {
   // Remove any existing popup
   const old = document.getElementById('flag-popup');
   if (old) old.remove();
@@ -10119,12 +10118,14 @@ popup.style.pointerEvents = 'auto'; // Make sure popup can be clicked
 
 
   // --- ADD: Tap/click handler to show user list popup ---
-  popup.onclick = function(ev) {
-    showCountryUserListPopup(country, x, y);
-  };
-  popup.ontouchstart = function(ev) {
-    showCountryUserListPopup(country, x, y);
-  };
+  if (allowUserList) {
+    popup.onclick = function(ev) {
+      showCountryUserListPopup(country, x, y);
+    };
+    popup.ontouchstart = function(ev) {
+      showCountryUserListPopup(country, x, y);
+    };
+  }
 
   // Remove after 6s (instead of 1.7s)
   setTimeout(() => {
