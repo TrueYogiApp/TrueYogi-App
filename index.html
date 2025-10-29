@@ -9849,8 +9849,8 @@ async function showCountryStatsOnEarthGrid() {
     const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
     return `
       <span class="scroll-flag" data-country="${stat.country}" style="display:inline-flex;align-items:center;margin:0 15px;">
-        <img src="https://flagcdn.com/w20/${code}.png"
-             style="width:25px;height:18px;border-radius:2px;box-shadow:0 0 2px #000;">
+        <img src="https://flagcdn.com/w40/${code}.png"
+           style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
         <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
           ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} · ${formatDuration(stat.total_seconds)}
         </span>
