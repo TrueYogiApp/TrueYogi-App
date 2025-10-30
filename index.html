@@ -10182,42 +10182,19 @@ async function showCountryUserListPopup(country, x, y) {
     text-align: left;
   `;
   
-  const userIds = Object.keys(userDurations);
+const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
+const currentUserId = localStorage.getItem('omUserId');
+
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No users found for this country.</i>";
 } else {
-  // Get current user ID for comparison
-  const currentUserId = localStorage.getItem('omUserId');
-  
   listPopup.innerHTML = userIds.map(id => {
-    const isCurrentUser = (id === currentUserId);
-    
+    const isCurrentUser = id === currentUserId;
     return `
-      <div style="
-        border-bottom: 1px solid ${isCurrentUser ? '#fde68a55' : '#333'};
-        padding: 6px 0;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        ${isCurrentUser ? 'background: rgba(253, 230, 138, 0.1); border-radius: 6px; padding: 6px 8px; margin: 2px 0;' : ''}
-      ">
-        <span style="
-          font-family: monospace; 
-          color: ${isCurrentUser ? '#fff' : '#ffd700'};
-          font-weight: ${isCurrentUser ? 'bold' : 'normal'};
-          ${isCurrentUser ? 'text-shadow: 0 0 8px #fde68a;' : ''}
-        ">${getShortUserId(id)} ${isCurrentUser ? '' : ''}</span>
-        <img src="assets/clock.svg" style="
-          width: 18px; 
-          height: 18px; 
-          vertical-align: middle;
-          ${isCurrentUser ? 'filter: brightness(1.5);' : ''}
-        ">
-        <span style="
-          color: ${isCurrentUser ? '#fff' : '#ffd700'};
-          font-weight: ${isCurrentUser ? 'bold' : 'normal'};
-          ${isCurrentUser ? 'text-shadow: 0 0 6px #fde68a;' : ''}
-        ">${formatDuration(userDurations[id])}</span>
+      <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+        <span style="font-family:monospace; color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">${getShortUserId(id)}</span>
+        <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
+        <span style="color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">${formatDuration(userDurations[id])}</span>
       </div>
     `;
   }).join('');
