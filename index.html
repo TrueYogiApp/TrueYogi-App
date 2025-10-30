@@ -10181,14 +10181,13 @@ async function showCountryUserListPopup(country, x, y) {
     overflow-y: auto;
     text-align: left;
   `;
-
+  const isCurrentUser = u.user_id === currentUserId;
   const userIds = Object.keys(userDurations);
   if (userIds.length === 0) {
     listPopup.innerHTML = "<i>No users found for this country.</i>";
   } else {
     listPopup.innerHTML = userIds.map(id => {
       // Bold and highlight current user
-      const isCurrentUser = u.user_id === currentUserId;
       return `
         <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
           <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
