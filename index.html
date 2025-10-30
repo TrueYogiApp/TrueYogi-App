@@ -10187,10 +10187,11 @@ async function showCountryUserListPopup(country, x, y) {
     listPopup.innerHTML = "<i>No users found for this country.</i>";
   } else {
     listPopup.innerHTML = userIds.map(id => {
+      // Bold and highlight current user
+      const isCurrentUser = u.user_id === currentUserId;
       return `
         <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
-          <b>ID:</b>
-          <span style="font-family:monospace; color:#ffd700;">${getShortUserId(id)}</span>
+          <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
           <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
           <span style="color:#ffd700;">${formatDuration(userDurations[id])}</span>
         </div>
