@@ -10181,7 +10181,7 @@ async function showCountryUserListPopup(country, x, y) {
     overflow-y: auto;
     text-align: left;
   `;
-  const isCurrentUser = u.user_id === currentUserId;
+  
   const userIds = Object.keys(userDurations);
   if (userIds.length === 0) {
     listPopup.innerHTML = "<i>No users found for this country.</i>";
@@ -10190,7 +10190,7 @@ async function showCountryUserListPopup(country, x, y) {
       // Bold and highlight current user
       return `
         <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;">
-          <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
+          <span style="font-family:monospace; color:#ffd700;">${getShortUserId(id)}</span>
           <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
           <span style="color:#ffd700;">${formatDuration(userDurations[id])}</span>
         </div>
