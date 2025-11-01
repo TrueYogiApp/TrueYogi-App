@@ -10428,9 +10428,9 @@ const isConnected = livePresenceRows.some(row => row.user_id === userrId);
 if (isConnected) {
   const soulCount = livePresenceRows.length;
   if (soulCount <= 1) {
-    resonanceMsg.textContent = "You are Meditating";
+    resonanceMsg.textContent = "Meditate • Be with your breath • Be present";
   } else {
-    resonanceMsg.textContent = `You are Meditating with ${soulCount - 1} ${soulCount - 1 === 1 ? "other" : "others"}`;
+    resonanceMsg.textContent = `Meditate • Be with your breath • Be present`;
   }
   resonanceMsg.style.display = ""; // Show
 } else {
