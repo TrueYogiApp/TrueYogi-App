@@ -5681,14 +5681,6 @@ challengeData = {
     list.appendChild(badge);
   });
 
-  // FIX: Only show Missed Session modal if NOT all today's sessions are completed
-  if (
-    hasMissedSession &&
-    currentMode === 'yogi' &&
-    todayCompleted < challengeData.requiredSessions
-  ) {
-    showMissedSessionModal();
-  }
 }
 
     function formatTime(time) {
