@@ -1874,6 +1874,20 @@ patchiness */
   100% { transform: rotate(360deg);}
 }
 
+/* Resonance message aura classes */
+#resonanceMsg.red         { color: #FF1A1A; text-shadow: 0 0 16px #FF1A1A99; }
+#resonanceMsg.orange      { color: #FF8800; text-shadow: 0 0 16px #FF880099; }
+#resonanceMsg.yellow      { color: #FFD600; text-shadow: 0 0 16px #FFD60099; }
+#resonanceMsg.green       { color: #29D884; text-shadow: 0 0 16px #29D88499; }
+#resonanceMsg.blue        { color: #3B82F6; text-shadow: 0 0 16px #3B82F6EE; }
+#resonanceMsg.indigo      { color: #4338CA; text-shadow: 0 0 16px #4338CAEE; }
+#resonanceMsg.violet      { color: #C026D3; text-shadow: 0 0 16px #C026D3EE; }
+#resonanceMsg.gold        { color: #FFD700; text-shadow: 0 0 16px #FFD700DD; }
+#resonanceMsg.silver      { color: #BFC9CA; text-shadow: 0 0 16px #BFC9CA99; }
+#resonanceMsg.sapphire    { color: #1a4fcc; text-shadow: 0 0 16px #1a4fccee; }
+#resonanceMsg.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
+#resonanceMsg.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -9217,25 +9231,27 @@ function getAuraIndex() {
 }
 
 function setAuraColor() {
-  // Card aura
-  const card = document.querySelector('.card-aura');
-  // OM counter
-  const omCounter = document.getElementById('om-counter');
-  if (!omCounter) return;
-
   const auraClass = auraColors[getAuraIndex()];
-  // Remove old classes from OM counter
-  auraColors.forEach(c => omCounter.classList.remove(c));
-  omCounter.classList.add(auraClass);
 
-  // For the card, keep your existing logic.
-  if (card) {
-    auraColors.forEach(c => card.classList.remove(c));
-    card.classList.add(auraClass);
-  }
+  // Elements to update
+  const card = document.querySelector('.card-aura');
+  const omCounter = document.getElementById('om-counter');
+  const resonanceMsg = document.getElementById('resonanceMsg');
+
+  // Remove old aura classes from all
+  auraColors.forEach(c => {
+    if (card) card.classList.remove(c);
+    if (omCounter) omCounter.classList.remove(c);
+    if (resonanceMsg) resonanceMsg.classList.remove(c);
+  });
+
+  // Add new aura class
+  if (card) card.classList.add(auraClass);
+  if (omCounter) omCounter.classList.add(auraClass);
+  if (resonanceMsg) resonanceMsg.classList.add(auraClass);
 }
 
-// Run once and then every minute
+// Run once and then every minute (or every second for animation)
 setAuraColor();
 setInterval(setAuraColor, 1000);
 
@@ -10362,7 +10378,67 @@ if (!globalHeading) {
   container.appendChild(globalHeading);
 }
 
-// --- After globalHeading is created ---
+// --- Motivational scroll/message below Global Resonance Field ---
+let resonanceMsg = document.getElementById('resonanceMsg');
+if (!resonanceMsg) {
+  resonanceMsg = document.createElement('div');
+  resonanceMsg.id = 'resonanceMsg';
+  resonanceMsg.style.cssText = `
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    opacity: 0.98;
+    padding: 16px 32px;
+    white-space: nowrap;
+    z-index: 10001;
+    width: max-content;
+    max-width: calc(100vw - 32px);
+    margin-top: 8px;
+    margin-bottom: 8px;
+    overflow: hidden;
+    animation: scrollMsg 18s linear infinite;
+  `;
+  container.appendChild(resonanceMsg);
+
+  // Optional: Add a smooth scrolling effect
+  if (!document.getElementById('scrollMsgStyle')) {
+    const style = document.createElement('style');
+    style.id = 'scrollMsgStyle';
+    style.textContent = `
+      @keyframes scrollMsg {
+        0% { letter-spacing: 2px; }
+        50% { letter-spacing: 6px; }
+        100% { letter-spacing: 2px; }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  setAuraColor(); 
+}
+
+// --- Calculate how many are present ---
+const userrId = localStorage.getItem('omUserId');
+const isConnected = livePresenceRows.some(row => row.user_id === userrId);
+
+if (isConnected) {
+  const soulCount = livePresenceRows.length;
+  if (soulCount <= 1) {
+    resonanceMsg.textContent = "You are Meditating";
+  } else {
+    resonanceMsg.textContent = `You are Meditating with ${soulCount - 1} ${soulCount - 1 === 1 ? "other" : "others"}`;
+  }
+  resonanceMsg.style.display = ""; // Show
+} else {
+  resonanceMsg.textContent = "";
+  resonanceMsg.style.display = "none"; // Hide
+}
+
+// --- Grid ID display ---
 let userIdDisplay = document.getElementById('userIdDisplay');
 if (!userIdDisplay) {
   userIdDisplay = document.createElement('div');
