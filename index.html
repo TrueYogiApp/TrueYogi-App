@@ -10386,33 +10386,31 @@ if (!resonanceMsg) {
   resonanceMsg.style.cssText = `
     position: absolute;
     top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
+    left: 0;
+    right: 0;
+    text-align: center;
     font-family: 'Poppins', sans-serif;
-    font-size: 1.1rem;
+    font-size: clamp(1.2rem, 4vw, 1.7rem);
     font-weight: 700;
-    letter-spacing: 2px;
     opacity: 0.98;
-    padding: 16px 32px;
+    padding: 16px 24px;
     white-space: nowrap;
     z-index: 10001;
-    width: max-content;
-    max-width: calc(100vw - 32px);
-    margin-top: 8px;
-    margin-bottom: 8px;
+    width: 100%;
+    box-sizing: border-box;
     overflow: hidden;
     animation: scrollMsg 18s linear infinite;
   `;
   container.appendChild(resonanceMsg);
 
-  // Optional: Add a smooth scrolling effect
+  // KEEP THE ANIMATION STYLES
   if (!document.getElementById('scrollMsgStyle')) {
     const style = document.createElement('style');
     style.id = 'scrollMsgStyle';
     style.textContent = `
       @keyframes scrollMsg {
         0% { letter-spacing: 2px; }
-        50% { letter-spacing: 6px; }
+        50% { letter-spacing: 4px; }
         100% { letter-spacing: 2px; }
       }
     `;
@@ -10421,22 +10419,9 @@ if (!resonanceMsg) {
   setAuraColor(); 
 }
 
-// --- Calculate how many are present ---
-const userrId = localStorage.getItem('omUserId');
-const isConnected = livePresenceRows.some(row => row.user_id === userrId);
-
-if (isConnected) {
-  const soulCount = livePresenceRows.length;
-  if (soulCount <= 1) {
-    resonanceMsg.textContent = "Meditate • Be with your breath • Be present";
-  } else {
-    resonanceMsg.textContent = `Meditate • Be with your breath • Be present`;
-  }
-  resonanceMsg.style.display = ""; // Show
-} else {
-  resonanceMsg.textContent = "";
-  resonanceMsg.style.display = "none"; // Hide
-}
+// Set the text
+resonanceMsg.textContent = "Breathe • Let Go • Be Still";
+resonanceMsg.style.display = "";
 
 // --- Grid ID display ---
 let userIdDisplay = document.getElementById('userIdDisplay');
