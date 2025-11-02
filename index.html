@@ -3154,6 +3154,13 @@ patchiness */
         <button onclick="showEndMeditationModal()" class="w-full max-w-xs bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-medium flex items-center justify-center gap-2 cursor-pointer">
          <i class="fas fa-stop"></i> <span id="end-meditation-btn-label">End Meditation</span>
         </button>
+				<!-- Add inside #timer-section, maybe below the timer or above the End Meditation button -->
+<button id="mute-audio-btn" 
+  class="bg-gray-800 hover:bg-gray-700 text-yellow-400 px-3 py-2 rounded-full font-medium flex items-center gap-2"
+  style="margin-bottom: 1em;"
+  title="Mute/Unmute Meditation Audio">
+  <i id="mute-audio-icon" class="fas fa-volume-up"></i>
+</button>
       </div>
 
       <!-- Complete Section -->
@@ -5626,7 +5633,71 @@ challengeData = {
   }
 }
 
-    function updateSessionTimesDisplay() {
+function completeExpiredSessionIfNeeded() {
+  // Check if there is an active session stored in localStorage
+  const activeSessionStr = localStorage.getItem('activeSession');
+  if (!activeSessionStr) return;
+
+  let sessionData;
+  try {
+    sessionData = JSON.parse(activeSessionStr);
+  } catch (e) {
+    // If corrupted, remove and exit
+    localStorage.removeItem('activeSession');
+    return;
+  }
+
+  // Check if the session is still flagged as active and expired
+  if (sessionData.sessionActive && sessionData.endTime <= Date.now()) {
+    // Prepare the completion data
+    const sessionDate = new Date(sessionData.startTime);
+    const today = getLocalDateString(sessionDate); // should match your main date formatting
+    const sessionTime = sessionData.sessionTime;
+    const duration = sessionData.targetDuration;
+
+    // Ensure challengeData.sessionsCompleted exists
+    if (!challengeData.sessionsCompleted) {
+      challengeData.sessionsCompleted = [];
+    }
+
+    // Only add if not already present (no duplicates)
+    const alreadyCompleted = challengeData.sessionsCompleted.some(
+      s => s.date === today && s.time === sessionTime
+    );
+
+    if (!alreadyCompleted) {
+      challengeData.sessionsCompleted.push({
+        time: sessionTime,
+        duration: duration,
+        date: today
+      });
+
+      // Update other stats if needed
+      challengeData.totalSessions = (challengeData.totalSessions || 0) + 1;
+      challengeData.totalMinutes = (challengeData.totalMinutes || 0) + Math.round(duration / 60);
+      challengeData.lastSessionDate = today;
+      // Optionally handle streak logic here
+      localStorage.setItem('yogiChallenge', JSON.stringify(challengeData));
+    }
+
+    // Remove the active session flag
+    localStorage.removeItem('activeSession');
+  }
+}
+
+  async  function updateSessionTimesDisplay() {
+	const completeSectionVisible = !document.getElementById('complete-section').classList.contains('hidden');
+	const finalSectionVisible = !document.getElementById('final-section').classList.contains('hidden');
+if (completeSectionVisible || finalSectionVisible) {
+  closeMissedSessionModal();
+  return; // Exit early, don't run any other modal logic
+}
+
+  // Await completion of any expired session before proceeding
+  if (typeof completeExpiredSessionIfNeeded === 'function') {
+    await completeExpiredSessionIfNeeded();
+  }
+  
   const list = document.getElementById('session-times-list');
   list.innerHTML = '';
   if (!challengeData.startDate || !userSessionTimes.length) return;
@@ -5694,7 +5765,14 @@ challengeData = {
     }
     list.appendChild(badge);
   });
-
+  // FIX: Only show Missed Session modal if NOT all today's sessions are completed
+  if (
+    hasMissedSession &&
+    currentMode === 'yogi' &&
+    todayCompleted < challengeData.requiredSessions
+  ) {
+    showMissedSessionModal();
+  }
 }
 
     function formatTime(time) {
@@ -6962,6 +7040,7 @@ function updateMeditationGuideImage(mode) {
 
 function handleVisibilityChange() {
   if (!document.hidden) {
+  completeExpiredSessionIfNeeded();
     // When user returns to tab
     if (sessionActive) {
 	  requestWakeLock();
@@ -11006,6 +11085,27 @@ document.addEventListener('DOMContentLoaded', function() {
     Array.from(this.options).forEach(option => {
       option.textContent = option.value.toUpperCase();
     });
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+  const muteBtn = document.getElementById('mute-audio-btn');
+  const muteIcon = document.getElementById('mute-audio-icon');
+  // Find the meditation background audio element
+  function getMeditationAudio() {
+    return window.backgroundAudio || document.querySelector('audio[id^="bg-music-"]:not([paused])');
+  }
+
+  let isMuted = false;
+
+  muteBtn.addEventListener('click', () => {
+    const audio = getMeditationAudio();
+    if (!audio) return;
+    isMuted = !isMuted;
+    audio.muted = isMuted;
+    muteIcon.className = isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
+    muteBtn.textContent = isMuted ? '' : '';
+    muteBtn.prepend(muteIcon); // Keep icon at front
   });
 });
 
