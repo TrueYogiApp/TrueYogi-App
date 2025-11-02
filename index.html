@@ -10993,6 +10993,13 @@ function showUserListPopup(users, parentPopup, x, y) {
   // Get current user's ID
   const currentUserId = localStorage.getItem('omUserId');
 
+  // SORT USERS BY DURATION (highest first)
+  const sortedUsers = users.sort((a, b) => {
+    const durationA = a.joined_at ? (Date.now() - new Date(a.joined_at)) / 1000 : 0;
+    const durationB = b.joined_at ? (Date.now() - new Date(b.joined_at)) / 1000 : 0;
+    return durationB - durationA; // Highest first
+  });
+
   // Create new popup
   const listPopup = document.createElement('div');
   listPopup.id = 'user-list-popup';
@@ -11013,10 +11020,10 @@ function showUserListPopup(users, parentPopup, x, y) {
     text-align: left;
   `;
 
-  if (users.length === 0) {
+  if (sortedUsers.length === 0) {
     listPopup.innerHTML = "<i>No users found.</i>";
   } else {
-    listPopup.innerHTML = users.map(u => {
+    listPopup.innerHTML = sortedUsers.map(u => {
       let duration = "";
       if (u.joined_at) {
         const secs = (Date.now() - new Date(u.joined_at)) / 1000;
@@ -11036,7 +11043,7 @@ function showUserListPopup(users, parentPopup, x, y) {
   }
 
   document.body.appendChild(listPopup);
-
+  
   // Optional: Remove on mouse leave
   //listPopup.onmouseleave = () => listPopup.remove();
   // Or remove after a timeout
