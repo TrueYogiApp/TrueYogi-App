@@ -10378,7 +10378,7 @@ if (!globalHeading) {
   container.appendChild(globalHeading);
 }
 
-// --- Motivational scroll/message below Global Resonance Field ---
+// --- Motivational scroll/message below // --- // --- Motivational scroll/message below Global Resonance Field ---
 let resonanceMsg = document.getElementById('resonanceMsg');
 if (!resonanceMsg) {
   resonanceMsg = document.createElement('div');
@@ -10388,30 +10388,33 @@ if (!resonanceMsg) {
     top: 10%;
     left: 0;
     right: 0;
-    text-align: center;
     font-family: 'Poppins', sans-serif;
-    font-size: clamp(1.2rem, 4vw, 1.7rem);
-    font-weight: 700;
+    font-size: clamp(1.8rem, 6vw, 2.8rem);  // Increased size
+    font-weight: 800;  // Bolder
     opacity: 0.98;
-    padding: 16px 24px;
+    padding: 25px 0;   // More padding
     white-space: nowrap;
     z-index: 10001;
     width: 100%;
     box-sizing: border-box;
     overflow: hidden;
-    animation: scrollMsg 18s linear infinite;
+    animation: scrollMsg 25s linear infinite;
+    
   `;
   container.appendChild(resonanceMsg);
 
-  // KEEP THE ANIMATION STYLES
+  // Scrolling animation
   if (!document.getElementById('scrollMsgStyle')) {
     const style = document.createElement('style');
     style.id = 'scrollMsgStyle';
     style.textContent = `
       @keyframes scrollMsg {
-        0% { letter-spacing: 2px; }
-        50% { letter-spacing: 4px; }
-        100% { letter-spacing: 2px; }
+        0% { 
+          transform: translateX(100%);
+        }
+        100% { 
+          transform: translateX(-100%);
+        }
       }
     `;
     document.head.appendChild(style);
@@ -10419,8 +10422,21 @@ if (!resonanceMsg) {
   setAuraColor(); 
 }
 
-// Set the text
-resonanceMsg.textContent = "Breathe • Let Go • Be Still";
+// Set the text with connection status
+const userrId = localStorage.getItem('omUserId');
+const isConnected = livePresenceRows.some(row => row.user_id === userrId);
+const soulCount = livePresenceRows.length;
+
+if (isConnected) {
+  if (soulCount === 1) {
+    resonanceMsg.textContent = "Breathe • Let Go • Be Still —— You are connected and Meditating";
+  } else {
+    const othersCount = soulCount - 1;
+    resonanceMsg.textContent = `Breathe • Let Go • Be Still —— You are connected and Meditating with ${othersCount} other${othersCount === 1 ? '' : 's'}`;
+  }
+} else {
+  resonanceMsg.textContent = "Breathe • Let Go • Be Still";
+}
 resonanceMsg.style.display = "";
 
 // --- Grid ID display ---
