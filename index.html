@@ -11034,7 +11034,6 @@ function showUserListPopup(users, parentPopup, x, y) {
     return `
       <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:10px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
         <span style="color:#888;font-size:0.8rem;min-width:20px;">${index + 1}</span>
-        <b>ID:</b>
         <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
         <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
         <span style="color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${duration}</span>
@@ -11042,7 +11041,6 @@ function showUserListPopup(users, parentPopup, x, y) {
     `;
   }).join('');
 }
-
   document.body.appendChild(listPopup);
   
   // Optional: Remove on mouse leave
