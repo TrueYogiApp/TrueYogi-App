@@ -10276,10 +10276,11 @@ const currentUserId = localStorage.getItem('omUserId');
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No users found for this country.</i>";
 } else {
-  listPopup.innerHTML = userIds.map(id => {
+  listPopup.innerHTML = userIds.map((id, index) => {
     const isCurrentUser = id === currentUserId;
     return `
-      <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+      <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:10px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+        <span style="color:#888;font-size:0.8rem;min-width:20px;">${index + 1}</span>
         <span style="font-family:monospace; color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">${getShortUserId(id)}</span>
         <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
         <span style="color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">${formatDuration(userDurations[id])}</span>
@@ -11033,6 +11034,7 @@ function showUserListPopup(users, parentPopup, x, y) {
     return `
       <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:10px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
         <span style="color:#888;font-size:0.8rem;min-width:20px;">${index + 1}</span>
+        <b>ID:</b>
         <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
         <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
         <span style="color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${duration}</span>
