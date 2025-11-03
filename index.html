@@ -10276,17 +10276,38 @@ const currentUserId = localStorage.getItem('omUserId');
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No users found for this country.</i>";
 } else {
-  listPopup.innerHTML = userIds.map((id, index) => {
-    const isCurrentUser = id === currentUserId;
-    return `
-      <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:10px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-        <span style="color:#888;font-size:0.8rem;min-width:20px;">${index + 1}</span>
-        <span style="font-family:monospace; color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">${getShortUserId(id)}</span>
-        <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
-        <span style="color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">${formatDuration(userDurations[id])}</span>
-      </div>
-    `;
-  }).join('');
+const liveIds = new Set(livePresenceRows.map(row => row.user_id));
+const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
+  <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
+</svg>`;
+const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
+  <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
+</svg>`;
+
+// ... inside your mapping:
+listPopup.innerHTML = userIds.map((id, index) => {
+  const isCurrentUser = id === currentUserId;
+  const isLive = liveIds.has(id);
+return `
+  <div style="border-bottom:1px solid #333;padding:4px 0;
+    display:flex;align-items:center;gap:0;
+    ${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+    <span style="color:#888;font-size:0.8rem;min-width:18px;">${index + 1}</span>
+    <span style="margin:0 2px;display:inline-block;vertical-align:middle;">
+      ${isLive ? liveSvg : blankSvg}
+    </span>
+    <span style="font-family:monospace; color:${isCurrentUser ? '#fff' : '#ffd700'};
+      ${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
+      ${getShortUserId(id)}
+    </span>
+    <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
+    <span style="color:${isCurrentUser ? '#fff' : '#ffd700'};
+      ${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
+      ${formatDuration(userDurations[id])}
+    </span>
+  </div>
+`;
+}).join('');
 }
 
   document.body.appendChild(listPopup);
