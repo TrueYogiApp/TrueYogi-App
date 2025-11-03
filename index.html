@@ -10268,6 +10268,9 @@ async function showCountryUserListPopup(country, x, y) {
     max-height: 320px;
     overflow-y: auto;
     text-align: left;
+	  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #fde68a #000000;
   `;
   
 const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
@@ -11040,29 +11043,41 @@ function showUserListPopup(users, parentPopup, x, y) {
     max-height: 320px;
     overflow-y: auto;
     text-align: left;
+	  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #fde68a #000000;
   `;
 
   if (users.length === 0) {
     listPopup.innerHTML = "<i>No users found.</i>";
   } else {
-    listPopup.innerHTML = users.map(u => {
-      let duration = "";
-      if (u.joined_at) {
-        const secs = (Date.now() - new Date(u.joined_at)) / 1000;
-        duration = formatDuration(secs);
-      }
-      // Bold and highlight current user
-      const isCurrentUser = u.user_id === currentUserId;
-      return `
-        <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-          <b>ID:</b>
-          <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
-          <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
-          <span style="color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${duration}</span>
-        </div>
-      `;
-    }).join('');
+    // Get country name from first user (assuming all users in this popup are from same country)
+    const countryName = users[0]?.country || "Active Users";
+    
+    listPopup.innerHTML = `
+      <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:6px;text-align:center;">
+        <strong>${countryName.replace(/_/g, ' ')}</strong>
+      </div>
+      ${users.map(u => {
+        let duration = "";
+        if (u.joined_at) {
+          const secs = (Date.now() - new Date(u.joined_at)) / 1000;
+          duration = formatDuration(secs);
+        }
+        // Bold and highlight current user
+        const isCurrentUser = u.user_id === currentUserId;
+        return `
+          <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+            <b>ID:</b>
+            <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
+            <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
+            <span style="color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${duration}</span>
+          </div>
+        `;
+      }).join('')}
+    `;
   }
+  
   document.body.appendChild(listPopup);
   
   // Optional: Remove on mouse leave
