@@ -10697,22 +10697,26 @@ async function showAllFlameKeepers(x, y) {
   // Display list of users with flag, shortUserId, SUMMED duration
   const listPopup = document.createElement('div');
   listPopup.id = 'flame-keeper-list';
-  listPopup.style.cssText = `
-    position: fixed;
-    left: ${x}px; top: ${y + 32}px;
-    transform: translate(-50%, 0);
-    background: rgba(0,0,0,0.96);
-    color: #ffd700;
-    font-size: 0.98rem;
-    padding: 9px 18px;
-    border-radius: 11px;
-    box-shadow: 0 0 14px #ffd70066;
-    z-index: 10050;
-    min-width: 194px;
-    max-height: 340px;
-    overflow-y: auto;
-    text-align: left;
-  `;
+listPopup.style.cssText = `
+  position: fixed;
+  left: ${x}px; top: ${y + 32}px;
+  transform: translate(-50%, 0);
+  background: rgba(0,0,0,0.96);
+  color: #ffd700;
+  font-size: 0.98rem;
+  padding: 9px 18px;
+  border-radius: 11px;
+  box-shadow: 0 0 14px #ffd70066;
+  z-index: 10050;
+  min-width: 0;
+  max-width: 320px;
+  max-height: 340px;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+  overflow-y: auto;
+  text-align: left;
+`;
 
   // Sort user IDs: longest duration first
 const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
