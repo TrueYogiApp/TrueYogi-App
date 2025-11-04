@@ -1888,6 +1888,45 @@ patchiness */
 #resonanceMsg.dark-silver { color: #606060EE; text-shadow: 0 0 16px #606060EE; }
 #resonanceMsg.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
 
+.om-flame-fire {
+      color: #ffd700;
+      font-weight: bold;
+      text-shadow:
+        0 0 16px #ff7100,
+        0 0 7px #fdad29,
+        0 2px 4px #e94012;
+      animation: flameGlow 1.2s infinite alternate;
+    }
+@keyframes flameGlow {
+      from {
+        text-shadow:
+          0 0 20px #ff7100,
+          0 0 6px #ffd700,
+          0 2px 4px #e94012;
+        color: #ffd700;
+      }
+      to {
+        text-shadow:
+          0 0 30px #ffd700,
+          0 0 20px #fdad29,
+          0 4px 10px #e94012;
+        color: #ffae42;
+      }
+    }
+	
+/* Grid ID aura classes */
+#userIdDisplay.red      { color: #FF1A1A; text-shadow: 0 0 7px #FF1A1A99; border-color: #FF1A1A44; background: linear-gradient(90deg,#232526 0%, #FF1A1A22 100%); }
+#userIdDisplay.orange   { color: #FF8800; text-shadow: 0 0 7px #FF880099; border-color: #FF880044; background: linear-gradient(90deg,#232526 0%, #FF880022 100%); }
+#userIdDisplay.yellow   { color: #FFD600; text-shadow: 0 0 7px #FFD60099; border-color: #FFD60044; background: linear-gradient(90deg,#232526 0%, #FFD60022 100%); }
+#userIdDisplay.green    { color: #29D884; text-shadow: 0 0 7px #29D88499; border-color: #29D88444; background: linear-gradient(90deg,#232526 0%, #29D88422 100%); }
+#userIdDisplay.blue     { color: #3B82F6; text-shadow: 0 0 7px #3B82F6EE; border-color: #3B82F644; background: linear-gradient(90deg,#232526 0%, #3B82F622 100%); }
+#userIdDisplay.indigo   { color: #4338CA; text-shadow: 0 0 7px #4338CAEE; border-color: #4338CA44; background: linear-gradient(90deg,#232526 0%, #4338CA22 100%); }
+#userIdDisplay.violet   { color: #C026D3; text-shadow: 0 0 7px #C026D3EE; border-color: #C026D344; background: linear-gradient(90deg,#232526 0%, #C026D322 100%); }
+#userIdDisplay.gold     { color: #FFD700; text-shadow: 0 0 7px #FFD700DD; border-color: #FFD70044; background: linear-gradient(90deg,#232526 0%, #FFD70022 100%); }
+#userIdDisplay.silver   { color: #BFC9CA; text-shadow: 0 0 7px #BFC9CA99; border-color: #BFC9CA44; background: linear-gradient(90deg,#232526 0%, #BFC9CA22 100%); }
+#userIdDisplay.sapphire { color: #1a4fcc; text-shadow: 0 0 7px #1a4fccee; border-color: #1a4fcc44; background: linear-gradient(90deg,#232526 0%, #1a4fcc22 100%); }
+#userIdDisplay.white    { color: #FFFFFF; text-shadow: 0 0 7px #FFFFFFCC; border-color: #FFF4; background: linear-gradient(90deg,#232526 0%, #fff2 100%); }
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -9316,18 +9355,21 @@ function setAuraColor() {
   const card = document.querySelector('.card-aura');
   const omCounter = document.getElementById('om-counter');
   const resonanceMsg = document.getElementById('resonanceMsg');
+  const userIdDisplay = document.getElementById('userIdDisplay'); // <-- Add this line
 
   // Remove old aura classes from all
   auraColors.forEach(c => {
     if (card) card.classList.remove(c);
     if (omCounter) omCounter.classList.remove(c);
     if (resonanceMsg) resonanceMsg.classList.remove(c);
+    if (userIdDisplay) userIdDisplay.classList.remove(c); // <-- Add this
   });
 
   // Add new aura class
   if (card) card.classList.add(auraClass);
   if (omCounter) omCounter.classList.add(auraClass);
   if (resonanceMsg) resonanceMsg.classList.add(auraClass);
+  if (userIdDisplay) userIdDisplay.classList.add(auraClass); // <-- Add this
 }
 
 // Run once and then every minute (or every second for animation)
@@ -10557,13 +10599,9 @@ if (!userIdDisplay) {
     font-family: 'Poppins', sans-serif;
     font-size: 0.98rem;
     letter-spacing: 2px;
-    color: #ffd700;
     opacity: 0.93;
-    text-shadow: 0 0 5px #ffd70055;
-    background: linear-gradient(90deg,#232526 0%, #ffd70022 100%);
     border-radius: 16px;
     padding: 4px 16px;
-    border: 1px solid #ffd70022;
     z-index: 10001;
     font-weight: 600;
     margin-top: 4px;
