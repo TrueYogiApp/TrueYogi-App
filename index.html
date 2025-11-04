@@ -10364,6 +10364,54 @@ function getShortUserId(id) {
   return id.slice(0,3) + '...' + id.slice(-3);
 }
 
+function formatFlameDuration(seconds) {
+  const days = Math.floor(seconds / 86400);
+  const hrs  = Math.floor((seconds % 86400) / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  const secs = seconds % 60;
+  if (days > 0) return `${days}d ${hrs}hr ${mins}min ${secs}s`;
+  if (hrs > 0) return `${hrs}hr ${mins}min ${secs}s`;
+  if (mins > 0) return `${mins}min ${secs}s`;
+  return `${secs}s`;
+}
+
+let flameTimerInterval = null;
+let heartbeatOn = false; // outside, top scope
+let lastStarterUserId = null;
+let lastFlameStarted = null;
+
+async function startFlameTimer() {
+  const timerEl = document.getElementById('om-flame-timer');
+  if (flameTimerInterval) clearInterval(flameTimerInterval);
+
+  try {
+    const res = await fetch('https://trueyogi-backend-test.onrender.com/om-flame');
+    const data = await res.json();
+    if (data.burning && data.started_at) {
+      let started = new Date(data.started_at);
+	  lastStarterUserId = data.starter_user_id || '';
+	  lastFlameStarted = new Date(data.started_at);
+      function updateFlame() {
+        const flameTimeEl = document.getElementById('om-flame-time');
+        const now = new Date();
+        const elapsed = Math.floor((now - started) / 1000);
+        flameTimeEl.textContent = formatFlameDuration(elapsed);
+
+        heartbeatOn = !heartbeatOn;
+        flameTimeEl.style.opacity = heartbeatOn ? "1" : "0.5";
+      }
+      // Initial run and then interval
+      updateFlame();
+      flameTimerInterval = setInterval(updateFlame, 1000);
+    } else {
+      timerEl.textContent = "The OM Flame awaits its next keeper...";
+    }
+  } catch (err) {
+    timerEl.textContent = "Unable to connect to OM Flame.";
+  }
+}
+
+
 // --- Main renderer (called whenever data changes or grid opens) ---
 function renderEarthGrid() {
   // --- Setup container, canvas, and label ---
@@ -10524,6 +10572,195 @@ if (!globalHeading) {
   container.appendChild(globalHeading);
 }
 
+// --- OM Flame Timer below Global Heading / with fire SVG ---
+let flameTimer = document.getElementById('om-flame-timer');
+if (!flameTimer) {
+  flameTimer = document.createElement('div');
+  flameTimer.id = 'om-flame-timer';
+  flameTimer.style.cssText = `
+    position: absolute;
+    bottom: 33%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.32rem;
+    font-weight: bold;
+    z-index: 10001;
+    padding: 3px 0;
+    background: none;
+    pointer-events: auto;
+    text-align: center;
+    white-space: nowrap;
+    cursor: pointer;
+  `;
+  flameTimer.innerHTML = `<span id="om-flame-time" class="om-flame-fire">--</span>`;
+  container.appendChild(flameTimer);
+}
+
+flameTimer.onclick = function(e) {
+  const oldTooltip = document.getElementById('flame-tooltip');
+  if (oldTooltip) oldTooltip.remove();
+
+  const flameTimeEl = document.getElementById('om-flame-time');
+  const rect = flameTimeEl.getBoundingClientRect();
+  let starterUserShortId = lastStarterUserId ? `${getShortUserId(lastStarterUserId)}` : 'Unknown';
+
+  const tooltip = document.createElement('div');
+  tooltip.id = 'flame-tooltip';
+tooltip.innerHTML = `
+  <div style="font-size:1.01rem;">
+    <b>OM Flame</b><br>
+    <span style="color:#ffd700;">
+      This flame was first lit by 
+      <b style="color:#fff; text-shadow:0 0 8px #fff8;">${starterUserShortId}</b><br>
+      <span style="color:#ffd700; font-weight:600; text-shadow:0 0 8px #ffd700;">Alive for ${flameTimeEl.textContent}</span><br>
+      <a href="#" id="flame-keepers-link" style="color:#FF8800;font-size:0.97rem;font-weight:bold;display:inline-block;text-decoration:underline;margin-top:6px;cursor:pointer;">Show all keepers</a>
+    </span>
+  </div>
+`;
+  tooltip.style.cssText = `
+    position: fixed;
+    left: ${rect.left + rect.width/2}px; 
+    top: ${rect.top - 32}px;
+    transform: translate(-50%, -100%);
+    background: rgba(0,0,0,0.94);
+    color: #ffd700;
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.01rem;
+    padding: 7px 19px;
+    border-radius: 11px;
+    box-shadow: 0 0 12px #ffd700bb;
+    white-space: nowrap;
+    z-index: 10040;
+    opacity: 0;
+    transition: opacity 0.16s;
+    pointer-events:auto;
+    text-align:center;
+  `;
+
+  document.body.appendChild(tooltip);
+  setTimeout(() => tooltip.style.opacity = 1, 10);
+
+  // Add handler for keepers link
+  tooltip.querySelector('#flame-keepers-link').onclick = function(ev) {
+    ev.preventDefault();
+    tooltip.remove();
+    showAllFlameKeepers(rect.left + rect.width/2, rect.top); // Show at same position
+  };
+
+  setTimeout(() => {
+    tooltip.style.opacity = 0;
+    setTimeout(() => tooltip.remove(), 400);
+  }, 15000);
+};
+
+async function showAllFlameKeepers(x, y) {
+  // Remove if already open
+  const oldList = document.getElementById('flame-keeper-list');
+  if (oldList) oldList.remove();
+
+  // Fetch sessions during this flame period 
+  let { data, error } = await supabase
+    .from('om_sessions')
+    .select('user_id, country, countryCode, duration_seconds, started_at, ended_at')
+    .gte('started_at', lastFlameStarted.toISOString());
+
+  if (error || !data) {
+    // fallback UI
+    // ... same fallback as before ...
+    return;
+  }
+
+  // Group and sum durations by user
+  const userDurations = {}; // user_id => total seconds
+  const userRows = {};      // user_id => store country/countryCode from any row
+
+  data.forEach(row => {
+    if (!row.user_id) return;
+    let duration = 0;
+
+    if (row.ended_at) {
+      // Session ended, use provided duration or calculate
+      duration = row.duration_seconds || (
+        Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000)
+      );
+    } else {
+      // Live session, use elapsed time from started_at to now
+      duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
+    }
+
+    userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
+
+    // Store row for country/countryCode
+    if (!userRows[row.user_id]) userRows[row.user_id] = row;
+  });
+
+  // Display list of users with flag, shortUserId, SUMMED duration
+  const listPopup = document.createElement('div');
+  listPopup.id = 'flame-keeper-list';
+  listPopup.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y + 32}px;
+    transform: translate(-50%, 0);
+    background: rgba(0,0,0,0.96);
+    color: #ffd700;
+    font-size: 0.98rem;
+    padding: 9px 18px;
+    border-radius: 11px;
+    box-shadow: 0 0 14px #ffd70066;
+    z-index: 10050;
+    min-width: 194px;
+    max-height: 340px;
+    overflow-y: auto;
+    text-align: left;
+  `;
+
+  // Sort user IDs: longest duration first
+const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
+const currentUserId = localStorage.getItem('omUserId');
+const liveIds = new Set(livePresenceRows.map(row => row.user_id));
+const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
+  <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
+</svg>`;
+const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
+  <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
+</svg>`;
+
+if (userIds.length === 0) {
+  listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
+} else {
+  listPopup.innerHTML = `
+    <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
+      <strong>All Flame Keepers</strong>
+    </div>
+    ${userIds.map((id, index) => {
+      const isCurrentUser = id === currentUserId;
+      const isLive = liveIds.has(id);
+      const row = userRows[id];
+      const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
+      return `
+        <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:8px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+          <span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
+          <span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
+            ${isLive ? liveSvg : blankSvg}
+          </span>
+          <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+          <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
+            ${getShortUserId(id)}
+          </span>
+          <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
+          <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
+            ${formatDuration(userDurations[id])}
+          </span>
+        </div>
+      `;
+    }).join('')}
+  `;
+}
+
+  document.body.appendChild(listPopup);
+  setTimeout(() => listPopup.remove(), 12000);
+}
+
 // --- Motivational scroll/message below // --- // --- Motivational scroll/message below Global Resonance Field ---
 let resonanceMsg = document.getElementById('resonanceMsg');
 if (!resonanceMsg) {
@@ -10669,6 +10906,7 @@ userIdDisplay.onclick = function(e) {
 
 showCountryStatsOnEarthGrid(); 
 showUserTravelBar();
+startFlameTimer();
 setAuraColor();
 
   const ctx = canvas.getContext('2d');
