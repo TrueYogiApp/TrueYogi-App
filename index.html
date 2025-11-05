@@ -10577,21 +10577,24 @@ let flameTimer = document.getElementById('om-flame-timer');
 if (!flameTimer) {
   flameTimer = document.createElement('div');
   flameTimer.id = 'om-flame-timer';
-  flameTimer.style.cssText = `
-    position: absolute;
-    bottom: 33%;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 1.32rem;
-    font-weight: bold;
-    z-index: 10001;
-    padding: 3px 0;
-    background: none;
-    pointer-events: auto;
-    text-align: center;
-    white-space: nowrap;
-    cursor: pointer;
-  `;
+flameTimer.style.cssText = `
+  position: absolute;
+  bottom: 33%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.32rem;
+  font-weight: bold;
+  z-index: 10001;
+  padding: 3px 0;
+  background: rgba(0,0,0,0.13);  /* transparent dark for glow */
+  backdrop-filter: blur(2px);    /* smooth out “patchy” glow */
+  pointer-events: auto;
+  text-align: center;
+  white-space: nowrap;
+  cursor: pointer;
+  border-radius: 10px;           /* optional: rounds timer bar edges */
+  box-sizing: border-box;        /* ensures no overflow on zoom */
+`;
   flameTimer.innerHTML = `<span id="om-flame-time" class="om-flame-fire">--</span>`;
   container.appendChild(flameTimer);
 }
