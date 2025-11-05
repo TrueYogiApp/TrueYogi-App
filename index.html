@@ -9373,6 +9373,21 @@ const auraColors = [
   "white"        // 12 (2:30–4:30am)
 ];
 
+const auraGradientHex = {
+  red:      "#FF1A1A",
+  orange:   "#FF8800",
+  yellow:   "#FFD600",
+  green:    "#29D884",
+  blue:     "#3B82F6",
+  indigo:   "#4338CA",
+  violet:   "#C026D3",
+  gold:     "#FFD700",
+  silver:   "#BFC9CA",
+  sapphire: "#1a4fcc",
+  "dark-silver": "#BFC9CA", // use silver as fallback
+  white:    "#fff"
+};
+
 // Returns 0–11 for slot
 function getAuraIndex() {
   const now = new Date();
@@ -9406,6 +9421,24 @@ function setAuraColor() {
   if (omCounter) omCounter.classList.add(auraClass);
   if (resonanceMsg) resonanceMsg.classList.add(auraClass);
   if (userIdDisplay) userIdDisplay.classList.add(auraClass); // <-- Add this
+  
+    // --- CONNECTION STATUS LOGIC ---
+  if (userIdDisplay) {
+    // Get user connection status
+    const userId = localStorage.getItem('omUserId');
+    // livePresenceRows must be global and updated!
+    const isConnected = Array.isArray(livePresenceRows) && livePresenceRows.some(row => row.user_id === userId);
+
+    // Use aura gradient color hex
+    const hex = auraGradientHex[auraClass] || "#FFD700";
+    const alpha = isConnected ? "66" : "11"; // Connected = more opaque
+
+    // Override gradient background inline
+    userIdDisplay.style.background = `linear-gradient(90deg,#232526 0%, ${hex}${alpha} 100%)`;
+
+    // You can also make color or box-shadow stronger for connected if you want:
+    // userIdDisplay.style.boxShadow = isConnected ? "0 0 16px " + hex + "99" : "0 0 4px " + hex + "44";
+  }
 }
 
 // Run once and then every minute (or every second for animation)
