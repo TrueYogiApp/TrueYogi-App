@@ -1889,30 +1889,30 @@ patchiness */
 #resonanceMsg.white       { color: #FFFFFF; text-shadow: 0 0 16px #FFFFFFCC; }
 
 .om-flame-fire {
-      color: #ffd700;
-      font-weight: bold;
-      text-shadow:
-        0 0 16px #ff7100,
-        0 0 7px #fdad29,
-        0 2px 4px #e94012;
-      animation: flameGlow 1.2s infinite alternate;
-    }
+  color: #ffd700;
+  font-weight: 900;
+  font-size: 1.45rem;
+  text-shadow:
+    0 0 12px #ff8800cc,
+    0 0 3px #ffd700cc;
+  animation: flameGlow 1.1s infinite alternate;
+  -webkit-font-smoothing: antialiased;
+  font-smooth: always;
+}
 @keyframes flameGlow {
-      from {
-        text-shadow:
-          0 0 20px #ff7100,
-          0 0 6px #ffd700,
-          0 2px 4px #e94012;
-        color: #ffd700;
-      }
-      to {
-        text-shadow:
-          0 0 30px #ffd700,
-          0 0 20px #fdad29,
-          0 4px 10px #e94012;
-        color: #ffae42;
-      }
-    }
+  from {
+    text-shadow:
+      0 0 14px #ff8800bb,
+      0 0 5px #ffd700bb;
+    color: #ffd700;
+  }
+  to {
+    text-shadow:
+      0 0 24px #ffd70099,
+      0 0 9px #ff8800aa;
+    color: #ffae42;
+  }
+}
 	
 /* Grid ID aura classes */
 #userIdDisplay.red      { color: #FF1A1A; text-shadow: 0 0 7px #FF1A1A99; border-color: #FF1A1A44; background: linear-gradient(90deg,#232526 0%, #FF1A1A22 100%); }
