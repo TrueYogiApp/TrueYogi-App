@@ -1927,6 +1927,42 @@ patchiness */
 #userIdDisplay.sapphire { color: #1a4fcc; text-shadow: 0 0 7px #1a4fccee; border-color: #1a4fcc44; background: linear-gradient(90deg,#232526 0%, #1a4fcc22 100%); }
 #userIdDisplay.white    { color: #FFFFFF; text-shadow: 0 0 7px #FFFFFFCC; border-color: #FFF4; background: linear-gradient(90deg,#232526 0%, #fff2 100%); }
 
+.chakra-glow {
+  animation: chakraRainbow 2.4s linear infinite;
+  font-weight: 600;
+  transition: color 0.25s;
+  /* For glow effect: */
+  text-shadow: 0 0 8px #fff5, 0 0 2px #fff;
+}
+
+@keyframes chakraRainbow {
+  0% { color: #FF1A1A; }    /* Red */
+  17% { color: #FF8800; }   /* Orange */
+  34% { color: #FFD600; }   /* Yellow */
+  50% { color: #29D884; }   /* Green */
+  66% { color: #3B82F6; }   /* Blue */
+  83% { color: #C026D3; }   /* Violet */
+  100% { color: #FF1A1A; }  /* Loop back to red */
+}
+	
+.om-flame-heading-gradient {
+  font-size: 1.21em;
+  font-weight: 900;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, #FFD700 25%, #FF8800 75%, #fff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 12px #FFD70065, 0 0 2px #fff;
+  animation: goldGlow 1.8s infinite alternate;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes goldGlow {
+  from { text-shadow: 0 0 14px #FFD70088, 0 0 1px #fff; }
+  to   { text-shadow: 0 0 30px #FFD700dd, 0 0 7px #fff; }
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -10611,11 +10647,19 @@ flameTimer.onclick = function(e) {
   tooltip.id = 'flame-tooltip';
 tooltip.innerHTML = `
   <div style="font-size:1.01rem;">
-    <b>OM Flame</b><br>
+    <div class="om-flame-heading-container" style="text-align:center;">
+      <img src="/assets/flame.svg"
+           alt="Flame"
+           style="height:1.6em; margin-bottom:-6px; filter:drop-shadow(0 0 9px #FF8800); display:block; margin-left:auto; margin-right:auto;">
+      <b class="om-flame-heading-gradient">OM Flame</b>
+    </div>
     <span style="color:#ffd700;">
       This flame was first lit by 
       <b style="color:#fff; text-shadow:0 0 8px #fff8;">${starterUserShortId}</b><br>
-      <span style="color:#ffd700; font-weight:600; text-shadow:0 0 8px #ffd700;">Unified for ${flameTimeEl.textContent}</span><br>
+      <span>
+        <span class="chakra-glow">Unified</span> for 
+        <span style="color:#29D884; font-weight:600; text-shadow:0 0 8px #29D88477;">${flameTimeEl.textContent}</span>
+      </span><br>
       <a href="#" id="flame-keepers-link" style="color:#FF8800;font-size:0.97rem;font-weight:bold;display:inline-block;text-decoration:underline;margin-top:6px;cursor:pointer;">Show all keepers</a>
     </span>
   </div>
@@ -10653,7 +10697,7 @@ tooltip.innerHTML = `
   setTimeout(() => {
     tooltip.style.opacity = 0;
     setTimeout(() => tooltip.remove(), 400);
-  }, 15000);
+  }, 30000);
 };
 
 async function showAllFlameKeepers(x, y) {
@@ -11188,8 +11232,8 @@ function togglePowerNodesGlow() {
     if (!found) { closeEarthGrid(); }
   };
 
-  // --- Fade out after 5 min (unchanged) ---
-  setTimeout(() => closeEarthGrid(), 300000);
+  // --- Fade out after 9 min (unchanged) ---
+  setTimeout(() => closeEarthGrid(), 540000);
 }
 
 function formatTotalDuration(seconds) {
