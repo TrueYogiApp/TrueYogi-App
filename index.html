@@ -10733,6 +10733,66 @@ tooltip.innerHTML = `
   }, 30000);
 };
 
+// ======== ADD THIS NEW CODE RIGHT HERE ========
+// Add click handler for the flame SVG in the tooltip
+document.addEventListener('click', function(e) {
+  // Check if the clicked element is the flame SVG inside the tooltip
+  if (e.target.closest('#flame-tooltip img[src*="flame1.svg"]')) {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Remove any existing awareness tooltip
+    const oldAwarenessTooltip = document.getElementById('awareness-tooltip');
+    if (oldAwarenessTooltip) oldAwarenessTooltip.remove();
+    
+    // Get position from the clicked flame
+    const flameRect = e.target.getBoundingClientRect();
+    
+    // Create the awareness tooltip
+    const awarenessTooltip = document.createElement('div');
+    awarenessTooltip.id = 'awareness-tooltip';
+    awarenessTooltip.innerHTML = `
+      <div style="text-align: center; max-width: 200px;">
+        <div style="font-size: 1.1rem; font-weight: bold; color: #FFD700; margin-bottom: 8px; text-shadow: 0 0 10px #FFD700;">
+          Living Fire of Awareness
+        </div>
+        <div style="font-size: 0.95rem; color: #FFFFFF; line-height: 1.4;">
+          When at least one awakes, the light remains
+        </div>
+      </div>
+    `;
+    
+    awarenessTooltip.style.cssText = `
+      position: fixed;
+      left: ${flameRect.left + flameRect.width/2}px;
+      top: ${flameRect.top - 10}px;
+      transform: translate(-50%, -100%);
+      background: rgba(0, 0, 0, 0.95);
+      color: white;
+      font-family: 'Poppins', sans-serif;
+      padding: 12px 16px;
+      border-radius: 12px;
+      border: 1px solid #FFD700;
+      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
+      z-index: 10050;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+    `;
+    
+    document.body.appendChild(awarenessTooltip);
+    
+    // Fade in
+    setTimeout(() => awarenessTooltip.style.opacity = 1, 10);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+      awarenessTooltip.style.opacity = 0;
+      setTimeout(() => awarenessTooltip.remove(), 300);
+    }, 5000);
+  }
+});
+
 async function showAllFlameKeepers(x, y) {
   // Remove if already open
   const oldList = document.getElementById('flame-keeper-list');
