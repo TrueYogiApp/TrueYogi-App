@@ -10723,8 +10723,7 @@ tooltip.innerHTML = `
   // Add handler for keepers link
   tooltip.querySelector('#flame-keepers-link').onclick = function(ev) {
     ev.preventDefault();
-    ev.stopPropagation();
-    tooltip.remove();
+    // tooltip.remove();
     showAllFlameKeepers(rect.left + rect.width/2, rect.top); // Show at same position
   };
 
