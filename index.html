@@ -10112,18 +10112,6 @@ function showEarthGrid() {
   }
 }
 
-function closeEarthGrid() {
-  earthGridOpen = false;
-  const container = document.getElementById('earthGridContainer');
-  if (container) {
-    container.style.opacity = 0;
-    setTimeout(() => container.style.display = 'none', 1000);
-  }
-  // Optionally, you could unsubscribe here if you want to save bandwidth
-   gridChannel?.unsubscribe();
-   gridChannel = null;
-}
-
 async function fetchUserCountryStats() {
   const userId = localStorage.getItem('omUserId');
   if (!userId) return [];
@@ -11373,6 +11361,7 @@ let totalSeconds = usersInZone.reduce((sum, u) => {
 
   // Popup HTML
 const popup = document.createElement('div');
+popup.classList.add('earthzone-popup'); 
 let showCount = zone.count !== null && zone.count !== undefined && zone.count > 0;
 popup.innerHTML = `
   <div style="display: flex; align-items: center; gap: 12px;">
@@ -11507,11 +11496,30 @@ function showUserListPopup(users, parentPopup, x, y) {
 
 function closeEarthGrid() {
   earthGridOpen = false;
+
+  // Remove ALL zone popups + other tooltips
+  document.querySelectorAll('.earthzone-popup').forEach(el => el.remove());
+
+  [
+    'flag-popup',
+    'country-user-list-popup',
+    'flame-keeper-list',
+    'user-list-popup',
+    'flame-tooltip',
+    'current-user-mins-popup',
+	'awareness-tooltip', 
+  ].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.remove();
+  });
+
   const container = document.getElementById('earthGridContainer');
   if (container) {
     container.style.opacity = 0;
     setTimeout(() => container.style.display = 'none', 1000);
   }
+  gridChannel?.unsubscribe();
+  gridChannel = null;
 }
 
 // Add this to your existing JavaScript
