@@ -10723,7 +10723,6 @@ tooltip.innerHTML = `
   // Add handler for keepers link
   tooltip.querySelector('#flame-keepers-link').onclick = function(ev) {
     ev.preventDefault();
-    // tooltip.remove();
     showAllFlameKeepers(rect.left + rect.width/2, rect.top); // Show at same position
   };
 
@@ -10733,7 +10732,6 @@ tooltip.innerHTML = `
   }, 30000);
 };
 
-// ======== ADD THIS NEW CODE RIGHT HERE ========
 // Add click handler for the flame SVG in the tooltip
 document.addEventListener('click', function(e) {
   // Check if the clicked element is the flame SVG inside the tooltip
@@ -10789,7 +10787,7 @@ document.addEventListener('click', function(e) {
     setTimeout(() => {
       awarenessTooltip.style.opacity = 0;
       setTimeout(() => awarenessTooltip.remove(), 300);
-    }, 5000);
+    }, 6000);
   }
 });
 
