@@ -10702,7 +10702,7 @@ flameTimer.onclick = async function(e) {
     ? `
       <div style="margin:5px 0 2px 0;font-size:0.97em;color:#FFD700EE;">
         <span style="color:#fff2;text-shadow:0 0 3px #FFD70066;">Longest Flame:</span>
-        <span style="color:#29D884;font-weight:bold;">${formatFlameDurationMs(maxDuration)}</span>
+        <span style="color:#29D884;font-weight:bold;">${formatFlameDuration(Math.floor(maxDuration / 1000))}</span>
         <span style="color:#fde68a; padding:0 1px;">│</span>
 		<span style="color:#fff;text-shadow:0 0 8px #FFD700bb,0 0 2px #fff;">${getShortUserId(longestFlame.starter_user_id)}</span>
       </div>
