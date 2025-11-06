@@ -10656,7 +10656,7 @@ flameTimer.style.cssText = `
   container.appendChild(flameTimer);
 }
 
-flameTimer.onclick = function(e) {
+flameTimer.onclick = async function(e) {
   const oldTooltip = document.getElementById('flame-tooltip');
   if (oldTooltip) oldTooltip.remove();
 
@@ -10664,27 +10664,72 @@ flameTimer.onclick = function(e) {
   const rect = flameTimeEl.getBoundingClientRect();
   let starterUserShortId = lastStarterUserId ? `${getShortUserId(lastStarterUserId)}` : 'Unknown';
 
+  // 1. Fetch the longest flame (excluding the current/active one)
+  let longestFlame = null;
+  let maxDuration = 0;
+  try {
+    const { data: flames, error } = await supabase
+      .from("om_flame")
+      .select("starter_user_id, started_at, ended_at")
+      .eq("active", false)
+      .not("ended_at", "is", null);
+
+    if (flames && flames.length) {
+      flames.forEach(f => {
+        if (f.started_at && f.ended_at) {
+          const dur = new Date(f.ended_at) - new Date(f.started_at);
+          if (dur > maxDuration) {
+            maxDuration = dur;
+            longestFlame = f;
+          }
+        }
+      });
+    }
+  } catch (err) {
+    // ignore, just don't show Longest Flame if error
+  }
+
+  // Helper: format duration ms to Xm Ys
+  function formatFlameDurationMs(ms) {
+    ms = Math.floor(ms / 1000); // seconds
+    const mins = Math.floor(ms / 60);
+    const secs = ms % 60;
+    return mins ? `${mins}min ${secs}s` : `${secs}s`;
+  }
+
+  // 2. Insert Longest Flame snippet if exists
+  const longestFlameHTML = longestFlame
+    ? `
+      <div style="margin:5px 0 2px 0;font-size:0.97em;color:#FFD700EE;">
+        <span style="color:#fff2;text-shadow:0 0 6px #FFD70066;">Longest Flame:</span>
+        <span style="color:#29D884;font-weight:bold;">${formatFlameDurationMs(maxDuration)}</span>
+        <span style="color:#fde68a; padding:0 3px;">│</span>
+		<span style="color:#fff;">${getShortUserId(longestFlame.starter_user_id)}</span>
+      </div>
+    ` : '';
+
   const tooltip = document.createElement('div');
   tooltip.id = 'flame-tooltip';
-tooltip.innerHTML = `
-  <div style="font-size:1.01rem;">
-    <div class="om-flame-heading-container" style="text-align:center;">
-      <img src="/assets/flame1.svg"
-           alt="Flame"
-           style="height:1.6em; margin-bottom:-6px; filter:drop-shadow(0 0 9px #FF8800); display:block; margin-left:auto; margin-right:auto;">
-      <b class="om-flame-heading-gradient">OM Flame</b>
+  tooltip.innerHTML = `
+    <div style="font-size:1.01rem;">
+      <div class="om-flame-heading-container" style="text-align:center;">
+        <img src="/assets/flame1.svg"
+             alt="Flame"
+             style="height:1.6em; margin-bottom:-6px; filter:drop-shadow(0 0 9px #FF8800); display:block; margin-left:auto; margin-right:auto;">
+        <b class="om-flame-heading-gradient">OM Flame</b>
+      </div>
+      <span style="color:#ffd700;">
+        This flame was first lit by 
+        <b style="color:#fff; text-shadow:0 0 8px #fff8;">${starterUserShortId}</b><br>
+        <span>
+          <span class="chakra-glow">Unified</span> for 
+          <span style="color:#29D884; font-weight:600; text-shadow:0 0 8px #29D88477;">${flameTimeEl.textContent}</span>
+        </span><br>
+        ${longestFlameHTML}
+        <a href="#" id="flame-keepers-link" style="color:#FF8800;font-size:0.97rem;font-weight:bold;display:inline-block;text-decoration:underline;margin-top:6px;cursor:pointer;">Show all keepers</a>
+      </span>
     </div>
-    <span style="color:#ffd700;">
-      This flame was first lit by 
-      <b style="color:#fff; text-shadow:0 0 8px #fff8;">${starterUserShortId}</b><br>
-      <span>
-        <span class="chakra-glow">Unified</span> for 
-        <span style="color:#29D884; font-weight:600; text-shadow:0 0 8px #29D88477;">${flameTimeEl.textContent}</span>
-      </span><br>
-      <a href="#" id="flame-keepers-link" style="color:#FF8800;font-size:0.97rem;font-weight:bold;display:inline-block;text-decoration:underline;margin-top:6px;cursor:pointer;">Show all keepers</a>
-    </span>
-  </div>
-`;
+  `;
   tooltip.style.cssText = `
     position: fixed;
     left: ${rect.left + rect.width/2}px; 
