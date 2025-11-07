@@ -10885,15 +10885,17 @@ listPopup.style.cssText = `
   z-index: 10050;
   min-width: 0;
   max-width: 320px;
-  max-height: 340px;
   width: 100%;
   box-sizing: border-box;
   overflow-x: auto;
   overflow-y: auto;
   text-align: left;
+   /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #fde68a #000000;
 `;
 
-  // Sort user IDs: longest duration first
+  // Sort user IDs: longest duration first  max-height: 340px;
 const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
 const currentUserId = localStorage.getItem('omUserId');
 const liveIds = new Set(livePresenceRows.map(row => row.user_id));
