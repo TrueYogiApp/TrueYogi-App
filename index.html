@@ -10664,9 +10664,9 @@ flameTimer.onclick = async function(e) {
   const rect = flameTimeEl.getBoundingClientRect();
   let starterUserShortId = lastStarterUserId ? `${getShortUserId(lastStarterUserId)}` : 'Unknown';
 
-  // 1. Fetch the longest flame (excluding the current/active one)
+  // 1. Fetch the longest completed flame
   let longestFlame = null;
-  let maxDuration = 0;
+  let maxDuration = 0; // in ms
   try {
     const { data: flames, error } = await supabase
       .from("om_flame")
@@ -10689,24 +10689,32 @@ flameTimer.onclick = async function(e) {
     // ignore, just don't show Longest Flame if error
   }
 
-  // Helper: format duration ms to Xm Ys
-  function formatFlameDurationMs(ms) {
-    ms = Math.floor(ms / 1000); // seconds
-    const mins = Math.floor(ms / 60);
-    const secs = ms % 60;
-    return mins ? `${mins}min ${secs}s` : `${secs}s`;
-  }
+  // 2. Get current session duration (in ms)
+  // You can get this in various ways, here we use the formatted time in the counter if that's all you have:
+  // It's safer to use a direct duration if you have started_at/live
+  let currentFlameDuration = 0;
+  try {
+    // If you track lastFlameStarted:
+    if (lastFlameStarted) {
+      currentFlameDuration = Date.now() - new Date(lastFlameStarted);
+    }
+  } catch {}
 
-  // 2. Insert Longest Flame snippet if exists
-  const longestFlameHTML = longestFlame
+  // 3. Only show "Longest Flame" if the current one is NOT beating the record.
+  let showLongestLine = true;
+  if (currentFlameDuration > maxDuration && maxDuration > 0) showLongestLine = false;
+
+  // 4. Generate Longest Flame HTML only if needed
+  const longestFlameHTML =
+    longestFlame && showLongestLine
     ? `
       <div style="margin:5px 0 2px 0;font-size:0.97em;color:#FFD700EE;">
         <span style="color:#fff2;text-shadow:0 0 3px #FFD70066;">Longest Flame:</span>
         <span style="color:#29D884;font-weight:bold;">${formatFlameDuration(Math.floor(maxDuration / 1000))}</span>
         <span style="color:#fde68a; padding:0 1px;">│</span>
-		<span style="color:#fff;text-shadow:0 0 8px #FFD700bb,0 0 2px #fff;">${getShortUserId(longestFlame.starter_user_id)}</span>
+        <span style="color:#fff;text-shadow:0 0 8px #FFD700bb,0 0 2px #fff;">${getShortUserId(longestFlame.starter_user_id)}</span>
       </div>
-    ` : '';
+      ` : '';
 
   const tooltip = document.createElement('div');
   tooltip.id = 'flame-tooltip';
