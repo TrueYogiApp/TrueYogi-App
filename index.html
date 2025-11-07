@@ -8680,18 +8680,23 @@ async function updateCount() {
     lastCount = 0;
     console.error(err);
   }
+    // Always sync OM counter glow ("active") with local omPresenceId
+  if (counterEl) {
+    let omPresenceId = localStorage.getItem('omPresenceId');
+    if (omPresenceId) {
+      counterEl.classList.add('active');
+    } else {
+      counterEl.classList.remove('active');
+    }
+  }
 }
 
 // clear user when closing page
 //window.addEventListener('beforeunload', () => {
-//  removeCount();
-//  stopHeartbeat(); // <--- add this
-//});
+//  removeCount();//  stopHeartbeat();//});
 //window.addEventListener('pagehide', () => {
-//  removeCount();
-//  stopHeartbeat();
-//});
-//setInterval(updateCount, 9000); // every 9 seconds
+//  removeCount();//  stopHeartbeat();//});
+// setInterval(updateCount, 9000); // every 9 seconds
 
 let heartbeatInterval = null;
 
