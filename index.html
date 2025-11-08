@@ -7108,15 +7108,17 @@ function toggleMeditationGuide() {
   const guide = document.getElementById('meditation-guide');
   if (!guide) return;
 
-  const isHidden = guide.classList.contains('hidden') || getComputedStyle(guide).display === 'none';
+  // was it hidden before toggling?
+  const wasHidden = guide.classList.contains('hidden') || getComputedStyle(guide).display === 'none';
 
-  if (isHidden) {
-    // Open the guide
-    guide.classList.remove('hidden');
-    // (optional) focus first element inside, or animate open
+  // toggle visibility
+  guide.classList.toggle('hidden');
+
+  if (wasHidden) {
+    // we just opened the guide — render the image for the current mode
+    updateMeditationGuideImage(currentMode);
   } else {
-    // Close the guide and ensure music stops
-    guide.classList.add('hidden');
+    // we just closed the guide — ensure music and glow stop
     stopMeditationMusicOnClose();
   }
 }
@@ -11749,7 +11751,6 @@ function stopMeditationMusicOnClose() {
 
   if (truemeditateImg) {
     truemeditateImg.style.filter = '';
-    truemeditateImg.classList.remove('truemeditate-playing'); // if you used a class-based approach
   }
 }
 
