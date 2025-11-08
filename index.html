@@ -3390,6 +3390,7 @@ patchiness */
   <audio id="bell" src="https://trueyogi.app/assets/meditation-end.mp3" preload="auto" muted></audio>
   <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
   <audio id="moon-sound" src="https://assets.trueyogi.app/assets/healing.m4a" preload="auto"></audio>
+  <audio id="meditate-music-audio"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
   <audio id="sound-bell" src="https://assets.trueyogi.app/assets/bell.m4a" preload="auto"></audio>
   <audio id="avatar-sound" src="https://assets.trueyogi.app/assets/meditation-eternal.m4a" preload="auto"></audio>
@@ -11645,6 +11646,79 @@ document.addEventListener('DOMContentLoaded', () => {
     muteBtn.prepend(muteIcon); // Keep icon at front
   });
 });
+
+// Attach music play handler to truemeditate.svg only
+const languageMusicMap = {
+  en: 'https://assets.trueyogi.app/assets/music/music-en.mp3',
+  te: 'https://assets.trueyogi.app/assets/music/music-te.mp3',
+  hi: 'https://assets.trueyogi.app/assets/music/music-hi.mp3',
+  es: 'https://assets.trueyogi.app/assets/music/music-es.mp3',
+  fr: 'https://assets.trueyogi.app/assets/music/music-fr.mp3',
+  de: 'https://assets.trueyogi.app/assets/music/music-de.mp3'
+};
+
+function setMeditationMusicForLang(langCode) {
+  const audio = document.getElementById('meditate-music-audio');
+  const src = languageMusicMap[langCode] || languageMusicMap['en'];
+  if (audio.src !== src) {
+    audio.src = src;
+    audio.currentTime = 0;
+    audio.pause();
+  }
+}
+
+// On page load and dropdown change:
+document.addEventListener('DOMContentLoaded', function() {
+  const langSwitch = document.getElementById('lang-switch');
+  setMeditationMusicForLang(langSwitch.value);
+
+  langSwitch.addEventListener('change', function() {
+    setMeditationMusicForLang(this.value);
+  });
+});
+
+function attachMeditationMusicHandler() {
+  const truemeditateImg = document.querySelector('#meditation-guide-image img[alt="TrueYogi Meditation"]');
+  const musicAudio = document.getElementById('meditate-music-audio');
+  if (!truemeditateImg || !musicAudio) return;
+
+  truemeditateImg.onclick = null;
+  let playing = false;
+
+  truemeditateImg.addEventListener('click', function(e) {
+    const rect = truemeditateImg.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const clickX = e.clientX;
+    const clickY = e.clientY;
+    const dist = Math.sqrt((centerX - clickX) ** 2 + (centerY - clickY) ** 2);
+
+    // Set a smaller central radius for the trigger, e.g. about 40% of SVG's smallest size
+    const tapRadius = Math.min(rect.width, rect.height) / 3;
+
+    if (dist < tapRadius) {
+      if (!playing) {
+        musicAudio.muted = false;
+        musicAudio.currentTime = 0;
+        musicAudio.volume = 0.7;
+        musicAudio.play().catch(()=>{});
+        playing = true;
+        truemeditateImg.style.filter = 'drop-shadow(0 0 22px #FFD700AA)';
+      } else {
+        musicAudio.pause();
+        musicAudio.currentTime = 0;
+        playing = false;
+        truemeditateImg.style.filter = '';
+      }
+    }
+    // If click is outside center, ignore it
+  });
+
+  musicAudio.addEventListener('ended', () => {
+    playing = false;
+    truemeditateImg.style.filter = '';
+  });
+}
 
   </script>
 	
