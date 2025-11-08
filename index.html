@@ -11060,7 +11060,7 @@ userIdDisplay.onclick = function(e) {
   // Calculate duration for current user
   let duration = "";
   if (userRow.joined_at) {
-    const secs = (Date.now() - new Date(userRow.joined_at)) / 1000;
+    const secs = Math.floor((Date.now() - new Date(userRow.joined_at)) / 1000);
     duration = formatDuration(secs);
   }
 
@@ -11536,7 +11536,7 @@ function showUserListPopup(users, parentPopup, x, y) {
       ${users.map(u => {
         let duration = "";
         if (u.joined_at) {
-          const secs = (Date.now() - new Date(u.joined_at)) / 1000;
+          const secs = Math.floor((Date.now() - new Date(u.joined_at)) / 1000);
           duration = formatDuration(secs);
         }
         // Bold and highlight current user
