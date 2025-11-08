@@ -10872,28 +10872,39 @@ async function showAllFlameKeepers(x, y) {
   // Display list of users with flag, shortUserId, SUMMED duration
   const listPopup = document.createElement('div');
   listPopup.id = 'flame-keeper-list';
-listPopup.style.cssText = `
-  position: fixed;
-  left: ${x}px; top: ${y + 32}px;
-  transform: translate(-50%, 0);
-  background: rgba(0,0,0,0.96);
-  color: #ffd700;
-  font-size: 0.98rem;
-  padding: 9px 18px;
-  border-radius: 11px;
-  box-shadow: 0 0 14px #ffd70066;
-  z-index: 10050;
-  min-width: 0;
-  max-width: 320px;
-  width: 100%;
-  box-sizing: border-box;
-  overflow-x: auto;
-  overflow-y: auto;
-  text-align: left;
-   /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: #fde68a #000000;
-`;
+  listPopup.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y + 32}px;
+    transform: translate(-50%, 0);
+    background: rgba(0,0,0,0.96);
+    color: #ffd700;
+    font-size: 0.98rem;
+    padding: 9px 18px;
+    border-radius: 11px;
+    box-shadow: 0 0 14px #ffd70066;
+    z-index: 10050;
+    min-width: 0;
+    max-width: 320px;
+    width: 100%;
+    max-height: 340px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    overflow-x: hidden;
+    text-align: left;
+    /* Scrollbar styling */
+    scrollbar-width: thin;
+    scrollbar-color: #fde68a #000000;
+  `;
+
+  // Add this to prevent scroll propagation
+  listPopup.addEventListener('wheel', (e) => {
+    e.stopPropagation();
+  });
+
+  // Add touch event prevention for mobile
+  listPopup.addEventListener('touchmove', (e) => {
+    e.stopPropagation();
+  });
 
   // Sort user IDs: longest duration first  max-height: 340px;
 const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
