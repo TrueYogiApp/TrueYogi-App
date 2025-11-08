@@ -7104,11 +7104,22 @@ function updateMeditationGuideImage(mode) {
   }
 }
 
-    function toggleMeditationGuide() {
-      const guide = document.getElementById('meditation-guide');
-      guide.classList.toggle('hidden');
-	  updateMeditationGuideImage(currentMode);
-    }
+function toggleMeditationGuide() {
+  const guide = document.getElementById('meditation-guide');
+  if (!guide) return;
+
+  const isHidden = guide.classList.contains('hidden') || getComputedStyle(guide).display === 'none';
+
+  if (isHidden) {
+    // Open the guide
+    guide.classList.remove('hidden');
+    // (optional) focus first element inside, or animate open
+  } else {
+    // Close the guide and ensure music stops
+    guide.classList.add('hidden');
+    stopMeditationMusicOnClose();
+  }
+}
 
 function handleVisibilityChange() {
   if (!document.hidden) {
@@ -11723,6 +11734,23 @@ function attachMeditationMusicHandler() {
     playing = false;
     truemeditateImg.style.filter = '';
   });
+}
+
+function stopMeditationMusicOnClose() {
+  const musicAudio = document.getElementById('meditate-music-audio');
+  const truemeditateImg = document.querySelector('#meditation-guide-image img[alt="TrueYogi Meditation"]');
+
+  if (musicAudio) {
+    try { musicAudio.pause(); } catch (e) {}
+    try { musicAudio.currentTime = 0; } catch (e) {}
+    // trigger any existing ended handlers so they can clear local flags/UI
+    try { musicAudio.dispatchEvent(new Event('ended')); } catch (e) {}
+  }
+
+  if (truemeditateImg) {
+    truemeditateImg.style.filter = '';
+    truemeditateImg.classList.remove('truemeditate-playing'); // if you used a class-based approach
+  }
 }
 
   </script>
