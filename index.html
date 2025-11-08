@@ -7097,6 +7097,11 @@ function updateMeditationGuideImage(mode) {
   img.style.width = 'auto';
   img.style.display = 'block';
   imageDiv.appendChild(img);
+  
+    // Only attach music to truemeditate image
+  if (mode === 'yogi') {
+    attachMeditationMusicHandler();
+  }
 }
 
     function toggleMeditationGuide() {
