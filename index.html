@@ -10659,7 +10659,7 @@ let flameTimer = document.getElementById('om-flame-timer');
 if (!flameTimer) {
   flameTimer = document.createElement('div');
   flameTimer.id = 'om-flame-timer';
-flameTimer.style.cssText = `
+  flameTimer.style.cssText = `
   position: absolute;
   bottom: 33%;
   left: 50%;
@@ -10736,8 +10736,6 @@ const longestFlameHTML =
     <div style="margin:5px 0 2px 0;font-size:0.97em;color:#FFD700EE;">
       <span style="color:#fff2;text-shadow:0 0 3px #FFD70066;">Longest Flame:</span>
       <span style="color:#29D884;font-weight:bold;">${formatFlameDuration(Math.floor(maxDuration / 1000))}</span>
-      <span style="color:#fde68a; padding:0 1px;">│</span>
-      <span style="color:#fff;text-shadow:0 0 8px #FFD700bb,0 0 2px #fff;">${getShortUserId(longestFlame.starter_user_id)}</span>
       <a href="#" id="longest-flame-keepers-link" style="
         color:#ff8800;text-decoration:underline;margin-left:12px;cursor:pointer;font-weight:600;
       ">Show keepers</a>
@@ -10761,7 +10759,7 @@ const longestFlameHTML =
         <span>
           <span class="chakra-glow">Unified</span> for 
           <span style="color:#29D884; font-weight:600; text-shadow:0 0 8px #29D88477;">${flameTimeEl.textContent}</span>
-        </span><br>
+        </span><br>  
         <a href="#" id="flame-keepers-link" style="color:#FF8800;font-size:0.97rem;font-weight:bold;display:inline-block;text-decoration:underline;margin-top:6px;cursor:pointer;">Show all keepers</a>
         ${longestFlameHTML}
 	  </span>
@@ -10798,13 +10796,13 @@ const longestFlameHTML =
 
 tooltip.querySelector('#longest-flame-keepers-link').onclick = function(ev) {
   ev.preventDefault();
-  // Pass the time window of the longest flame
   showAllFlameKeepersForPeriod(
     longestFlame.started_at,
     longestFlame.ended_at,
+    longestFlame.starter_user_id,
     rect.left + rect.width/2,
     rect.top
-  ); // Show at same position as tooltip
+  );
 };
 
   setTimeout(() => {
@@ -10950,7 +10948,7 @@ async function showAllFlameKeepers(x, y) {
     e.stopPropagation();
   });
 
-  // Sort user IDs: longest duration first  max-height: 340px;
+  // Sort user IDs: longest duration first
 const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
 const currentUserId = localStorage.getItem('omUserId');
 const liveIds = new Set(livePresenceRows.map(row => row.user_id));
@@ -10997,19 +10995,19 @@ if (userIds.length === 0) {
   setTimeout(() => listPopup.remove(), 12000);
 }
 
-async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, x, y) {
+async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starterUserId, x, y) {
   // Remove any previous keeper popup
   const oldList = document.getElementById('flame-keeper-list');
   if (oldList) oldList.remove();
 
-  // Query the session table for all sessions that started AND ended within the completed flame's duration
+  // Query sessions for all users in completed flame's duration
   let { data, error } = await supabase
     .from('om_sessions')
     .select('user_id, country, countryCode, duration_seconds, started_at, ended_at')
     .gte('started_at', new Date(flameStartedAt).toISOString())
     .lte('ended_at', new Date(flameEndedAt).toISOString());
 
-  // Fallback UI if no data
+  // Fallback UI
   if (error || !data || data.length === 0) {
     const fallbackPopup = document.createElement('div');
     fallbackPopup.id = 'flame-keeper-list';
@@ -11035,26 +11033,25 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, x, y) 
     return;
   }
 
-  // Build durations per user
-  const userDurations = {}; // user_id -> sum of seconds
-  const userRows = {}; // user_id -> any row (for country, etc.)
+  // Durations per user & starter
+  const userDurations = {};
+  const userRows = {};
 
   data.forEach(row => {
     if (!row.user_id) return;
-    let duration = 0;
-    if (row.ended_at) {
-      duration = row.duration_seconds || Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000);
-    } else {
-      duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
-    }
+    let duration = row.ended_at
+      ? row.duration_seconds || Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000)
+      : Math.floor((Date.now() - new Date(row.started_at)) / 1000);
     userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
     if (!userRows[row.user_id]) userRows[row.user_id] = row;
   });
 
-  // Sort by longest total duration
-  const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
+  // Sort all userIds by duration (excluding the starter from normal list)
+  const keeperUserIds = Object
+    .keys(userDurations)
+    .filter(id => id !== starterUserId)
+    .sort((a, b) => userDurations[b] - userDurations[a]);
 
-  // Get current user id for highlight
   const currentUserId = localStorage.getItem('omUserId');
 
   // Build popup HTML
@@ -11082,45 +11079,61 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, x, y) 
     scrollbar-width: thin;
     scrollbar-color: #fde68a #000000;
   `;
-
-  // Prevent scroll propagation
   listPopup.addEventListener('wheel', (e) => { e.stopPropagation(); });
   listPopup.addEventListener('touchmove', (e) => { e.stopPropagation(); });
 
-  if (userIds.length === 0) {
-    listPopup.innerHTML = `<i>No Flame Keepers found for this record.</i>`;
-  } else {
-    listPopup.innerHTML = `
-      <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-        <strong>Longest Flame Keepers</strong>
-        <div style="font-size:0.89em;color:#bbb;margin-top:2px;">
-          (${userIds.length} soul${userIds.length > 1 ? 's' : ''} unified)
-        </div>
+  let keeperHtml = `
+    <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
+      <strong>Longest Flame Keepers</strong>
+      <div style="font-size:0.89em;color:#bbb;margin-top:2px;">
+        (${keeperUserIds.length + 1} soul${keeperUserIds.length ? 's' : ''} unified)
       </div>
-      ${userIds.map((id, index) => {
-        const row = userRows[id];
-        const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
-        const isCurrentUser = id === currentUserId;
-        return `
-          <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-            <span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
-            <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
-            <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-              ${getShortUserId(id)}
-            </span>
-            <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
-            <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-              ${formatDuration(userDurations[id])}
-            </span>
-          </div>
-        `;
-      }).join('')}
+    </div>
+  `;
+
+  // Show starter as the first keeper ★
+  if (starterUserId && userRows[starterUserId]) {
+    const starterRow = userRows[starterUserId];
+    const starterCode = starterRow.countryCode ? starterRow.countryCode.toLowerCase() : "un";
+    const starterDuration = formatDuration(userDurations[starterUserId] || 0);
+    keeperHtml += `
+      <div style="padding:7px 0 5px 0;display:flex;align-items:center;gap:0;background:#22222233;font-weight:bold;">
+        <span style="color:#FFD700;font-size:1.07em;min-width:18px;">★</span>
+        <img src="https://flagcdn.com/w20/${starterCode}.png" style="width:20px;height:15px;border-radius:2px;box-shadow:0 0 2px #000;">
+        <span style="font-family:monospace; font-size:1.1em; color:#FFD700;font-weight:bold;text-shadow:0 0 8px #fff;">
+          ${getShortUserId(starterUserId)}
+        </span>
+        <img src="assets/clock.svg" style="width:17px; height:17px; vertical-align:middle; margin:0 3px;">
+        <span style="color:#FFD700;font-weight:bold;text-shadow:0 0 8px #fff;">
+          ${starterDuration} (starter)
+        </span>
+      </div>
+      <div style="border-bottom:1px solid #444;margin:2px 0 6px 0;"></div>
     `;
   }
 
-  document.body.appendChild(listPopup);
+  // Show all other keepers ranked by duration
+  keeperHtml += keeperUserIds.map((id, index) => {
+    const row = userRows[id];
+    const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
+    const isCurrentUser = id === currentUserId;
+    return `
+      <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+        <span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
+        <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+        <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
+          ${getShortUserId(id)}
+        </span>
+        <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
+        <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
+          ${formatDuration(userDurations[id])}
+        </span>
+      </div>
+    `;
+  }).join('');
 
-  // Remove popup after 12s
+  listPopup.innerHTML = keeperHtml;
+  document.body.appendChild(listPopup);
   setTimeout(() => listPopup.remove(), 12000);
 }
 
