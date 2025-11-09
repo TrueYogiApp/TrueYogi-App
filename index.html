@@ -8589,6 +8589,7 @@ function startOmSelfHeal() {
   omSelfHealInterval = setInterval(() => {
     if (omPresenceId && counterEl.classList.contains('active')) {
       if (om.paused) {
+	    om.loop = true;
         om.muted = false;
         om.volume = 0.7;
         om.play().catch(()=>{});
@@ -11108,7 +11109,7 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
 
   let keeperHtml = `
     <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-      <strong>Longest Flame Keepers</strong>
+      <strong>Flame Keepers</strong>
       <div style="font-size:0.89em;color:#bbb;margin-top:2px;">
         (${keeperUserIds.length + 1} soul${keeperUserIds.length ? 's' : ''} unified)
       </div>
