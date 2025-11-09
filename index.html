@@ -10744,10 +10744,6 @@ const longestFlameHTML =
         font-size:1em;
         text-shadow:0 0 8px #29D88477;
       ">${formatFlameDuration(Math.floor(maxDuration / 1000))}</a>
-      <span style="color:#fde68a;">│</span>
-      <span style="color:#fff;text-shadow:0 0 8px #FFD700bb,0 0 2px #fff;">
-        ${getShortUserId(longestFlame.starter_user_id)}
-      </span>
     </div>
   `
   : '';
@@ -11114,7 +11110,7 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
         </span>
         <img src="assets/clock.svg" style="width:17px; height:17px; vertical-align:middle; margin:0 3px;">
         <span style="color:#FFD700;font-weight:bold;text-shadow:0 0 8px #fff;">
-          ${starterDuration} (starter)
+          ${starterDuration} • Kindler
         </span>
       </div>
       <div style="border-bottom:1px solid #444;margin:2px 0 6px 0;"></div>
@@ -11128,7 +11124,6 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
     const isCurrentUser = id === currentUserId;
     return `
       <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-        <span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
         <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
         <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
           ${getShortUserId(id)}
