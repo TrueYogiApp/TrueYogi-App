@@ -5453,11 +5453,14 @@ function showCertificatePage() {
   const wallet = window.walletPublicKey || localStorage.getItem('currentJourneyWallet') || '';
   document.getElementById('cert-wallet').textContent = wallet ? `(Wallet: ${wallet.slice(0,4)}...${wallet.slice(-4)})` : 'N/A';
   document.getElementById('cert-startDate').textContent = challenge.startDate || 'N/A';
-  document.getElementById('cert-endDate').textContent = challenge.endDate || challenge.completionDate || 'N/A';
+  
+// Prefer showing the local completion date if available; fallback to endDate
+  const shownCompletionDate = challenge.completionDate || challenge.endDate || 'N/A';
+  document.getElementById('cert-endDate').textContent = shownCompletionDate;
   document.getElementById('cert-totalSessions').textContent = challenge.totalSessions || 'N/A';
   document.getElementById('cert-totalMinutes').textContent = challenge.totalMinutes || 'N/A';
   document.getElementById('cert-totalTokens').textContent = 'Y̐' + challenge.totalTokens || 'N/A';
-  document.getElementById('cert-issuedOn').textContent = new Date().toLocaleDateString();
+  document.getElementById('cert-issuedOn').textContent = shownCompletionDate;
   document.getElementById('cert-certId').textContent = 'TR_' + challengeData.challengeId;
 }
 
@@ -6555,13 +6558,15 @@ quoteOrder = yogiQuotes.slice().sort(() => Math.random() - 0.5); // Or your wisd
 document.getElementById('show-wisdom').textContent = t('revealTodaysWisdom');
 document.getElementById('show-wisdom').style.display = ""; // Make button visible
   
+const completionDateLocal = getLocalDateString(new Date(startTime || Date.now())); // YYYY-MM-DD local
+  
   if (showCongrats) {
   // --- ADD THIS BLOCK ---
   completedChallenges.push({
     challengeId: challengeData.challengeId,
     startDate: challengeData.startDate,
     endDate: challengeData.endDate,
-    completionDate: new Date().toISOString().split('T')[0],
+    completionDate: completionDateLocal,
     claimed: false,
     claimTxId: null,
 	totalTokens: challengeData.totalTokens,
@@ -6578,7 +6583,7 @@ document.getElementById('show-wisdom').style.display = ""; // Make button visibl
     challenge_id: challengeData.challengeId,
     start_date: challengeData.startDate,
     end_date: challengeData.endDate,
-    completion_date: new Date().toISOString().split('T')[0],
+    completion_date: completionDateLocal,
     total_tokens: challengeData.totalTokens,
 	total_minutes: challengeData.totalMinutes,
     claimed: false,
