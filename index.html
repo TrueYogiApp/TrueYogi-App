@@ -8501,13 +8501,15 @@ document.addEventListener('DOMContentLoaded', function() {
           om.volume = 0.7;
           om.play().catch(()=>{});
           isPlaying = true;
-		  safeAddCount()
+		  safeAddCount();
+		  startOmSelfHeal();
         } else {
           // Stop playing
           om.pause();
           om.currentTime = 0;
           isPlaying = false;
-		  safeRemoveCount()
+		  safeRemoveCount();
+		  startOmSelfHeal();
         }
       }
     });
@@ -8579,10 +8581,27 @@ function safeRemoveCount() {
   removeCount();
 }
 
-//function showOmLockNotice() {
-  // You can use a modal, toast, or just console log:
-//  alert("You've played OM too frequently. Please wait 30 minutes before joining again. This is to keep our space peaceful.");
-//}
+// --- OM self-heal sound interval ---
+let omSelfHealInterval = null;
+
+function startOmSelfHeal() {
+  stopOmSelfHeal(); // Clear any existing
+  omSelfHealInterval = setInterval(() => {
+    if (omPresenceId && counterEl.classList.contains('active')) {
+      if (om.paused) {
+        om.muted = false;
+        om.volume = 0.7;
+        om.play().catch(()=>{});
+      }
+    }
+  }, 2500); // every 2.5 seconds, tweak if needed
+}
+function stopOmSelfHeal() {
+  if (omSelfHealInterval) {
+    clearInterval(omSelfHealInterval);
+    omSelfHealInterval = null;
+  }
+}
 
 // === create the small counter display ===
 const counterEl = document.getElementById('om-counter');
