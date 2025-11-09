@@ -3391,6 +3391,7 @@ patchiness */
   <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
   <audio id="moon-sound" src="https://assets.trueyogi.app/assets/healing.m4a" preload="auto"></audio>
   <audio id="meditate-music-audio"></audio>
+  <audio id="awareness-sound" src="https://assets.trueyogi.app/assets/music/music-en.mp3"></audio>
   <audio id="bg-music-player" preload="auto" loop></audio>
   <audio id="sound-bell" src="https://assets.trueyogi.app/assets/bell.m4a" preload="auto"></audio>
   <audio id="avatar-sound" src="https://assets.trueyogi.app/assets/meditation-eternal.m4a" preload="auto"></audio>
@@ -10879,11 +10880,32 @@ document.addEventListener('click', function(e) {
       z-index: 10050;
       opacity: 0;
       transition: opacity 0.2s ease;
-      pointer-events: none;
+      pointer-events: auto;
     `;
     
     document.body.appendChild(awarenessTooltip);
     
+	awarenessTooltip.addEventListener('click', function(e) {
+  const awAudio = document.getElementById('awareness-sound');
+  if (awAudio) {
+    if (awAudio.paused) {
+      // If paused, play
+      awAudio.currentTime = 0;
+      awAudio.muted = false;
+      awAudio.volume = 0.75;
+      awAudio.play().catch(err => {
+        console.log('Audio play failed:', err);
+      });
+    } else {
+      // If playing, pause
+      awAudio.pause();
+      awAudio.currentTime = 0;
+    }
+  } else {
+    console.log('Audio element not found!');
+  }
+});
+
     // Fade in
     setTimeout(() => awarenessTooltip.style.opacity = 1, 10);
     
