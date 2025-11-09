@@ -10762,9 +10762,9 @@ const longestFlameHTML =
           <span class="chakra-glow">Unified</span> for 
           <span style="color:#29D884; font-weight:600; text-shadow:0 0 8px #29D88477;">${flameTimeEl.textContent}</span>
         </span><br>
-        ${longestFlameHTML}
         <a href="#" id="flame-keepers-link" style="color:#FF8800;font-size:0.97rem;font-weight:bold;display:inline-block;text-decoration:underline;margin-top:6px;cursor:pointer;">Show all keepers</a>
-      </span>
+        ${longestFlameHTML}
+	  </span>
     </div>
   `;
   tooltip.style.cssText = `
@@ -10795,6 +10795,17 @@ const longestFlameHTML =
     ev.preventDefault();
     showAllFlameKeepers(rect.left + rect.width/2, rect.top); // Show at same position
   };
+
+tooltip.querySelector('#longest-flame-keepers-link').onclick = function(ev) {
+  ev.preventDefault();
+  // Pass the time window of the longest flame
+  showAllFlameKeepersForPeriod(
+    longestFlame.started_at,
+    longestFlame.ended_at,
+    rect.left + rect.width/2,
+    rect.top
+  ); // Show at same position as tooltip
+};
 
   setTimeout(() => {
     tooltip.style.opacity = 0;
