@@ -11103,7 +11103,6 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
     const starterDuration = formatDuration(userDurations[starterUserId] || 0);
     keeperHtml += `
       <div style="padding:7px 0 5px 0;display:flex;align-items:center;gap:0;background:#22222233;font-weight:bold;">
-        <span style="color:#FFD700;font-size:1.07em;min-width:18px;">★</span>
         <img src="https://flagcdn.com/w20/${starterCode}.png" style="width:20px;height:15px;border-radius:2px;box-shadow:0 0 2px #000;">
         <span style="font-family:monospace; font-size:1.1em; color:#FFD700;font-weight:bold;text-shadow:0 0 8px #fff;">
           ${getShortUserId(starterUserId)}
