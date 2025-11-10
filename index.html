@@ -6092,6 +6092,29 @@ function cancelStartMeditation() {
   document.getElementById('start-meditation-modal').classList.add('hidden');
 }
 
+let meditationSelfHealInterval = null;
+
+function startMeditationSelfHeal() {
+  stopMeditationSelfHeal();
+  meditationSelfHealInterval = setInterval(() => {
+    if (backgroundAudio && sessionActive) {
+      if (backgroundAudio.paused) {
+        backgroundAudio.loop = true;    // Safe to re-assert
+        backgroundAudio.muted = false;
+        backgroundAudio.volume = 0.5;
+        backgroundAudio.play().catch(()=>{});
+      }
+    }
+  }, 2500); // every 2.5 seconds
+}
+
+function stopMeditationSelfHeal() {
+  if (meditationSelfHealInterval) {
+    clearInterval(meditationSelfHealInterval);
+    meditationSelfHealInterval = null;
+  }
+}
+
   async function startMeditation() {
    // 1. If journey wallet exists but wallet is not connected, block session start 
   const journeyWallet = localStorage.getItem('currentJourneyWallet');
@@ -6295,8 +6318,12 @@ if (document.getElementById('music-toggle').checked) {
   bgMusicPlayer.volume = 0.5;
   try {
     await bgMusicPlayer.play();
+    startMeditationSelfHeal();             
   } catch (e) {
-    setTimeout(() => bgMusicPlayer.play(), 300);
+    setTimeout(() => {
+      bgMusicPlayer.play();
+      startMeditationSelfHeal();          
+    }, 300);
   }
   backgroundAudio = bgMusicPlayer;
 }
@@ -6446,6 +6473,7 @@ function updateTimer() {
 	updateHideUiBtnVisibility();
 	releaseWakeLock();
 	disableMobileAudioResume();
+	stopMeditationSelfHeal();
     
     const modal = document.getElementById('end-meditation-modal');
     if (!modal.classList.contains('hidden')) {
@@ -6506,6 +6534,7 @@ if (bgMusicPlayer) {
   bgMusicPlayer.pause();
   bgMusicPlayer.currentTime = 0;
   backgroundAudio = null;
+  stopMeditationSelfHeal();
 }
 
     document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -7132,6 +7161,13 @@ function toggleMeditationGuide() {
 function handleVisibilityChange() {
   if (!document.hidden) {
   completeExpiredSessionIfNeeded();
+      // Resume OM music if needed
+    const omAudio = document.getElementById('om-sound');
+    if (omAudio && omAudio.paused && window.omPresenceId) {
+      omAudio.muted = false;
+      omAudio.volume = 0.7;
+      omAudio.play().catch(() => {});
+    }
     // When user returns to tab
     if (sessionActive) {
 	  requestWakeLock();
