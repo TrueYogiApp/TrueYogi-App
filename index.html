@@ -10105,6 +10105,13 @@ async function fetchCountryStats() {
 }
 
 function formatDuration(seconds) {
+  const hrs = Math.floor(seconds / 3600);
+  const mins = Math.floor((seconds % 3600) / 60);
+  if (hrs > 0) return `${hrs} hr${hrs > 1 ? 's' : ''} ${mins} min${mins !== 1 ? 's' : ''}`;
+  return `${mins} min${mins !== 1 ? 's' : ''}`;
+}
+
+function formatDurationGrid(seconds) {
   const days = Math.floor(seconds / 86400);
   const hrs  = Math.floor((seconds % 86400) / 3600);
   const mins = Math.floor((seconds % 3600) / 60);
@@ -10132,7 +10139,7 @@ async function showCountryStatsOnEarthGrid() {
        <img src="https://flagcdn.com/w40/${code}.png"
            style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
         <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
-          ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} · ${formatDuration(stat.total_seconds)}
+          ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} · ${formatDurationGrid(stat.total_seconds)}
         </span>
       </span>
     `;
@@ -10318,7 +10325,7 @@ bar.querySelectorAll('.user-scroll-flag').forEach(el => {
         <img src="https://flagcdn.com/w40/${code}.png"
              style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
         <span style="font-weight:bold;font-size:1em;padding-left:7px;">
-          ${formatDuration(stat.total_seconds)}
+          ${formatDurationGrid(stat.total_seconds)}
         </span>
       </span>
     `;
@@ -10486,7 +10493,7 @@ if (userIds.length === 0) {
           </span>
           <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
           <span style="color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-            ${formatDuration(userDurations[id])}
+            ${formatDurationGrid(userDurations[id])}
           </span>
         </div>
       `;
@@ -11066,7 +11073,7 @@ if (userIds.length === 0) {
           </span>
           <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
           <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-            ${formatDuration(userDurations[id])}
+            ${formatDurationGrid(userDurations[id])}
           </span>
         </div>
       `;
@@ -11178,7 +11185,7 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
   if (starterUserId && userRows[starterUserId]) {
     const starterRow = userRows[starterUserId];
     const starterCode = starterRow.countryCode ? starterRow.countryCode.toLowerCase() : "un";
-    const starterDuration = formatDuration(userDurations[starterUserId] || 0);
+    const starterDuration = formatDurationGrid(userDurations[starterUserId] || 0);
     keeperHtml += `
       <div style="padding:7px 0 5px 0;display:flex;align-items:center;gap:0;background:#22222233;font-weight:bold;">
         <img src="https://flagcdn.com/w20/${starterCode}.png" style="width:20px;height:15px;border-radius:2px;box-shadow:0 0 2px #000;">
@@ -11207,7 +11214,7 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
         </span>
         <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
         <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-          ${formatDuration(userDurations[id])}
+          ${formatDurationGrid(userDurations[id])}
         </span>
       </div>
     `;
