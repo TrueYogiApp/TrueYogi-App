@@ -3607,14 +3607,13 @@ function disableMobileAudioResume() {
 }
 
 // Function to request screen wake lock
-// Function to request screen wake lock
 async function requestWakeLock() {
   try {
     if (isWakeLockSupported && document.visibilityState === 'visible') {
       wakeLock = await navigator.wakeLock.request('screen');
-      console.log('Screen Wake Lock is active');
+      //console.log('Screen Wake Lock is active');
       wakeLock.addEventListener('release', () => {
-        console.log('Screen Wake Lock was released');
+       // console.log('Screen Wake Lock was released');
         // Try to reacquire if we're still in a session and tab is visible
         if (sessionActive && document.visibilityState === 'visible') {
           setTimeout(requestWakeLock, 1000);
