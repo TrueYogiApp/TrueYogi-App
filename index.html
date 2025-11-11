@@ -10866,16 +10866,20 @@ const longestFlameHTML =
     showAllFlameKeepers(rect.left + rect.width/2, rect.top); // Show at same position
   };
 
-tooltip.querySelector('#longest-flame-keepers-link').onclick = function(ev) {
-  ev.preventDefault();
-  showAllFlameKeepersForPeriod(
-    longestFlame.started_at,
-    longestFlame.ended_at,
-    longestFlame.starter_user_id,
-    rect.left + rect.width/2,
-    rect.top
-  );
-};
+// Only add handler for longestFlame link if present:
+const longestFlameLink = tooltip.querySelector('#longest-flame-keepers-link');
+if (longestFlameLink) {
+  longestFlameLink.onclick = function(ev) {
+    ev.preventDefault();
+    showAllFlameKeepersForPeriod(
+      longestFlame.started_at,
+      longestFlame.ended_at,
+      longestFlame.starter_user_id,
+      rect.left + rect.width/2,
+      rect.top
+    );
+  };
+}
 
   setTimeout(() => {
     tooltip.style.opacity = 0;
