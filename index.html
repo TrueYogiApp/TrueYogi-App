@@ -8521,6 +8521,8 @@ document.addEventListener('DOMContentLoaded', function() {
     om.loop = true;
     
     logo.addEventListener('click', function(e) {
+	  e.stopPropagation();
+      e.preventDefault(); 
       // Get logo position and click coordinates
       const rect = logo.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -8621,24 +8623,26 @@ function safeRemoveCount() {
 // --- OM self-heal sound interval ---
 let omSelfHealInterval = null;
 
-function startOmSelfHeal() {
-  stopOmSelfHeal(); // Clear any existing
-  omSelfHealInterval = setInterval(() => {
-    if (omPresenceId && counterEl.classList.contains('active')) {
-      if (om.paused) {
-	    om.loop = true;
-        om.muted = false;
-        om.volume = 0.7;
-        om.play().catch(()=>{});
-      }
-    }
-  }, 2500); // every 2.5 seconds, tweak if needed
-}
 function stopOmSelfHeal() {
   if (omSelfHealInterval) {
     clearInterval(omSelfHealInterval);
     omSelfHealInterval = null;
   }
+}
+function startOmSelfHeal() {
+  stopOmSelfHeal();
+  if (!window.om || !window.counterEl) return;
+  omSelfHealInterval = setInterval(() => {
+    // omPresenceId and counterEl must be global/shared if used!
+    if (window.omPresenceId && window.counterEl.classList.contains('active')) {
+      if (window.om.paused) {
+        window.om.loop = true;
+        window.om.muted = false;
+        window.om.volume = 0.7;
+        window.om.play().catch(()=>{});
+      }
+    }
+  }, 2500);
 }
 
 // === create the small counter display ===
@@ -11645,8 +11649,8 @@ function togglePowerNodesGlow() {
     if (!found) { closeEarthGrid(); }
   };
 
-  // --- Fade out after 9 min (unchanged) ---
-  setTimeout(() => closeEarthGrid(), 540000);
+  // --- Fade out after 30 min (unchanged) ---
+  setTimeout(() => closeEarthGrid(), 3000000);
 }
 
 function formatTotalDuration(seconds) {
