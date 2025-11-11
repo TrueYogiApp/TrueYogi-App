@@ -11338,19 +11338,89 @@ userIdDisplay.onclick = function(e) {
     duration = formatDuration(secs);
   }
 
+  // --- HEARTBEAT WARNING LOGIC ---
+  let heartbeatStyle = "color:#ffd700"; // normal gold
+  let lastHeartbeatStr = "";
+  let nextHeartbeatStr = "";
+  let missedHeartbeat = false;
+  let nextCountdownText = "";
+  let nextHeartbeatDate = null;
+  if (userRow.last_heartbeat) {
+    const lastHeartbeatDate = new Date(userRow.last_heartbeat);
+    lastHeartbeatStr = lastHeartbeatDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // 30min + custom grace (change graceMins for your threshold)
+    const graceMins = 30;
+    const now = Date.now();
+    const lastMs = lastHeartbeatDate.getTime();
+    missedHeartbeat = (now - lastMs) > (graceMins * 60 * 1000);
+
+    if (missedHeartbeat) {
+      heartbeatStyle = "color:#ffa366;font-weight:bold;text-shadow:0 0 8px #ff9944"; // warning orange
+    }
+    nextHeartbeatDate = new Date(lastMs + 30 * 60 * 1000);
+    nextHeartbeatStr = nextHeartbeatDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // -- Countdown until next heartbeat
+    const timeLeftMs = nextHeartbeatDate - now;
+    if (timeLeftMs < 0) {
+      nextCountdownText = "Due now!";
+    } else {
+      const minsLeft = Math.floor(timeLeftMs / 60000);
+      const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
+      nextCountdownText = `${minsLeft} min${minsLeft !== 1 ? 's' : ''} ${secsLeft}s left`;
+    }
+  }
+
   // Get position (show near the Grid ID bar)
   const rect = userIdDisplay.getBoundingClientRect();
   const x = rect.left + rect.width / 2;
-  const y = rect.top - 10; // just above the bar
+  const y = rect.top - 10;
 
   // Remove any existing popup
   const oldPopup = document.getElementById('current-user-mins-popup');
   if (oldPopup) oldPopup.remove();
 
-  // Create a minimal popup
+  // Build your popup with heartbeat warning color and countdown
   const popup = document.createElement('div');
   popup.id = 'current-user-mins-popup';
-  popup.innerHTML = `<span style="font-size:1.05em;font-weight:bold;color:#ffd700;">${duration}</span>`;
+  popup.innerHTML = `
+    <div style="font-size:1.2em;font-weight:800;color:#ffd700;margin-bottom:3px;letter-spacing:1px;">
+      ${duration} <span style="font-size:0.7em;font-weight:normal;">connected</span>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:9px;">
+      <span style="width:24px;height:24px;border-radius:50%;display:inline-block;
+        background: radial-gradient(circle at 50% 50%, ${missedHeartbeat?'#f72b29':'#29D884'} 0%, #332c2c 90%);
+        box-shadow: 0 0 9px ${missedHeartbeat?'#f72b29':'#29D884'};">
+        <svg viewBox="0 0 20 20" fill="none" style="width:100%;height:100%;">
+          <path d="M4 11 L7 7 L10 13 L13 10 L16 13" stroke="#fff" stroke-width="2" fill="none"/>
+        </svg>
+      </span>
+      <span style="font-size:1em;color:#ffe066;">
+        <b>${lastHeartbeatStr || 'None'}</b>
+        <br>
+        <span style="font-size:0.9em;color:${missedHeartbeat?'#ff9944':'#29D884'};">
+          ${missedHeartbeat?'<b>Resonance interrupted!</b>':'Resonance active.'}
+        </span>
+      </span>
+    </div>
+    <hr style="opacity:0.2;">
+    <div style="display:flex;align-items:center;justify-content:center;gap:7px;">
+      <span style="font-size:1em;color:#ffe066;">
+        Next heartbeat: <b>${nextHeartbeatStr || 'Unknown'}</b>
+        <br>
+        <span id="hb-countdown" style="font-size:0.95em;color:#ffd700;">
+          ${nextCountdownText}
+        </span>
+      </span>
+    </div>
+${missedHeartbeat 
+  ? `<div style="margin-top:12px;font-size:1.01em;color:#ff4444;font-weight:bold;">
+        Heartbeat missed! Please reconnect.
+     </div>`
+  : ''
+}
+  `;
   popup.style.cssText = `
     position: fixed;
     left: ${x}px; top: ${y}px;
@@ -11359,20 +11429,41 @@ userIdDisplay.onclick = function(e) {
     color: #ffd700;
     font-family: 'Poppins', sans-serif;
     font-size: 1.02rem;
-    padding: 7px 18px;
+    padding: 11px 18px;
     border-radius: 12px;
     box-shadow: 0 0 10px #ffd70066;
     z-index: 10020;
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.18s;
+    text-align: center;
   `;
   document.body.appendChild(popup);
   setTimeout(() => popup.style.opacity = 1, 10);
+
+  // --- Live countdown update for heartbeat ---
+  if (nextHeartbeatDate) {
+    function updateCountdown() {
+      const countdownEl = document.getElementById("hb-countdown");
+      if (!countdownEl) return;
+      const timeLeftMs = nextHeartbeatDate - Date.now();
+      if (timeLeftMs < 0) {
+        countdownEl.textContent = "Due now!";
+        return;
+      }
+      const minsLeft = Math.floor(timeLeftMs / 60000);
+      const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
+      countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
+    }
+    const intervalId = setInterval(updateCountdown, 1000);
+    updateCountdown();
+    setTimeout(() => clearInterval(intervalId), 12000);
+  }
+  
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 400);
-  }, 6000);
+  }, 12000);
 };
 
 showCountryStatsOnEarthGrid(); 
