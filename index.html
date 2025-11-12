@@ -11335,7 +11335,7 @@ userIdDisplay.onclick = function(e) {
   let duration = "";
   if (userRow.joined_at) {
     const secs = Math.floor((Date.now() - new Date(userRow.joined_at)) / 1000);
-    duration = formatDuration(secs);
+    duration = formatDurationGrid(secs);
   }
 
   // --- HEARTBEAT WARNING LOGIC ---
