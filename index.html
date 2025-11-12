@@ -1954,6 +1954,12 @@ patchiness */
   to   { text-shadow: 0 0 30px #FFD700dd, 0 0 7px #fff; }
 }
 
+@keyframes pulse-flash {
+  0% { color: #ffd700; background: none; }
+  30% { color: #fff; background: #29D88455; }
+  70% { color: #29D884; background: #ffd70066; }
+  100% { color: #ffd700; background: none; }
+}
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -11446,10 +11452,19 @@ ${missedHeartbeat
       const countdownEl = document.getElementById("hb-countdown");
       if (!countdownEl) return;
       const timeLeftMs = nextHeartbeatDate - Date.now();
-      if (timeLeftMs < 0) {
+    if (timeLeftMs < 0) {
+      if (missedHeartbeat) {
         countdownEl.textContent = "Due now!";
-        return;
+        countdownEl.style.animation = "";
+      } else {
+        countdownEl.textContent = "Pulse received!";
+        countdownEl.style.animation = "pulse-flash 9s ease";
+        clearInterval(intervalId); // Stop further updates!
+        // Remove animation after tooltip disappears
+        setTimeout(() => countdownEl.style.animation = "", 12000);
       }
+      return;
+    }
       const minsLeft = Math.floor(timeLeftMs / 60000);
       const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
       countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
