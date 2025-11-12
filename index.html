@@ -11385,37 +11385,37 @@ userIdDisplay.onclick = function(e) {
   const popup = document.createElement('div');
   popup.id = 'current-user-mins-popup';
 popup.innerHTML = `
-  <div style="font-size:1.2em;font-weight:800;color:#ffd700;margin-bottom:3px;letter-spacing:1px;">
-    ${duration} <span style="font-size:0.7em;font-weight:normal;">connected</span>
+  <div style="font-size:1.2em;font-weight:800;color:#ffd700;margin-bottom:5px;letter-spacing:1px;text-align:center;">
+    ${duration} <span style="font-size:0.7em;font-weight:normal;opacity:0.9;">connected</span>
   </div>
-  <div style="display:flex;align-items:center;justify-content:center;gap:9px;">
-    <span style="width:24px;height:24px;border-radius:50%;display:inline-block;
-      background: radial-gradient(circle at 50% 50%, ${missedHeartbeat?'#f72b29':'#29D884'} 0%, #332c2c 90%);
-      box-shadow: 0 0 9px ${missedHeartbeat?'#f72b29':'#29D884'};">
-      <svg viewBox="0 0 20 20" fill="none" style="width:100%;height:100%;">
-        <path d="M4 11 L7 7 L10 13 L13 10 L16 13" stroke="#fff" stroke-width="2" fill="none"/>
+  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;">
+    <span style="width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+      background: radial-gradient(circle at 50% 50%, ${missedHeartbeat?'#f72b29':'#29D884'} 0%, #2a2525 90%);
+      box-shadow: 0 0 12px ${missedHeartbeat?'#f72b29':'#29D884'}, inset 0 1px 1px rgba(255,255,255,0.2);">
+      <svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.3));">
+        <path d="M4 11 L7 7 L10 13 L13 10 L16 13" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
       </svg>
     </span>
-    <span style="font-size:1em;color:#ffe066;">
-      <span style="font-size:0.9em;color:${missedHeartbeat?'#ff9944':'#29D884'};">
-        ${missedHeartbeat?'<b>Resonance interrupted!</b>':'Resonance active.'}
+    <span style="font-size:1.05em;color:#ffe066;">
+      <span style="font-size:0.95em;color:${missedHeartbeat?'#ff9944':'#29D884'};font-weight:600;">
+        ${missedHeartbeat?'Resonance interrupted!':'Resonance active'}
       </span>
     </span>
   </div>
-  <hr style="opacity:0.2;">
-  <div style="display:flex;align-items:center;justify-content:center;gap:7px;">
-    <span style="font-size:1em;color:#ffe066;">
-      <span style="font-weight:600;">Next heartbeat: </span><b>${nextHeartbeatStr || 'Unknown'}</b>
+  <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;">
+    <span style="font-size:1em;color:#ffe066;line-height:1.4;">
+      <span style="font-weight:600;opacity:0.9;">Next pulse: </span><b style="color:#ffd700;">${nextHeartbeatStr || 'Unknown'}</b>
       <br>
-      <span id="hb-countdown" style="font-size:0.95em;color:#ffd700;">
+      <span id="hb-countdown" style="font-size:0.95em;color:#ffd700;font-weight:600;">
         ${nextCountdownText}
       </span>
     </span>
   </div>
 ${missedHeartbeat 
-  ? `<div style="margin-top:12px;font-size:1.01em;color:#ff4444;font-weight:bold;">
-        Heartbeat missed! 
-        <span style="color:#ffd700;font-weight:bold;text-shadow:0 0 8px #fff,0 0 13px #ffd700,0 0 2px #ffd700;animation:om-glow 2s infinite alternate;">OM</span> again.
+  ? `<div style="margin-top:14px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:6px;font-size:1.02em;color:#ff6b6b;font-weight:bold;text-align:center;border:1px solid rgba(255,68,68,0.3);">
+        Pulse missed! 
+        <span style="color:#ffd700;font-weight:bold;text-shadow:0 0 8px #ffd700;animation:om-glow 2s infinite alternate;">OM</span> again.
      </div>`
   : ''
 }
