@@ -11412,10 +11412,13 @@ popup.innerHTML = `
       </span>
     </span>
   </div>
-  ${missedHeartbeat 
-    ? `<div style="margin-top:12px;font-size:1.01em;color:#ff4444;font-weight:bold;">
-        Heartbeat missed! Please reconnect.
-      </div>` : ''}
+${missedHeartbeat 
+  ? `<div style="margin-top:12px;font-size:1.01em;color:#ff4444;font-weight:bold;">
+        Heartbeat missed! 
+        <span style="color:#ffd700;font-weight:bold;text-shadow:0 0 8px #fff,0 0 13px #ffd700,0 0 2px #ffd700;animation:om-glow 2s infinite alternate;">OM</span> again.
+     </div>`
+  : ''
+}
 `;
   popup.style.cssText = `
     position: fixed;
