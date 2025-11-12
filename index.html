@@ -11410,13 +11410,16 @@ popup.innerHTML = `
   </div>
   <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
   <div style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;">
-    <span style="font-size:1em;color:#ffe066;line-height:1.4;">
-      <span style="font-weight:600;opacity:0.9;">Next pulse: </span><b style="color:#ffd700;">${nextHeartbeatStr || 'Unknown'}</b>
-      <br>
-      <span id="hb-countdown" style="font-size:0.95em;color:#ffd700;font-weight:600;">
-        ${nextCountdownText}
-      </span>
-    </span>
+<span style="font-size:1em;color:#ffe066;line-height:1.4;text-align:center;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">
+    <span style="font-weight:600;opacity:0.9;color:#ffeb99;">Next pulse:</span>
+    <b style="color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.4);">${nextHeartbeatStr || 'Unknown'}</b>
+  </div>
+  <div id="hb-countdown" style="font-size:0.95em;color:#ffd700;font-weight:700;letter-spacing:0.5px;
+                background:rgba(255,215,0,0.1);padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.2);">
+    ${nextCountdownText}
+  </div>
+</span>
   </div>
 ${missedHeartbeat 
   ? `<div style="margin-top:14px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:6px;font-size:1.02em;color:#ff6b6b;font-weight:bold;text-align:center;border:1px solid rgba(255,68,68,0.3);">
@@ -11447,32 +11450,38 @@ ${missedHeartbeat
   setTimeout(() => popup.style.opacity = 1, 10);
 
   // --- Live countdown update for heartbeat ---
-  if (nextHeartbeatDate) {
-    function updateCountdown() {
-      const countdownEl = document.getElementById("hb-countdown");
-      if (!countdownEl) return;
-      const timeLeftMs = nextHeartbeatDate - Date.now();
+if (nextHeartbeatDate) {
+  function updateCountdown() {
+    const countdownEl = document.getElementById("hb-countdown");
+    if (!countdownEl) return;
+
+    // Re-calculate missedHeartbeat on each tick
+    const now = Date.now();
+    const lastHeartbeat = userRow.last_heartbeat ? new Date(userRow.last_heartbeat).getTime() : 0;
+    const graceMins = 30;
+    const missedHeartbeatLive = (now - lastHeartbeat) > (graceMins * 60 * 1000);
+
+    const timeLeftMs = nextHeartbeatDate - now;
     if (timeLeftMs < 0) {
-      if (missedHeartbeat) {
+      if (missedHeartbeatLive) {
         countdownEl.textContent = "Due now!";
         countdownEl.style.animation = "";
       } else {
         countdownEl.textContent = "Pulse received!";
         countdownEl.style.animation = "pulse-flash 9s ease";
         clearInterval(intervalId); // Stop further updates!
-        // Remove animation after tooltip disappears
         setTimeout(() => countdownEl.style.animation = "", 12000);
       }
       return;
     }
-      const minsLeft = Math.floor(timeLeftMs / 60000);
-      const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
-      countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
-    }
-    const intervalId = setInterval(updateCountdown, 1000);
-    updateCountdown();
-    setTimeout(() => clearInterval(intervalId), 12000);
+    const minsLeft = Math.floor(timeLeftMs / 60000);
+    const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
+    countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
   }
+  const intervalId = setInterval(updateCountdown, 1000);
+  updateCountdown();
+  setTimeout(() => clearInterval(intervalId), 12000);
+}
   
   setTimeout(() => {
     popup.style.opacity = 0;
