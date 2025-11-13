@@ -7421,62 +7421,50 @@ function isMobile() {
   </span>
 `;
 
-    // Wait a tiny bit for DOM to be updated, then get elements
+const row = document.getElementById('wallet-status-row');
+const dot = document.getElementById('wallet-status-dot');
+const addr = document.getElementById('wallet-short-address');
+const tooltip = document.getElementById('wallet-connected-tooltip');
+const copiedEl = document.getElementById('wallet-copied');
+
+    // Auto-hide tooltip after 3 seconds
     setTimeout(() => {
-        const row = document.getElementById('wallet-status-row');
-        const tooltip = document.getElementById('wallet-connected-tooltip');
-        const copiedEl = document.getElementById('wallet-copied');
-        const addr = document.getElementById('wallet-short-address');
-
-        if (!row || !tooltip) {
-            console.error('Wallet status elements not found');
-            return;
+        if (tooltip) {
+            tooltip.style.display = 'none';
         }
+    }, 3000);
+	
+if (row && tooltip) {
+  // Show tooltip on hover
+  row.addEventListener('mouseenter', () => {
+    tooltip.style.display = 'block';
+  });
+  row.addEventListener('mouseleave', () => {
+    tooltip.style.display = 'none';
+  });
 
-        let tooltipTimeout;
-
-        // Auto-hide tooltip after 3 seconds
-        tooltipTimeout = setTimeout(() => {
-            tooltip.style.display = 'none';
-        }, 3000);
-
-        // Clear timeout on hover and restore auto-hide on mouse leave
-        row.addEventListener('mouseenter', () => {
-            clearTimeout(tooltipTimeout);
-            tooltip.style.display = 'block';
-        });
-
-        row.addEventListener('mouseleave', () => {
-            tooltip.style.display = 'none';
-            // Restart auto-hide if user hovers then leaves quickly
-            tooltipTimeout = setTimeout(() => {
-                tooltip.style.display = 'none';
-            }, 3000);
-        });
-
-        // Copy address on click (anywhere in row: dot or addr)
-        row.addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText(walletPublicKey);
-                if (copiedEl && addr) {
-                    copiedEl.style.display = 'inline';
-                    addr.style.color = '#10b981';
-                    setTimeout(() => {
-                        copiedEl.style.display = 'none';
-                        addr.style.color = '#fde68a';
-                    }, 1200);
-                }
-            } catch (e) {
-                // fallback: select and copy
-                const temp = document.createElement('textarea');
-                temp.value = walletPublicKey;
-                document.body.appendChild(temp);
-                temp.select();
-                document.execCommand('copy');
-                document.body.removeChild(temp);
-            }
-        });
-    }, 10);
+  // Copy address on click (anywhere in row: dot or addr)
+  row.addEventListener('click', async () => {
+    try {
+      await navigator.clipboard.writeText(walletPublicKey);
+      if (copiedEl && addr) {
+        copiedEl.style.display = 'inline';
+        addr.style.color = '#10b981';
+        setTimeout(() => {
+          copiedEl.style.display = 'none';
+          addr.style.color = '#fde68a';
+        }, 1200);
+      }
+    } catch (e) {
+      // fallback: select and copy
+      const temp = document.createElement('textarea');
+      temp.value = walletPublicKey;
+      document.body.appendChild(temp);
+      temp.select();
+      document.execCommand('copy');
+      document.body.removeChild(temp);
+    }
+  });
 }
 
         // Timer logic
