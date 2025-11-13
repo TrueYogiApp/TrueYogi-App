@@ -7444,27 +7444,41 @@ if (row && tooltip) {
   });
 
   // Copy address on click (anywhere in row: dot or addr)
-  row.addEventListener('click', async () => {
+// Copy address on click (anywhere in row: dot or addr)
+row.addEventListener('click', async () => {
     try {
-      await navigator.clipboard.writeText(walletPublicKey);
-      if (copiedEl && addr) {
-        copiedEl.style.display = 'inline';
-        addr.style.color = '#10b981';
-        setTimeout(() => {
-          copiedEl.style.display = 'none';
-          addr.style.color = '#fde68a';
-        }, 1200);
-      }
+        await navigator.clipboard.writeText(walletPublicKey);
+        if (copiedEl && addr) {
+            // Temporarily disable hover behavior
+            row.style.pointerEvents = 'none';
+            
+            copiedEl.style.display = 'inline';
+            addr.style.color = '#10b981';
+            
+            setTimeout(() => {
+                copiedEl.style.display = 'none';
+                addr.style.color = '#fde68a';
+                // Re-enable hover behavior after copy animation
+                setTimeout(() => {
+                    row.style.pointerEvents = 'auto';
+                }, 100);
+            }, 1200);
+        }
     } catch (e) {
-      // fallback: select and copy
-      const temp = document.createElement('textarea');
-      temp.value = walletPublicKey;
-      document.body.appendChild(temp);
-      temp.select();
-      document.execCommand('copy');
-      document.body.removeChild(temp);
+        // fallback: select and copy
+        const temp = document.createElement('textarea');
+        temp.value = walletPublicKey;
+        document.body.appendChild(temp);
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
     }
-  });
+    
+    // Force hide tooltip immediately on click
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
+});
 }
 
         // Timer logic
