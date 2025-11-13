@@ -11450,38 +11450,29 @@ ${missedHeartbeat
   setTimeout(() => popup.style.opacity = 1, 10);
 
   // --- Live countdown update for heartbeat ---
-if (nextHeartbeatDate) {
-  function updateCountdown() {
-    const countdownEl = document.getElementById("hb-countdown");
-    if (!countdownEl) return;
-
-    // Re-calculate missedHeartbeat on each tick
-    const now = Date.now();
-    const lastHeartbeat = userRow.last_heartbeat ? new Date(userRow.last_heartbeat).getTime() : 0;
-    const graceMins = 30;
-    const missedHeartbeatLive = (now - lastHeartbeat) > (graceMins * 60 * 1000);
-
-    const timeLeftMs = nextHeartbeatDate - now;
-    if (timeLeftMs < 0) {
-      if (missedHeartbeatLive) {
+  if (nextHeartbeatDate) {
+    function updateCountdown() {
+      const countdownEl = document.getElementById("hb-countdown");
+      if (!countdownEl) return;
+      const timeLeftMs = nextHeartbeatDate - Date.now();
+      if (timeLeftMs < 0) {
         countdownEl.textContent = "Due now!";
-        countdownEl.style.animation = "";
-      } else {
-        countdownEl.textContent = "Pulse received!";
-        countdownEl.style.animation = "pulse-flash 9s ease";
-        clearInterval(intervalId); // Stop further updates!
-        setTimeout(() => countdownEl.style.animation = "", 12000);
+        return;
       }
-      return;
+      const minsLeft = Math.floor(timeLeftMs / 60000);
+      const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
+      countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
     }
-    const minsLeft = Math.floor(timeLeftMs / 60000);
-    const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
-    countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
+    const intervalId = setInterval(updateCountdown, 1000);
+    updateCountdown();
+    setTimeout(() => clearInterval(intervalId), 12000);
   }
-  const intervalId = setInterval(updateCountdown, 1000);
-  updateCountdown();
-  setTimeout(() => clearInterval(intervalId), 12000);
-}
+  
+  setTimeout(() => {
+    popup.style.opacity = 0;
+    setTimeout(() => popup.remove(), 400);
+  }, 12000);
+};
   
   setTimeout(() => {
     popup.style.opacity = 0;
