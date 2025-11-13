@@ -11468,28 +11468,55 @@ ${missedHeartbeat
   setTimeout(() => popup.style.opacity = 1, 10);
 
   // --- Live countdown update for heartbeat ---
-  if (nextHeartbeatDate) {
-    function updateCountdown() {
-      const countdownEl = document.getElementById("hb-countdown");
-      if (!countdownEl) return;
-      const timeLeftMs = nextHeartbeatDate - Date.now();
-      if (timeLeftMs < 0) {
-        countdownEl.textContent = "Due now!";
+// --- Live countdown update for heartbeat ---
+if (nextHeartbeatDate) {
+  function updateCountdown() {
+    const countdownEl = document.getElementById("hb-countdown");
+    if (!countdownEl) return;
+    const timeLeftMs = nextHeartbeatDate - Date.now();
+    
+    // Check if heartbeat was received while popup is open
+    const currentUserId = localStorage.getItem('omUserId');
+    const currentUserRow = livePresenceRows.find(row => row.user_id === currentUserId);
+    
+    if (currentUserRow && currentUserRow.last_heartbeat) {
+      const lastHeartbeatMs = new Date(currentUserRow.last_heartbeat).getTime();
+      // If we have a newer heartbeat than when we opened the popup
+      if (lastHeartbeatMs > new Date(userRow.last_heartbeat).getTime()) {
+        countdownEl.textContent = "Pulse received!";
+        countdownEl.style.cssText = `
+          font-size: 0.95em;
+          color: #29D884;
+          font-weight: 700;
+          letter-spacing: 0.5px;
+          background: rgba(41, 216, 132, 0.1);
+          padding: 4px 8px;
+          border-radius: 4px;
+          border: 1px solid rgba(41, 216, 132, 0.2);
+          animation: pulse-flash 1.5s infinite;
+        `;
         return;
       }
-      const minsLeft = Math.floor(timeLeftMs / 60000);
-      const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
-      countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
     }
-    const intervalId = setInterval(updateCountdown, 1000);
-    updateCountdown();
-    setTimeout(() => clearInterval(intervalId), 12000);
+    
+    if (timeLeftMs < 0) {
+      countdownEl.textContent = "Due now!";
+      return;
+    }
+    const minsLeft = Math.floor(timeLeftMs / 60000);
+    const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
+    countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
   }
   
-  setTimeout(() => {
-    popup.style.opacity = 0;
-    setTimeout(() => popup.remove(), 400);
-  }, 12000);
+  const intervalId = setInterval(updateCountdown, 1000);
+  updateCountdown();
+  setTimeout(() => clearInterval(intervalId), 12000);
+}
+
+setTimeout(() => {
+  popup.style.opacity = 0;
+  setTimeout(() => popup.remove(), 400);
+}, 12000);
 };
 
 showCountryStatsOnEarthGrid(); 
