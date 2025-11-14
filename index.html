@@ -8543,9 +8543,13 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set the audio to loop
     om.loop = true;
     
-    logo.addEventListener('click', function(e) {
-	  e.stopPropagation();
+    // Create and resume audio context on first user interaction
+    let audioContextResumed = false;
+    
+    logo.addEventListener('click', async function(e) {
+      e.stopPropagation();
       e.preventDefault(); 
+      
       // Get logo position and click coordinates
       const rect = logo.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -8554,24 +8558,41 @@ document.addEventListener('DOMContentLoaded', function() {
       const clickY = e.clientY;
       const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
       
-      // Only toggle sound if click is within 47px of center (radius)
+      // Only toggle sound if click is within 33px of center (radius)
       if (dist < 33) {
+        // Resume audio context on first interaction (mobile requirement)
+        if (!audioContextResumed && om.webkitAudioContext) {
+          const context = new (window.AudioContext || window.webkitAudioContext)();
+          await context.resume();
+          audioContextResumed = true;
+        }
+        
         if (!isPlaying) {
-          // Start playing
-          om.muted = false;
-          om.currentTime = 0;
-          om.volume = 0.7;
-          om.play().catch(()=>{});
-          isPlaying = true;
-		  safeAddCount();
-		  startOmSelfHeal();
+          // Start playing with error handling
+          try {
+            om.muted = false;
+            om.currentTime = 0;
+            om.volume = 0.7;
+            await om.play();
+            isPlaying = true;
+            safeAddCount();
+            startOmSelfHeal();
+            
+            // Add periodic audio health check
+            startAudioHealthCheck();
+            
+          } catch (error) {
+            console.log('Audio play failed:', error);
+            isPlaying = false;
+          }
         } else {
           // Stop playing
           om.pause();
           om.currentTime = 0;
           isPlaying = false;
-		  safeRemoveCount();
-		  startOmSelfHeal();
+          safeRemoveCount();
+          stopOmSelfHeal();
+          stopAudioHealthCheck();
         }
       }
     });
@@ -8643,6 +8664,37 @@ function safeRemoveCount() {
   removeCount();
 }
 
+// --- Audio Health Check System ---
+let audioHealthCheckInterval = null;
+
+function startAudioHealthCheck() {
+  stopAudioHealthCheck();
+  audioHealthCheckInterval = setInterval(() => {
+    const om = document.getElementById('om-sound');
+    if (om && !om.paused && om.currentTime > 0) {
+      // Audio is healthy - do nothing
+      return;
+    }
+    
+    // Audio might be stuck - try to restart
+    if (om && window.isPlaying) {
+      console.log('Audio health check: restarting stuck audio');
+      om.currentTime = 0;
+      om.play().catch(error => {
+        console.log('Audio health restart failed:', error);
+        window.isPlaying = false;
+        stopAudioHealthCheck();
+      });
+    }
+  }, 5000); // Check every 5 seconds
+}
+function stopAudioHealthCheck() {
+  if (audioHealthCheckInterval) {
+    clearInterval(audioHealthCheckInterval);
+    audioHealthCheckInterval = null;
+  }
+}
+
 // --- OM self-heal sound interval ---
 let omSelfHealInterval = null;
 
@@ -8655,17 +8707,20 @@ function stopOmSelfHeal() {
 function startOmSelfHeal() {
   stopOmSelfHeal();
   if (!window.om || !window.counterEl) return;
+  
   omSelfHealInterval = setInterval(() => {
-    // omPresenceId and counterEl must be global/shared if used!
     if (window.omPresenceId && window.counterEl.classList.contains('active')) {
-      if (window.om.paused) {
-        window.om.loop = true;
-        window.om.muted = false;
-        window.om.volume = 0.7;
-        window.om.play().catch(()=>{});
+      const om = document.getElementById('om-sound');
+      if (om && om.paused && window.isPlaying) {
+        console.log('Self-heal: restarting paused audio');
+        om.currentTime = 0;
+        om.play().catch(error => {
+          console.log('Self-heal restart failed:', error);
+          window.isPlaying = false;
+        });
       }
     }
-  }, 2500);
+  }, 3000); // Reduced from 2500 to 3000 for better performance
 }
 
 // === create the small counter display ===
