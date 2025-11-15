@@ -1960,6 +1960,58 @@ patchiness */
   70% { color: #29D884; background: #ffd70066; }
   100% { color: #ffd700; background: none; }
 }
+
+body.lock-scroll {
+  overflow: hidden !important;
+  touch-action: none !important; /* more robust for some mobile browsers */
+}
+
+
+.modal-bg {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(30,41,59,0.65);
+  z-index: 99999;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-content {
+  background: #232626;
+  padding: 1.5em 2em;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px #444;
+  color: #fde68a;
+  min-width: 320px;
+  text-align: center;
+  border: 2px solid #eab308;
+}
+.modal-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-bottom: .7em;
+}
+.modal-message {
+  margin-bottom: 1.1em;
+}
+.modal-actions button {
+  background: #fde68a;
+  color: #232626;
+  font-weight: bold;
+  border: none;
+  padding: 0.6em 1.4em;
+  margin: 0 .7em;
+  border-radius: 7px;
+  font-size: 1em;
+  cursor: pointer;
+  box-shadow: 0 2px 7px #eab30833;
+}
+.modal-actions button:hover {
+  background: #eab308;
+  color: #232626;
+}
+.hidden {
+  display: none !important;
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -3500,8 +3552,19 @@ patchiness */
 </div>
 	
 	
-	<div id="swipe-effects"></div>
+<div id="swipe-effects"></div>
 	
+	<div id="call-confirm-modal" class="modal-bg hidden">
+  <div class="modal-content">
+    <div class="modal-title">Are you sure?</div>
+    <div class="modal-message"></div>
+    <div class="modal-actions">
+      <button id="call-confirm-ok">Yes, call</button>
+      <button id="call-confirm-cancel">Cancel</button>
+    </div>
+  </div>
+</div>
+
   <script>
     // State Management
     let endTime = 0;
@@ -3774,11 +3837,13 @@ function hasMissedSession() {
 function openFAQModal() {
   document.getElementById('faq-modal').classList.remove('hidden');
   document.body.style.overflow = 'hidden'; // Prevent scrolling
+  document.body.classList.add('lock-scroll');
 }
 
 function closeFAQModal() {
   document.getElementById('faq-modal').classList.add('hidden');
   document.body.style.overflow = ''; // Re-enable scrolling
+  document.body.classList.remove('lock-scroll');
 }
 
 function showMobileRequiredModal() {
@@ -11133,37 +11198,104 @@ const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
   <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
 </svg>`;
 
+const longestDurationUserId = userIds[0]; // Top flame keeper
+
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
 } else {
   listPopup.innerHTML = `
-    <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-      <strong>Flame Keepers</strong>
-    </div>
-    ${userIds.map((id, index) => {
-      const isCurrentUser = id === currentUserId;
-      const isLive = liveIds.has(id);
-      const row = userRows[id];
-      const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
-      return `
-        <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-          <span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
-          <span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
-            ${isLive ? liveSvg : blankSvg}
-          </span>
-          <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
-          <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-            ${getShortUserId(id)}
-          </span>
-          <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
-          <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-            ${formatDurationGrid(userDurations[id])}
-          </span>
-        </div>
-      `;
-    }).join('')}
+  <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
+    <strong>Flame Keepers</strong>
+  </div>
+  ${userIds.map((id, index) => {
+    const isCurrentUser = id === currentUserId;
+    const isLive = liveIds.has(id);
+    const row = userRows[id];
+    const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
+
+    // Only top duration keeper sees call icon for other live users
+    let callIcon = '';
+    if (
+      currentUserId === longestDurationUserId &&
+      !isCurrentUser &&
+      isLive
+    ) {
+      callIcon = `<span class="call-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Start call">☎️</span>`;
+    }
+
+    return `
+      <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+        <span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
+        <span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
+          ${isLive ? liveSvg : blankSvg}
+        </span>
+        <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+        <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
+          ${getShortUserId(id)}
+        </span>
+        <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
+        <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
+          ${formatDurationGrid(userDurations[id])}
+        </span>
+        ${callIcon}
+      </div>
+    `;
+  }).join('')}
   `;
 }
+
+// ADD THIS DIRECTLY AFTER listPopup.innerHTML IS ASSIGNED
+Array.from(listPopup.querySelectorAll('.call-icon')).forEach(el => {
+  el.onclick = function(e) {
+    e.stopPropagation();
+    const currentUserId = localStorage.getItem('omUserId'); // Top keeper (host)
+    const targetUserId = this.getAttribute('data-userid');  // Invited user
+    const targetUserName = this.getAttribute('data-username'); // optional, if you have from HTML
+	const shortId = getShortUserId(targetUserId);
+
+    // Show custom confirmation dialog
+    showCallConfirm(shortId, targetUserName, async (result) => {
+      if (!result) return; // Cancelled
+
+      // Request a new Whereby room from your backend server
+      let resp;
+      try {
+        resp = await fetch('https://trueyogi-backend-test.onrender.com/create-whereby-room', {
+          method: 'POST', credentials: 'include',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            hostUserId: currentUserId,
+            targetUserId: targetUserId
+          })
+        });
+      } catch (err) {
+        alert('Network error or backend is down.');
+        return;
+      }
+
+      if (!resp.ok) {
+        // Show error to user, log for debug
+        const text = await resp.text();
+        alert('Failed to create call: ' + text);
+        return;
+      }
+
+      let data;
+      try {
+        data = await resp.json();
+      } catch (err) {
+        alert('Backend did not return valid JSON.');
+        return;
+      }
+
+      if (!data.hostUrl) {
+        alert('Backend did not provide host link.');
+        return;
+      }
+      showWherebyHostDialog(data.hostUrl);
+    });
+  };
+});
 
   document.body.appendChild(listPopup);
   setTimeout(() => listPopup.remove(), 12000);
@@ -11894,8 +12026,84 @@ function togglePowerNodesGlow() {
     if (!found) { closeEarthGrid(); }
   };
 
+// Track which call id you've already popped up for in this session
+let lastCallId = null;
+
+setInterval(async () => {
+  const currentUserId = localStorage.getItem('omUserId');
+  const { data, error } = await supabase
+    .from('om_calls')
+    .select('*')
+    .eq('participant_user_id', currentUserId)
+    .eq('status', 'pending')
+    .order('id', { ascending: false })
+    .limit(1);
+
+  if (data && data.length) {
+    const call = data[0];
+    // Prevent showing again for same call
+    if (lastCallId === call.id) return; 
+
+    lastCallId = call.id; // Mark as seen for this session
+
+    showWherebyParticipantDialog(call.whereby_participant_url);
+
+    // Optionally update the DB status so others/sessions/devices don't show again
+    await supabase
+      .from('om_calls')
+      .update({ status: 'active' })
+      .eq('id', call.id);
+  }
+}, 3000);
+
   // --- Fade out after 30 min (unchanged) ---
   setTimeout(() => closeEarthGrid(), 3000000);
+}
+
+function showWherebyParticipantDialog(participantUrl) {
+  const dlg = document.createElement('div');
+  dlg.style = "position:fixed;top:10%;left:50%;transform:translate(-50%, 0);z-index:10050;background:#232626;";
+  dlg.innerHTML = `<iframe src="${participantUrl}" allow="camera; microphone; fullscreen; speaker" width="700" height="500" style="border-radius: 12px; border:none"></iframe>
+  <button onclick="this.parentNode.remove()">Close</button>`;
+  document.body.appendChild(dlg);
+}
+
+function showWherebyHostDialog(hostUrl) {
+  const dlg = document.createElement('div');
+  dlg.style = "position:fixed;top:10%;left:50%;transform:translate(-50%, 0);z-index:10050;background:#232626;";
+  dlg.innerHTML = `<iframe src="${hostUrl}" allow="camera; microphone; fullscreen; speaker" width="700" height="500" style="border-radius: 12px; border:none"></iframe>
+  <button onclick="this.parentNode.remove()">Close</button>`;
+  document.body.appendChild(dlg);
+}
+
+function showCallConfirm(userId, userName, onConfirm) {
+  const modal = document.getElementById('call-confirm-modal');
+  const msgElem = modal.querySelector('.modal-message');
+  const okBtn = document.getElementById('call-confirm-ok');
+  const cancelBtn = document.getElementById('call-confirm-cancel');
+
+  // Customize the message as you like
+  msgElem.textContent = userName
+    ? `Are you sure you want to call ${userName}?`
+    : `Are you sure you want to call user ${userId}?`;
+
+  modal.classList.remove('hidden');
+
+  function cleanup() {
+    modal.classList.add('hidden');
+    okBtn.removeEventListener('click', okHandler);
+    cancelBtn.removeEventListener('click', cancelHandler);
+  }
+  function okHandler() {
+    cleanup();
+    onConfirm(true);
+  }
+  function cancelHandler() {
+    cleanup();
+    onConfirm(false);
+  }
+  okBtn.addEventListener('click', okHandler);
+  cancelBtn.addEventListener('click', cancelHandler);
 }
 
 function formatTotalDuration(seconds) {
