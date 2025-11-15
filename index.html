@@ -3556,7 +3556,7 @@ body.lock-scroll {
 	
 	<div id="call-confirm-modal" class="modal-bg hidden">
   <div class="modal-content">
-    <div class="modal-title">Are you sure?</div>
+    <div class="modal-title">Confirm?</div>
     <div class="modal-message"></div>
     <div class="modal-actions">
       <button id="call-confirm-ok">Yes, call</button>
@@ -11226,6 +11226,7 @@ const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
   <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
 </svg>`;
 
+// const longestDurationUserId = userIds[0]; // top flame keeper
 const longestDurationUserId = await fetchUserWithHighestDuration();
 
 if (userIds.length === 0) {
