@@ -8917,6 +8917,12 @@ async function updateCount() {
   }
 }
 
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === "visible") {
+    updateCount();
+  }
+});
+
 // clear user when closing page
 //window.addEventListener('beforeunload', () => {
 //  removeCount();//  stopHeartbeat();//});
@@ -9535,18 +9541,60 @@ dtStyle.textContent = `
 }`;
 document.head.appendChild(dtStyle);
 
-
-// Avatar music
+// Avatar music with robust audio health check
 document.addEventListener('DOMContentLoaded', function() {
   const avatar = document.querySelector('.avatar-container');
-  const avatarSound = document.getElementById('avatar-sound'); // Add this audio element
+  const avatarSound = document.getElementById('avatar-sound');
   let avatarPlaying = false;
+  let avatarAudioContextResumed = false;
+
+  // Avatar audio health check system
+  let avatarHealthCheckInterval = null;
+
+  function startAvatarHealthCheck() {
+    stopAvatarHealthCheck();
+    avatarHealthCheckInterval = setInterval(() => {
+      if (avatarPlaying && avatarSound && avatarSound.paused) {
+        console.log('Avatar health check: restarting stopped audio');
+        avatarSound.currentTime = 0;
+        avatarSound.play().catch(error => {
+          console.log('Avatar health restart failed:', error);
+          avatarPlaying = false;
+          stopAvatarHealthCheck();
+        });
+      }
+    }, 5000); // Check every 5 seconds
+  }
+
+  function stopAvatarHealthCheck() {
+    if (avatarHealthCheckInterval) {
+      clearInterval(avatarHealthCheckInterval);
+      avatarHealthCheckInterval = null;
+    }
+  }
+
+  // PREVENT browser from pausing avatar audio on visibility change
+  if (avatarSound) {
+    avatarSound.addEventListener('pause', function() {
+      if (avatarPlaying && document.hidden) {
+        // Browser tried to pause because tab went to background - RESTART IT
+        console.log('Browser tried to pause avatar audio due to visibility change - RESTARTING');
+        setTimeout(() => {
+          if (avatarPlaying) {
+            avatarSound.play().catch(error => {
+              console.log('Avatar visibility restart failed:', error);
+            });
+          }
+        }, 100);
+      }
+    });
+  }
 
   if (avatar && avatarSound) {
     // Set audio properties
     avatarSound.loop = true;
     
-    avatar.addEventListener('click', function(e) {
+    avatar.addEventListener('click', async function(e) {
       // Get avatar position and click coordinates
       const rect = avatar.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
@@ -9559,23 +9607,57 @@ document.addEventListener('DOMContentLoaded', function() {
       const avatarRadius = Math.min(rect.width, rect.height) / 22;
       
       if (dist < avatarRadius) {
+        // Resume audio context on first interaction (mobile requirement)
+        if (!avatarAudioContextResumed && avatarSound.webkitAudioContext) {
+          const context = new (window.AudioContext || window.webkitAudioContext)();
+          await context.resume();
+          avatarAudioContextResumed = true;
+        }
+
         if (!avatarPlaying) {
-          // Start playing avatar sound
-          avatarSound.muted = false;
-          avatarSound.currentTime = 0;
-          avatarSound.volume = 0.3;
-          avatarSound.play().catch(()=>{});
-          avatarPlaying = true;
-          
+          // Start playing avatar sound with error handling
+          try {
+            avatarSound.muted = false;
+            avatarSound.currentTime = 0;
+            avatarSound.volume = 0.3;
+            await avatarSound.play();
+            avatarPlaying = true;
+            
+            // Visual feedback for avatar
+            showAvatarFeedback(centerX, centerY);
+            
+            // Start health monitoring
+            startAvatarHealthCheck();
+            
+          } catch (error) {
+            console.log('Avatar audio play failed:', error);
+            avatarPlaying = false;
+          }
         } else {
           // Stop playing
           avatarSound.pause();
           avatarSound.currentTime = 0;
           avatarPlaying = false;
+          
+          // Stop health monitoring
+          stopAvatarHealthCheck();
         }
       }
     });
   }
+
+  // Handle page visibility changes
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && avatarPlaying && avatarSound && avatarSound.paused) {
+      // Tab became visible and avatar audio should be playing but is paused
+      console.log('Tab visible - restoring paused avatar audio');
+      avatarSound.play().catch(error => {
+        console.log('Avatar tab restore failed:', error);
+        avatarPlaying = false;
+        stopAvatarHealthCheck();
+      });
+    }
+  });
 });
 
 
@@ -12413,8 +12495,50 @@ function attachMeditationMusicHandler() {
 
   truemeditateImg.onclick = null;
   let playing = false;
+  let audioContextResumed = false;
 
-  truemeditateImg.addEventListener('click', function(e) {
+  // Audio health check for meditation music
+  let musicHealthCheckInterval = null;
+
+  function startMusicHealthCheck() {
+    stopMusicHealthCheck();
+    musicHealthCheckInterval = setInterval(() => {
+      if (playing && musicAudio && musicAudio.paused) {
+        console.log('Music health check: restarting stopped audio');
+        musicAudio.currentTime = 0;
+        musicAudio.play().catch(error => {
+          console.log('Music health restart failed:', error);
+          playing = false;
+          truemeditateImg.style.filter = '';
+          stopMusicHealthCheck();
+        });
+      }
+    }, 5000);
+  }
+
+  function stopMusicHealthCheck() {
+    if (musicHealthCheckInterval) {
+      clearInterval(musicHealthCheckInterval);
+      musicHealthCheckInterval = null;
+    }
+  }
+
+  // PREVENT browser from pausing audio on visibility change
+  musicAudio.addEventListener('pause', function() {
+    if (playing && document.hidden) {
+      // Browser tried to pause because tab went to background - RESTART IT
+      console.log('Browser tried to pause audio due to visibility change - RESTARTING');
+      setTimeout(() => {
+        if (playing) {
+          musicAudio.play().catch(error => {
+            console.log('Visibility restart failed:', error);
+          });
+        }
+      }, 100);
+    }
+  });
+
+  truemeditateImg.addEventListener('click', async function(e) {
     const rect = truemeditateImg.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
     const centerY = rect.top + rect.height / 2;
@@ -12422,30 +12546,44 @@ function attachMeditationMusicHandler() {
     const clickY = e.clientY;
     const dist = Math.sqrt((centerX - clickX) ** 2 + (centerY - clickY) ** 2);
 
-    // Set a smaller central radius for the trigger, e.g. about 40% of SVG's smallest size
     const tapRadius = Math.min(rect.width, rect.height) / 3;
 
     if (dist < tapRadius) {
+      // Resume audio context on first interaction
+      if (!audioContextResumed && musicAudio.webkitAudioContext) {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        await context.resume();
+        audioContextResumed = true;
+      }
+
       if (!playing) {
-        musicAudio.muted = false;
-        musicAudio.currentTime = 0;
-        musicAudio.volume = 0.7;
-        musicAudio.play().catch(()=>{});
-        playing = true;
-        truemeditateImg.style.filter = 'drop-shadow(0 0 22px #FFD700AA)';
+        try {
+          musicAudio.muted = false;
+          musicAudio.currentTime = 0;
+          musicAudio.volume = 0.7;
+          await musicAudio.play();
+          playing = true;
+          truemeditateImg.style.filter = 'drop-shadow(0 0 22px #FFD700AA)';
+          startMusicHealthCheck();
+        } catch (error) {
+          console.log('Meditation music play failed:', error);
+          playing = false;
+          truemeditateImg.style.filter = '';
+        }
       } else {
         musicAudio.pause();
         musicAudio.currentTime = 0;
         playing = false;
         truemeditateImg.style.filter = '';
+        stopMusicHealthCheck();
       }
     }
-    // If click is outside center, ignore it
   });
 
   musicAudio.addEventListener('ended', () => {
     playing = false;
     truemeditateImg.style.filter = '';
+    stopMusicHealthCheck();
   });
 }
 
