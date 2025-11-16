@@ -12603,45 +12603,51 @@ function stopMeditationMusicOnClose() {
   }
 }
 
-// Track which call id you've already popped up for in this session
-let lastCallId = null;
-
-setInterval(async () => {
-  const currentUserId = localStorage.getItem('omUserId');
-  const { data, error } = await supabase
-    .from('om_calls')
-    .select('*')
-    .eq('participant_user_id', currentUserId)
-    .in('status', ['pending']) // select only pending
-    .order('created_at', { ascending: false })
-    .limit(1);
-
-  if (data && data.length) {
-    const call = data[0];
-    if (lastCallId === call.id) return;
-
-    const callTime = new Date(call.created_at).getTime();
-    const now = Date.now();
-    if ((now - callTime) > 3 * 60 * 1000) {
-      // Optional: expire stale call
-      await supabase.from('om_calls').update({ status: 'expired' }).eq('id', call.id);
-      return;
-    }
-
-    lastCallId = call.id;
-
-    showWherebyParticipantDialog(call.whereby_participant_url);
-
-    const { error: updateError } = await supabase
-      .from('om_calls')
-      .update({ status: 'active' })
-      .eq('id', call.id);
-
-    if (updateError) {
-      console.error('Call status update failed:', updateError);
-    }
+function startCallPolling() {
+  if (typeof supabase === "undefined") {
+    // Wait and try again in 500ms, up to N tries
+    setTimeout(startCallPolling, 500);
+    return;
   }
-}, 3000);
+
+  let lastCallId = null;
+  setInterval(async () => {
+    const currentUserId = localStorage.getItem('omUserId');
+    if (!currentUserId) return;
+    const { data, error } = await supabase
+      .from('om_calls')
+      .select('*')
+      .eq('participant_user_id', currentUserId)
+      .in('status', ['pending'])
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (data && data.length) {
+      const call = data[0];
+      if (lastCallId === call.id) return;
+
+      const callTime = new Date(call.created_at).getTime();
+      const now = Date.now();
+      if ((now - callTime) > 3 * 60 * 1000) {
+        await supabase.from('om_calls').update({ status: 'expired' }).eq('id', call.id);
+        return;
+      }
+
+      lastCallId = call.id;
+
+      showWherebyParticipantDialog(call.whereby_participant_url);
+
+      const { error: updateError } = await supabase
+        .from('om_calls')
+        .update({ status: 'active' })
+        .eq('id', call.id);
+
+      if (updateError) {
+        console.error('Call status update failed:', updateError);
+      }
+    }
+  }, 3000);
+}
 
   </script>
 	
@@ -14599,6 +14605,7 @@ window.addEventListener('online', () => {
   window.authenticateWithWallet = authenticateWithWallet;
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
+  startCallPolling();
   
 </script>
 
