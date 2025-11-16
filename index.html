@@ -12064,27 +12064,34 @@ setInterval(async () => {
     .from('om_calls')
     .select('*')
     .eq('participant_user_id', currentUserId)
-    .eq('status', 'pending')
-    .order('id', { ascending: false })
+    .in('status', ['pending']) // select only pending
+    .order('created_at', { ascending: false })
     .limit(1);
 
   if (data && data.length) {
     const call = data[0];
-    if (lastCallId === call.id) return; 
+    if (lastCallId === call.id) return;
 
-    // Only show if call is recent (less than 3 minutes old)
     const callTime = new Date(call.created_at).getTime();
     const now = Date.now();
-    if ((now - callTime) > 3 * 60 * 1000) return; // skip old calls
+    if ((now - callTime) > 3 * 60 * 1000) {
+      // Optional: expire stale call
+      await supabase.from('om_calls').update({ status: 'expired' }).eq('id', call.id);
+      return;
+    }
 
     lastCallId = call.id;
 
     showWherebyParticipantDialog(call.whereby_participant_url);
 
-    await supabase
+    const { error: updateError } = await supabase
       .from('om_calls')
       .update({ status: 'active' })
       .eq('id', call.id);
+
+    if (updateError) {
+      console.error('Call status update failed:', updateError);
+    }
   }
 }, 3000);
 
