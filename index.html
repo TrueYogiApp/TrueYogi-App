@@ -12670,7 +12670,8 @@ function startCallPolling() {
       }
 
       lastCallId = call.id;
-
+	  
+	  stopAllAudio();
       showWherebyParticipantDialog(call.whereby_participant_url);
 
       const { error: updateError } = await supabase
@@ -12683,7 +12684,6 @@ function startCallPolling() {
       }
     }
   }, 3000);
-  stopAllAudio();
 }
 
   </script>
