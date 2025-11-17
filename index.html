@@ -12166,6 +12166,7 @@ function showWherebyHostDialog(hostUrl, callId) {
 
   document.getElementById('close-host-btn').onclick = async function() {
     dlg.remove();
+	showWherebyHostDialog
     if (callId) {
       await supabase.from('om_calls').update({ status: 'finish' }).eq('id', callId);
     }
