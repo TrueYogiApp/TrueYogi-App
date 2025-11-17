@@ -12158,35 +12158,29 @@ function closeCallDialog(button) {
 }
 
 function showWherebyHostDialog(hostUrl, callId) {
+  // 🎥 CHECK IF CAMERA MIGHT BE LOCKED - FORCE FRESH START
+  const existingCall = document.querySelector('[id^="whereby-iframe-"]');
+  if (existingCall) {
+    if (confirm("Camera needs reset. Restart the call?")) {
+      window.location.reload();
+      return;
+    }
+  }
+  
   const dlg = document.createElement('div');
   dlg.style = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10050;background:#232626;display:flex;flex-direction:column;align-items:center;justify-content:center;";
   
-  // 🔄 ADD UNIQUE ID TO IFRAME AND FORCE RELOAD
-  const iframeId = 'whereby-iframe-' + Date.now();
-  
-  dlg.innerHTML = `<iframe id="${iframeId}" src="${hostUrl}" allow="camera; microphone; fullscreen; speaker" style="border-radius:12px;border:none;width:96vw;height:90vh;max-width:700px;max-height:500px;background:#232626;"></iframe>
+  dlg.innerHTML = `<iframe src="${hostUrl}" allow="camera; microphone; fullscreen; speaker" style="border-radius:12px;border:none;width:96vw;height:90vh;max-width:700px;max-height:500px;background:#232626;"></iframe>
     <button id="close-host-btn" style="margin-top:12px;padding:.5em 1.4em;background:#fde68a;color:#232626;border:none;border-radius:7px;font-weight:bold;box-shadow:0 2px 10px #eab30822;cursor:pointer;">Close</button>`;
   document.body.appendChild(dlg);
 
   document.getElementById('close-host-btn').onclick = async function() {
-    // 🎥 FORCE CAMERA RELEASE BEFORE REMOVING
-    const iframe = document.getElementById(iframeId);
-    if (iframe) {
-      // Stop all media streams from the iframe
-      iframe.src = 'about:blank';
-    }
-    
     dlg.remove();
     restoreAudioAfterCall();
     
     if (callId) {
       await supabase.from('om_calls').update({ status: 'finish' }).eq('id', callId);
     }
-    
-    // 🎥 ADD SMALL DELAY TO ENSURE CAMERA IS RELEASED
-    setTimeout(() => {
-      // This helps the mobile OS properly release the camera
-    }, 100);
   }
 }
 
