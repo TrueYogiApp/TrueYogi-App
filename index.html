@@ -12185,6 +12185,7 @@ function showCallConfirm(userId, userName, onConfirm) {
   function okHandler() {
     cleanup();
     onConfirm(true);
+	stopAllAudio();
   }
   function cancelHandler() {
     cleanup();
@@ -12192,6 +12193,19 @@ function showCallConfirm(userId, userName, onConfirm) {
   }
   okBtn.addEventListener('click', okHandler);
   cancelBtn.addEventListener('click', cancelHandler);
+}
+
+// 🔇 ADD THIS FUNCTION TO STOP ALL AUDIO
+function stopAllAudio() {
+  // Stop OM sound
+  const omSound = document.getElementById('om-sound');
+  if (omSound) {
+    omSound.pause();
+    omSound.currentTime = 0;
+    window.isPlaying = false; // Update global state
+    stopOmSelfHeal(); // Stop health check
+    stopAudioHealthCheck(); // Stop health check
+  }
 }
 
 function formatTotalDuration(seconds) {
