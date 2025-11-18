@@ -8917,18 +8917,19 @@ async function updateCount() {
   }
 }
 
-document.addEventListener('visibilitychange', () => {
-  if (document.visibilityState === "visible") {
-    updateCount();
-  }
-});
+//document.addEventListener('visibilitychange', () => {
+ // if (document.visibilityState === "visible") {
+  //  updateCount();
+ // }
+//});
 
 // clear user when closing page
 //window.addEventListener('beforeunload', () => {
 //  removeCount();//  stopHeartbeat();//});
 //window.addEventListener('pagehide', () => {
 //  removeCount();//  stopHeartbeat();//});
-// setInterval(updateCount, 9000); // every 9 seconds
+
+ setInterval(updateCount, 9000); // every 9 seconds
 
 let heartbeatInterval = null;
 
