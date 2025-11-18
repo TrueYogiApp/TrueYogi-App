@@ -8917,12 +8917,6 @@ async function updateCount() {
   }
 }
 
-//document.addEventListener('visibilitychange', () => {
- // if (document.visibilityState === "visible") {
-  //  updateCount();
- // }
-//});
-
 // clear user when closing page
 //window.addEventListener('beforeunload', () => {
 //  removeCount();//  stopHeartbeat();//});
@@ -11054,7 +11048,7 @@ const longestFlameHTML =
   longestFlame && showLongestLine
   ? `
 <div style="margin:6px 0 3px 0;font-size:0.95em;">
-  <span style="color:#FFD700;text-shadow:0 0 6px #FFD700CC;font-weight:600;letter-spacing:0.4px;background:linear-gradient(45deg, #FFD70022, #FFD70011);padding:2px 8px;border-radius:3px;border:1px solid #FFD70044;">LONGEST FLAME:</span>
+  <span style="color:#FFD700;text-shadow:0 0 6px #FFD700CC;font-weight:600;letter-spacing:0.4px;padding:2px 8px;">LONGEST FLAME:</span>
   <a href="#" id="longest-flame-keepers-link" style="
     color:#29D884;
     font-weight:700;
