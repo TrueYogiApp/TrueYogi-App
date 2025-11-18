@@ -43,6 +43,7 @@ const PERMANENT_ASSETS = [
 const APP_FILES = [
   '/',
   '/index.html',
+  '/offline.html',
   '/output.css',
   '/manifest.json',
   '/assets/welcomeMessages.en.json',
@@ -192,16 +193,34 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((networkResponse) => {
+        // Check for document fetches with server error
+        if (
+          event.request.destination === 'document' &&
+          networkResponse.status >= 500
+        ) {
+          // Serve offline.html if available, otherwise return the error response
+          return caches.match('/offline.html').then(response =>
+            response || networkResponse
+          );
+        }
+
         // Only cache successful non-HTML requests
-        if (networkResponse.status === 200 && event.request.destination !== 'document') {
+        if (
+          networkResponse.status === 200 &&
+          event.request.destination !== 'document'
+        ) {
           const responseToCache = networkResponse.clone();
           const url = new URL(event.request.url);
           const cacheName = isPermanentAsset(url.pathname)
             ? PERMANENT_CACHE_NAME
             : CACHE_NAME;
 
-          caches.open(cacheName).then((cache) => cache.put(event.request, responseToCache));
+          caches.open(cacheName).then((cache) =>
+            cache.put(event.request, responseToCache)
+          );
         }
+
+        // Normal response for everything else
         return networkResponse;
       })
       .catch(() => {
@@ -211,6 +230,7 @@ self.addEventListener('fetch', (event) => {
 
           // Offline fallback logic
           if (event.request.destination === 'document') {
+            // User is truly offline: show main app UI
             return caches.match('/index.html');
           } else if (event.request.destination === 'image') {
             return caches.match('/assets/spaceship.svg');
