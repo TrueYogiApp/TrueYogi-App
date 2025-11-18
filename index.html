@@ -11052,18 +11052,26 @@ flameTimer.onclick = async function(e) {
 const longestFlameHTML =
   longestFlame && showLongestLine
   ? `
-    <div style="margin:5px 0 2px 0;font-size:0.97em;color:#FFD700EE;">
-      <span style="color:#fff2;text-shadow:0 0 3px #FFD70066;">Longest Flame:</span>
-      <a href="#" id="longest-flame-keepers-link" style="
-        color:#29D884;
-        font-weight:bold;
-        text-decoration:underline;
-        margin-left:7px;
-        cursor:pointer;
-        font-size:1em;
-        text-shadow:0 0 8px #29D88477;
-      ">${formatFlameDuration(Math.floor(maxDuration / 1000))}</a>
-    </div>
+<div style="margin:6px 0 3px 0;font-size:0.95em;">
+  <span style="color:#FFD700;text-shadow:0 0 6px #FFD700CC;font-weight:600;letter-spacing:0.4px;background:linear-gradient(45deg, #FFD70022, #FFD70011);padding:2px 8px;border-radius:3px;border:1px solid #FFD70044;">LONGEST FLAME:</span>
+  <a href="#" id="longest-flame-keepers-link" style="
+    color:#29D884;
+    font-weight:700;
+    text-decoration:none;
+    margin-left:8px;
+    cursor:pointer;
+    font-size:1.02em;
+    text-shadow:0 0 10px #29D884AA;
+    background:linear-gradient(45deg, #29D88422, #29D88411);
+    padding:2px 8px;
+    border-radius:4px;
+    border:1px solid #29D88433;
+    transition:all 0.3s ease;
+  " onmouseover="this.style.textShadow='0 0 15px #29D884CC';this.style.background='linear-gradient(45deg, #29D88433, #29D88422)';"
+     onmouseout="this.style.textShadow='0 0 10px #29D884AA';this.style.background='linear-gradient(45deg, #29D88422, #29D88411)';">
+    ${formatFlameDuration(Math.floor(maxDuration / 1000))}
+  </a>
+</div>
   `
   : '';
 
