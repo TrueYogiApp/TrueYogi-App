@@ -12381,24 +12381,29 @@ const popup = document.createElement('div');
 popup.classList.add('earthzone-popup'); 
 let showCount = zone.count !== null && zone.count !== undefined && zone.count > 0;
 popup.innerHTML = `
-  <div style="display: flex; align-items: center; gap: 12px;">
-    ${showCount 
-      ? `<span>${countText}</span>` 
-      : ''
-    }
-    <span style="min-width:33px;min-height:33px;display:inline-flex;align-items:center;justify-content:center;">
-  ${svgImg}
-</span>
-    <span>${zone.zone.replace(/_/g, ' ')}</span>
-    ${
-      showCount && totalDurationText
-      ? `<span style="font-weight:600;color:#ffe066;display: flex; align-items: center;">
-           <img src="/assets/clockchakra.svg" class="chakra-rotate" style="width:18px; height:18px; margin-right:5px;">
-           ${totalDurationText.replace(/[()]/g, '')}
+<div style="
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  max-width: 98vw;
+  overflow: auto;
+  font-size: 0.91em;
+">
+  ${showCount ? `<span>${countText}</span>` : ''}
+  <span style="min-width:33px;min-height:33px;display:inline-flex;align-items:center;justify-content:center;">
+    ${svgImg}
+  </span>
+  <span>${zone.zone.replace(/_/g, ' ')}</span>
+  ${
+    showCount && totalDurationText
+      ? `<span style="font-weight:600;color:#ffe066;display: flex; align-items: center;max-width:80vw;overflow:hidden;text-overflow:ellipsis;">
+            <img src="/assets/clockchakra.svg" class="chakra-rotate" style="width:18px; height:18px; margin-right:5px;">
+            ${totalDurationText.replace(/[()]/g, '')}
          </span>`
       : ''
-    }
-  </div>
+  }
+</div>
 `;
   popup.style.cssText = `
     position: fixed;
