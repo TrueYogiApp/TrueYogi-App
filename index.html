@@ -12247,10 +12247,13 @@ function showWherebyParticipantDialog(participantUrl) {
 
 function closeCallDialog(button) {
   const dlg = button.parentNode;
-  dlg.remove();
-  
-  // Restore OM music if it was playing before the call
-  restoreAudioAfterCall();
+  const iframe = dlg.querySelector('iframe');
+  if (iframe) iframe.src = 'about:blank'; // Release camera/mic
+
+  setTimeout(() => {
+    dlg.remove();
+    restoreAudioAfterCall();
+  }, 100); // Give browser time to clean up
 }
 
 function showWherebyHostDialog(hostUrl, callId) {
@@ -12261,11 +12264,17 @@ function showWherebyHostDialog(hostUrl, callId) {
   document.body.appendChild(dlg);
 
   document.getElementById('close-host-btn').onclick = async function() {
-    dlg.remove();
-	restoreAudioAfterCall();
-    if (callId) {
-      await supabase.from('om_calls').update({ status: 'finish' }).eq('id', callId);
-    }
+    // 👇 Force camera release
+    const iframe = dlg.querySelector('iframe');
+    if (iframe) iframe.src = 'about:blank';
+
+    setTimeout(async () => {
+      dlg.remove();
+      restoreAudioAfterCall();
+      if (callId) {
+        await supabase.from('om_calls').update({ status: 'finish' }).eq('id', callId);
+      }
+    }, 100); // 100ms delay
   }
 }
 
