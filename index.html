@@ -10858,6 +10858,19 @@ async function startFlameTimer() {
   }
 }
 
+let canStartCall = false;
+
+async function fetchCallPermission() {
+  const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/permissions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ userId: localStorage.getItem('omUserId') })
+  });
+  const data = await response.json();
+  canStartCall = data.canStartCall;
+}
+
 async function fetchUserWithHighestDuration() {
   let { data, error } = await supabase
     .from('om_sessions')
@@ -11302,6 +11315,7 @@ document.addEventListener('click', function(e) {
 });
 
 async function showAllFlameKeepers(x, y) {
+await fetchCallPermission();
   // Remove if already open
   const oldList = document.getElementById('flame-keeper-list');
   if (oldList) oldList.remove();
@@ -11391,7 +11405,7 @@ const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
 </svg>`;
 
 // const longestDurationUserId = userIds[0]; // top flame keeper
-const longestDurationUserId = await fetchUserWithHighestDuration();
+//const longestDurationUserId = await fetchUserWithHighestDuration();
 
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
@@ -11409,7 +11423,7 @@ if (userIds.length === 0) {
     // Only top duration keeper sees call icon for other live users
     let callIcon = '';
     if (
-      currentUserId === longestDurationUserId &&
+      canStartCall &&
       !isCurrentUser &&
       isLive
     ) {
