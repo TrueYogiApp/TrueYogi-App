@@ -529,10 +529,29 @@
 }
 
 .web3-status-wrapper {
+  background: radial-gradient(circle at 50% 40%, #101a32 60%, #232746 100%);
+  border-radius: 18px;
+  box-shadow: 0 0 28px 4px #683dd5, 0 0 14px 2px #eabfff90, 0 2px 12px #0005;
+  padding: 16px 0;
+  margin: 0 5px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.2em;
+  justify-content: center;
+  min-height: 65px;
+  position: relative;
+  transition: box-shadow 0.35s;
+  overflow: hidden;
+}
+
+.web3-status-wrapper::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: radial-gradient(circle at 50% 30%, #ad7efb33 0%, #232746 90%);
+  animation: portalGlowMove 5s infinite linear;
+  opacity: 0.8;
 }
 
 .web3-status-icon {
