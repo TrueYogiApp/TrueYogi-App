@@ -5960,7 +5960,7 @@ if (completeSectionVisible || finalSectionVisible) {
       badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium';
       badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
       const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      badge.setAttribute('data-tooltip', t('journeyBegins') + startDate.toLocaleDateString('en-US', options));
+      badge.setAttribute('data-tooltip', t('journeyBegins') + ' ' + startDate.toLocaleDateString('en-US', options));
       badge.classList.add('status-tooltip', 'Journey-begins-tip');
       list.appendChild(badge);
     });
