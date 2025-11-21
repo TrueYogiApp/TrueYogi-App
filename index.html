@@ -19,6 +19,7 @@
   <link href="/output.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css?family=Dancing+Script:700&display=swap" rel="stylesheet">
   <style>
     body {
       font-family: 'Lexend', sans-serif;
@@ -570,17 +571,17 @@
 }
 
 .web3-status-desc {
-  color: #fef08a;
-  font-style: italic;
-  font-size: clamp(1rem, 1.08em, 1.2rem);
-  text-align: center;
-  letter-spacing: 0.3px;
-  margin-top: 0.1em;
-  font-family: 'Dancing Script', cursive, system-ui, -apple-system, sans-serif;
+  color: #fffad6; /* lighter yellow */
   font-weight: 700;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
+  font-style: italic;
+  font-size: 1.25em;
+  text-align: center;
+  letter-spacing: 0.4px;
+  font-family: 'Dancing Script', cursive, system-ui, -apple-system, sans-serif;
+  text-shadow:
+    0 0 6px #ffe06677, /* soft gold glow */
+    0 0 18px #f7ffd0aa, /* outer brighter glow */
+    0 1px 1px #fff8;
 }
 
 @keyframes heartbeat {
