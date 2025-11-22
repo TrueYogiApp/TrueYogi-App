@@ -9635,60 +9635,50 @@ dtStyle.textContent = `
 }`;
 document.head.appendChild(dtStyle);
 
-// Avatar music with robust audio health check
+// Minimal avatar music with basic health guard and single-init protection
 document.addEventListener('DOMContentLoaded', function() {
-  // Guard: run initialization only once (prevents duplicate listeners/intervals)
-  if (window.__avatarAudioInitialized) {
-    console.log('Avatar audio already initialized - skipping duplicate init');
-    return;
-  }
+  // Guard: init only once
+  if (window.__avatarAudioInitialized) return;
   window.__avatarAudioInitialized = true;
 
   const avatar = document.querySelector('.avatar-container');
-  const avatarSound = document.getElementById('avatar-sound');
+  const avatarSound = document.getElementById('avatar-sound'); // audio element
   let avatarPlaying = false;
-  let avatarAudioContextResumed = false;
-
-  // Avatar audio health check system
-  let avatarHealthCheckInterval = null;
+  let avatarHealthInterval = null;
 
   function startAvatarHealthCheck() {
     stopAvatarHealthCheck();
-    avatarHealthCheckInterval = setInterval(() => {
+    avatarHealthInterval = setInterval(() => {
       try {
         if (avatarPlaying && avatarSound && avatarSound.paused) {
-          console.log('Avatar health check: restarting stopped audio');
+          console.log('Avatar health: audio paused unexpectedly — restarting');
           avatarSound.currentTime = 0;
-          avatarSound.play().then(() => {
-            avatarPlaying = true;
-          }).catch(error => {
-            console.log('Avatar health restart failed:', error);
+          avatarSound.play().catch(err => {
+            console.log('Avatar health restart failed:', err);
             avatarPlaying = false;
             stopAvatarHealthCheck();
           });
         }
-      } catch (e) { console.error('avatar health check error', e); }
-    }, 5000); // Check every 5 seconds
+      } catch (e) { console.error(e); }
+    }, 5000);
   }
-
   function stopAvatarHealthCheck() {
-    if (avatarHealthCheckInterval) {
-      clearInterval(avatarHealthCheckInterval);
-      avatarHealthCheckInterval = null;
+    if (avatarHealthInterval) {
+      clearInterval(avatarHealthInterval);
+      avatarHealthInterval = null;
     }
   }
 
-  // PREVENT browser from pausing avatar audio on visibility change
+  // Only try to auto-restart if the pause happened because tab was hidden
   if (avatarSound) {
-    avatarSound.addEventListener('pause', function() {
-      // Only auto-restart when the pause is due to backgrounding (document.hidden)
-      // and when we expected audio to be playing (avatarPlaying === true).
+    avatarSound.addEventListener('pause', () => {
       if (avatarPlaying && document.hidden) {
-        console.log('Browser tried to pause avatar audio due to visibility change - RESTARTING');
         setTimeout(() => {
-          if (avatarPlaying) {
-            avatarSound.play().catch(error => {
-              console.log('Avatar visibility restart failed:', error);
+          if (avatarPlaying && avatarSound.paused) {
+            avatarSound.play().catch(err => {
+              console.log('Avatar visibility restart failed:', err);
+              avatarPlaying = false;
+              stopAvatarHealthCheck();
             });
           }
         }, 100);
@@ -9697,83 +9687,45 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (avatar && avatarSound) {
-    // Ensure we have desired audio settings
     avatarSound.loop = true;
-    avatarSound.preload = 'auto';
-    avatarSound.volume = 0.3;
-
-    avatar.addEventListener('click', async function(e) {
-      // Compute distance from center so clicks near avatar toggle only
+    avatar.addEventListener('click', function(e) {
       const rect = avatar.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
       const clickX = e.clientX;
       const clickY = e.clientY;
-      const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
-      const avatarRadius = Math.min(rect.width, rect.height) / 22; // more reasonable radius
+      const dist = Math.hypot(centerX - clickX, centerY - clickY);
+      const avatarRadius = Math.min(rect.width, rect.height) / 22;
 
       if (dist < avatarRadius) {
-        // Resume audio context on first interaction (mobile requirement)
-        if (!avatarAudioContextResumed) {
-          try {
-            const ctx = new (window.AudioContext || window.webkitAudioContext)();
-            await ctx.resume();
-            avatarAudioContextResumed = true;
-          } catch (err) {
-            // Not fatal; continue
-            console.log('Audio context resume failed or not needed:', err);
-          }
-        }
-
         if (!avatarPlaying) {
-          // Start playing avatar sound with error handling
+          // Start
           try {
-            // Defensive: ensure health-check not running from previous instance
-            stopAvatarHealthCheck();
-
+            stopAvatarHealthCheck(); // ensure no stray interval
             avatarSound.muted = false;
             avatarSound.currentTime = 0;
             avatarSound.volume = 0.3;
-            await avatarSound.play();
+            avatarSound.play().catch(()=>{});
             avatarPlaying = true;
-
-            // Start health monitoring after successful play
             startAvatarHealthCheck();
-
-          } catch (error) {
-            console.log('Avatar audio play failed:', error);
+            // optional visual feedback: showAvatarFeedback(centerX, centerY);
+          } catch (err) {
+            console.log('Avatar play failed:', err);
             avatarPlaying = false;
             stopAvatarHealthCheck();
           }
         } else {
-          // Stop health monitoring first to avoid a race
+          // Stop: stop health-check first to avoid immediate restart
           stopAvatarHealthCheck();
-
-          // Stop playing (pause is synchronous)
           try {
             avatarSound.pause();
             avatarSound.currentTime = 0;
-          } catch (err) {
-            console.warn('Error pausing avatar sound:', err);
-          }
-
+          } catch (err) { console.warn(err); }
           avatarPlaying = false;
         }
       }
     });
   }
-
-  // Handle page visibility changes - restore only if we expect it to be playing
-  document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && avatarPlaying && avatarSound && avatarSound.paused) {
-      console.log('Tab visible - restoring paused avatar audio');
-      avatarSound.play().catch(error => {
-        console.log('Avatar tab restore failed:', error);
-        avatarPlaying = false;
-        stopAvatarHealthCheck();
-      });
-    }
-  });
 });
 
 
