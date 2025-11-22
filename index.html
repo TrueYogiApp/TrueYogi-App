@@ -9710,7 +9710,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const clickX = e.clientX;
       const clickY = e.clientY;
       const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
-      const avatarRadius = Math.min(rect.width, rect.height) / 2; // more reasonable radius
+      const avatarRadius = Math.min(rect.width, rect.height) / 22; // more reasonable radius
 
       if (dist < avatarRadius) {
         // Resume audio context on first interaction (mobile requirement)
