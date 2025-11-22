@@ -91,7 +91,7 @@
   "now": "NOW",
   "arrival": "Arrival",
   "openPhantomWallet": "Open Phantom Wallet?",
-  "phantomRedirectNotice": "You are about to be redirected to the Phantom wallet app to connect your wallet.",
+  "phantomRedirectNotice": "You are about to be redirected to the Phantom app to connect your wallet.",
   "phantomRedirectConfirm": "Do you want to continue?",
   "disconnectWalletTitle": "Disconnect Wallet?",
   "disconnectWalletStatsLine1": "• Your Meditation stats will no longer sync to space.",

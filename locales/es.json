@@ -91,7 +91,7 @@
   "now": "AHORA",
   "arrival": "Llegada",
   "openPhantomWallet": "¿Abrir Phantom Wallet?",
-  "phantomRedirectNotice": "Estás a punto de ser redirigido a la aplicación Phantom Wallet para conectar tu wallet.",
+  "phantomRedirectNotice": "Estás a punto de ser redirigido a la aplicación Phantom para conectar tu wallet.",
   "phantomRedirectConfirm": "¿Quieres continuar?",
   "disconnectWalletTitle": "¿Desconectar Wallet?",
   "disconnectWalletStatsLine1": "• Tus estadísticas de meditación ya no se sincronizarán en el espacio.",
