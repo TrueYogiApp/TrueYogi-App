@@ -9637,6 +9637,13 @@ document.head.appendChild(dtStyle);
 
 // Avatar music with robust audio health check
 document.addEventListener('DOMContentLoaded', function() {
+  // Guard: run initialization only once (prevents duplicate listeners/intervals)
+  if (window.__avatarAudioInitialized) {
+    console.log('Avatar audio already initialized - skipping duplicate init');
+    return;
+  }
+  window.__avatarAudioInitialized = true;
+
   const avatar = document.querySelector('.avatar-container');
   const avatarSound = document.getElementById('avatar-sound');
   let avatarPlaying = false;
@@ -9648,15 +9655,19 @@ document.addEventListener('DOMContentLoaded', function() {
   function startAvatarHealthCheck() {
     stopAvatarHealthCheck();
     avatarHealthCheckInterval = setInterval(() => {
-      if (avatarPlaying && avatarSound && avatarSound.paused) {
-        console.log('Avatar health check: restarting stopped audio');
-        avatarSound.currentTime = 0;
-        avatarSound.play().catch(error => {
-          console.log('Avatar health restart failed:', error);
-          avatarPlaying = false;
-          stopAvatarHealthCheck();
-        });
-      }
+      try {
+        if (avatarPlaying && avatarSound && avatarSound.paused) {
+          console.log('Avatar health check: restarting stopped audio');
+          avatarSound.currentTime = 0;
+          avatarSound.play().then(() => {
+            avatarPlaying = true;
+          }).catch(error => {
+            console.log('Avatar health restart failed:', error);
+            avatarPlaying = false;
+            stopAvatarHealthCheck();
+          });
+        }
+      } catch (e) { console.error('avatar health check error', e); }
     }, 5000); // Check every 5 seconds
   }
 
@@ -9670,8 +9681,9 @@ document.addEventListener('DOMContentLoaded', function() {
   // PREVENT browser from pausing avatar audio on visibility change
   if (avatarSound) {
     avatarSound.addEventListener('pause', function() {
+      // Only auto-restart when the pause is due to backgrounding (document.hidden)
+      // and when we expected audio to be playing (avatarPlaying === true).
       if (avatarPlaying && document.hidden) {
-        // Browser tried to pause because tab went to background - RESTART IT
         console.log('Browser tried to pause avatar audio due to visibility change - RESTARTING');
         setTimeout(() => {
           if (avatarPlaying) {
@@ -9685,65 +9697,75 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   if (avatar && avatarSound) {
-    // Set audio properties
+    // Ensure we have desired audio settings
     avatarSound.loop = true;
-    
+    avatarSound.preload = 'auto';
+    avatarSound.volume = 0.3;
+
     avatar.addEventListener('click', async function(e) {
-      // Get avatar position and click coordinates
+      // Compute distance from center so clicks near avatar toggle only
       const rect = avatar.getBoundingClientRect();
       const centerX = rect.left + rect.width / 2;
       const centerY = rect.top + rect.height / 2;
       const clickX = e.clientX;
       const clickY = e.clientY;
       const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
-      
-      // Only toggle sound if click is within reasonable distance from center
-      const avatarRadius = Math.min(rect.width, rect.height) / 22;
-      
+      const avatarRadius = Math.min(rect.width, rect.height) / 2; // more reasonable radius
+
       if (dist < avatarRadius) {
         // Resume audio context on first interaction (mobile requirement)
-        if (!avatarAudioContextResumed && avatarSound.webkitAudioContext) {
-          const context = new (window.AudioContext || window.webkitAudioContext)();
-          await context.resume();
-          avatarAudioContextResumed = true;
+        if (!avatarAudioContextResumed) {
+          try {
+            const ctx = new (window.AudioContext || window.webkitAudioContext)();
+            await ctx.resume();
+            avatarAudioContextResumed = true;
+          } catch (err) {
+            // Not fatal; continue
+            console.log('Audio context resume failed or not needed:', err);
+          }
         }
 
         if (!avatarPlaying) {
           // Start playing avatar sound with error handling
           try {
+            // Defensive: ensure health-check not running from previous instance
+            stopAvatarHealthCheck();
+
             avatarSound.muted = false;
             avatarSound.currentTime = 0;
             avatarSound.volume = 0.3;
             await avatarSound.play();
             avatarPlaying = true;
-            
-            // Visual feedback for avatar
-            showAvatarFeedback(centerX, centerY);
-            
-            // Start health monitoring
+
+            // Start health monitoring after successful play
             startAvatarHealthCheck();
-            
+
           } catch (error) {
             console.log('Avatar audio play failed:', error);
             avatarPlaying = false;
+            stopAvatarHealthCheck();
           }
         } else {
-          // Stop playing
-          avatarSound.pause();
-          avatarSound.currentTime = 0;
-          avatarPlaying = false;
-          
-          // Stop health monitoring
+          // Stop health monitoring first to avoid a race
           stopAvatarHealthCheck();
+
+          // Stop playing (pause is synchronous)
+          try {
+            avatarSound.pause();
+            avatarSound.currentTime = 0;
+          } catch (err) {
+            console.warn('Error pausing avatar sound:', err);
+          }
+
+          avatarPlaying = false;
         }
       }
     });
   }
 
-  // Handle page visibility changes
+  // Handle page visibility changes - restore only if we expect it to be playing
   document.addEventListener('visibilitychange', () => {
     if (!document.hidden && avatarPlaying && avatarSound && avatarSound.paused) {
-      // Tab became visible and avatar audio should be playing but is paused
       console.log('Tab visible - restoring paused avatar audio');
       avatarSound.play().catch(error => {
         console.log('Avatar tab restore failed:', error);
