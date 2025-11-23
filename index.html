@@ -12624,6 +12624,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', () => {
   const muteBtn = document.getElementById('mute-audio-btn');
   const muteIcon = document.getElementById('mute-audio-icon');
+  
   // Find the meditation background audio element
   function getMeditationAudio() {
     return window.backgroundAudio || document.querySelector('audio[id^="bg-music-"]:not([paused])');
@@ -12632,8 +12633,17 @@ document.addEventListener('DOMContentLoaded', () => {
   let isMuted = false;
 
   muteBtn.addEventListener('click', () => {
+    // FIRST: Try to resume audio context if suspended
+    if (audioContext && audioContext.state === 'suspended') {
+      audioContext.resume().then(() => {
+        console.log('Audio context resumed via mute button');
+      });
+    }
+
+    // THEN: Handle mute/unmute as normal
     const audio = getMeditationAudio();
     if (!audio) return;
+    
     isMuted = !isMuted;
     audio.muted = isMuted;
     muteIcon.className = isMuted ? 'fas fa-volume-mute' : 'fas fa-volume-up';
