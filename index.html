@@ -2511,7 +2511,7 @@ body.lock-scroll {
   background: transparent;
   z-index: 10;
 "></div>
-  <img id="logo-sacred" src="/assets/icrown3.png" alt="Sacred Symbol" class="w-full h-full object-cover" style="display:block;">
+  <img id="logo-sacred" src="/assets/icrown3.png" alt="Sacred Symbol" class="w-full h-full object-cover" draggable="false" onmousedown="return false;" style="user-select:none;-webkit-user-drag:none;">
 <div id="lotus-eye-flare"
      style="
        position:absolute;
@@ -8708,61 +8708,55 @@ document.addEventListener('DOMContentLoaded', function() {
   const om = document.getElementById('om-sound');
   let isPlaying = false;
 
-  if (logo && om) {
-    // Set the audio to loop
-    om.loop = true;
-    
-    // Create and resume audio context on first user interaction
-    let audioContextResumed = false;
-    
-    logo.addEventListener('click', async function(e) {
-      e.stopPropagation();
-      e.preventDefault(); 
-      
-      // Get logo position and click coordinates
-      const rect = logo.getBoundingClientRect();
-      const centerX = rect.left + rect.width / 2;
-      const centerY = rect.top + rect.height / 2;
-      const clickX = e.clientX;
-      const clickY = e.clientY;
-      const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
-      
-      // Only toggle sound if click is within 33px of center (radius)
-      if (dist < 33) {
-        // Resume audio context on first interaction (mobile requirement)
-        if (!audioContextResumed && om.webkitAudioContext) {
-          const context = new (window.AudioContext || window.webkitAudioContext)();
-          await context.resume();
-          audioContextResumed = true;
-        }
-        
-        if (!isPlaying) {
-          // Start playing with error handling
-          try {
-            om.muted = false;
-            om.currentTime = 0;
-            om.volume = 0.7;
-            await om.play();
-            isPlaying = true;
-            safeAddCount();
-            startOmSelfHeal();
-            startAudioHealthCheck();
-            
-          } catch (error) {
-            console.log('Audio play failed:', error);
-            isPlaying = false;
-          }
-        } else {
-          // Stop playing
-          om.pause();
-          om.currentTime = 0;
-          isPlaying = false;
-          safeRemoveCount();
-          stopOmSelfHeal();
-          stopAudioHealthCheck();
-        }
+  function handleLogoTap(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const rect = logo.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const clickX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clickY = e.touches ? e.touches[0].clientY : e.clientY;
+    const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
+
+    if (dist < 33) {
+      // Resume audio context if needed (usually for iOS)
+      if (!window.audioContextResumed && window.webkitAudioContext) {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        context.resume();
+        window.audioContextResumed = true;
       }
-    });
+
+      if (!isPlaying) {
+        try {
+          om.loop = true;         // <<<<<< THIS is where it goes!
+          om.muted = false;
+          om.currentTime = 0;
+          om.volume = 0.7;
+          om.play();
+          isPlaying = true;
+          safeAddCount();
+          startOmSelfHeal();
+          startAudioHealthCheck();
+        } catch (error) {
+          console.log('Audio play failed:', error);
+          isPlaying = false;
+        }
+      } else {
+        om.pause();
+        om.currentTime = 0;
+        isPlaying = false;
+        safeRemoveCount();
+        stopOmSelfHeal();
+        stopAudioHealthCheck();
+      }
+    }
+  }
+
+  if (logo && om) {
+    om.loop = true; // Make sure; also can set here on DOM ready
+    logo.addEventListener('click', handleLogoTap, { passive: false });
+    logo.addEventListener('touchstart', handleLogoTap, { passive: false });
   }
 });
 
