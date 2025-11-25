@@ -9021,13 +9021,18 @@ async function updateCount() {
   }
 }
 
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden) updateCount();
+});
+
+setInterval(updateCount, 9000); // every 9 seconds
+
 // clear user when closing page
 //window.addEventListener('beforeunload', () => {
 //  removeCount();//  stopHeartbeat();//});
 //window.addEventListener('pagehide', () => {
 //  removeCount();//  stopHeartbeat();//});
-
- setInterval(updateCount, 9000); // every 9 seconds
+ 
 
 let heartbeatInterval = null;
 
