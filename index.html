@@ -3680,7 +3680,7 @@ body.lock-scroll {
     let currentMode = null;
     let userSessionTimes = [];
     let yogiQuotes = [];
-    let notificationWindow = 30;
+    let notificationWindow = 60;
     let currentSessionTime = null;
     let audioContext = null;
     let sessionCompletedWhileModalOpen = false;
@@ -3924,11 +3924,11 @@ function hasMissedSession() {
     );
     
     // If session is not completed and the window has not even started (-10 min), it's not missed
-    if (!isCompleted && currentMinutes < sessionTime - 30) {
+    if (!isCompleted && currentMinutes < sessionTime - 60) {
       return false;
     }
     // If session is not completed and the window is open, it's not missed yet
-    if (!isCompleted && Math.abs(currentMinutes - sessionTime) <= 30) {
+    if (!isCompleted && Math.abs(currentMinutes - sessionTime) <= 60) {
       return false;
     }
   }
@@ -5978,11 +5978,11 @@ if (completeSectionVisible || finalSectionVisible) {
   sortedSessions.forEach(session => {
     const [hours, minutes] = session.time.split(':').map(Number);
     const sessionTime = hours * 60 + minutes;
-    const isActive = Math.abs(sessionTime - currentTime) <= 30;
+    const isActive = Math.abs(sessionTime - currentTime) <= 60;
     const isCompleted = challengeData.sessionsCompleted.some(
       completed => completed.time === session.time && completed.date === today
     );
-    const isMissed = !isCompleted && sessionTime < currentTime - 30;
+    const isMissed = !isCompleted && sessionTime < currentTime - 60;
 
     if (isMissed) {
       hasMissedSession = true;
@@ -6409,7 +6409,7 @@ if (
     completed => completed.time === session.time && completed.date === today
   );
   // Only allow if in window and not already completed
-  if (Math.abs(sessionTime - currentTime) <= 30 && !isCompleted) {
+  if (Math.abs(sessionTime - currentTime) <= 60 && !isCompleted) {
     selectedSession = session;
     break;
   }
@@ -14956,6 +14956,7 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
+
 
 
 
