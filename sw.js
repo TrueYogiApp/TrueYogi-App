@@ -223,13 +223,20 @@ self.addEventListener('fetch', (event) => {
         ) {
           const responseToCache = networkResponse.clone();
           const url = new URL(event.request.url);
-          const cacheName = isPermanentAsset(url.pathname)
-            ? PERMANENT_CACHE_NAME
-            : CACHE_NAME;
 
-          caches.open(cacheName).then((cache) =>
-            cache.put(event.request, responseToCache)
-          );
+          // PATCH: Only cache if protocol is http or https!
+          if (url.protocol === "http:" || url.protocol === "https:") {
+            const cacheName = isPermanentAsset(url.pathname)
+              ? PERMANENT_CACHE_NAME
+              : CACHE_NAME;
+
+            caches.open(cacheName).then((cache) =>
+              cache.put(event.request, responseToCache)
+            );
+          } else {
+            // Optionally, log what you skip
+            // console.log("Skipping cache.put for non-http(s) request: ", url.href);
+          }
         }
 
         // Normal response for everything else
