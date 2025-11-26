@@ -13799,43 +13799,45 @@ function drawNeurons() {
           ctx.stroke();
         }
         
-        // Enhanced Third Eye (Ajna) chakra glow
-        if (chakra === 5) {
-          ctx.save();
-          
-          // Create pulsing effect for the glow
-          const pulseIntensity = 0.5 + 0.3 * Math.sin(Date.now() * 0.002);
-          const glowSize = 47 + 8 * pulseIntensity;
-          
-          // Inner intense glow
-          ctx.globalAlpha = 0.6 * pulseIntensity;
-          let glowGradient = ctx.createRadialGradient(
-            canvas.width/2, chakraY, 0,
-            canvas.width/2, chakraY, glowSize
-          );
-          glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 95%, 70%, 1)`);
-          glowGradient.addColorStop(0.7, `hsla(${chakraColors[5].hue}, 85%, 60%, 0.4)`);
-          glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 80%, 50%, 0)`);
-          
-          ctx.beginPath();
-          ctx.ellipse(canvas.width/2, chakraY, glowSize, glowSize/2, 0, 0, Math.PI * 2);
-          ctx.fillStyle = glowGradient;
-          ctx.fill();
-          
-          // Outer subtle glow
-          ctx.globalAlpha = 0.25;
-          glowGradient = ctx.createRadialGradient(
-            canvas.width/2, chakraY, 0,
-            canvas.width/2, chakraY, glowSize * 1.8
-          );
-          glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 90%, 65%, 0.5)`);
-          glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 85%, 55%, 0)`);
-          
-          ctx.beginPath();
-          ctx.ellipse(canvas.width/2, chakraY, glowSize * 1.8, glowSize * 0.9, 0, 0, Math.PI * 2);
-          ctx.fillStyle = glowGradient;
-          ctx.fill();
-          
+// Enhanced Third Eye (Ajna) chakra glow
+if (chakra === 5) {
+  ctx.save();
+  
+  // Create pulsing effect for the glow
+  const pulseIntensity = 0.5 + 0.3 * Math.sin(Date.now() * 0.002);
+  const glowSize = 55 + 12 * pulseIntensity; // Increased base size
+  
+  // Inner intense glow - more vibrant
+  ctx.globalAlpha = 0.7 * pulseIntensity;
+  let glowGradient = ctx.createRadialGradient(
+    canvas.width/2, chakraY, 0,
+    canvas.width/2, chakraY, glowSize
+  );
+  glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 98%, 80%, 1)`);
+  glowGradient.addColorStop(0.5, `hsla(${chakraColors[5].hue}, 90%, 65%, 0.6)`);
+  glowGradient.addColorStop(0.8, `hsla(${chakraColors[5].hue}, 85%, 55%, 0.3)`);
+  glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 80%, 50%, 0)`);
+  
+  ctx.beginPath();
+  ctx.ellipse(canvas.width/2, chakraY, glowSize, glowSize/1.8, 0, 0, Math.PI * 2);
+  ctx.fillStyle = glowGradient;
+  ctx.fill();
+  
+  // Outer subtle glow - expanded
+  ctx.globalAlpha = 0.3;
+  glowGradient = ctx.createRadialGradient(
+    canvas.width/2, chakraY, 0,
+    canvas.width/2, chakraY, glowSize * 2.2
+  );
+  glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 95%, 70%, 0.4)`);
+  glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 90%, 60%, 0)`);
+  
+  ctx.beginPath();
+  ctx.ellipse(canvas.width/2, chakraY, glowSize * 2.2, glowSize * 1.1, 0, 0, Math.PI * 2);
+  ctx.fillStyle = glowGradient;
+  ctx.fill();
+  
+  // Enhanced glowing particles with varying sizes
           // Add glowing particles around Third Eye
           ctx.globalAlpha = 0.7;
           for (let i = 0; i < 8; i++) {
@@ -13852,9 +13854,23 @@ function drawNeurons() {
             ctx.fillStyle = `hsla(${chakraColors[5].hue + i * 10}, 90%, 70%, ${0.8 - i * 0.1})`;
             ctx.fill();
           }
-          
-          ctx.restore();
-        }
+    
+  // ADDITION: Central core with brighter glow
+  ctx.globalAlpha = 0.9;
+  const coreGradient = ctx.createRadialGradient(
+    canvas.width/2, chakraY, 0,
+    canvas.width/2, chakraY, glowSize * 0.4
+  );
+  coreGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 100%, 90%, 1)`);
+  coreGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 95%, 70%, 0)`);
+  
+  ctx.beginPath();
+  ctx.arc(canvas.width/2, chakraY, glowSize * 0.4, 0, Math.PI * 2);
+  ctx.fillStyle = coreGradient;
+  ctx.fill();
+  
+  ctx.restore();
+}
         
         // After drawing petals for Crown
         if (chakra === 6) {
