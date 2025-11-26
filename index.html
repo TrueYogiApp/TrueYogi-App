@@ -6409,7 +6409,7 @@ if (
     completed => completed.time === session.time && completed.date === today
   );
   // Only allow if in window and not already completed
-  if (Math.abs(sessionTime - currentTime) <= 10 && !isCompleted) {
+  if (Math.abs(sessionTime - currentTime) <= 30 && !isCompleted) {
     selectedSession = session;
     break;
   }
@@ -14956,6 +14956,7 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
+
 
 
 
