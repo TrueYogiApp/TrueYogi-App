@@ -5982,7 +5982,14 @@ if (completeSectionVisible || finalSectionVisible) {
     const isCompleted = challengeData.sessionsCompleted.some(
       completed => completed.time === session.time && completed.date === today
     );
-    const isMissed = !isCompleted && sessionTime < currentTime - 10;
+	
+        // FIX: Check if this session was missed on ANY previous date, not just today
+    const isMissed = !isCompleted && (
+      // Missed today if session time has passed
+      (sessionTime < currentTime - 10) ||
+      // OR check if this session was missed on any previous day
+      isSessionMissedOnPreviousDays(session.time, today)
+    );
 
     if (isMissed) {
       hasMissedSession = true;
@@ -6010,6 +6017,7 @@ if (completeSectionVisible || finalSectionVisible) {
     }
     list.appendChild(badge);
   });
+
   // FIX: Only show Missed Session modal if NOT all today's sessions are completed
   if (
     hasMissedSession &&
@@ -6018,6 +6026,32 @@ if (completeSectionVisible || finalSectionVisible) {
   ) {
     showMissedSessionModal();
   }
+}
+
+// NEW HELPER FUNCTION: Check if a session was missed on any previous day
+function isSessionMissedOnPreviousDays(sessionTime, today) {
+  const todayDate = new Date(today);
+  const startDate = new Date(challengeData.startDate);
+  
+  // Check each day from start date until yesterday
+  for (let date = new Date(startDate); date < todayDate; date.setDate(date.getDate() + 1)) {
+    const dateString = getLocalDateString(date);
+    
+    // Skip if challenge wasn't active on this date (optional)
+    // if (date < startDate) continue;
+    
+    // Check if this session was completed on this date
+    const wasCompleted = challengeData.sessionsCompleted.some(
+      completed => completed.time === sessionTime && completed.date === dateString
+    );
+    
+    // If session wasn't completed on this date, it was missed
+    if (!wasCompleted) {
+      return true;
+    }
+  }
+  
+  return false;
 }
 
     function formatTime(time) {
