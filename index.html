@@ -5965,7 +5965,7 @@ if (completeSectionVisible || finalSectionVisible) {
       badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium';
       badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
       const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      badge.setAttribute('data-tooltip', t('journeyBegins') + ' ' + startDate.toLocaleDateString('en-US', options));
+      badge.setAttribute('data-tooltip', t('journeyBegins') + startDate.toLocaleDateString('en-US', options));
       badge.classList.add('status-tooltip', 'Journey-begins-tip');
       list.appendChild(badge);
     });
@@ -5982,14 +5982,7 @@ if (completeSectionVisible || finalSectionVisible) {
     const isCompleted = challengeData.sessionsCompleted.some(
       completed => completed.time === session.time && completed.date === today
     );
-	
-        // FIX: Check if this session was missed on ANY previous date, not just today
-    const isMissed = !isCompleted && (
-      // Missed today if session time has passed
-      (sessionTime < currentTime - 10) ||
-      // OR check if this session was missed on any previous day
-      isSessionMissedOnPreviousDays(session.time, today)
-    );
+    const isMissed = !isCompleted && sessionTime < currentTime - 10;
 
     if (isMissed) {
       hasMissedSession = true;
@@ -6017,6 +6010,15 @@ if (completeSectionVisible || finalSectionVisible) {
     }
     list.appendChild(badge);
   });
+  // FIX: Only show Missed Session modal if NOT all today's sessions are completed
+  if (
+    hasMissedSession &&
+    currentMode === 'yogi' &&
+    todayCompleted < challengeData.requiredSessions
+  ) {
+    showMissedSessionModal();
+  }
+}
 
   // FIX: Only show Missed Session modal if NOT all today's sessions are completed
   if (
@@ -15007,4 +15009,5 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
+
 
