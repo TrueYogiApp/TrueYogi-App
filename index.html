@@ -9846,8 +9846,9 @@ function setAuraColor() {
     // Override gradient background inline
     userIdDisplay.style.background = `linear-gradient(90deg,#232526 0%, ${hex}${alpha} 100%)`;
 
-    // You can also make color or box-shadow stronger for connected if you want:
-    // userIdDisplay.style.boxShadow = isConnected ? "0 0 16px " + hex + "99" : "0 0 4px " + hex + "44";
+	    // Simple connection indicators
+    userIdDisplay.style.border = isConnected ? `2px solid ${hex}` : "1px solid #444";
+    userIdDisplay.style.boxShadow = isConnected ? `0 0 15px ${hex}88` : "none";
   }
 }
 
