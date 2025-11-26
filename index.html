@@ -9760,7 +9760,7 @@ const auraGradientHex = {
   gold:     "#FFD700",
   silver:   "#BFC9CA",
   sapphire: "#1a4fcc",
-  "dark-silver": "#606060EE", // use silver as fallback
+  "dark-silver": "#606060", // use silver as fallback
   white:    "#fff"
 };
 
@@ -9805,9 +9805,16 @@ function setAuraColor() {
     // livePresenceRows must be global and updated!
     const isConnected = Array.isArray(livePresenceRows) && livePresenceRows.some(row => row.user_id === userId);
 
-    // Use aura gradient color hex
+     // Use aura gradient color hex
     const hex = auraGradientHex[auraClass] || "#FFD700";
-    const alpha = isConnected ? "66" : "11"; // Connected = more opaque
+    
+    // SPECIAL CASE: Use lower opacity for dark-silver (12:30-2:30am)
+    let alpha;
+    if (auraClass === "dark-silver") {
+      alpha = isConnected ? "44" : "11"; // Much more subtle for night time
+    } else {
+      alpha = isConnected ? "66" : "11"; // Normal opacity for other times
+    } // Connected = more opaque
 
     // Override gradient background inline
     userIdDisplay.style.background = `linear-gradient(90deg,#232526 0%, ${hex}${alpha} 100%)`;
