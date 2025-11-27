@@ -5940,7 +5940,7 @@ function completeExpiredSessionIfNeeded() {
   }
 }
 
- async  function updateSessionTimesDisplay() {
+  async  function updateSessionTimesDisplay() {
 	const completeSectionVisible = !document.getElementById('complete-section').classList.contains('hidden');
 	const finalSectionVisible = !document.getElementById('final-section').classList.contains('hidden');
 if (completeSectionVisible || finalSectionVisible) {
@@ -5992,11 +5992,13 @@ if (completeSectionVisible || finalSectionVisible) {
     const isCompleted = challengeData.sessionsCompleted.some(
       completed => completed.time === session.time && completed.date === today
     );
-    // FIX: Only consider today's sessions for missed status display
-    const isMissed = !isCompleted && sessionTime < currentTime - 10;
-    
-    // For badge display: show missed if missed today OR historically missed
-    const showMissedBadge = isMissed || isSessionMissedOnPreviousDays(session.time, today);
+            // FIX: Check if this session was missed on ANY previous date, not just today
+    const isMissed = !isCompleted && (
+      // Missed today if session time has passed
+      (sessionTime < currentTime - 10) ||
+      // OR check if this session was missed on any previous day
+      isSessionMissedOnPreviousDays(session.time, today)
+    );
 
     if (isMissed) {
       hasMissedSession = true;
@@ -6006,13 +6008,13 @@ if (completeSectionVisible || finalSectionVisible) {
     badge.className = `session-time-badge px-2 py-1 rounded-full text-xs font-medium ${
       isActive && !isCompleted ? 'active' : 
       isCompleted ? 'completed' : 
-      showMissedBadge ? 'missed' : ''
+      isMissed ? 'missed' : ''
     }`;
     badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
     if (isCompleted) {
       badge.setAttribute('data-tooltip', t('completed'));
       badge.classList.add('status-tooltip', 'completed-tip');
-    } else if (showMissedBadge) {
+    } else if (isMissed) {
       badge.setAttribute('data-tooltip', t("missed"));
       badge.classList.add('status-tooltip', 'missed-tip');
     } else if (isActive) {
