@@ -5940,7 +5940,7 @@ function completeExpiredSessionIfNeeded() {
   }
 }
 
-  async  function updateSessionTimesDisplay() {
+ async  function updateSessionTimesDisplay() {
 	const completeSectionVisible = !document.getElementById('complete-section').classList.contains('hidden');
 	const finalSectionVisible = !document.getElementById('final-section').classList.contains('hidden');
 if (completeSectionVisible || finalSectionVisible) {
@@ -5992,7 +5992,11 @@ if (completeSectionVisible || finalSectionVisible) {
     const isCompleted = challengeData.sessionsCompleted.some(
       completed => completed.time === session.time && completed.date === today
     );
+    // FIX: Only consider today's sessions for missed status display
     const isMissed = !isCompleted && sessionTime < currentTime - 10;
+    
+    // For badge display: show missed if missed today OR historically missed
+    const showMissedBadge = isMissed || isSessionMissedOnPreviousDays(session.time, today);
 
     if (isMissed) {
       hasMissedSession = true;
@@ -6028,6 +6032,19 @@ if (completeSectionVisible || finalSectionVisible) {
   ) {
     showMissedSessionModal();
   }
+}
+
+function isSessionMissedOnPreviousDays(sessionTime, today) {
+  const todayDate = new Date(today + 'T00:00:00');
+  const startDate = new Date(challengeData.startDate + 'T00:00:00');
+  
+  const daysSinceStart = Math.floor((todayDate - startDate) / (1000 * 60 * 60 * 24));
+  const expectedSessions = daysSinceStart * challengeData.requiredSessions;
+  const actualSessions = challengeData.sessionsCompleted.length;
+  
+  console.log(`Days: ${daysSinceStart}, Expected: ${expectedSessions}, Actual: ${actualSessions}`);
+  
+  return actualSessions < expectedSessions;
 }
 
     function formatTime(time) {
