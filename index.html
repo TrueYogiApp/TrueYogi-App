@@ -3744,26 +3744,32 @@ function clearAppCache() {
 }
 
 function enableMobileAudioResume() {
-  // Find all elements that could be touched during meditation
+  const htmlEl = document.documentElement;
   const elements = [
     document.getElementById('timer-section'),
     document.getElementById('meditating'),
     document.getElementById('timer'),
     document.getElementById('session-info-badge'),
     document.getElementById('meditation-canvas'),
-    document.body // fallback
+    document.body,
+    htmlEl,
+    window,
+    document
   ];
-  elements.forEach(el => {
-    if (!el) return;
-    el.addEventListener('touchstart', tryResumeAudio, { once: false });
-    el.addEventListener('click', tryResumeAudio, { once: false });
+
+  ['touchstart', 'pointerdown', 'click'].forEach(evt => {
+    elements.forEach(el => {
+      if (!el) return;
+      el.addEventListener(evt, tryResumeAudio, { passive: false, capture: true });
+    });
   });
 }
 
-function tryResumeAudio() {
-  if (audioContext && audioContext.state === 'suspended') {
-    audioContext.resume().then(() => {
-      // Resume ALL audio elements
+function tryResumeAudio(e) {
+  // Try to resume context first
+  if (window.audioContext && window.audioContext.state === 'suspended') {
+    window.audioContext.resume().then(() => {
+      // Resume all audio elements if paused and not at beginning
       document.querySelectorAll('audio').forEach(audio => {
         if (audio.paused && audio.currentTime > 0) {
           audio.play().catch(() => {});
@@ -3774,18 +3780,24 @@ function tryResumeAudio() {
 }
 
 function disableMobileAudioResume() {
+  const htmlEl = document.documentElement;
   const elements = [
     document.getElementById('timer-section'),
     document.getElementById('meditating'),
     document.getElementById('timer'),
     document.getElementById('session-info-badge'),
     document.getElementById('meditation-canvas'),
-    document.body
+    document.body,
+    htmlEl,
+    window,
+    document
   ];
-  elements.forEach(el => {
-    if (!el) return;
-    el.removeEventListener('touchstart', tryResumeAudio);
-    el.removeEventListener('click', tryResumeAudio);
+
+  ['touchstart', 'pointerdown', 'click'].forEach(evt => {
+    elements.forEach(el => {
+      if (!el) return;
+      el.removeEventListener(evt, tryResumeAudio, { passive: false, capture: true });
+    });
   });
 }
 
