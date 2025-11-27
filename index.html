@@ -6006,13 +6006,13 @@ if (completeSectionVisible || finalSectionVisible) {
     badge.className = `session-time-badge px-2 py-1 rounded-full text-xs font-medium ${
       isActive && !isCompleted ? 'active' : 
       isCompleted ? 'completed' : 
-      isMissed ? 'missed' : ''
+      showMissedBadge ? 'missed' : ''
     }`;
     badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
     if (isCompleted) {
       badge.setAttribute('data-tooltip', t('completed'));
       badge.classList.add('status-tooltip', 'completed-tip');
-    } else if (isMissed) {
+    } else if (showMissedBadge) {
       badge.setAttribute('data-tooltip', t("missed"));
       badge.classList.add('status-tooltip', 'missed-tip');
     } else if (isActive) {
