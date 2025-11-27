@@ -3680,7 +3680,7 @@ body.lock-scroll {
     let currentMode = null;
     let userSessionTimes = [];
     let yogiQuotes = [];
-    let notificationWindow = 60;
+    let notificationWindow = 10;
     let currentSessionTime = null;
     let audioContext = null;
     let sessionCompletedWhileModalOpen = false;
@@ -3924,11 +3924,11 @@ function hasMissedSession() {
     );
     
     // If session is not completed and the window has not even started (-10 min), it's not missed
-    if (!isCompleted && currentMinutes < sessionTime - 60) {
+    if (!isCompleted && currentMinutes < sessionTime - 10) {
       return false;
     }
     // If session is not completed and the window is open, it's not missed yet
-    if (!isCompleted && Math.abs(currentMinutes - sessionTime) <= 60) {
+    if (!isCompleted && Math.abs(currentMinutes - sessionTime) <= 10) {
       return false;
     }
   }
@@ -5978,11 +5978,11 @@ if (completeSectionVisible || finalSectionVisible) {
   sortedSessions.forEach(session => {
     const [hours, minutes] = session.time.split(':').map(Number);
     const sessionTime = hours * 60 + minutes;
-    const isActive = Math.abs(sessionTime - currentTime) <= 60;
+    const isActive = Math.abs(sessionTime - currentTime) <= 10;
     const isCompleted = challengeData.sessionsCompleted.some(
       completed => completed.time === session.time && completed.date === today
     );
-    const isMissed = !isCompleted && sessionTime < currentTime - 60;
+    const isMissed = !isCompleted && sessionTime < currentTime - 10;
 
     if (isMissed) {
       hasMissedSession = true;
@@ -6409,7 +6409,7 @@ if (
     completed => completed.time === session.time && completed.date === today
   );
   // Only allow if in window and not already completed
-  if (Math.abs(sessionTime - currentTime) <= 60 && !isCompleted) {
+  if (Math.abs(sessionTime - currentTime) <= 10 && !isCompleted) {
     selectedSession = session;
     break;
   }
@@ -9760,7 +9760,7 @@ const auraGradientHex = {
   gold:     "#FFD700",
   silver:   "#BFC9CA",
   sapphire: "#1a4fcc",
-  "dark-silver": "#BFC9CA", // use silver as fallback
+  "dark-silver": "#606060",
   white:    "#fff"
 };
 
@@ -9812,8 +9812,9 @@ function setAuraColor() {
     // Override gradient background inline
     userIdDisplay.style.background = `linear-gradient(90deg,#232526 0%, ${hex}${alpha} 100%)`;
 
-    // You can also make color or box-shadow stronger for connected if you want:
-    // userIdDisplay.style.boxShadow = isConnected ? "0 0 16px " + hex + "99" : "0 0 4px " + hex + "44";
+	    // Simple connection indicators
+    userIdDisplay.style.border = isConnected ? `2px solid ${hex}` : "1px solid #444";
+    userIdDisplay.style.boxShadow = isConnected ? `0 0 15px ${hex}88` : "none";
   }
 }
 
@@ -13764,43 +13765,45 @@ function drawNeurons() {
           ctx.stroke();
         }
         
-        // Enhanced Third Eye (Ajna) chakra glow
-        if (chakra === 5) {
-          ctx.save();
-          
-          // Create pulsing effect for the glow
-          const pulseIntensity = 0.5 + 0.3 * Math.sin(Date.now() * 0.002);
-          const glowSize = 47 + 8 * pulseIntensity;
-          
-          // Inner intense glow
-          ctx.globalAlpha = 0.6 * pulseIntensity;
-          let glowGradient = ctx.createRadialGradient(
-            canvas.width/2, chakraY, 0,
-            canvas.width/2, chakraY, glowSize
-          );
-          glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 95%, 70%, 1)`);
-          glowGradient.addColorStop(0.7, `hsla(${chakraColors[5].hue}, 85%, 60%, 0.4)`);
-          glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 80%, 50%, 0)`);
-          
-          ctx.beginPath();
-          ctx.ellipse(canvas.width/2, chakraY, glowSize, glowSize/2, 0, 0, Math.PI * 2);
-          ctx.fillStyle = glowGradient;
-          ctx.fill();
-          
-          // Outer subtle glow
-          ctx.globalAlpha = 0.25;
-          glowGradient = ctx.createRadialGradient(
-            canvas.width/2, chakraY, 0,
-            canvas.width/2, chakraY, glowSize * 1.8
-          );
-          glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 90%, 65%, 0.5)`);
-          glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 85%, 55%, 0)`);
-          
-          ctx.beginPath();
-          ctx.ellipse(canvas.width/2, chakraY, glowSize * 1.8, glowSize * 0.9, 0, 0, Math.PI * 2);
-          ctx.fillStyle = glowGradient;
-          ctx.fill();
-          
+// Enhanced Third Eye (Ajna) chakra glow
+if (chakra === 5) {
+  ctx.save();
+  
+  // Create pulsing effect for the glow
+  const pulseIntensity = 0.5 + 0.3 * Math.sin(Date.now() * 0.002);
+  const glowSize = 55 + 12 * pulseIntensity; // Increased base size
+  
+  // Inner intense glow - more vibrant
+  ctx.globalAlpha = 0.7 * pulseIntensity;
+  let glowGradient = ctx.createRadialGradient(
+    canvas.width/2, chakraY, 0,
+    canvas.width/2, chakraY, glowSize
+  );
+  glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 98%, 80%, 1)`);
+  glowGradient.addColorStop(0.5, `hsla(${chakraColors[5].hue}, 90%, 65%, 0.6)`);
+  glowGradient.addColorStop(0.8, `hsla(${chakraColors[5].hue}, 85%, 55%, 0.3)`);
+  glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 80%, 50%, 0)`);
+  
+  ctx.beginPath();
+  ctx.ellipse(canvas.width/2, chakraY, glowSize, glowSize/1.8, 0, 0, Math.PI * 2);
+  ctx.fillStyle = glowGradient;
+  ctx.fill();
+  
+  // Outer subtle glow - expanded
+  ctx.globalAlpha = 0.3;
+  glowGradient = ctx.createRadialGradient(
+    canvas.width/2, chakraY, 0,
+    canvas.width/2, chakraY, glowSize * 2.2
+  );
+  glowGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 95%, 70%, 0.4)`);
+  glowGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 90%, 60%, 0)`);
+  
+  ctx.beginPath();
+  ctx.ellipse(canvas.width/2, chakraY, glowSize * 2.2, glowSize * 1.1, 0, 0, Math.PI * 2);
+  ctx.fillStyle = glowGradient;
+  ctx.fill();
+  
+  // Enhanced glowing particles with varying sizes
           // Add glowing particles around Third Eye
           ctx.globalAlpha = 0.7;
           for (let i = 0; i < 8; i++) {
@@ -13817,9 +13820,23 @@ function drawNeurons() {
             ctx.fillStyle = `hsla(${chakraColors[5].hue + i * 10}, 90%, 70%, ${0.8 - i * 0.1})`;
             ctx.fill();
           }
-          
-          ctx.restore();
-        }
+    
+  // ADDITION: Central core with brighter glow
+  ctx.globalAlpha = 0.9;
+  const coreGradient = ctx.createRadialGradient(
+    canvas.width/2, chakraY, 0,
+    canvas.width/2, chakraY, glowSize * 0.4
+  );
+  coreGradient.addColorStop(0, `hsla(${chakraColors[5].hue}, 100%, 90%, 1)`);
+  coreGradient.addColorStop(1, `hsla(${chakraColors[5].hue}, 95%, 70%, 0)`);
+  
+  ctx.beginPath();
+  ctx.arc(canvas.width/2, chakraY, glowSize * 0.4, 0, Math.PI * 2);
+  ctx.fillStyle = coreGradient;
+  ctx.fill();
+  
+  ctx.restore();
+}
         
         // After drawing petals for Crown
         if (chakra === 6) {
@@ -14956,8 +14973,4 @@ window.addEventListener('online', () => {
 
 </body>
 </html>
-
-
-
-
 
