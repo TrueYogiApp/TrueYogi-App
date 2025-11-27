@@ -2113,6 +2113,16 @@ body.lock-scroll {
   display: none !important;
 }
 
+.looping {
+  background: radial-gradient(circle at center, #ffd70044 0%, #fffbe6 100%);
+  box-shadow: 0 0 12px #ffd70099;
+  animation: loopingBgPulse 0.79s both;
+}
+@keyframes loopingBgPulse {
+  0%, 100% { background-size: 100% 100%; }
+  50% { background-size: 120% 120%; }
+}
+
 </style>
   
 <!-- 1. Load bs58 via Skypack and attach to window -->
@@ -12743,47 +12753,75 @@ function attachMeditationMusicHandler() {
     }
   });
 
-  truemeditateImg.addEventListener('click', async function(e) {
-    const rect = truemeditateImg.getBoundingClientRect();
-    const centerX = rect.left + rect.width / 2;
-    const centerY = rect.top + rect.height / 2;
-    const clickX = e.clientX;
-    const clickY = e.clientY;
-    const dist = Math.sqrt((centerX - clickX) ** 2 + (centerY - clickY) ** 2);
+let lastTap = 0;
+let tapTimeout = null;
 
-    const tapRadius = Math.min(rect.width, rect.height) / 3;
+truemeditateImg.addEventListener('click', async function(e) {
+  const rect = truemeditateImg.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const clickX = e.clientX;
+  const clickY = e.clientY;
+  const dist = Math.sqrt((centerX - clickX) ** 2 + (centerY - clickY) ** 2);
 
-    if (dist < tapRadius) {
-      // Resume audio context on first interaction
-      if (!audioContextResumed && musicAudio.webkitAudioContext) {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        await context.resume();
-        audioContextResumed = true;
-      }
+  const tapRadius = Math.min(rect.width, rect.height) / 3;
+  if (dist >= tapRadius) return;
 
-      if (!playing) {
-        try {
-          musicAudio.muted = false;
-          musicAudio.currentTime = 0;
-          musicAudio.volume = 0.7;
-          await musicAudio.play();
-          playing = true;
-          truemeditateImg.style.filter = 'drop-shadow(0 0 22px #FFD700AA)';
-          startMusicHealthCheck();
-        } catch (error) {
-          console.log('Meditation music play failed:', error);
-          playing = false;
-          truemeditateImg.style.filter = '';
-        }
-      } else {
-        musicAudio.pause();
+  const now = Date.now();
+  if (now - lastTap < 333) {
+    // DOUBLE TAP
+    clearTimeout(tapTimeout);
+    lastTap = 0;
+    // Set loop mode for double tap
+    musicAudio.loop = true;
+    if (!playing) {
+      try {
+        musicAudio.muted = false;
         musicAudio.currentTime = 0;
+        musicAudio.volume = 0.7;
+        await musicAudio.play();
+        playing = true;
+        truemeditateImg.style.filter = 'drop-shadow(0 0 22px #FFD700AA)';
+        startMusicHealthCheck();
+      } catch (error) {
         playing = false;
         truemeditateImg.style.filter = '';
-        stopMusicHealthCheck();
       }
     }
-  });
+    // Optionally: show short visual feedback for loop mode
+    truemeditateImg.classList.add("looping");
+    setTimeout(() => truemeditateImg.classList.remove("looping"), 500);
+    return;
+  }
+
+  // SINGLE TAP delay logic
+  lastTap = now;
+  clearTimeout(tapTimeout);
+  tapTimeout = setTimeout(async () => {
+    // SINGLE TAP (no loop)
+    musicAudio.loop = false;
+    if (!playing) {
+      try {
+        musicAudio.muted = false;
+        musicAudio.currentTime = 0;
+        musicAudio.volume = 0.7;
+        await musicAudio.play();
+        playing = true;
+        truemeditateImg.style.filter = 'drop-shadow(0 0 22px #FFD700AA)';
+        startMusicHealthCheck();
+      } catch (error) {
+        playing = false;
+        truemeditateImg.style.filter = '';
+      }
+    } else {
+      musicAudio.pause();
+      musicAudio.currentTime = 0;
+      playing = false;
+      truemeditateImg.style.filter = '';
+      stopMusicHealthCheck();
+    }
+  }, 340);
+});
 
   musicAudio.addEventListener('ended', () => {
     playing = false;
