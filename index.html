@@ -7346,6 +7346,11 @@ function updateMeditationGuideImage(mode) {
   img.style.height = '143px';
   img.style.width = 'auto';
   img.style.display = 'block';
+  
+      if (mode === 'yogi') {
+    img.id = 'truemeditate-img-svg'; // Set the ID ONLY here for Yogi
+  }
+  
   imageDiv.appendChild(img);
   
     // Only attach music to truemeditate image
@@ -9566,6 +9571,11 @@ document.addEventListener('touchend', function(e) {
 
   const logoEl = document.getElementById('logo-sacred');
   if (logoEl && logoEl.contains(e.target)) return;
+  
+    const truemeditateImg = document.getElementById('truemeditate-img-svg');
+if (truemeditateImg && (e.target === truemeditateImg || truemeditateImg.contains(e.target))) {
+  return; // Skip zone/bell/double-tap sounds here!
+}
   
   const modeSelectionEl = document.getElementById('mode-selection');
   const appInterfaceEl  = document.getElementById('app-interface');
