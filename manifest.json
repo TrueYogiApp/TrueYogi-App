@@ -9,10 +9,35 @@
   "theme_color": "#1e293b",
   "orientation": "any",
   "scope": "/",
-  "description": "Meditation App",
-  "categories": ["Spirituality", "Consciousness", "Truth", "Universe", "Cosmos"],
+  "description": "True Yogi: Meditation app that rewards your practice. Build discipline & presence through daily meditation sessions. Earn token rewards for completing 41-day meditation streaks. Minimalist design for focused stillness.",
+  "categories": ["health", "fitness", "lifestyle", "Spirituality", "Consciousness", "Truth", "Universe", "Cosmos"],
   "lang": "en",
   "dir": "ltr",
+  
+  "screenshots": [
+    {
+      "src": "/assets/screenshots/phone-1-1080x1920.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Main Meditation Screen"
+    },
+    {
+      "src": "/assets/screenshots/phone-2-1080x1920.png", 
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Session in Progress"
+    },
+    {
+      "src": "/assets/screenshots/tablet-1-1920x1080.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "Tablet View"
+    }
+  ],
+
   "icons": [
     {
       "src": "/assets/android-chrome-192x192.png",
@@ -34,6 +59,16 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
+    },
+    {
+      "src": "/assets/play-store-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/assets/play-store-1024x1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
     }
   ]
 }
