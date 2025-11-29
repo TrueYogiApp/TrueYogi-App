@@ -8806,6 +8806,14 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
+window.addEventListener('pagehide', function() {
+  const om = document.getElementById('om-sound');
+  if (om) {
+    om.pause();
+    om.currentTime = 0;
+  }
+});
+
 // --- OM play/stop rate limit logic ---
 let omActionTimestamps = []; // Array of Date.now()
 let omLockUntil = 0; // timestamp when lock ends
