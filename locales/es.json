@@ -301,5 +301,19 @@
   "clearCacheModalButtonCancel": "Cancelar",
   "faqClearCacheHeading": "Recargar Caché de la App",
   "faqClearCacheDescription": "Recarga los datos de la app para obtener el contenido más reciente si es necesario. Útil para la experiencia offline.",
-  "faqClearCacheButton": "Recargar Caché de la App"
+  "faqClearCacheButton": "Recargar Caché de la App",
+  "unseen_faq_q1": "¿Cómo puedo descubrir funciones más profundas?",
+  "unseen_faq_a1": "VerdaderoYogi contiene experiencias en capas para practicantes dedicados. Explora elementos interactivos y gestos significativos a lo largo de tu recorrido.",
+  "unseen_faq_q2": "¿Qué es el Campo de Resonancia Global?",
+  "unseen_faq_a2": "Una visualización en tiempo real de la energía colectiva de meditación en todo el planeta.",
+  "unseen_faq_q3": "¿Qué es la Llama OM?",
+  "unseen_faq_a3": "Un temporizador sagrado continuo que representa la conciencia sostenida en la comunidad global.",
+  "unseen_faq_q4": "¿Cómo funciona la Red Terrestre?",
+  "unseen_faq_a4": "Una visualización global que muestra la actividad de meditación en tiempo real en todo el mundo.",
+  "unseen_faq_q5": "¿Hay experiencias de audio ocultas?",
+  "unseen_faq_a5": "Descubre paisajes sonoros, campanas, gongs y composiciones musicales completas explorando.",
+  "unseen_faq_q6": "¿Qué interacciones ocultas existen?",
+  "unseen_faq_a6": "La app responde a varios gestos y exploración de elementos visuales.",
+  "unseen_faq_q7": "¿Por qué algunas funciones están ocultas?",
+  "unseen_faq_a7": "VerdaderoYogi premia a los practicantes pacientes y curiosos con descubrimientos que enriquecen su camino."  
 }

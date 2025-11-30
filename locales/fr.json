@@ -302,5 +302,19 @@
   "clearCacheModalButtonCancel": "Annuler",
   "faqClearCacheHeading": "Recharger le cache de l'application",
   "faqClearCacheDescription": "Rechargez les données de l'application pour obtenir le dernier contenu si nécessaire. Utile pour une expérience hors ligne.",
-  "faqClearCacheButton": "recharger App cache"
+  "faqClearCacheButton": "recharger App cache",
+  "unseen_faq_q1": "Comment puis-je découvrir des fonctionnalités avancées ?",
+  "unseen_faq_a1": "VraiYogi propose des expériences en couches pour les pratiquants dévoués. Explorez les éléments interactifs et les gestes significatifs tout au long de votre chemin.",
+  "unseen_faq_q2": "Qu'est-ce que le Champ de Résonance Global ?",
+  "unseen_faq_a2": "Une visualisation en temps réel de l'énergie collective de méditation à travers la planète.",
+  "unseen_faq_q3": "Qu'est-ce que la Flamme OM ?",
+  "unseen_faq_a3": "Un minuteur sacré continu représentant la conscience soutenue de la communauté mondiale.",
+  "unseen_faq_q4": "Comment fonctionne la Grille Terrestre ?",
+  "unseen_faq_a4": "Une visualisation mondiale montrant l'activité de méditation en temps réel dans le monde entier.",
+  "unseen_faq_q5": "Existe-t-il des expériences audio cachées ?",
+  "unseen_faq_a5": "Découvrez des paysages sonores, des cloches, des gongs et des compositions musicales complètes en explorant.",
+  "unseen_faq_q6": "Quelles interactions cachées existent ?",
+  "unseen_faq_a6": "L'application répond à divers gestes et à l'exploration des éléments visuels.",
+  "unseen_faq_q7": "Pourquoi certaines fonctionnalités sont-elles cachées ?",
+  "unseen_faq_a7": "VraiYogi récompense les pratiquants patients et curieux par des découvertes qui enrichissent leur voyage."  
 }

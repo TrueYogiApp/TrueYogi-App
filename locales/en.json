@@ -302,5 +302,19 @@
   "clearCacheModalButtonCancel": "Cancel",
   "faqClearCacheHeading": "Reload App Cache",
   "faqClearCacheDescription": "Reload the app data to get the latest content if required. Useful for offline experience.",
-  "faqClearCacheButton": "Reload App Cache"
+  "faqClearCacheButton": "Reload App Cache",
+  "unseen_faq_q1": "How do I discover deeper features?",
+  "unseen_faq_a1": "TrueYogi contains layered experiences for dedicated practitioners. Explore interactive elements and meaningful gestures throughout your journey.",
+  "unseen_faq_q2": "What is the Global Resonance Field?",
+  "unseen_faq_a2": "A real-time visualization of collective meditation energy across the planet.",
+  "unseen_faq_q3": "What is the OM Flame?",
+  "unseen_faq_a3": "A continuous sacred timer representing sustained awareness across the global community.",
+  "unseen_faq_q4": "How does the Earth Grid work?",
+  "unseen_faq_a4": "A global visualization showing real-time meditation activity worldwide.",
+  "unseen_faq_q5": "Are there hidden audio experiences?",
+  "unseen_faq_a5": "Discover soundscapes, bells, gongs, and full musical compositions through exploration.",
+  "unseen_faq_q6": "What hidden interactions exist?",
+  "unseen_faq_a6": "The app responds to various gestures and exploration of visual elements.",
+  "unseen_faq_q7": "Why are some features hidden?",
+  "unseen_faq_a7": "TrueYogi rewards patient, curious practitioners with discoveries that enhance their journey."  
 }

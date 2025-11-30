@@ -2642,6 +2642,9 @@ body.lock-scroll {
   <button id="rewards-faq-tab" class="tab-button px-4 py-2 text-gray-400 font-medium border-b-2 border-transparent cursor-pointer">
     Rewards
   </button> 
+    <button id="unseen-faq-tab" class="tab-button px-4 py-2 text-gray-400 font-medium border-b-2 border-transparent cursor-pointer">
+  🔮
+</button>
     <button id="certificate-faq-tab" class="tab-button px-4 py-2 text-gray-400 font-medium border-b-2 border-transparent cursor-pointer">
   <i class="fa-solid fa-award mr-2" style="color: #D4AF37;"></i>
 </button>
@@ -2947,6 +2950,37 @@ body.lock-scroll {
     </button>
   </div>
 </div>
+</div>
+
+<div id="unseen-faq-content" class="space-y-4 hidden">
+  <div class="faq-item">
+    <h3 id="unseen-faq-q1" class="text-yellow-200 font-medium"></h3>
+    <p id="unseen-faq-a1" class="text-gray-300 mt-1"></p>
+  </div>
+  <div class="faq-item">
+    <h3 id="unseen-faq-q2" class="text-yellow-200 font-medium"></h3>
+    <p id="unseen-faq-a2" class="text-gray-300 mt-1"></p>
+  </div>
+  <div class="faq-item">
+    <h3 id="unseen-faq-q3" class="text-yellow-200 font-medium"></h3>
+    <p id="unseen-faq-a3" class="text-gray-300 mt-1"></p>
+  </div>
+  <div class="faq-item">
+    <h3 id="unseen-faq-q4" class="text-yellow-200 font-medium"></h3>
+    <p id="unseen-faq-a4" class="text-gray-300 mt-1"></p>
+  </div>
+  <div class="faq-item">
+    <h3 id="unseen-faq-q5" class="text-yellow-200 font-medium"></h3>
+    <p id="unseen-faq-a5" class="text-gray-300 mt-1"></p>
+  </div>
+  <div class="faq-item">
+    <h3 id="unseen-faq-q6" class="text-yellow-200 font-medium"></h3>
+    <p id="unseen-faq-a6" class="text-gray-300 mt-1"></p>
+  </div>
+  <div class="faq-item">
+    <h3 id="unseen-faq-q7" class="text-yellow-200 font-medium"></h3>
+    <p id="unseen-faq-a7" class="text-gray-300 mt-1"></p>
+  </div>
 </div>
 
 <!-- Certificate  Content -->
@@ -4051,6 +4085,7 @@ function setupFAQTabs() {
   const rewardsTab = document.getElementById('rewards-faq-tab'); 
   const resetTab = document.getElementById('reset-faq-tab'); 
   const certificateTab = document.getElementById('certificate-faq-tab');
+  const unseenTab = document.getElementById('unseen-faq-tab');
   
   const meditationContent = document.getElementById('meditation-faq-content');
   const dappContent = document.getElementById('dapp-faq-content');
@@ -4059,6 +4094,7 @@ function setupFAQTabs() {
   const aboutContent = document.getElementById('about-faq-content');
   const resetContent = document.getElementById('reset-faq-content');
   const certificateContent = document.getElementById('certificate-faq-content');
+  const unseenContent = document.getElementById('unseen-faq-content');
 
 certificateTab.addEventListener('click', () => {
   resetTabs(); // Hide other tabs/contents
@@ -4319,12 +4355,12 @@ window.saveCertificateAsJPEG = function() {
 };
 
   function resetTabs() {
-  [meditationTab, dappTab, appTab, rewardsTab, aboutTab, resetTab, certificateTab].forEach(tab => {
+  [meditationTab, dappTab, appTab, rewardsTab, aboutTab, resetTab, unseenTab, certificateTab].forEach(tab => {
     tab.classList.remove('active', 'text-yellow-300');
     tab.classList.add('text-gray-400');
     tab.style.borderBottomColor = 'transparent';
   });
-  [meditationContent, dappContent, appContent, rewardsContent, aboutContent, resetContent, certificateContent].forEach(content => {
+  [meditationContent, dappContent, appContent, rewardsContent, aboutContent, resetContent, unseenContent, certificateContent].forEach(content => {
     content.classList.add('hidden');
   });
 }
@@ -4344,6 +4380,7 @@ window.saveCertificateAsJPEG = function() {
   aboutTab.addEventListener('click', () => activateTab(aboutTab, aboutContent));
   resetTab.addEventListener('click', () => activateTab(resetTab, resetContent));
   certificateTab.addEventListener('click', () => activateTab(certificateTab, certificateContent));
+  unseenTab.addEventListener('click', () => activateTab(unseenTab, unseenContent));
 
 }
 
@@ -8482,6 +8519,21 @@ document.getElementById('clear-cache-cancel-btn').textContent = t('clearCacheMod
 document.getElementById('faq-clear-cache-heading').textContent = t('faqClearCacheHeading');
 document.getElementById('faq-clear-cache-description').textContent = t('faqClearCacheDescription');
 document.getElementById('faq-clear-cache-btn').innerHTML = `<i class="fas fa-broom mr-2"></i> ${t('faqClearCacheButton')}`;
+
+document.getElementById('unseen-faq-q1').textContent = t('unseen_faq_q1');
+document.getElementById('unseen-faq-a1').textContent = t('unseen_faq_a1');
+document.getElementById('unseen-faq-q2').textContent = t('unseen_faq_q2');
+document.getElementById('unseen-faq-a2').textContent = t('unseen_faq_a2');
+document.getElementById('unseen-faq-q3').textContent = t('unseen_faq_q3');
+document.getElementById('unseen-faq-a3').textContent = t('unseen_faq_a3');
+document.getElementById('unseen-faq-q4').textContent = t('unseen_faq_q4');
+document.getElementById('unseen-faq-a4').textContent = t('unseen_faq_a4');
+document.getElementById('unseen-faq-q5').textContent = t('unseen_faq_q5');
+document.getElementById('unseen-faq-a5').textContent = t('unseen_faq_a5');
+document.getElementById('unseen-faq-q6').textContent = t('unseen_faq_q6');
+document.getElementById('unseen-faq-a6').textContent = t('unseen_faq_a6');
+document.getElementById('unseen-faq-q7').textContent = t('unseen_faq_q7');
+document.getElementById('unseen-faq-a7').textContent = t('unseen_faq_a7');
 
 }
 
