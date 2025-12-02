@@ -6088,6 +6088,12 @@ if (completeSectionVisible || finalSectionVisible) {
 function isSessionMissedOnPreviousDays(sessionTime, today) {
   const todayDate = new Date(today + 'T00:00:00');
   const startDate = new Date(challengeData.startDate + 'T00:00:00');
+  const endDate = new Date(challengeData.endDate + 'T00:00:00');
+  
+  // FIX: If today is after challenge end date, no sessions were missed
+  if (todayDate > endDate) {
+    return false;
+  }
   
   const daysSinceStart = Math.floor((todayDate - startDate) / (1000 * 60 * 60 * 24));
   const expectedSessions = daysSinceStart * challengeData.requiredSessions;
