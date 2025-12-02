@@ -315,5 +315,9 @@
   "unseen_faq_q6": "Welche versteckten Interaktionen existieren?",
   "unseen_faq_a6": "Die App reagiert auf verschiedene Gesten und das Erkunden visueller Elemente.",
   "unseen_faq_q7": "Warum sind einige Funktionen versteckt?",
-  "unseen_faq_a7": "WahrerYogi belohnt geduldige, neugierige Praktizierende mit Entdeckungen, die ihre Reise bereichern."  
+  "unseen_faq_a7": "WahrerYogi belohnt geduldige, neugierige Praktizierende mit Entdeckungen, die ihre Reise bereichern.",
+  "challengeCompleteHeading": "Herausforderung Abgeschlossen!",
+  "challengeCompleteDescription": "Deine Meditationsreise hat ihr Ziel erreicht. Du hast die Herausforderung vom ${startDate} bis zum ${endDate} abgeschlossen.",
+  "challengeCompleteButtonNewJourney": "Eine Neue Reise Starten",
+  "close": "Schließen"  
 }

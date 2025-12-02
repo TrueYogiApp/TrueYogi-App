@@ -316,5 +316,9 @@
   "unseen_faq_q6": "存在哪些隐藏的互动？",
   "unseen_faq_a6": "应用会对多种手势与视觉元素的探索做出回应。",
   "unseen_faq_q7": "为什么有些功能被隐藏？",
-  "unseen_faq_a7": "真正的瑜伽士 奖赏那些耐心、好奇的修行者以丰富的发现。"  
+  "unseen_faq_a7": "真正的瑜伽士 奖赏那些耐心、好奇的修行者以丰富的发现。",
+  "challengeCompleteHeading": "挑战完成！",
+  "challengeCompleteDescription": "您的冥想旅程已到达目的地。您已完成从 ${startDate} 到 ${endDate} 的挑战。",
+  "challengeCompleteButtonNewJourney": "开始新的旅程",
+  "close": "关闭"  
 }

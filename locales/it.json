@@ -316,5 +316,9 @@
   "unseen_faq_q6": "Quali interazioni nascoste esistono?",
   "unseen_faq_a6": "L'app risponde a vari gesti e all'esplorazione degli elementi visivi.",
   "unseen_faq_q7": "Perché alcune funzionalità sono nascoste?",
-  "unseen_faq_a7": "VeroYogi premia praticanti pazienti e curiosi con scoperte che arricchiscono il loro percorso."  
+  "unseen_faq_a7": "VeroYogi premia praticanti pazienti e curiosi con scoperte che arricchiscono il loro percorso.",
+  "challengeCompleteHeading": "Sfida Completata!",
+  "challengeCompleteDescription": "Il tuo viaggio di meditazione ha raggiunto la sua destinazione. Hai completato la sfida dal ${startDate} al ${endDate}.",
+  "challengeCompleteButtonNewJourney": "Inizia un Nuovo Viaggio",
+  "close": "Chiudi"  
 }

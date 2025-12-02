@@ -315,5 +315,9 @@
   "unseen_faq_q6": "¿Qué interacciones ocultas existen?",
   "unseen_faq_a6": "La app responde a varios gestos y exploración de elementos visuales.",
   "unseen_faq_q7": "¿Por qué algunas funciones están ocultas?",
-  "unseen_faq_a7": "VerdaderoYogi premia a los practicantes pacientes y curiosos con descubrimientos que enriquecen su camino."  
+  "unseen_faq_a7": "VerdaderoYogi premia a los practicantes pacientes y curiosos con descubrimientos que enriquecen su camino.",
+  "challengeCompleteHeading": "¡Desafío Completado!",
+  "challengeCompleteDescription": "Tu viaje de meditación ha llegado a su destino. Has completado el desafío del ${startDate} al ${endDate}.",
+  "challengeCompleteButtonNewJourney": "Comenzar un Nuevo Viaje",
+  "close": "Cerrar"  
 }

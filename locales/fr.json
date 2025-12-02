@@ -317,8 +317,8 @@
   "unseen_faq_a6": "L'application répond à divers gestes et à l'exploration des éléments visuels.",
   "unseen_faq_q7": "Pourquoi certaines fonctionnalités sont-elles cachées ?",
   "unseen_faq_a7": "VraiYogi récompense les pratiquants patients et curieux par des découvertes qui enrichissent leur voyage.",
-"challengeCompleteHeading": "Défi Terminé !",
-"challengeCompleteDescription": "Votre voyage de méditation a atteint sa destination. Vous avez terminé le défi du ${startDate} au ${endDate}.",
-"challengeCompleteButtonNewJourney": "Commencer un Nouveau Voyage",
-"close": "Fermer"  
+  "challengeCompleteHeading": "Défi Terminé !",
+  "challengeCompleteDescription": "Votre voyage de méditation a atteint sa destination. Vous avez terminé le défi du ${startDate} au ${endDate}.",
+  "challengeCompleteButtonNewJourney": "Commencer un Nouveau Voyage",
+  "close": "Fermer"  
 }
