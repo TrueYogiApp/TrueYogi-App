@@ -3713,6 +3713,8 @@ body.lock-scroll {
   </div>
 </div>
 
+<div id="challenge-completed-modal" class="hidden"></div>
+
   <script>
     // State Management
     let endTime = 0;
@@ -3751,6 +3753,41 @@ body.lock-scroll {
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
+
+function showChallengeCompletedModal() {
+  const modal = document.getElementById('challenge-completed-modal');
+  modal.innerHTML = `
+    <div class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
+      <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-yellow-500/30 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+        <div class="text-center mb-6">
+          <div class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <i class="fas fa-trophy text-yellow-400 text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold text-white mb-2">Challenge Completed!</h3>
+          <p class="text-gray-300 text-sm">
+            Your meditation journey has reached its destination. You've completed the challenge from ${challengeData.startDate} to ${challengeData.endDate}.
+          </p>
+        </div>
+        
+        <div class="space-y-3">
+          <button onclick="resetYogiJourney()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 hover:scale-[1.02]">
+            <i class="fas fa-om mr-2"></i>Start a New Journey
+          </button>
+          
+          <button onclick="closeChallengeCompletedModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 border border-gray-700">
+            <i class="fas fa-times mr-2"></i>Close
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+function closeChallengeCompletedModal() {
+  const modal = document.getElementById('challenge-completed-modal');
+  modal.classList.add('hidden');
+}
 
 function showClearCacheModal() {
   document.getElementById('clearCacheModal').classList.remove('hidden');
@@ -6562,48 +6599,58 @@ if (
   updateNowDisplay();
   initAudioContext();
   
-  // First handle the Yogi mode validation and session selection
-  if (currentMode === 'yogi') {
-    const now = new Date();
-    const currentHours = now.getHours();
-    const currentMinutes = now.getMinutes();
-    const currentTime = currentHours * 60 + currentMinutes;
-    const today = getLocalDateString(now);
-    let selectedSession = null;
-
-    // Check if before start date
-    const startDate = new Date(challengeData.startDate);
-    if (now < startDate) {
-      showSessionTimeModal();
+ // First handle the Yogi mode validation and session selection
+if (currentMode === 'yogi') {
+  const now = new Date();
+  const today = getLocalDateString(now);
+  
+  // Check if challenge has ended
+  if (challengeData.endDate) {
+    const endDate = new Date(challengeData.endDate + "T00:00:00");
+    if (now > endDate) {
+      showChallengeCompletedModal();
       return;
     }
-
-    for (const session of userSessionTimes) {
-  const [hours, minutes] = session.time.split(':').map(Number);
-  const sessionTime = hours * 60 + minutes;
-  const isCompleted = challengeData.sessionsCompleted.some(
-    completed => completed.time === session.time && completed.date === today
-  );
-  // Only allow if in window and not already completed
-  if (Math.abs(sessionTime - currentTime) <= 10 && !isCompleted) {
-    selectedSession = session;
-    break;
   }
-}
 
-    if (!selectedSession) {
-      const remainingSessions = userSessionTimes.filter(session => {
-        return !challengeData.sessionsCompleted.some(
-          completed => completed.time === session.time && completed.date === today
-        );
-      });
-      if (remainingSessions.length === 0) {
-        showCompletedSessionsModal(challengeData.requiredSessions);
-      } else {
-        showSessionTimeModal();
-      }
-      return;
+  const currentHours = now.getHours();
+  const currentMinutes = now.getMinutes();
+  const currentTime = currentHours * 60 + currentMinutes;
+  let selectedSession = null;
+
+  // Check if before start date
+  const startDate = new Date(challengeData.startDate);
+  if (now < startDate) {
+    showSessionTimeModal();
+    return;
+  }
+
+  for (const session of userSessionTimes) {
+    const [hours, minutes] = session.time.split(':').map(Number);
+    const sessionTime = hours * 60 + minutes;
+    const isCompleted = challengeData.sessionsCompleted.some(
+      completed => completed.time === session.time && completed.date === today
+    );
+    // Only allow if in window and not already completed
+    if (Math.abs(sessionTime - currentTime) <= 10 && !isCompleted) {
+      selectedSession = session;
+      break;
     }
+  }
+
+  if (!selectedSession) {
+    const remainingSessions = userSessionTimes.filter(session => {
+      return !challengeData.sessionsCompleted.some(
+        completed => completed.time === session.time && completed.date === today
+      );
+    });
+    if (remainingSessions.length === 0) {
+      showCompletedSessionsModal(challengeData.requiredSessions);
+    } else {
+      showSessionTimeModal();
+    }
+    return;
+  }
 
     targetDuration = selectedSession.duration;
     currentSessionTime = selectedSession.time;
