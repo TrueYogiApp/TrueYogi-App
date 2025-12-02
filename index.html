@@ -3560,12 +3560,14 @@ body.lock-scroll {
 </div>
 
  <!-- Add to Homescreen Prompt -->
-  <div id="add-to-homescreen">
-    <button class="close-btn" onclick="dismissHomescreenPrompt()">×</button>
-    <h3>📱 Install TrueYogi App</h3>
-    <p>Add TrueYogi to your home screen for a better experience and quick access!</p>
-    
-    <div class="steps">
+<div id="add-to-homescreen" style="display: none;">
+  <button class="close-btn" onclick="dismissHomescreenPrompt()">×</button>
+  <h3>📱 Install TrueYogi App</h3>
+  <p>Add TrueYogi to your home screen for a better experience and quick access!</p>
+  
+  <div class="steps">
+    <!-- iOS Instructions -->
+    <div id="ios-steps" style="display: none;">
       <div>
         <span class="number">1</span>
         <span>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i></span>
@@ -3580,11 +3582,44 @@ body.lock-scroll {
       </div>
     </div>
     
-    <div class="buttons">
-      <button class="btn-secondary" onclick="dismissHomescreenPrompt()">Maybe Later</button>
-      <button class="btn-primary" onclick="dismissHomescreenPrompt(true)">Got It!</button>
+    <!-- Android Chrome Instructions -->
+    <div id="android-chrome-steps" style="display: none;">
+      <div>
+        <span class="number">1</span>
+        <span>Tap the <strong>three dots</strong> menu <i class="fa-solid fa-ellipsis-vertical"></i></span>
+      </div>
+      <div>
+        <span class="number">2</span>
+        <span>Select <strong>Add to Home screen</strong> <i class="fa-regular fa-square-plus"></i></span>
+      </div>
+      <div>
+        <span class="number">3</span>
+        <span>Tap <strong>Add</strong> to confirm</span>
+      </div>
+    </div>
+    
+    <!-- Samsung Browser Instructions -->
+    <div id="samsung-steps" style="display: none;">
+      <div>
+        <span class="number">1</span>
+        <span>Tap the <strong>menu button</strong> <i class="fa-solid fa-bars"></i></span>
+      </div>
+      <div>
+        <span class="number">2</span>
+        <span>Select <strong>Add page to</strong> → <strong>Home screen</strong></span>
+      </div>
+      <div>
+        <span class="number">3</span>
+        <span>Tap <strong>Add</strong> to confirm</span>
+      </div>
     </div>
   </div>
+  
+  <div class="buttons">
+    <button class="btn-secondary" onclick="dismissHomescreenPrompt()">Maybe Later</button>
+    <button class="btn-primary" onclick="dismissHomescreenPrompt(true)">Got It!</button>
+  </div>
+</div>
   
 <button id="hide-ui-btn"
   
@@ -8728,37 +8763,71 @@ document.addEventListener('visibilitychange', handleVisibilityChange);
 // ADD THIS ONE LINE FOR PWA SUPPORT
 document.addEventListener('visibilitychange', requestWakeLock);
 
-   // Add to Homescreen functionality
-    function showHomescreenPrompt() {
-      // Check if we should show the prompt
-      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-      const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-      const promptDismissed = localStorage.getItem('homescreenPromptDismissed');
-      
-      // Only show on mobile devices, when not already in standalone mode, and if not previously dismissed
-      if (isMobile && !isStandalone && !promptDismissed) {
-        const prompt = document.getElementById('add-to-homescreen');
-        prompt.style.display = 'block';
-      }
-    }
+// Add to Homescreen functionality
 
-    function dismissHomescreenPrompt(permanent = false) {
-      const prompt = document.getElementById('add-to-homescreen');
-      prompt.style.display = 'none';
-      
-      if (permanent) {
-        localStorage.setItem('homescreenPromptDismissed', 'true');
-      }
-    }
+// NEW: Detect platform and show correct instructions
+function detectPlatformAndShowInstructions() {
+  const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+  const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
+  const isSamsungBrowser = /SamsungBrowser/i.test(userAgent);
+  
+  // Hide all instruction sets first
+  document.getElementById('ios-steps').style.display = 'none';
+  document.getElementById('android-chrome-steps').style.display = 'none';
+  document.getElementById('samsung-steps').style.display = 'none';
+  
+  // Show relevant instructions
+  if (isIOS) {
+    document.getElementById('ios-steps').style.display = 'block';
+  } else if (isSamsungBrowser) {
+    document.getElementById('samsung-steps').style.display = 'block';
+  } else {
+    // Default to Android Chrome (most common)
+    document.getElementById('android-chrome-steps').style.display = 'block';
+  }
+}
 
-    // Wait a bit before showing the prompt for better UX
-    setTimeout(showHomescreenPrompt, 20000);
+function showHomescreenPrompt() {
+  // Check if we should show the prompt
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+  const promptDismissed = localStorage.getItem('homescreenPromptDismissed');
+  
+  // Only show on mobile devices, when not already in standalone mode, and if not previously dismissed
+  if (isMobile && !isStandalone && !promptDismissed) {
+    // NEW: Detect platform before showing
+    detectPlatformAndShowInstructions();
+    
+    const prompt = document.getElementById('add-to-homescreen');
+    prompt.style.display = 'block';
+  }
+}
 
-    // Listen for app installed event
-    window.addEventListener('appinstalled', () => {
-      // The app was successfully installed
-      dismissHomescreenPrompt(true);
-    });
+function dismissHomescreenPrompt(permanent = false) {
+  const prompt = document.getElementById('add-to-homescreen');
+  prompt.style.display = 'none';
+  
+  if (permanent) {
+    localStorage.setItem('homescreenPromptDismissed', 'true');
+  }
+}
+
+// Wait a bit before showing the prompt for better UX
+setTimeout(showHomescreenPrompt, 20000);
+
+// Listen for app installed event
+window.addEventListener('appinstalled', () => {
+  // The app was successfully installed
+  dismissHomescreenPrompt(true);
+});
+
+// NEW: Optional - Also detect on page load in case of slow connection
+window.addEventListener('load', function() {
+  // Re-check after load to ensure detection is accurate
+  if (document.getElementById('add-to-homescreen').style.display === 'block') {
+    detectPlatformAndShowInstructions();
+  }
+});
 	
 	
 // --- Meditation Hide UI Toggle Button ---
