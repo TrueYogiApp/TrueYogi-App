@@ -6055,9 +6055,9 @@ if (completeSectionVisible || finalSectionVisible) {
 
     const badge = document.createElement('span');
     badge.className = `session-time-badge px-2 py-1 rounded-full text-xs font-medium ${
-      isActive && !isCompleted ? 'active' : 
-      isCompleted ? 'completed' : 
-      isMissed ? 'missed' : ''
+    isMissed ? 'missed' :
+    isActive && !isCompleted ? 'active' : 
+    isCompleted ? 'completed' : ''
     }`;
     badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
     if (isCompleted) {
