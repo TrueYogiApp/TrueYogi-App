@@ -316,5 +316,9 @@
   "unseen_faq_q6": "What hidden interactions exist?",
   "unseen_faq_a6": "The app responds to various gestures and exploration of visual elements.",
   "unseen_faq_q7": "Why are some features hidden?",
-  "unseen_faq_a7": "TrueYogi rewards patient, curious practitioners with discoveries that enhance their journey."  
+  "unseen_faq_a7": "TrueYogi rewards patient, curious practitioners with discoveries that enhance their journey.",
+  "ChallengeCompleteHeading": "Challenge Completed!",
+  "ChallengeCompleteDescription": "Your meditation journey has reached its destination. You've completed the challenge from ${startDate} to ${endDate}.",
+  "challengeCompleteButtonNewJourney": "Start a New Journey",
+  "close": "close"    
 }

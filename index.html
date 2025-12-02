@@ -3756,32 +3756,40 @@ body.lock-scroll {
 
 function showChallengeCompletedModal() {
   const modal = document.getElementById('challenge-completed-modal');
+  
+  // Format the description with actual dates
+  const description = t('challengeCompleteDescription')
+    .replace('${startDate}', challengeData.startDate)
+    .replace('${endDate}', challengeData.endDate);
+  
   modal.innerHTML = `
-    <div class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
+    <div id="challenge-complete-section" class="fixed inset-0 bg-gray-900 flex items-center justify-center z-50">
       <div class="bg-gradient-to-br from-gray-900 to-gray-800 border border-yellow-500/30 rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
         <div class="text-center mb-6">
           <div class="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
             <i class="fas fa-trophy text-yellow-400 text-2xl"></i>
           </div>
-          <h3 class="text-xl font-bold text-white mb-2">Challenge Completed!</h3>
-          <p class="text-gray-300 text-sm">
-            Your meditation journey has reached its destination. You've completed the challenge from ${challengeData.startDate} to ${challengeData.endDate}.
+          <h3 id="challenge-complete-heading" class="text-xl font-bold text-white mb-2">${t('challengeCompleteHeading')}</h3>
+          <p id="challenge-complete-description" class="text-gray-300 text-sm">
+            ${description}
           </p>
         </div>
         
         <div class="space-y-3">
-          <button onclick="resetYogiJourney()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 hover:scale-[1.02]">
-            <i class="fas fa-om mr-2"></i>Start a New Journey
+          <button id="challenge-complete-new-journey-btn" onclick="resetYogiJourney()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 hover:scale-[1.02]">
+            <i class="fas fa-om mr-2"></i>${t('challengeCompleteButtonNewJourney')}
           </button>
           
-          <button onclick="closeChallengeCompletedModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 border border-gray-700">
-            <i class="fas fa-times mr-2"></i>Close
+          <button id="challenge-complete-close-btn" onclick="closeChallengeCompletedModal()" class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 border border-gray-700">
+            <i class="fas fa-times mr-2"></i>${t('close')}
           </button>
         </div>
       </div>
     </div>
   `;
   modal.classList.remove('hidden');
+  
+  // If your updateUILanguage function updates elements by these IDs, they'll exist now
 }
 
 function closeChallengeCompletedModal() {
@@ -8524,7 +8532,7 @@ updateFAQTokenAddress();
   document.querySelector('#journey-complete-section .text-yellow-300').textContent = t('journeyCompleteHeading');
   document.querySelector('#journey-complete-section .text-gray-300').textContent = t('journeyCompleteDescription');
   document.querySelector('#journey-complete-section button[onclick="resetYogiJourney()"]').innerHTML =
-  `<i class="fas fa-om mr-2"></i>${t('journeyCompleteButtonNewJourney')}`;
+  `<i class="fas fa-om mr-2"></i>${t('journeyCompleteButtonNewJourney')}`;  
   document.getElementById('claim-tokens-btn').innerHTML =
   `<i class="fas fa-coins mr-2"></i>${t('journeyCompleteButtonClaimTokens')}`;
   document.getElementById('view-certificate-btn').innerHTML =
@@ -8680,6 +8688,31 @@ document.getElementById('unseen-faq-a6').textContent = t('unseen_faq_a6');
 document.getElementById('unseen-faq-q7').textContent = t('unseen_faq_q7');
 document.getElementById('unseen-faq-a7').textContent = t('unseen_faq_a7');
 
+  // Fix for challenge completed modal
+  const heading = document.querySelector('#challenge-complete-section .text-white');
+  const description = document.querySelector('#challenge-complete-section .text-gray-300');
+  const newJourneyBtn = document.querySelector('#challenge-complete-section button[onclick="resetYogiJourney()"]');
+  const closeBtn = document.querySelector('#challenge-complete-section button[onclick="closeChallengeCompletedModal()"]');
+  
+  if (heading) {
+    heading.textContent = t('challengeCompleteHeading');
+  }
+  
+  if (description) {
+    const descText = t('challengeCompleteDescription')
+      .replace('${startDate}', challengeData.startDate)
+      .replace('${endDate}', challengeData.endDate);
+    description.textContent = descText;
+  }
+  
+  if (newJourneyBtn) {
+    newJourneyBtn.innerHTML = `<i class="fas fa-om mr-2"></i>${t('challengeCompleteButtonNewJourney')}`;
+  }
+  
+  if (closeBtn) {
+    closeBtn.innerHTML = `<i class="fas fa-times mr-2"></i>${t('close')}`;
+  }
+  
 }
 
 document.addEventListener('DOMContentLoaded', updateUILanguage);
