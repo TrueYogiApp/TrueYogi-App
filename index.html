@@ -7155,36 +7155,44 @@ function updateProgressDisplay() {
   const fireIcon = document.querySelector('#yogi-progress .fa-fire');
   if (fireIcon) {
     fireIcon.style.color = getStreakFireColor(challengeData.currentDay);
-	// fireIcon.classList.add('streak-fire-glow');
   }
 
   // Multi-segment progress bar
   const progressBarBg = document.getElementById('progress-bar-bg');
   progressBarBg.innerHTML = ''; // Clear previous segments
 
-  let daysDone = challengeData.currentDay - 1;
-  let totalDays = 41;
+  // Cap at totalDays so bar can fill 100%
+  const totalDays = 41;
+  let daysDone = Math.min(challengeData.currentDay, totalDays);
+
   let left = 0;
 
-  PROGRESS_SEGMENTS.forEach(seg => {
+  PROGRESS_SEGMENTS.forEach((seg, i) => {
     const segDiv = document.createElement('div');
+    // Fill this segment with remaining days only if available
     let segDays = Math.min(seg.days, daysDone);
-    let widthPercent = (seg.days / totalDays) * 100;
-    if (daysDone <= 0) {
-      widthPercent = 0;
-    } else if (daysDone < seg.days) {
-      widthPercent = (daysDone / totalDays) * 100;
-    }
+    let widthPercent = (segDays / totalDays) * 100;
+    if (segDays <= 0) widthPercent = 0;
+
     segDiv.style.width = `${widthPercent}%`;
     segDiv.style.background = seg.color;
     segDiv.style.height = '100%';
     segDiv.style.display = 'inline-block';
-    segDiv.style.borderRadius = left === 0 ? '9999px 0 0 9999px' : '0'; // Round left edge for first
+
+    // Left border radius for first, right border radius for last segment
+    if (i === 0 && widthPercent > 0) {
+      segDiv.style.borderRadius = '9999px 0 0 9999px';
+    }
+    // Make the final segment right edge rounded if it's the last *filled* segment
+    if (i === PROGRESS_SEGMENTS.length - 1 && widthPercent > 0) {
+      segDiv.style.borderRadius = '0 9999px 9999px 0';
+    }
+
     segDiv.style.verticalAlign = 'top';
     progressBarBg.appendChild(segDiv);
 
-    daysDone -= seg.days;
-    left += seg.days;
+    daysDone -= segDays;
+    left += segDays;
     if (daysDone <= 0) return;
   });
   
