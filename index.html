@@ -5989,13 +5989,13 @@ function completeExpiredSessionIfNeeded() {
   }
 }
 
-  async  function updateSessionTimesDisplay() {
-	const completeSectionVisible = !document.getElementById('complete-section').classList.contains('hidden');
-	const finalSectionVisible = !document.getElementById('final-section').classList.contains('hidden');
-if (completeSectionVisible || finalSectionVisible) {
-  closeMissedSessionModal();
-  return; // Exit early, don't run any other modal logic
-}
+async function updateSessionTimesDisplay() {
+  const completeSectionVisible = !document.getElementById('complete-section').classList.contains('hidden');
+  const finalSectionVisible = !document.getElementById('final-section').classList.contains('hidden');
+  if (completeSectionVisible || finalSectionVisible) {
+    closeMissedSessionModal();
+    return;
+  }
 
   // Await completion of any expired session before proceeding
   if (typeof completeExpiredSessionIfNeeded === 'function') {
@@ -6012,7 +6012,12 @@ if (completeSectionVisible || finalSectionVisible) {
   const currentTime = currentHours * 60 + currentMinutes;
   const today = getLocalDateString(now);
   const [y, m, d] = challengeData.startDate.split('-').map(Number);
-  const startDate = new Date(y, m - 1, d); // Month is 0-based
+  const startDate = new Date(y, m - 1, d);
+  const [ey, em, ed] = challengeData.endDate.split('-').map(Number);
+  const endDate = new Date(ey, em - 1, ed);
+
+  // FIX: Check if today is after challenge end date
+  const isChallengeEnded = now > endDate;
 
   let hasMissedSession = false;
   let todayCompleted = challengeData.sessionsCompleted.filter(s => s.date === today).length;
@@ -6041,11 +6046,21 @@ if (completeSectionVisible || finalSectionVisible) {
     const isCompleted = challengeData.sessionsCompleted.some(
       completed => completed.time === session.time && completed.date === today
     );
-            // FIX: Check if this session was missed on ANY previous date, not just today
+    
+    // FIX: If challenge has ended, treat all sessions as completed
+    if (isChallengeEnded) {
+      const badge = document.createElement('span');
+      badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium completed';
+      badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
+      badge.setAttribute('data-tooltip', t('challengeCompleted'));
+      badge.classList.add('status-tooltip', 'completed-tip');
+      list.appendChild(badge);
+      return; // Skip to next session
+    }
+    
+    // Original logic for active challenge period
     const isMissed = !isCompleted && (
-      // Missed today if session time has passed
       (sessionTime < currentTime - 10) ||
-      // OR check if this session was missed on any previous day
       isSessionMissedOnPreviousDays(session.time, today)
     );
 
@@ -6055,9 +6070,9 @@ if (completeSectionVisible || finalSectionVisible) {
 
     const badge = document.createElement('span');
     badge.className = `session-time-badge px-2 py-1 rounded-full text-xs font-medium ${
-    isMissed ? 'missed' :
-    isActive && !isCompleted ? 'active' : 
-    isCompleted ? 'completed' : ''
+      isMissed ? 'missed' :
+      isActive && !isCompleted ? 'active' : 
+      isCompleted ? 'completed' : ''
     }`;
     badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
     if (isCompleted) {
@@ -6075,8 +6090,10 @@ if (completeSectionVisible || finalSectionVisible) {
     }
     list.appendChild(badge);
   });
-  // FIX: Only show Missed Session modal if NOT all today's sessions are completed
+
+  // FIX: Don't show missed modal if challenge has ended
   if (
+    !isChallengeEnded &&
     hasMissedSession &&
     currentMode === 'yogi' &&
     todayCompleted < challengeData.requiredSessions
@@ -6088,12 +6105,6 @@ if (completeSectionVisible || finalSectionVisible) {
 function isSessionMissedOnPreviousDays(sessionTime, today) {
   const todayDate = new Date(today + 'T00:00:00');
   const startDate = new Date(challengeData.startDate + 'T00:00:00');
-  const endDate = new Date(challengeData.endDate + 'T00:00:00');
-  
-  // FIX: If today is after challenge end date, no sessions were missed
-  if (todayDate > endDate) {
-    return false;
-  }
   
   const daysSinceStart = Math.floor((todayDate - startDate) / (1000 * 60 * 60 * 24));
   const expectedSessions = daysSinceStart * challengeData.requiredSessions;
