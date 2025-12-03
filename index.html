@@ -7828,6 +7828,10 @@ function isMobile() {
   
   // Check for Android FIRST
   if (/Android/i.test(ua)) {
+
+  if (platform === 'Linux armv81' || platform === 'Linux armv8l' || platform === 'Linux arm64') {
+    return false; // Block LDPlayer/Android emulators
+  }
     // Check for REAL Android vs DevTools emulation
     const isLikelyDevToolsEmulation = 
       // DevTools emulation clues:
