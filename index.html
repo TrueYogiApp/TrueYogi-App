@@ -7825,18 +7825,12 @@ function isMobile() {
   const ua = navigator.userAgent;
   const platform = navigator.platform;
   const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
-  
-  // Use your OLD desktop check (which blocked LDPlayer)
-  const isDesktopOS = /Win|Mac|Linux|X11/.test(platform) || 
-                     /Windows NT|Macintosh|Linux x86_64|X11|Win64/i.test(ua);
-  
-  // BUT: Android on Linux platform is OK (not desktop)
-  if (/Android/i.test(ua) && /Linux/.test(platform)) {
-    return true; // Real Android (not desktop Linux)
-  }
-  
+  const isDesktopOS = /Win|Mac|Linux|X11/.test(platform) || /Windows NT|Macintosh|Linux x86_64|X11|Win64/i.test(ua);
+  // If desktop OS, block regardless of UA or touch
   if (isDesktopOS) return false;
+  // If not mobile UA, block
   if (!isMobileUA) return false;
+  // Otherwise, it's a mobile device
   return true;
 }
 
