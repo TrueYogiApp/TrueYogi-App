@@ -7824,12 +7824,19 @@ function handleVisibilityChange() {
 function isMobile() {
   const ua = navigator.userAgent;
   const platform = navigator.platform;
-  const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
   
-  // Desktop OS check: ONLY "Linux x86_64" not regular "Linux"
-  const isDesktopOS = /Win|Mac|X11/.test(platform) ||  // No regular Linux
+  // TEMPORARY DEBUG - REMOVE AFTER
+  alert(
+    'DEBUG LDPlayer:\n' +
+    'UA: ' + ua.substring(0, 50) + '...\n' +
+    'Platform: ' + platform + '\n' +
+    'Exact platform: "' + platform + '"\n' +
+    'Length: ' + platform.length
+  );
+  
+  const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
+  const isDesktopOS = /Win|Mac|X11/.test(platform) || 
                      /Windows NT|Macintosh|Linux x86_64|X11|Win64/i.test(ua);
-                     // ↑ Only Linux x86_64, not Linux alone
   
   if (isDesktopOS) return false;
   if (!isMobileUA) return false;
