@@ -7840,7 +7840,7 @@ function isMobile() {
        window.chrome.devtools); // DevTools is open
     
     if (isLikelyDevToolsEmulation) {
-      console.log('Blocking DevTools emulation');
+      //console.log('Blocking DevTools emulation');
       return false; // No wallet
     }
     
@@ -7851,7 +7851,7 @@ function isMobile() {
       /BrowserStack|LambdaTest/.test(ua);
     
     if (isEmulator) {
-      console.log('Blocking emulator');
+      // console.log('Blocking emulator');
       return false;
     }
     
