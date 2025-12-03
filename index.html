@@ -5674,6 +5674,7 @@ function enforceClaimBeforeProceeding() {
   document.getElementById('final-section').classList.add('hidden');
   document.getElementById('incomplete-section').classList.add('hidden');
   document.getElementById('yogi-config-modal').classList.add('hidden');
+  window.location.hash = '';
   document.getElementById('end-meditation-modal').classList.add('hidden');
   document.getElementById('start-section').classList.remove('hidden');
   document.getElementById('session-stats').classList.remove('hidden');
@@ -5753,6 +5754,10 @@ if (bgMusicPlayer) {
 }
 
     function loadYogiConfig() {
+	  // ADD THESE 3 LINES AT THE VERY TOP:
+  if (window.location.hash === '#challenge') {
+    return; // Skip config, challenge page will handle it
+  }
       const savedConfig = localStorage.getItem('yogiConfig');
       try {
         if (savedConfig) {
@@ -6105,6 +6110,7 @@ challengeData = {
   saveChallengeData(); 
   updateYogiIcon(); 
   document.getElementById('yogi-config-modal').classList.add('hidden');
+  window.location.hash = 'challenge'; 
   document.getElementById('app-interface').classList.remove('hidden');
   updateBackButtonVisibility();
   updateSessionTimesDisplay();
