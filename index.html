@@ -7825,18 +7825,17 @@ function isMobile() {
   const ua = navigator.userAgent;
   const platform = navigator.platform;
   
-  // TEMPORARY DEBUG - REMOVE AFTER
-  alert(
-    'DEBUG LDPlayer:\n' +
-    'UA: ' + ua.substring(0, 50) + '...\n' +
-    'Platform: ' + platform + '\n' +
-    'Exact platform: "' + platform + '"\n' +
-    'Length: ' + platform.length
-  );
+  // Check Android/iOS first
+  const isMobileUA = /Android|iPhone|iPad|iPod|Mobi/i.test(ua);
   
-  const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
-  const isDesktopOS = /Win|Mac|X11/.test(platform) || 
-                     /Windows NT|Macintosh|Linux x86_64|X11|Win64/i.test(ua);
+  // More specific desktop detection
+  const isDesktopOS = /Win|Mac|X11|Linux x86_64/.test(platform) || 
+                     /Windows NT|Macintosh|Linux x86_64|Win64/i.test(ua);
+  
+  // Special case for Android emulators - they often have "Linux" in platform
+  if (/Android/i.test(ua) && /Linux/i.test(platform)) {
+    return true; // Android device/emulator
+  }
   
   if (isDesktopOS) return false;
   if (!isMobileUA) return false;
