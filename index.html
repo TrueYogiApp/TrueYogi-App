@@ -5161,6 +5161,18 @@ function showWelcomeModal() {
     }
 
     function showNextSessionModal(time, duration, dateOrDay) {
+	  // Check if challenge has ended
+  if (challengeData.endDate) {
+    const now = new Date();
+    const endDate = new Date(challengeData.endDate + "T00:00:00");
+    if (now > endDate) {
+      // Challenge has ended, don't show next session info
+      // Instead, you could show a different message or do nothing
+      console.log("Challenge has ended, not showing next session modal");
+      return;
+    }
+  }
+
   const modal = document.getElementById('next-session-modal');
   if (!modal) return;
   const textElement = document.getElementById('next-session-text');
@@ -7427,6 +7439,9 @@ function updateJourneyCompleteButtons() {
   // Reset the Yogi stats display
   document.getElementById('yogi-total-sessions').textContent = '0';
   document.getElementById('yogi-total-minutes').textContent = '0';
+  
+    // Close the challenge completed modal
+  closeChallengeCompletedModal();
   
   // Update UI
   document.getElementById('journey-complete-section').classList.add('hidden');
