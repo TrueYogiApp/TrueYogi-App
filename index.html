@@ -7826,19 +7826,10 @@ function isMobile() {
   const platform = navigator.platform;
   const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
   
-  // 1. Handle Android FIRST (before Linux check)
-  if (/Android/i.test(ua)) {
-    // Android with "Linux x86_64" = emulator (LDPlayer)
-    // Android with "Linux armv8l" = real device
-    if (platform.includes('Linux x86_64')) {
-      return false; // LDPlayer/emulator
-    }
-    return true; // Real Android
-  }
-  
-  // 2. Now check desktop OS (Android already filtered out)
-  const isDesktopOS = /Win|Mac|Linux|X11/.test(platform) || 
+  // Desktop OS check: ONLY "Linux x86_64" not regular "Linux"
+  const isDesktopOS = /Win|Mac|X11/.test(platform) ||  // No regular Linux
                      /Windows NT|Macintosh|Linux x86_64|X11|Win64/i.test(ua);
+                     // ↑ Only Linux x86_64, not Linux alone
   
   if (isDesktopOS) return false;
   if (!isMobileUA) return false;
