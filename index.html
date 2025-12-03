@@ -7826,27 +7826,29 @@ function isMobile() {
   const platform = navigator.platform;
   const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
   
-  // Check for Android FIRST (Android reports "Linux" platform but IS mobile)
-if (/Android/i.test(ua)) {
-  // Check for emulator
-  const isLikelyEmulator = 
-    navigator.userAgent.includes('x86') ||
-    !('ontouchstart' in window) ||
-    window.screen.width > 2000; // Emulators often have huge screens
+  // Check for Android FIRST
+  if (/Android/i.test(ua)) {
+    // ONLY block DEFINITE emulators
+    const isDefiniteEmulator = 
+      // SDK/Emulator in User Agent (100% emulator)
+      /SDK|sdk|Emulator|emulator|Android.*x86|Linux.*x86_64/.test(ua) ||
+      
+      // Testing services
+      /BrowserStack|LambdaTest|CrossBrowserTesting/.test(ua);
+    
+    if (isDefiniteEmulator) {
+      return false; // Block emulator
+    }
+    
+    return true; // Allow real device (even if missing some features)
+  }
   
-  if (isLikelyEmulator) return false; // No wallet
-  return true; // Wallet on real device
-}
-  
-  // Now check desktop OS (Linux desktop = desktop, Android already filtered out)
+  // Rest of your original desktop detection
   const isDesktopOS = /Win|Mac|Linux|X11/.test(platform) || 
                      /Windows NT|Macintosh|Linux x86_64|X11|Win64/i.test(ua);
   
-  // If desktop OS, block regardless of UA or touch
   if (isDesktopOS) return false;
-  // If not mobile UA, block
   if (!isMobileUA) return false;
-  // Otherwise, it's a mobile device
   return true;
 }
 
