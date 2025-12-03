@@ -7849,8 +7849,9 @@ const isEmulator =
   /Android.*x86|Linux.*x86_64|SDK built for|emulator/i.test(ua) ||
   (navigator.platform === 'Linux x86_64' && /Android/.test(ua)) ||
   /BrowserStack|LambdaTest|ldplayer|ldad/i.test(ua) ||
-  // ADD THIS: Android + X11 in UA = emulator (LDPlayer)
-  (/Android/i.test(ua) && /X11/i.test(ua));
+  // LDPlayer specific patterns:
+  /Android 10; K\)/i.test(ua) ||  // From your debug: "(Linux; Android 10; K)"
+  (/Android/i.test(ua) && platform === 'Linux armv81');
     
     if (isEmulator) {
       // console.log('Blocking emulator');
