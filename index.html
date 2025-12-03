@@ -7828,42 +7828,13 @@ function isMobile() {
   
   // Check for Android FIRST (Android reports "Linux" platform but IS mobile)
 if (/Android/i.test(ua)) {
-  // Enhanced emulator detection
+  // Check for emulator
   const isLikelyEmulator = 
-    // Architecture
     navigator.userAgent.includes('x86') ||
-    navigator.userAgent.includes('i686') ||
-    /Android.*Linux.*x86_64/.test(navigator.userAgent) ||
-    
-    // SDK/Emulator keywords
-    navigator.userAgent.includes('SDK') ||
-    navigator.userAgent.includes('sdk') ||
-    navigator.userAgent.includes('Emulator') ||
-    navigator.userAgent.includes('emulator') ||
-    
-    // Missing mobile features
     !('ontouchstart' in window) ||
-    !('orientation' in window) ||
-    !('vibrate' in navigator) ||
-    
-    // Unrealistic screen sizes (emulators often huge)
-    window.screen.width > 2000 ||
-    window.screen.height > 2000 ||
-    
-    // No device memory (emulators often don't report)
-    !('deviceMemory' in navigator) ||
-    
-    // BrowserStack/cloud testing indicators
-    navigator.userAgent.includes('BrowserStack') ||
-    navigator.userAgent.includes('LambdaTest') ||
-    navigator.userAgent.includes('CrossBrowserTesting');
+    window.screen.width > 2000; // Emulators often have huge screens
   
-  if (isLikelyEmulator) {
-    console.log('Detected Android emulator, blocking wallet');
-    return false; // No wallet
-  }
-  
-  console.log('Real Android device, showing wallet');
+  if (isLikelyEmulator) return false; // No wallet
   return true; // Wallet on real device
 }
   
