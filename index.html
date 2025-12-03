@@ -7826,11 +7826,40 @@ function isMobile() {
   const platform = navigator.platform;
   const isMobileUA = /Mobi|Android|iPhone|iPad|iPod/i.test(ua);
   
-  // Android first - always mobile
-  if (/Android/i.test(ua)) return true;
+  // Check for Android FIRST
+  if (/Android/i.test(ua)) {
+    // Check for REAL Android vs DevTools emulation
+    const isLikelyDevToolsEmulation = 
+      // DevTools emulation clues:
+      ('ontouchstart' in window && navigator.maxTouchPoints === 0) || // Touch API exists but no touch points
+      (platform.includes('Win') && ua.includes('Android')) || // Windows platform + Android UA = DevTools
+      (platform.includes('Mac') && ua.includes('Android')) || // Mac platform + Android UA = DevTools
+      (navigator.platform === 'Win32' && /Android/.test(ua)) || // Specific DevTools signature
+      (navigator.userAgent.includes('Chrome') && 
+       window.chrome && 
+       window.chrome.devtools); // DevTools is open
+    
+    if (isLikelyDevToolsEmulation) {
+      //console.log('Blocking DevTools emulation');
+      return false; // No wallet
+    }
+    
+    // Only block 100% certain emulators (keep your existing code)
+    const isEmulator = 
+      /Android.*x86|Linux.*x86_64|SDK built for|emulator/i.test(ua) ||
+      (navigator.platform === 'Linux x86_64' && /Android/.test(ua)) ||
+      /BrowserStack|LambdaTest/.test(ua);
+    
+    if (isEmulator) {
+      // console.log('Blocking emulator');
+      return false;
+    }
+    
+    return true;
+  }
   
-  // Desktop OS check
-  const isDesktopOS = /Win|Mac|X11/.test(platform) || 
+  // Rest of your original desktop detection
+  const isDesktopOS = /Win|Mac|Linux|X11/.test(platform) || 
                      /Windows NT|Macintosh|Linux x86_64|X11|Win64/i.test(ua);
   
   if (isDesktopOS) return false;
