@@ -7828,10 +7828,6 @@ function isMobile() {
   
   // Check for Android FIRST
   if (/Android/i.test(ua)) {
-
-if (platform === 'Linux armv81' || ua.includes('Android 10; K)')) {
-  return false;
-}
     // Check for REAL Android vs DevTools emulation
     const isLikelyDevToolsEmulation = 
       // DevTools emulation clues:
