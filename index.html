@@ -6660,10 +6660,10 @@ if (currentMode === 'yogi') {
   }
 
     // Block if missed session in Yogi mode
-  if (currentMode === 'yogi' && hasMissedSession()) {
-    showMissedSessionModal();
-    return;
-  }
+if (hasMissedSession()) {
+  showMissedSessionModal();
+  return;
+}
   
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
