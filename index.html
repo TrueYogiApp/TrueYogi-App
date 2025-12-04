@@ -4027,18 +4027,10 @@ function hasMissedSession() {
   
   const now = new Date();
   const today = getLocalDateString(now);
-  const startDate = new Date(challengeData.startDate + "T00:00:00");
+  const startDate = new Date(challengeData.startDate + "T00:00:00"); // Treat start date as local
   
   // Journey hasn't started yet
   if (now < startDate) return false;
-  
-  // FIX: Check if challenge has ended
-  if (challengeData.endDate) {
-    const endDate = new Date(challengeData.endDate + "T00:00:00");
-    if (now > endDate) {
-      return false; // Challenge has ended, no missed sessions
-    }
-  }
   
   const currentMinutes = now.getHours() * 60 + now.getMinutes();
 
