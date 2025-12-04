@@ -7,7 +7,7 @@
   "display_override": ["standalone", "browser"],
   "background_color": "#1e293b",
   "theme_color": "#1e293b",
-  "orientation": "any",
+  "orientation": "portrait",
   "scope": "/",
   "description": "True Yogi (YOGI) draws from Bhagavad Gita wisdom: 'A Yogi excels the monk, scholar, and ritualist. Strive to be a Yogi.' Anchoring a cosmic grid of awakened souls devoted to meditation and truth. Earn YOGI through stillness practice and wisdom engagement.",
   "categories": ["health", "fitness", "lifestyle", "Spirituality", "Consciousness", "Truth", "Universe", "Cosmos"],
