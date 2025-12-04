@@ -12435,7 +12435,11 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
   .then(allCountries => {
     const flagPromises = [];
     zones.forEach((z, i) => {
-      const zoneName = typeof z === 'object' ? z.zone : z;
+            let zoneName = typeof z === 'object' ? z.zone : z;
+	  // Normalize any USA variant to "United States"
+	  if (zoneName && zoneName.toLowerCase().includes('united states')) {
+	   zoneName = 'United States';
+	  } 
       let coords;
       const country = allCountries.find(c => 
         c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
@@ -12456,6 +12460,8 @@ fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
       if (country && country.cca2) countryCode = country.cca2.toLowerCase();
       const codeMap = {
         'USA': 'us', 'US': 'us', 'United_States': 'us',
+		'United States of America': 'us',
+		'United States of America (the)': 'us',
         'India': 'in', 'IN': 'in',
         'China': 'cn', 'CN': 'cn',
         'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
@@ -12973,6 +12979,54 @@ function showUserListPopup(users, parentPopup, x, y) {
   setTimeout(() => { listPopup.remove(); }, 12000);
 }
 
+// Track which call id you've already popped up for in this session
+function startCallPolling() {
+  if (typeof supabase === "undefined") {
+    // Wait and try again in 500ms, up to N tries
+    setTimeout(startCallPolling, 500);
+    return;
+  }
+
+  let lastCallId = null;
+  setInterval(async () => {
+    const currentUserId = localStorage.getItem('omUserId');
+    if (!currentUserId) return;
+    const { data, error } = await supabase
+      .from('om_calls')
+      .select('*')
+      .eq('participant_user_id', currentUserId)
+      .in('status', ['pending'])
+      .order('created_at', { ascending: false })
+      .limit(1);
+
+    if (data && data.length) {
+      const call = data[0];
+      if (lastCallId === call.id) return;
+
+      const callTime = new Date(call.created_at).getTime();
+      const now = Date.now();
+      if ((now - callTime) > 3 * 60 * 1000) {
+        await supabase.from('om_calls').update({ status: 'expired' }).eq('id', call.id);
+        return;
+      }
+
+      lastCallId = call.id;
+	  
+	  stopAllAudio();
+      showWherebyParticipantDialog(call.whereby_participant_url, call.id);
+
+      const { error: updateError } = await supabase
+        .from('om_calls')
+        .update({ status: 'active' })
+        .eq('id', call.id);
+
+      if (updateError) {
+        console.error('Call status update failed:', updateError);
+      }
+    }
+  }, 3000);
+}
+
 function closeEarthGrid() {
   earthGridOpen = false;
 
@@ -13245,53 +13299,6 @@ function stopMeditationMusicOnClose() {
   if (truemeditateImg) {
     truemeditateImg.style.filter = '';
   }
-}
-
-function startCallPolling() {
-  if (typeof supabase === "undefined") {
-    // Wait and try again in 500ms, up to N tries
-    setTimeout(startCallPolling, 500);
-    return;
-  }
-
-  let lastCallId = null;
-  setInterval(async () => {
-    const currentUserId = localStorage.getItem('omUserId');
-    if (!currentUserId) return;
-    const { data, error } = await supabase
-      .from('om_calls')
-      .select('*')
-      .eq('participant_user_id', currentUserId)
-      .in('status', ['pending'])
-      .order('created_at', { ascending: false })
-      .limit(1);
-
-    if (data && data.length) {
-      const call = data[0];
-      if (lastCallId === call.id) return;
-
-      const callTime = new Date(call.created_at).getTime();
-      const now = Date.now();
-      if ((now - callTime) > 3 * 60 * 1000) {
-        await supabase.from('om_calls').update({ status: 'expired' }).eq('id', call.id);
-        return;
-      }
-
-      lastCallId = call.id;
-	  
-	  stopAllAudio();
-      showWherebyParticipantDialog(call.whereby_participant_url, call.id);
-
-      const { error: updateError } = await supabase
-        .from('om_calls')
-        .update({ status: 'active' })
-        .eq('id', call.id);
-
-      if (updateError) {
-        console.error('Call status update failed:', updateError);
-      }
-    }
-  }, 3000);
 }
 
   </script>
