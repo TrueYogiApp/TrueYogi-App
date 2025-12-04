@@ -6618,11 +6618,6 @@ if (
   return;
 }
 
-    // Block if missed session in Yogi mode
-  if (currentMode === 'yogi' && hasMissedSession()) {
-    showMissedSessionModal();
-    return;
-  }
     // Day-21 wallet check (only in Yogi mode)
   if (
     currentMode === 'yogi' &&
@@ -6664,6 +6659,12 @@ if (currentMode === 'yogi') {
     }
   }
 
+    // Block if missed session in Yogi mode
+  if (currentMode === 'yogi' && hasMissedSession()) {
+    showMissedSessionModal();
+    return;
+  }
+  
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
   const currentTime = currentHours * 60 + currentMinutes;
