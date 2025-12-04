@@ -12796,6 +12796,14 @@ function formatTotalDuration(seconds) {
   return `${mins} min${mins !== 1 ? 's' : ''}`;
 }
 
+function getDisplayCountryName(zoneName) {
+  if (!zoneName) return '';
+  const name = zoneName.toLowerCase();
+  if (name.includes('united states')) return 'United States';
+  // Add more custom aliases here if needed (e.g., UK, UAE)
+  return zoneName.replace(/_/g, ' ');
+}
+
 async function showZonePopup(zone, x, y) {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
@@ -12855,7 +12863,7 @@ popup.innerHTML = `
   <span style="min-width:33px;min-height:33px;display:inline-flex;align-items:center;justify-content:center;">
     ${svgImg}
   </span>
-  <span>${zone.zone.replace(/_/g, ' ')}</span>
+  <span>${getDisplayCountryName(zone.zone)}</span>
   ${
     showCount && totalDurationText
       ? `<span style="font-weight:600;color:#ffe066;display: flex; align-items: center;max-width:80vw;overflow:hidden;text-overflow:ellipsis;">
