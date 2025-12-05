@@ -10144,20 +10144,20 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 
-// Aura 12 Colors
+// Aura 12 Colors - Rotated by 2 hours forward
 const auraColors = [
-  "red",         // 1 (4:30–6:30am)
-  "orange",      // 2 (6:30–8:30am)
-  "yellow",      // 3 (8:30–10:30am)
-  "green",       // 4 (10:30–12:30pm)
-  "blue",        // 5 (12:30–2:30pm)
-  "indigo",      // 6 (2:30–4:30pm)
-  "violet",      // 7 (4:30–6:30pm)
-  "gold",        // 8 (6:30–8:30pm)
-  "silver",      // 9 (8:30–10:30pm)
-  "sapphire",    // 10 (10:30–12:30am)
-  "dark-silver", // 11 (12:30–2:30am)
-  "white"        // 12 (2:30–4:30am)
+  "red",         // 1 (6:30–8:30)  
+  "orange",      // 2 (8:30–10:30) 
+  "yellow",      // 3 (10:30–12:30)  
+  "green",       // 4 (12:30–2:30)  
+  "blue",        // 5 (2:30–4:30)  
+  "indigo",      // 6 (4:30–6:30)  
+  "violet",      // 7 (6:30–8:30) 
+  "gold",        // 8 (8:30–10:30) 
+  "silver",      // 9 (10:30–12:30) 
+  "sapphire",    // 10 (12:30–2:30) 
+  "dark-silver", // 11 (2:30–4:30) 
+  "white"        // 12 (4:30–6:30) 
 ];
 
 const auraGradientHex = {
@@ -10171,17 +10171,20 @@ const auraGradientHex = {
   gold:     "#FFD700",
   silver:   "#BFC9CA",
   sapphire: "#1a4fcc",
-  "dark-silver": "#606060",
+  "dark-silver": "#606060EE",
   white:    "#fff"
 };
 
-// Returns 0–11 for slot
+// Returns 0–11 for slot based on new timing (6:30 start instead of 4:30)
 function getAuraIndex() {
   const now = new Date();
   const localHour = now.getHours();
   const localMin = now.getMinutes();
-  let minutesSinceStart = (localHour * 60 + localMin) - (4 * 60 + 30);
+  
+  // Start from 6:30 instead of 4:30
+  let minutesSinceStart = (localHour * 60 + localMin) - (6 * 60 + 30);
   if (minutesSinceStart < 0) minutesSinceStart += 24 * 60;
+  
   const slot = Math.floor(minutesSinceStart / 120);
   return slot % 12;
 }
