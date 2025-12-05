@@ -12714,9 +12714,15 @@ function closeCallDialog(button) {
 }
 
 function showWherebyHostDialog(hostUrl, callId) {
+  // Get host user info and enhance the URL
+  const currentUserId = localStorage.getItem('omUserId') || 'Host';
+  const shortId = getShortUserId(currentUserId);
+    // Add auto-join parameters to host URL
+  const enhancedUrl = `${hostUrl}${hostUrl.includes('?') ? '&' : '?'}displayName=${encodeURIComponent(shortId)}&skipMediaPermissionPrompt=true&skipJoinDialog=true`;
+  
   const dlg = document.createElement('div');
   dlg.style = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10050;background:#232626;display:flex;flex-direction:column;align-items:center;justify-content:center;";
-  dlg.innerHTML = `<iframe src="${hostUrl}" allow="camera; microphone; fullscreen; speaker" style="border-radius:12px;border:none;width:96vw;height:90vh;max-width:700px;max-height:500px;background:#232626;"></iframe>
+  dlg.innerHTML = `<iframe src="${enhancedUrl}" allow="camera; microphone; fullscreen; speaker" style="border-radius:12px;border:none;width:96vw;height:90vh;max-width:700px;max-height:500px;background:#232626;"></iframe>
     <button id="close-host-btn" style="margin-top:12px;padding:.5em 1.4em;background:#fde68a;color:#232626;border:none;border-radius:7px;font-weight:bold;box-shadow:0 2px 10px #eab30822;cursor:pointer;">Close</button>`;
   document.body.appendChild(dlg);
 
