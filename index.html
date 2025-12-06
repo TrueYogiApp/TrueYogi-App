@@ -7327,11 +7327,6 @@ function resetChallengeForDay21() {
   showResetConfirmation();
 }
 
-// Update the close function to match
-function closeWalletRequiredModal() {
-  document.getElementById('wallet-required-modal').classList.add('hidden');
-}
-
     function checkJourneyCompletion() {
   if (!challengeData.startDate) return;
 
@@ -9369,10 +9364,14 @@ let lastCount = null; // Place this at the top (outside the function)
 async function updateCount() {
   try {
     // Get the up-to-date count directly from Supabase
-    const { count, error } = await supabase
-      .from('om_presence')
-      .select('*', { count: 'exact', head: true });
-    if (error) throw error;
+    //const { count, error } = await supabase
+     // .from('om_presence')
+      //.select('*', { count: 'exact', head: true });
+    //if (error) throw error;
+	
+	    // Get OM count from your backend API instead of Supabase directly!
+    const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
+    const { count } = await resp.json();
 
     const newCount = (typeof count === "number") ? count : 0;
 
