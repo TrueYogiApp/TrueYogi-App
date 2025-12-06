@@ -2125,6 +2125,15 @@ body.lock-scroll {
 
 </style>
   
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
+<script>
+  // Regular script - executes IMMEDIATELY
+  const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
+  
+  window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  console.log('✅ Supabase loaded at start');
+</script>
 <!-- 1. Load bs58 via Skypack and attach to window -->
   <script type="module">
     import bs58 from 'https://cdn.skypack.dev/bs58';
@@ -9364,14 +9373,14 @@ let lastCount = null; // Place this at the top (outside the function)
 async function updateCount() {
   try {
     // Get the up-to-date count directly from Supabase
-    //const { count, error } = await supabase
-     // .from('om_presence')
-      //.select('*', { count: 'exact', head: true });
-    //if (error) throw error;
+     const { count, error } = await supabase
+       .from('om_presence')
+       .select('*', { count: 'exact', head: true });
+    if (error) throw error;
 	
 	    // Get OM count from your backend API instead of Supabase directly!
-    const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
-    const { count } = await resp.json();
+    //const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
+    //const { count } = await resp.json();
 
     const newCount = (typeof count === "number") ? count : 0;
 
@@ -14864,12 +14873,12 @@ for (let i = 0; i < 3; i++) {
 
  <!-- Place this at the END of your index.html, after ALL other scripts -->
 <script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+  //import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
   
   // --- Supabase credentials ---
-  const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
-  const supabase = createClient(supabaseUrl, supabaseKey);
+  //const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
+  //const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
+  //const supabase = createClient(supabaseUrl, supabaseKey);
   
   const channel = supabase
   .channel('om-presence')
