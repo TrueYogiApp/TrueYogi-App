@@ -13,7 +13,14 @@
   "categories": ["health", "fitness", "lifestyle", "Spirituality", "Consciousness", "Truth", "Universe", "Cosmos"],
   "lang": "en",
   "dir": "ltr",
-  
+  "prefer_related_applications": true,
+  "related_applications": [
+    {
+      "platform": "play",
+      "id": "app.trueyogi.android",
+      "url": "https://play.google.com/store/apps/details?id=app.trueyogi.android"
+    }
+  ],
   "screenshots": [
     {
       "src": "/assets/screenshots/phone-1-1080x1920.png",
