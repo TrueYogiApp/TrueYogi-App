@@ -8936,6 +8936,17 @@ document.getElementById('unseen-faq-a7').textContent = t('unseen_faq_a7');
     closeBtn.innerHTML = `<i class="fas fa-times mr-2"></i>${t('close')}`;
   }
 
+document.getElementById('enable-offline-faq-heading').textContent = t('enable_offline_faq_heading');
+document.getElementById('enable-offline-faq-description').firstChild.textContent = t('enable_offline_faq_description');
+document.getElementById('enable-offline-faq-note').textContent = t('enable_offline_faq_note');
+  
+document.getElementById('clear-offline-faq-heading').textContent = t('clear_offline_faq_heading');
+document.getElementById('clear-offline-faq-description').textContent = t('clear_offline_faq_description');
+const clearBtnLabel = document.getElementById('clear-offline-faq-button');
+if (clearBtnLabel) {
+  clearBtnLabel.textContent = t('clear_offline_faq_button');
+}
+
 document.getElementById('storage-faq-heading').textContent = t('storage_faq_heading');
 document.getElementById('storage-faq-label-content').textContent = t('storage_faq_label_content');
 document.getElementById('storage-faq-label-version').textContent = t('storage_faq_label_version');
