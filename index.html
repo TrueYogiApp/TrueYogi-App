@@ -10433,80 +10433,6 @@ setInterval(updateOnlineStatus, 10000); // Check every 10 seconds
 updateOnlineStatus();
 
 
-// Service Worker Status Indicator
-class SWStatusIndicator {
-  constructor() {
-    this.indicator = this.createIndicator();
-    this.showInstalling = true;
-    this.init();
-  }
-
-  createIndicator() {
-    const indicator = document.createElement('div');
-    indicator.id = 'sw-status-indicator';
-    indicator.innerHTML = `
-      <style>
-        #sw-status-indicator {
-          position: fixed;
-          top: 10px;
-          right: 10px;
-          width: 12px;
-          height: 12px;
-          background: #ffeb3b;
-          border-radius: 50%;
-          box-shadow: 0 0 10px #ffeb3b;
-          z-index: 10000;
-          animation: blink 1s infinite;
-          display: none;
-        }
-        @keyframes blink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.3; }
-        }
-      </style>
-    `;
-    document.body.appendChild(indicator);
-    return indicator;
-  }
-
-  show() {
-    if (this.showInstalling) {
-      this.indicator.style.display = 'block';
-    }
-  }
-
-  hide() {
-    this.indicator.style.display = 'none';
-  }
-
-  init() {
-    if ('serviceWorker' in navigator) {
-      // Show when installing/updating
-      navigator.serviceWorker.addEventListener('message', (event) => {
-        if (event.data && event.data.type === 'SW_INSTALLING') {
-          this.show();
-        }
-        if (event.data && event.data.type === 'SW_READY') {
-          setTimeout(() => this.hide(), 1000); // Hide after 1 sec
-        }
-      });
-
-      // Also show when page loads if SW is installing
-      navigator.serviceWorker.ready.then(() => {
-        setTimeout(() => this.hide(), 500);
-      });
-    }
-  }
-}
-
-// Initialize the indicator
-const swIndicator = new SWStatusIndicator();
-
-// Show indicator immediately when page loads (optional)
-swIndicator.show();
-setTimeout(() => swIndicator.hide(), 22000); // Hide after 22 seconds if no SW activity
-
-
 // 7 Chakra sound files and icons (bottom to top)
 const chakraSounds = [
   { sound: '/assets/root_lam_396hz.mp3',   icon: '🔴', name: '' },
@@ -14151,7 +14077,7 @@ function updateStorageFallback() {
   if (isOfflineInstalled) {
     // User has offline mode - show approximate size
     if (storageEl) {
-      storageEl.textContent = '~100MB';
+      storageEl.textContent = '~108MB';
       storageEl.className = 'font-medium text-green-400';
     }
   } else {
