@@ -3481,6 +3481,7 @@ body.lock-scroll {
   <h2 class="text-yellow-300 font-semibold mb-2"><i class="fas fa-book-open mr-2"></i>How to Meditate:</h2>
   <ol id="meditation-steps-list" class="list-decimal list-inside space-y-1 pl-2 mb-4 meditation-steps">
   <li> Take any comfortable sitting position on chair or mat.</li>
+  <li> Practice Anulom Vilom (alternate nostril breathing) for a few minutes: Gently close your right nostril with your thumb and inhale slowly through your left nostril, then close your left nostril with ring finger and exhale through your right. Inhale through your right nostril, then switch and exhale through your left. Continue this cycle smoothly and naturally, focusing on your breath.</li>
   <li> Close your eyes, join your hands and cross your legs. Observe your natural in/out Breath.</li>
   <li> If any thoughts arise bring your awareness back to your Breath.</li>
   <li> After finishing, gently place your hands over your eyes. Open your eyes slowly with a smile and feel gratitude.</li>
@@ -8790,7 +8791,8 @@ updateStorageInfo();
       t('meditationStep1'),
       t('meditationStep2'),
       t('meditationStep3'),
-      t('meditationStep4')
+      t('meditationStep4'),
+	  t('meditationStep5')
     ];
     stepsList.innerHTML = steps.map(step => `<li>${step}</li>`).join('');
   }
