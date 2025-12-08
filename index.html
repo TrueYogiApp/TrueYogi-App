@@ -8933,6 +8933,39 @@ document.getElementById('unseen-faq-a7').textContent = t('unseen_faq_a7');
   if (closeBtn) {
     closeBtn.innerHTML = `<i class="fas fa-times mr-2"></i>${t('close')}`;
   }
+
+document.getElementById('storage-faq-heading').textContent = t('storage_faq_heading');
+document.getElementById('storage-faq-label-content').textContent = t('storage_faq_label_content');
+document.getElementById('storage-faq-label-version').textContent = t('storage_faq_label_version');
+document.getElementById('storage-faq-label-updated').textContent = t('storage_faq_label_updated');
+document.getElementById('storage-faq-note').textContent = t('storage_faq_note');
+
+document.getElementById('clear-modal-heading').textContent = t('clear_modal_heading');
+document.getElementById('clear-modal-description').textContent = t('clear_modal_description');
+document.getElementById('clear-modal-note').textContent = t('clear_modal_note');
+document.getElementById('clear-modal-confirm-label').textContent = t('clear_modal_confirm');
+document.getElementById('clear-modal-cancel-label').textContent = t('clear_modal_cancel');
+
+document.getElementById('offline-modal-heading').textContent = t('offline_modal_heading');
+document.getElementById('offline-modal-description').textContent = t('offline_modal_description');
+document.getElementById('offline-modal-note').textContent = t('offline_modal_note');
+document.getElementById('offline-modal-accept-label').textContent = t('offline_modal_accept');
+document.getElementById('offline-modal-cancel-label').textContent = t('offline_modal_cancel');
+
+const heading1 = document.getElementById('clearing-modal-heading');
+if (heading1) heading.textContent = t('clearing_modal_heading');
+const status = document.getElementById('clearing-modal-status');
+if (status) status.textContent = t('clearing_modal_status');
+const note = document.getElementById('clearing-modal-note');
+if (note) note.textContent = t('clearing_modal_note'); 
+
+const challengeSettings = document.getElementById('challenge-settings-heading');
+if (challengeSettings) challengeSettings.textContent = t('challenge_settings_heading');
+const spaceshipMode = document.getElementById('spaceship-mode-heading');
+if (spaceshipMode) spaceshipMode.textContent = t('spaceship_mode_heading');
+const technicalTools = document.getElementById('technical-tools-heading');
+if (technicalTools) technicalTools.textContent = t('technical_tools_heading');
+
   
 }
 
