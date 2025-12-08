@@ -1,6 +1,6 @@
 // service-worker.js — Optimized version
 
-const APP_VERSION = '1.6.1';
+const APP_VERSION = '1.2.0';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2'; 
 
@@ -20,6 +20,15 @@ const AUDIO_ASSETS = [
   'https://assets.trueyogi.app/assets/music2.m4a',
   'https://assets.trueyogi.app/assets/music1.m4a',
   'https://assets.trueyogi.app/assets/healing.m4a',
+  'https://assets.trueyogi.app/assets/music/music-en.mp3',
+  'https://assets.trueyogi.app/assets/music/music-te.mp3',
+  'https://assets.trueyogi.app/assets/music/music-fr.mp3',
+  'https://assets.trueyogi.app/assets/music/music-es.mp3',
+  'https://assets.trueyogi.app/assets/music/music-de.mp3',
+  'https://assets.trueyogi.app/assets/music/music-hi.mp3',
+  'https://assets.trueyogi.app/assets/music/music-zh.mp3',
+  'https://assets.trueyogi.app/assets/music/music-it.mp3',
+  'https://assets.trueyogi.app/assets/music/music-ru.mp3',
   '/assets/crown_aum_963hz.mp3',
   '/assets/thirdeye_om_852hz.mp3',
   '/assets/throat_ham_741hz.mp3',
