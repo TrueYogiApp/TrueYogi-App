@@ -103,12 +103,12 @@ async function cacheAudioFiles(cache) {
     if (!existingUrls.has(fullUrl)) {
       try {
         await cache.add(file);
-        console.log('✅ Audio cached:', file);
+        //console.log('✅ Audio cached:', file);
       } catch (e) {
         console.warn('❌ Audio cache failed:', file, e);
       }
     } else {
-      console.log('🔵 Already in permanent cache:', file);
+      //console.log('🔵 Already in permanent cache:', file);
     }
   }
 }
@@ -130,7 +130,7 @@ self.addEventListener('install', (event) => {
             if (!existingUrls.has(fullUrl)) {
               try {
                 await permanentCache.add(file);
-                console.log('✅ Permanent cached:', file);
+                //console.log('✅ Permanent cached:', file);
               } catch (e) {
                 console.warn('❌ Permanent cache failed:', file, e);
               }
@@ -150,7 +150,7 @@ self.addEventListener('install', (event) => {
           APP_FILES.map(async (file) => {
             try {
               await appCache.add(file);
-              console.log('✅ App cached:', file);
+              //console.log('✅ App cached:', file);
             } catch (e) {
               console.warn('❌ App cache failed:', file, e);
             }
@@ -159,7 +159,7 @@ self.addEventListener('install', (event) => {
       })
     ])
     .then(() => {
-      console.log('Service Worker: All caches installed');
+      //console.log('Service Worker: All caches installed');
       return self.skipWaiting();
     })
     .catch((error) => {
@@ -175,7 +175,7 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       // Log all cache names for debugging
-      console.log('All cache names on activate:', cacheNames);
+      //console.log('All cache names on activate:', cacheNames);
       return Promise.all(
         cacheNames.map((cacheName) => {
           // Delete any cache that matches our app's naming pattern but is not current
@@ -187,12 +187,12 @@ self.addEventListener('activate', (event) => {
               cacheName.startsWith('TrueYogi-Permanent') && cacheName !== PERMANENT_CACHE_NAME
             )
           ) {
-            console.log('🧹 Aggressively deleting old or duplicate cache:', cacheName);
+            //console.log('🧹 Aggressively deleting old or duplicate cache:', cacheName);
             return caches.delete(cacheName);
           }
           // Also delete anything not in the expected list (paranoia)
           if (!expectedCaches.includes(cacheName)) {
-            console.log('🧹 Deleting non-whitelisted cache:', cacheName);
+            //console.log('🧹 Deleting non-whitelisted cache:', cacheName);
             return caches.delete(cacheName);
           }
           // Otherwise, keep it
@@ -200,7 +200,7 @@ self.addEventListener('activate', (event) => {
         })
       );
     }).then(() => {
-      console.log('✅ Service Worker: Only current caches remain.');
+      //console.log('✅ Service Worker: Only current caches remain.');
       return self.clients.claim();
     })
   );
