@@ -5927,10 +5927,22 @@ if (bgMusicPlayer) {
   document.getElementById('start-date').value = today; // Default to today
   document.getElementById('start-date').min = today; // Prevent past dates
   document.getElementById('start-date').max = maxDateStr; // Limit to 30 days ahead
+  // Get current time and round to nearest 5 minutes
+const now = new Date();
+let hours = now.getHours().toString().padStart(2, '0');
+let minutes = now.getMinutes();
+// Round minutes to nearest 5
+minutes = Math.round(minutes / 5) * 5;
+if (minutes === 60) {
+  minutes = 0;
+  hours = (parseInt(hours) + 1).toString().padStart(2, '0');
+}
+const currentTime = `${hours}:${minutes.toString().padStart(2, '0')}`;
+
   document.getElementById('session-times-inputs').innerHTML = `
     <label id="session-times-label" class="block text-sm text-gray-400 mb-2"></label>
     <div id="session-time-1" class="mb-2 flex items-center gap-2 flex-col sm:flex-row">
-      <input type="time" class="w-full bg-gray-800 text-white px-4 py-2 rounded-lg" required>
+      <input type="time" class="w-full bg-gray-800 text-white px-4 py-2 rounded-lg" required value="${currentTime}">
       <select id="duration-1" class="w-full bg-gray-800 text-white px-4 py-2 rounded-lg">
         <option value="60">1 minute</option>
         <option value="180">3 minutes</option>
