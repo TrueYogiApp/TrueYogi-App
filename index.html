@@ -7339,7 +7339,35 @@ const PROGRESS_SEGMENTS = [
   { color: "#8b5cf6", days: 5 },   // violet
 ];
 
+function getCurrentDay(challengeStartDate, sessionsCompleted, totalDays = 41) {
+  // Get unique dates in sorted order
+  const uniqueDates = Array.from(new Set(sessionsCompleted.map(s => s.date))).sort();
+
+  if (!uniqueDates.length) return 0; // No sessions
+  
+  let streak = 1;
+  let lastDate = new Date(challengeStartDate);
+
+  for (let i = 1; i < uniqueDates.length && streak < totalDays; i++) {
+    const expected = new Date(lastDate);
+    expected.setDate(expected.getDate() + 1);
+    const thisDate = new Date(uniqueDates[i]);
+    if (
+      expected.getFullYear() !== thisDate.getFullYear() ||
+      expected.getMonth() !== thisDate.getMonth() ||
+      expected.getDate() !== thisDate.getDate()
+    ) {
+      // Gap detected, streak ends here
+      break;
+    }
+    streak++;
+    lastDate = thisDate;
+  }
+  return streak;
+}
+
 function updateProgressDisplay() {
+  challengeData.currentDay = getCurrentDay(challengeData.startDate, challengeData.sessionsCompleted);
   document.getElementById('current-day-display').textContent = challengeData.currentDay;
   const today = getLocalDateString();
   const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === today).length;
