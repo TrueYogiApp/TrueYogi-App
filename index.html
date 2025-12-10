@@ -13475,7 +13475,7 @@ if ('serviceWorker' in navigator) {
     if (offlineRequested || alreadyInstalled || installStarted) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
-          console.log('Service Worker registered: ', registration);
+          // console.log('Service Worker registered: ', registration);
           localStorage.setItem('trueyogi_offline_installed', 'true');
           localStorage.removeItem('trueyogi_install_started');
           
