@@ -2132,7 +2132,7 @@ body.lock-scroll {
   const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
   
   window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
-  console.log('✅ Supabase loaded at start');
+  //console.log('✅ Supabase loaded at start');
 </script>
 <!-- 1. Load bs58 via Skypack and attach to window -->
   <script type="module">
@@ -14106,7 +14106,7 @@ function updateStorageInfo() {
     navigator.storage.estimate().then(estimate => {
       const usedMB = Math.round(estimate.usage / 1024 / 1024);
       
-      console.log(`Storage: ${usedMB}MB used`); // Simplified log
+      //console.log(`Storage: ${usedMB}MB used`); // Simplified log
       
       // Update all UI elements
       const storageEl = document.getElementById('storage-size');
@@ -14212,7 +14212,7 @@ function startNormalStorageMonitoring() {
     updateStorageInfo();
   }, 30 * 60 * 1000); // 30 minutes = 30 * 60 * 1000 milliseconds
   
-  console.log('Normal storage monitoring started (15s intervals)');
+  // console.log('Normal storage monitoring started (15s intervals)');
 }
 
 // Update storage info when offline mode is installed
