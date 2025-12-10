@@ -9492,7 +9492,7 @@ async function addCount() {
   let id = localStorage.getItem('omPresenceId');
   if (id) {
     // Validate it with backend
-    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
+    const res = await fetch('https://trueyogi-backend-test.onrender.com/check-om', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
@@ -9506,18 +9506,24 @@ async function addCount() {
   if (!id) {
     // Now, add presence
     try {
-	const localTimeString = new Date().toLocaleString();
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  
-      const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-		    body: JSON.stringify({
-      timezone,
-	  user_id: omUserId,
-      local_joined_at: localTimeString // Or use localTimeString if you want human readable
-    })
-  });
+	const now = new Date();
+const localTimeString = now.getFullYear() + '-' +
+                        String(now.getMonth()+1).padStart(2, '0') + '-' +
+                        String(now.getDate()).padStart(2,'0') + 'T' +
+                        String(now.getHours()).padStart(2,'0') + ':' +
+                        String(now.getMinutes()).padStart(2,'0');
+
+const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    timezone,
+    user_id: omUserId,
+    local_joined_at: localTimeString
+  })
+});
       const data = await res.json();
       localStorage.setItem('omPresenceId', data.id);
       omPresenceId = data.id;
@@ -9542,16 +9548,27 @@ async function addCount() {
 async function removeCount() {
   if (!omPresenceId) return;
   try {
+    const now = new Date();
+    const local_left_at = now.getFullYear() + '-' +
+                          String(now.getMonth()+1).padStart(2, '0') + '-' +
+                          String(now.getDate()).padStart(2,'0') + 'T' +
+                          String(now.getHours()).padStart(2,'0') + ':' +
+                          String(now.getMinutes()).padStart(2,'0');
+
     await fetch('https://trueyogi-backend-knkq.onrender.com/leave-om', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: omPresenceId })
+      body: JSON.stringify({ 
+        id: omPresenceId,
+        local_left_at
+      })
     });
-	localStorage.removeItem('omPresenceId');
+    localStorage.removeItem('omPresenceId');
     omPresenceId = null;
     updateCount();
-	stopHeartbeat();
-	    // ➤ Remove active glow
+    stopHeartbeat();
+    stopOmSelfHeal();
+    // ➤ Remove active glow
     const counterEl = document.getElementById('om-counter');
     if (counterEl) counterEl.classList.remove('active');
   } catch (err) { console.error(err); }
@@ -9582,7 +9599,7 @@ async function updateCount() {
       if (lastCount !== null && newCount !== lastCount) {
         counterEl.classList.add('om-counter-pulse');
         setTimeout(() => counterEl.classList.remove('om-counter-pulse'), 700);
-        showMeditatorFloat();
+        //showMeditatorFloat();
       }
       lastCount = newCount;
 
@@ -9669,7 +9686,8 @@ async function validateOmPresence() {
 
 let meditateSVGContent = null;
 
-async function showMeditatorFloat() {
+async function showMeditatorFloat(auraClassOverride) {
+
   // 1. Fetch SVG if not already loaded
   if (!meditateSVGContent) {
     const resp = await fetch('/assets/ommeditate.svg');
@@ -9677,22 +9695,24 @@ async function showMeditatorFloat() {
   }
 
   // 2. Get aura color
-  const auraClass = Array.from(counterEl.classList).find(c => auraColors.includes(c)) || "yellow";
-  const auraColorMap = {
-    red: "#FF1A1A", orange: "#FF8800", yellow: "#FFD600", green: "#29D884",
-    blue: "#3B82F6", indigo: "#4338CA", violet: "#C026D3", gold: "#FFD700",
-    silver: "#BFC9CA", sapphire: "#1a4fcc", "dark-silver": "#606060EE", white: "#FFFFFF"
-  };
-  const color = auraColorMap[auraClass] || "#FFD600";
+  const auraClass = auraClassOverride ||
+    Array.from(counterEl.classList).find(c => auraColors.includes(c)) ||
+    "yellow";
+  const color = auraGradientHex[auraClass] || "#FFD600";
 
   // 3. Replace color in SVG (adjust regex if needed)
   let svgColored = meditateSVGContent.replace(/fill="[^"]*"/g, `fill="${color}"`);
 
-  // 4. Position: get OM counter center
-  const rect = counterEl.getBoundingClientRect();
-  const svgSize = 0.1; // px, adjust if needed
-  const centerX = rect.left + rect.width / 2 - svgSize / 2;
-  const centerY = rect.top + rect.height / 2 - svgSize / 2;
+// 4. Position: get OM counter center OR use fallback if counterEl missing/hidden
+const svgSize = 32; // or any px size you want for the SVG popup
+
+// Option 2: fallback position to screen center if counterEl is missing or hidden
+const rect = (counterEl && counterEl.offsetWidth > 0 && counterEl.offsetParent !== null)
+  ? counterEl.getBoundingClientRect()
+  : { left: window.innerWidth / 2, top: window.innerHeight / 2, width: 0, height: 0 };
+
+const centerX = rect.left + rect.width / 2 - svgSize / 2;
+const centerY = rect.top + rect.height / 2 - svgSize / 2;
 
   // 5. Create floating div for SVG
   const float = document.createElement("div");
@@ -15766,6 +15786,20 @@ for (let i = 0; i < 3; i++) {
   //const supabaseUrl = 'https://jroelnuiafmamlzrpcfj.supabase.co';
   //const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Impyb2VsbnVpYWZtYW1senJwY2ZqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTM1NTE2NTEsImV4cCI6MjA2OTEyNzY1MX0.mQcImn6VhYCpYEQ5mFVZnSp4QoIIEk6iYXKIm6CB4Ko';
   //const supabase = createClient(supabaseUrl, supabaseKey);
+
+supabase
+  .channel('public:om_meta')
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'om_meta' },
+    (payload) => {
+      if (payload.new && payload.new.key === "lastUserAura" && payload.new.value) {
+        // Show the SVG in the aura color of whoever just joined/left!
+        showMeditatorFloat(payload.new.value);
+      }
+    }
+  )
+  .subscribe();
   
   const channel = supabase
   .channel('om-presence')
