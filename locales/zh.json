@@ -372,5 +372,7 @@
 "spaceship_ready_status": "✅ 太空船模式已准备好！",
 "challenge_settings_heading": "⚙️ 挑战与设置",
 "spaceship_mode_heading": "🛸 太空船模式",
-"technical_tools_heading": "🛠️ 技术工具"
+"technical_tools_heading": "🛠️ 技术工具",
+ "wallet_copied": "已复制！",
+ "wallet_connected": "已连接"
 }

@@ -8038,7 +8038,7 @@ function isMobile() {
     <span id="wallet-short-address" style="font-weight:bold; color:#fde68a; font-size:1.07em; transition:color 0.2s;">
       ${shortAddress}
     </span>
-    <span id="wallet-copied" style="display:none; margin-left:8px; color:#10b981; font-size:0.96em; font-weight:500;">Copied!</span>
+    <span id="wallet-copied" style="display:none; margin-left:8px; color:#10b981; font-size:0.96em; font-weight:500;">${t("wallet_copied")}</span>
     <span id="jwt-timer" style="margin-left:10px;color:#fde68a;font-size:0.97em;"></span>
     <span id="wallet-connected-tooltip" style="
       display:block;
@@ -8056,7 +8056,7 @@ function isMobile() {
       pointer-events:none;
       min-width: 100px;
       text-align: center;
-    ">Connected</span>
+    ">${t("wallet_connected")}</span>
   </span>
 `;
 
@@ -8993,6 +8993,10 @@ if (spaceshipMode) spaceshipMode.textContent = t('spaceship_mode_heading');
 const technicalTools = document.getElementById('technical-tools-heading');
 if (technicalTools) technicalTools.textContent = t('technical_tools_heading');
 
+  const tooltip = document.getElementById('wallet-connected-tooltip');
+  const copiedEl = document.getElementById('wallet-copied');
+  if (tooltip) tooltip.textContent = t("wallet_connected");
+  if (copiedEl) copiedEl.textContent = t("wallet_copied");
   
 }
 

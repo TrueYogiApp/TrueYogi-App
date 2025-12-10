@@ -371,5 +371,7 @@
 "spaceship_ready_status": "✅ ¡Modo nave espacial listo!",
 "challenge_settings_heading": "⚙️ Desafío y Configuración",
 "spaceship_mode_heading": "🛸 Modo Nave Espacial",
-"technical_tools_heading": "🛠️ Herramientas Técnicas"
+"technical_tools_heading": "🛠️ Herramientas Técnicas",
+  "wallet_copied": "¡Copiado!",
+  "wallet_connected": "Conectado"
 }

@@ -371,5 +371,7 @@
 "spaceship_ready_status": "✅ Spaceship-Modus bereit!",
 "challenge_settings_heading": "⚙️ Challenge & Einstellungen",
 "spaceship_mode_heading": "🛸 Spaceship-Modus",
-"technical_tools_heading": "🛠️ Technische Werkzeuge"
+"technical_tools_heading": "🛠️ Technische Werkzeuge",
+  "wallet_copied": "Kopiert!",
+  "wallet_connected": "Verbunden"
 }

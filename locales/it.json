@@ -372,5 +372,7 @@
 "spaceship_ready_status": "✅ Modalità astronave pronta!",
 "challenge_settings_heading": "⚙️ Challenge e Impostazioni",
 "spaceship_mode_heading": "🛸 Modalità Astronave",
-"technical_tools_heading": "🛠️ Strumenti Tecnici"
+"technical_tools_heading": "🛠️ Strumenti Tecnici",
+  "wallet_copied": "Copiato!",
+  "wallet_connected": "Connesso"
 }

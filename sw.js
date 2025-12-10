@@ -4,7 +4,7 @@ const APP_VERSION = '1.2.0';
 const CACHE_NAME = `TrueYogi-App-${APP_VERSION}`;
 const PERMANENT_CACHE_NAME = 'TrueYogi-Permanent-v2'; 
 
-// Permanent assets that rarely change 13
+// Permanent assets that rarely change
 const AUDIO_ASSETS = [
   'https://assets.trueyogi.app/assets/aum.m4a',
   'https://assets.trueyogi.app/assets/bell.m4a',
