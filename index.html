@@ -2296,15 +2296,15 @@ body.lock-scroll {
 </div>
 
   <!-- Reset Confirmation Modal -->
-<div id="reset-confirmation-modal" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true">
+<div id="reset-confirmation-modal" class="hidden fixed inset-0 flex items-center justify-center" style="z-index: 10000;" role="dialog" aria-modal="true">
   <div class="config-modal max-w-md mx-4 p-6 rounded-xl text-center">
-    <div class="text-red-400 text-5xl mb-4">
+    <div class="text-yellow-400 text-5xl mb-4">
       <i class="fas fa-exclamation-triangle"></i>
     </div>
-    <h2 class="text-xl font-semibold text-red-300 mb-2">Reset TrueYogi Stillness?</h2>
+    <h2 class="text-xl font-semibold text-yellow-300 mb-2">Reset TrueYogi Stillness?</h2>
     <p id="reset-description" class="text-gray-200 mb-4">The circle Resets. Are you sure you wish to Reset your 41-day Sacred Sits? All progress will be cleared, and a new Vibration must be chosen.</p>
     <div class="flex justify-center gap-4">
-      <button onclick="confirmResetChallenge()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button onclick="confirmResetChallenge()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         Confirm Reset
       </button>
       <button onclick="closeResetConfirmation()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
@@ -2939,7 +2939,7 @@ body.lock-scroll {
       <h3 class="text-yellow-200 font-medium">{{t('resetYogiConfigHeading')}}</h3>
       <p class="text-gray-300 mt-1">{{t('resetYogiConfigDescription')}}</p>
       <div class="mt-4">
-        <button onclick="showResetConfirmation()" class="w-full bg-orange-400 hover:bg-orange-500 text-white py-2 rounded-lg font-medium cursor-pointer">
+        <button onclick="showResetConfirmation()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-white py-2 rounded-lg font-medium cursor-pointer">
           <i class="fas fa-redo mr-2"></i> {{t('resetYogiConfigButton')}}
         </button>
       </div>
@@ -5512,7 +5512,6 @@ function showYellowIndicator(duration = 1500) {
     showAuthRequiredModal();
     return;
   }
-  closeFAQModal();
   // Otherwise show the normal reset confirmation modal
   document.getElementById('reset-confirmation-modal').classList.remove('hidden');
 }
@@ -8710,7 +8709,7 @@ updateStorageInfo();
   document.querySelector('#end-meditation-modal h2').textContent = t('endMeditation');
   document.querySelector('#reset-confirmation-modal h2').textContent = t('resetStillness');
   document.getElementById('reset-description').textContent = t('resetDescription');
-  document.querySelector('#reset-confirmation-modal .bg-red-500').textContent = t('resetConfirmation');
+  document.querySelector('#reset-confirmation-modal .bg-yellow-500').textContent = t('resetConfirmation');
   document.querySelector('#reset-confirmation-modal .bg-gray-600').textContent = t('resetCancel');
   document.querySelector('#session-timing-display p.text-yellow-300').childNodes[1].textContent = t('sessionTime');
   document.querySelector('#yogi-stats .text-yellow-400').nextElementSibling.textContent = t('yogiSessions');
