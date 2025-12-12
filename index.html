@@ -3298,7 +3298,7 @@ body.lock-scroll {
     <h2 id="offline-modal-heading" class="text-xl font-semibold text-green-300 mb-2" style="color:#8BC34A;">Enable Spaceship Mode</h2>
     <div style="color:#fff;text-align:center;font-size:1.04em;line-height:1.5;margin-bottom:18px;">
       <span id="offline-modal-description">
-        Download all meditation content (~100MB) for full offline access.
+        Download all meditation content for full offline access.
       </span>
       <br>
       <span id="offline-modal-note">
@@ -3327,7 +3327,7 @@ body.lock-scroll {
     <h2 id="clear-modal-heading" class="text-xl font-semibold text-orange-300 mb-2" style="color:#FF9800;">Clear Offline Data</h2>
     <div style="color:#fff;text-align:center;font-size:1.04em;line-height:1.5;margin-bottom:18px;">
       <span id="clear-modal-description">
-        This will remove all downloaded meditation content (~100MB) and disable spaceship mode.
+        This will remove all downloaded meditation content and disable spaceship mode.
       </span>
       <br><br>
       <span id="clear-modal-note" style="color:#FFB74D;font-size:0.9em;">
@@ -13598,7 +13598,7 @@ document.addEventListener('DOMContentLoaded', function () {
   ">
     <h2 id="launching-modal-heading" style="color: #4CAF50; margin-bottom: 20px; font-size: 1.8em;">🚀 Launching Spaceship Mode</h2>
     <p id="launching-modal-description" style="font-size: 1.1em;">Downloading meditation content...</p>
-    <p id="launching-modal-note" style="font-size: 14px; opacity: 0.8; margin-top: 10px;">This will take a few minutes (~100MB)</p>
+    <p id="launching-modal-note" style="font-size: 14px; opacity: 0.8; margin-top: 10px;">This will take a few minutes</p>
     
     <!-- Progress container -->
     <div style="width: 300px; margin: 30px 0 20px;">
@@ -14079,7 +14079,7 @@ function showClearedNotification() {
         <div>
           <div id="offline-cleared-heading">Offline Data Cleared</div>
           <div>
-            <span id="offline-cleared-description">~100MB storage freed.</span>
+            <span id="offline-cleared-description">storage freed.</span>
             <br>
             <span id="offline-cleared-note">You can re-enable spaceship mode anytime.</span>
           </div>
@@ -14189,7 +14189,7 @@ function updateStorageFallback() {
   if (isOfflineInstalled) {
     // User has offline mode - show approximate size
     if (storageEl) {
-      storageEl.textContent = '~100MB';
+      storageEl.textContent = '~112MB';
       storageEl.className = 'font-medium text-green-400';
     }
   } else {
