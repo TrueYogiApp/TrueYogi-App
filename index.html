@@ -5249,10 +5249,10 @@ async function loadWelcomeMessages() {
     return;
   }
   
-  // Returning visitor logic (only show if >15 minutes since last visit)
+  // Returning visitor logic (only show if >180 minutes since last visit)
   if (lastVisitTime) {
     const minutesSinceLastVisit = (now.getTime() - parseInt(lastVisitTime)) / (1000 * 60);
-    if (minutesSinceLastVisit > 15) {
+    if (minutesSinceLastVisit > 180) {
       welcomeHeading.textContent = t('welcomeHeadingReturn');
       welcomeText.textContent = welcomeMessages.returnVisit[
         Math.floor(Math.random() * welcomeMessages.returnVisit.length)
