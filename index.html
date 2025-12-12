@@ -13494,7 +13494,7 @@ function stopMeditationMusicOnClose() {
 
   </script>
 	
- <script>
+<script>
 // Register Service Worker with user opt-in
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
@@ -13506,7 +13506,7 @@ if ('serviceWorker' in navigator) {
     if (offlineRequested || alreadyInstalled || installStarted) {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
-          // console.log('Service Worker registered: ', registration);
+          console.log('Service Worker registered: ', registration);
           localStorage.setItem('trueyogi_offline_installed', 'true');
           localStorage.removeItem('trueyogi_install_started');
           
@@ -13561,10 +13561,10 @@ document.addEventListener('DOMContentLoaded', function () {
   var offlineModalCancel = document.getElementById('offline-modal-cancel');
 
   function showOfflineModal() {
-    if (offlineModalBackdrop) offlineModalBackdrop.style.display = "block";
+    if (offlineModalBackdrop) offlineModalBackdrop.classList.remove('hidden');
   }
   function closeOfflineModal() {
-    if (offlineModalBackdrop) offlineModalBackdrop.style.display = "none";
+    if (offlineModalBackdrop) offlineModalBackdrop.classList.add('hidden');
   }
   
   if (faqBtn) {
@@ -13778,7 +13778,7 @@ function updateFaqButton() {
         clearBtn.style.cursor = 'pointer';
         clearBtn.disabled = false;
         clearBtn.onclick = function() {
-          document.getElementById('clear-modal-backdrop').style.display = "block";
+          document.getElementById('clear-modal-backdrop').classList.remove('hidden');
         };
         const clearBtnLabel = document.getElementById('clear-offline-faq-button');
         if (clearBtnLabel) clearBtnLabel.textContent = t('clear_offline_faq_button');
@@ -13790,7 +13790,7 @@ function updateFaqButton() {
       faqBtn.style.cursor = 'pointer';
       faqBtn.disabled = false;
       faqBtn.onclick = function() {
-        document.getElementById('offline-modal-backdrop').style.display = "block";
+        document.getElementById('offline-modal-backdrop').classList.remove('hidden');
       };
       // Set translation for NOT ENABLED state
       const btnLabel = document.getElementById('enable-offline-faq-button');
@@ -13811,8 +13811,8 @@ function updateFaqButton() {
 
   // Optionally, close modal if open
   const modalBackdrop = document.getElementById('offline-modal-backdrop');
-  if (modalBackdrop && modalBackdrop.style.display === 'block') {
-    modalBackdrop.style.display = 'none';
+  if (modalBackdrop && !modalBackdrop.classList.contains('hidden')) {
+    modalBackdrop.classList.add('hidden');
   }
 }
 
@@ -13926,19 +13926,19 @@ document.addEventListener('DOMContentLoaded', function() {
   
   if (clearBtn) {
     clearBtn.addEventListener('click', function() {
-      if (clearModalBackdrop) clearModalBackdrop.style.display = "block";
+      if (clearModalBackdrop) clearModalBackdrop.classList.remove('hidden');
     });
   }
   
   if (clearModalCancel) {
     clearModalCancel.addEventListener('click', function() {
-      if (clearModalBackdrop) clearModalBackdrop.style.display = "none";
+      if (clearModalBackdrop) clearModalBackdrop.classList.add('hidden');
     });
   }
   
   if (clearModalConfirm) {
     clearModalConfirm.addEventListener('click', function() {
-      if (clearModalBackdrop) clearModalBackdrop.style.display = "none";
+      if (clearModalBackdrop) clearModalBackdrop.classList.add('hidden');
       
       // Show clearing message
       const clearingMsg = document.createElement('div');
@@ -13987,7 +13987,7 @@ if (note) note.textContent = t('clearing_modal_note');
             faqBtn.style.cursor = 'pointer';
             faqBtn.disabled = false;
             faqBtn.onclick = function() {
-              document.getElementById('offline-modal-backdrop').style.display = "block";
+              document.getElementById('offline-modal-backdrop').classList.remove('hidden');
             };
 			  // Set translation
   const btnLabel = document.getElementById('enable-offline-faq-button');
@@ -14137,7 +14137,7 @@ function updateStorageInfo() {
     navigator.storage.estimate().then(estimate => {
       const usedMB = Math.round(estimate.usage / 1024 / 1024);
       
-      //console.log(`Storage: ${usedMB}MB used`); // Simplified log
+      console.log(`Storage: ${usedMB}MB used`); // Simplified log
       
       // Update all UI elements
       const storageEl = document.getElementById('storage-size');
@@ -14183,7 +14183,7 @@ function updateStorageFallback() {
   if (isOfflineInstalled) {
     // User has offline mode - show approximate size
     if (storageEl) {
-      storageEl.textContent = '~112MB';
+      storageEl.textContent = '~100MB';
       storageEl.className = 'font-medium text-green-400';
     }
   } else {
@@ -14243,7 +14243,7 @@ function startNormalStorageMonitoring() {
     updateStorageInfo();
   }, 30 * 60 * 1000); // 30 minutes = 30 * 60 * 1000 milliseconds
   
-  // console.log('Normal storage monitoring started (15s intervals)');
+  console.log('Normal storage monitoring started (15s intervals)');
 }
 
 // Update storage info when offline mode is installed
