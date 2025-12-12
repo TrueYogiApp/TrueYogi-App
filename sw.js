@@ -12,6 +12,7 @@ const AUDIO_ASSETS = [
   'https://assets.trueyogi.app/assets/tao-chi-gong.m4a',
   'https://assets.trueyogi.app/assets/tamtam-gong.m4a',
   'https://assets.trueyogi.app/assets/meditation-eternal.m4a',
+  'https://assets.trueyogi.app/assets/meditation-end.mp3',
   'https://assets.trueyogi.app/assets/music7.m4a',
   'https://assets.trueyogi.app/assets/music6.m4a',
   'https://assets.trueyogi.app/assets/music5.m4a',
