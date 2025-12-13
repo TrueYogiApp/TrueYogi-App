@@ -3523,6 +3523,15 @@ body.lock-scroll {
   </div>
 </div>
 
+<!-- Challenge streak stats -->
+<div class="flex flex-col items-center justify-center mt-4 w-full">
+  <div id="challenge-streak-container" class="text-center">
+    <p class="text-xl font-bold" id="challenge-streak" style="color:#8b5cf6;">0</p>
+    <p class="text-xs text-gray-400">Yogi Challenges</p>
+    <p class="text-xs text-orange-500" id="challenge-duration-label"></p>
+  </div>
+</div>
+
   <!-- Flow Stats -->
   <div id="flow-stats" class="grid grid-cols-2 gap-4 text-center mb-4">
     <div>
@@ -5570,6 +5579,49 @@ function showYellowIndicator(duration = 1500) {
     }, 1500);
   }
 
+// --- 1. Save completed 21-day offline challenge to history --- //
+try {
+  const challenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
+  const jwtToken = localStorage.getItem('jwtToken');
+  const currentJourneyWallet = localStorage.getItem('currentJourneyWallet');
+  const onChainJourney = jwtToken && currentJourneyWallet;
+
+  let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+  // If user completes 21-day offline
+  if (
+    challenge.startDate &&
+    challenge.currentDay >= 21 &&
+    !onChainJourney
+  ) {
+    history.push({
+      startDate: challenge.startDate,
+      endDate: new Date().toISOString(),
+      days: challenge.currentDay,
+      mode: 'offline',
+      sessionsCompleted: challenge.sessionsCompleted || [],
+      totalSessions: challenge.totalSessions || 0,
+      totalMinutes: challenge.totalMinutes || 0,
+    });
+    localStorage.setItem('challengeHistory', JSON.stringify(history));
+  // If user completes 41-day online
+  } else if (
+    challenge.startDate &&
+    challenge.currentDay >= 41 &&
+    onChainJourney
+  ) {
+    history.push({
+      startDate: challenge.startDate,
+      endDate: new Date().toISOString(),
+      days: challenge.currentDay,
+      mode: 'online',
+      sessionsCompleted: challenge.sessionsCompleted || [],
+      totalSessions: challenge.totalSessions || 0,
+      totalMinutes: challenge.totalMinutes || 0,
+    });
+    localStorage.setItem('challengeHistory', JSON.stringify(history));
+  }
+} catch (e) { /* ignore */ }
+
   // Proceed with local reset regardless (or, if you want, only if resetSuccess)
   localStorage.removeItem('yogiConfig');
   localStorage.removeItem('yogiChallenge');
@@ -7594,6 +7646,27 @@ function updateJourneyCompleteButtons() {
     }
   }
   // --- END BLOCK ---
+
+	// --- Save completed 41-day on-chain challenge to history if qualifying ---
+try {
+  const challenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
+  const jwtToken = localStorage.getItem('jwtToken');
+  const walletKey = window.walletPublicKey || localStorage.getItem('currentJourneyWallet');
+  // Only for 41+ days & wallet connected
+  if (challenge.startDate && Number(challenge.currentDay) >= 41 && jwtToken && walletKey) {
+    let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+    history.push({
+      startDate: challenge.startDate,
+      endDate: new Date().toISOString(),
+      days: challenge.currentDay,
+      mode: 'online',
+      sessionsCompleted: challenge.sessionsCompleted || [],
+      totalSessions: challenge.totalSessions || 0,
+      totalMinutes: challenge.totalMinutes || 0,
+    });
+    localStorage.setItem('challengeHistory', JSON.stringify(history));
+  }
+} catch (e) { /* ignore */ }
   
   localStorage.removeItem('yogiConfig');
   localStorage.removeItem('yogiChallenge');
@@ -7720,6 +7793,36 @@ function updateStats() {
   if (currentMode === 'yogi') {
     updateProgressDisplay();
   }
+  
+	  // --- 2. Update challenge streak display --- //
+	  let history = [];
+	  try {
+		history = JSON.parse(localStorage.getItem('challengeHistory')) || [];
+	  } catch (e) {}
+	  const challengeStreakDiv = document.getElementById('challenge-streak-container');
+	  const challengeStreak = document.getElementById('challenge-streak');
+	  const challengeDurationLabel = document.getElementById('challenge-duration-label');
+	  const jwtToken = localStorage.getItem('jwtToken');
+	const currentJourneyWallet = localStorage.getItem('currentJourneyWallet');
+	const onChainJourney = !!(jwtToken && currentJourneyWallet);
+		// Only show in yogi mode
+	if (challengeStreakDiv && challengeStreak) {
+	  challengeStreak.textContent = history.length;
+	  if (currentMode === 'yogi') {
+		challengeStreakDiv.classList.remove('hidden');
+		// Show "21 Day" ONLY if not on-chain
+		if (challengeDurationLabel) {
+		  if (!onChainJourney) {
+			challengeDurationLabel.textContent = t('yogichallenges.duration.21');
+		  } else {
+			challengeDurationLabel.textContent = '';
+		  }
+		}
+	  } else {
+		challengeStreakDiv.classList.add('hidden');
+		if (challengeDurationLabel) challengeDurationLabel.textContent = '';
+	  }
+	}
 }
 
 function showCompletionStats() {
@@ -9030,6 +9133,9 @@ if (technicalTools) technicalTools.textContent = t('technical_tools_heading');
   const copiedEl = document.getElementById('wallet-copied');
   if (tooltip) tooltip.textContent = t("wallet_connected");
   if (copiedEl) copiedEl.textContent = t("wallet_copied");
+
+document.querySelector('#challenge-streak-container .text-gray-400').textContent = t('yogichallenges.label');
+document.getElementById('challenge-duration-label').textContent = t('yogichallenges.duration.21');
   
 }
 

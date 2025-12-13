@@ -375,5 +375,7 @@
 "spaceship_mode_heading": "🛸 太空船模式",
 "technical_tools_heading": "🛠️ 技术工具",
  "wallet_copied": "已复制！",
- "wallet_connected": "已连接"
+ "wallet_connected": "已连接",
+ "yogichallenges.label": "瑜伽挑战",
+"yogichallenges.duration.21": "21天"
 }

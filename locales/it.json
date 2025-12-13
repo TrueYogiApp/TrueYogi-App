@@ -375,5 +375,7 @@
 "spaceship_mode_heading": "🛸 Modalità Astronave",
 "technical_tools_heading": "🛠️ Strumenti Tecnici",
   "wallet_copied": "Copiato!",
-  "wallet_connected": "Connesso"
+  "wallet_connected": "Connesso",
+  "yogichallenges.label": "Sfide Yogi",
+"yogichallenges.duration.21": "21 Giorni"
 }
