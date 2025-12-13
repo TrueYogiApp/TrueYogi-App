@@ -3526,9 +3526,17 @@ body.lock-scroll {
 <!-- Challenge streak stats -->
 <div class="flex flex-col items-center justify-center mt-4 w-full">
   <div id="challenge-streak-container" class="text-center">
-    <p class="text-xl font-bold" id="challenge-streak" style="color:#8b5cf6;">0</p>
+    <p class="text-xl font-bold" id="challenge-streak" style="color:#6366f1;">0</p>
     <p class="text-xs text-gray-400">Yogi Challenges</p>
     <p class="text-xs text-orange-500" id="challenge-duration-label"></p>
+  </div>
+</div>
+
+<!-- Yogi Spaceship Challenge stats -->
+<div class="flex flex-col items-center justify-center mt-2 w-full" id="spaceship-challenge-container">
+  <div id="spaceship-challenge-streak-container" class="text-center">
+    <p class="text-xl font-bold" id="spaceship-challenge-count" style="color:#a21caf;">0</p>
+    <p class="text-xs text-gray-400">Yogi Spaceship Challenges</p>
   </div>
 </div>
 
@@ -5587,7 +5595,13 @@ try {
   const onChainJourney = jwtToken && currentJourneyWallet;
 
   let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
-  // If user completes 21-day offline
+
+  // SPACESHIP (pure offline) detection:
+  const spaceshipKeyAtStart = challenge.spaceshipKeyAtStart || null;
+  const spaceshipKeyNow = localStorage.getItem('spaceshipKey') || null;
+  const completedPureOffline = spaceshipKeyAtStart && spaceshipKeyAtStart === spaceshipKeyNow;
+
+  // If user completes 21-day offline, check spaceship first!
   if (
     challenge.startDate &&
     challenge.currentDay >= 21 &&
@@ -5597,12 +5611,14 @@ try {
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
-      mode: 'offline',
+      // Key: spaceship or regular?
+      mode: completedPureOffline ? 'spaceship' : 'offline',
       sessionsCompleted: challenge.sessionsCompleted || [],
       totalSessions: challenge.totalSessions || 0,
       totalMinutes: challenge.totalMinutes || 0,
     });
     localStorage.setItem('challengeHistory', JSON.stringify(history));
+
   // If user completes 41-day online
   } else if (
     challenge.startDate &&
@@ -6287,6 +6303,18 @@ challengeData = {
   user_agent: userAgent,
   challenge_source: challengeSourceFull
 };
+
+// -- SPACESHIP OFFLINE CHALLENGE SETUP --
+if (!navigator.onLine || !isActuallyOnline()) {
+  // Always generate a *NEW* spaceshipKey at challenge start if offline
+  const spaceshipKey = Date.now().toString() + Math.random().toString(16).substr(2);
+  localStorage.setItem('spaceshipKey', spaceshipKey);
+  // Save this key on the challenge as proof
+  challengeData.spaceshipKeyAtStart = spaceshipKey;
+} else {
+  // If starting online, make sure spaceship info is not added
+  delete challengeData.spaceshipKeyAtStart;
+}
 
   localStorage.setItem('yogiConfig', JSON.stringify({
     startDate: challengeData.startDate,
@@ -7823,6 +7851,21 @@ function updateStats() {
 		if (challengeDurationLabel) challengeDurationLabel.textContent = '';
 	  }
 	}
+	
+		// --- Yogi Spaceship Challenge Display ---
+	const spaceshipChallengeContainer = document.getElementById('spaceship-challenge-container');
+	const spaceshipChallengeCount = document.getElementById('spaceship-challenge-count');
+
+	if (spaceshipChallengeContainer && spaceshipChallengeCount) {
+	  if (!onChainJourney && currentMode === 'yogi') {
+		const spaceshipCount = history.filter(h => h.mode === 'spaceship').length;
+		spaceshipChallengeCount.textContent = spaceshipCount;
+		spaceshipChallengeContainer.classList.remove('hidden');
+	  } else {
+		spaceshipChallengeContainer.classList.add('hidden');
+	  }
+	}
+
 }
 
 function showCompletionStats() {
@@ -9136,6 +9179,7 @@ if (technicalTools) technicalTools.textContent = t('technical_tools_heading');
 
 document.querySelector('#challenge-streak-container .text-gray-400').textContent = t('yogichallenges.label');
 document.getElementById('challenge-duration-label').textContent = t('yogichallenges.duration.21');
+document.querySelector('#spaceship-challenge-streak-container .text-gray-400').textContent = t('yogispaceshipchallenges.label');
   
 }
 
@@ -10649,6 +10693,21 @@ setInterval(updateOnlineStatus, 10000); // Check every 10 seconds
 
 // Initial check
 updateOnlineStatus();
+
+function handleSpaceshipKey() {
+  const prevKey = localStorage.getItem('spaceshipKey');
+  // If online, always refresh key (breaks the chain, so can't finish as spaceship)
+  if (navigator.onLine && isActuallyOnline()) {
+    // Generate new key to invalidate any ongoing Spaceship attempt
+    const newKey = Date.now().toString() + Math.random().toString(16).substr(2);
+    localStorage.setItem('spaceshipKey', newKey);
+  }
+  // If offline, just keep using the current key
+}
+
+window.addEventListener('online', handleSpaceshipKey);
+window.addEventListener('offline', handleSpaceshipKey);
+setInterval(handleSpaceshipKey, 10000); // every 10 seconds
 
 
 // 7 Chakra sound files and icons (bottom to top)
