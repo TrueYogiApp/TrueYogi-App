@@ -134,6 +134,7 @@
   "walletRequiredHeading": "Подключите кошелек",
   "walletRequiredDescriptionLine1": "Для продолжения пути после 21 дня подключите и верифицируйте кошелек.",
   "walletRequiredDescriptionLine2": "Это гарантирует сохранность прогресса и наград.",
+  "walletRequiredDescriptionLine3": "Или вы можете сбросить задание и начать сначала с первого дня.",
   "walletRequiredButtonConnect": "Подключить кошелек",
   "walletRequiredButtonReset": "Сбросить испытание",
   "claimRequiredHeading": "Требуется подтверждение",

@@ -134,6 +134,7 @@
   "walletRequiredHeading": "Connecter le portefeuille",
   "walletRequiredDescriptionLine1": "Pour poursuivre votre parcours sacré au-delà de 21 jours, veuillez connecter et vérifier votre portefeuille.",
   "walletRequiredDescriptionLine2": "Cela garantit la sécurité de votre progression et de vos récompenses.",
+  "walletRequiredDescriptionLine3": "Ou vous pouvez réinitialiser le défi et recommencer depuis le jour 1.",
   "walletRequiredButtonConnect": "Connecter le portefeuille",
   "walletRequiredButtonReset": "Réinitialiser le défi",
   "claimRequiredHeading": "Réclamation requise",

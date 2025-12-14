@@ -134,6 +134,7 @@
   "walletRequiredHeading": "Connect Your Wallet",
   "walletRequiredDescriptionLine1": "To continue your sacred journey beyond 21 days, please connect and verify your wallet.",
   "walletRequiredDescriptionLine2": "This ensures your progress and rewards are secure.",
+  "walletRequiredDescriptionLine3": "Or you can reset the challenge and start again from day 1.",
   "walletRequiredButtonConnect": "Connect Wallet",
   "walletRequiredButtonReset": "Reset Challenge",
   "claimRequiredHeading": "Claim Required",
