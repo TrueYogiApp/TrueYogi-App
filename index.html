@@ -10587,8 +10587,8 @@ function getAuraIndex() {
   const localHour = now.getHours();
   const localMin = now.getMinutes();
   
-  // Start from 6:30 instead of 4:30
-  let minutesSinceStart = (localHour * 60 + localMin) - (6 * 60 + 30);
+  // Start from 6 instead of 6:30
+  let minutesSinceStart = (localHour * 60 + localMin) - (6 * 60);
   if (minutesSinceStart < 0) minutesSinceStart += 24 * 60;
   
   const slot = Math.floor(minutesSinceStart / 120);
