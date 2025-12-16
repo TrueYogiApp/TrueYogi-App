@@ -3914,7 +3914,9 @@ body.lock-scroll {
 </div>
 
 <div id="challenge-completed-modal" class="hidden"></div>
-
+<button id="manual-sync-yogi-challenge" style="position:fixed;bottom:10px;right:10px;z-index:10000;font-size:12px;">
+  ↻ Sync Yogi Challenge
+</button>
   <script>
     // State Management
     let endTime = 0;
@@ -13680,6 +13682,21 @@ function stopMeditationMusicOnClose() {
   }
 }
 
+document.getElementById('manual-sync-yogi-challenge').addEventListener('click', async function() {
+  this.disabled = true;
+  this.textContent = "Syncing…";
+  try {
+    await window.fetchYogiChallengeFromSupabase();
+    this.textContent = "Synced!";
+    setTimeout(() => {
+      this.textContent = "↻ Sync Yogi Challenge";
+      this.disabled = false;
+    }, 1800);
+  } catch(e) {
+    this.textContent = "Error, Retry?";
+    this.disabled = false;
+  }
+});
   </script>
 	
 <script>
