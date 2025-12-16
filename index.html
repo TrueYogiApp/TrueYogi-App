@@ -8114,7 +8114,7 @@ function handleVisibilityChange() {
   if (!localStorage.getItem('currentJourneyWallet')) {
   localStorage.setItem('currentJourneyWallet', window.walletPublicKey);
   }
-  // await window.fetchYogiChallengeFromSupabase();
+   await window.fetchYogiChallengeFromSupabase();
   updateWalletUI();
   hideSyncAuthBanner();
   if (window.supabase && window.supabase.auth && window.supabase.auth.setSession) {
@@ -8547,7 +8547,7 @@ async function ensureAuthenticated() {
     if (result.success && result.token) {
       localStorage.setItem('jwtToken', result.token);  
 	  updateWalletUI();
-	  // await window.fetchYogiChallengeFromSupabase();
+	   await window.fetchYogiChallengeFromSupabase();
       return result.token;
     } else {
       statusDiv.textContent = `Auth failed: ${result.error}`;
@@ -16446,7 +16446,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
 	  //await window.fetchYogiConfigFromSupabase();
-      //await window.fetchYogiChallengeFromSupabase();
+      await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
   });
