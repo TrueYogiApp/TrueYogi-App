@@ -6894,7 +6894,7 @@ if (currentMode === 'yogi') {
   
   // Check if challenge has ended
   if (challengeData.endDate) {
-    const endDate = new Date(challengeData.endDate + "T00:00:00");
+    const endDate = new Date(challengeData.endDate + "T23:59:59");
     if (now > endDate) {
       showChallengeCompletedModal();
       return;
