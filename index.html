@@ -8792,12 +8792,22 @@ function t(key, opts = {}) {
   return str;
 }
 
+document.addEventListener('DOMContentLoaded', async function() {
+  const lang = localStorage.getItem('lang') || 'en';
+  await setLanguage(lang);
+});
+
 async function setLanguage(lang) {
   localStorage.setItem('lang', lang);
   await loadLanguage(lang);
+    if (localStorage.getItem('showCacheClearedTooltip') === '1') {
+    showTooltip(t('cacheReloaded'));
+    localStorage.removeItem('showCacheClearedTooltip');
+  }
+  updateFaqButton();
   updateUILanguage();
   updateWalletUI();
-  await loadQuotes();
+  await loadQuotes();  
 }
 
 function updateFAQTokenAddress() {
@@ -14480,6 +14490,54 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // ==================== END STORAGE MONITORING ====================
+
+function showClearCacheModal() {
+  document.getElementById('clearCacheModal').classList.remove('hidden');
+}
+function hideClearCacheModal() {
+  document.getElementById('clearCacheModal').classList.add('hidden');
+}
+
+function clearAppCache() {
+  hideClearCacheModal();
+  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_APP_CACHE' });
+  }
+  navigator.serviceWorker.getRegistration().then(function(reg) {
+    if (reg) {
+      reg.unregister().then(function(success) {
+        // Set flag BEFORE reload
+        localStorage.setItem('showCacheClearedTooltip', '1');
+        setTimeout(function() {
+          window.location.reload(true);
+        }, 100);
+      });
+    } else {
+      // Set flag BEFORE reload
+      localStorage.setItem('showCacheClearedTooltip', '1');
+      window.location.reload(true);
+    }
+  });
+}
+
+function showTooltip(message) {
+  let el = document.createElement('div');
+  el.textContent = message;
+  el.style.position = 'fixed';
+  el.style.bottom = '16px';
+  el.style.left = '50%';
+  el.style.transform = 'translateX(-50%)';
+  el.style.background = '#232325cc';
+  el.style.color = '#fffacd';
+  el.style.padding = '10px 26px';
+  el.style.borderRadius = '14px';
+  el.style.fontWeight = '700';
+  el.style.boxShadow = '0 4px 24px #000a';
+  el.style.zIndex = 9999;
+  el.style.fontSize = '1.09em';
+  document.body.appendChild(el);
+  setTimeout(() => { el.remove(); }, 6000);
+}
 
 </script> 
 	
