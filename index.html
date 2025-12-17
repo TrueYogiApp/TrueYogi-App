@@ -3038,6 +3038,24 @@ body.lock-scroll {
         </button>
       </div>
     </div>
+	
+		<!-- Add this button somewhere in your settings/FAQ page -->
+<div class="faq-item mt-6">
+  <h3 class="text-yellow-200 font-medium">🔧 Debug Tools</h3>
+  <p class="text-gray-300 mt-1 text-sm">
+    For testing challenge completion flow
+  </p>
+  <div class="mt-4 space-y-2">
+    <button onclick="addTestCompletedChallenge()" class="w-full bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-medium cursor-pointer">
+      <i class="fas fa-vial mr-2"></i> Add Test Completed Challenge
+    </button>
+    
+    <button onclick="clearTestChallenges()" class="w-full bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg font-medium cursor-pointer">
+      <i class="fas fa-trash mr-2"></i> Clear Test Data
+    </button>
+  </div>
+</div>
+
   </div>
 </div>
 
@@ -3953,6 +3971,85 @@ body.lock-scroll {
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
+
+function addTestCompletedChallenge() {
+  try {
+    // Get current challenge data or use defaults
+    const challengeData = window.challengeData || {
+      challengeId: '2025-11-04_2025-12-14_1s_180md_1762298241967',
+      startDate: '2025-11-04',
+      endDate: '2025-12-14',
+      totalTokens: 1800,
+      totalSessions: 41,
+      totalMinutes: 7380
+    };
+    
+    // Use today's date or the challenge end date
+    const completionDate = challengeData.endDate || new Date().toISOString().split('T')[0];
+    
+    // Create the completed challenge object
+    const completedChallenge = {
+      challengeId: challengeData.challengeId || '2025-11-04_2025-12-14_1s_180md_1762298241967',
+      startDate: challengeData.startDate || '2025-11-04',
+      endDate: challengeData.endDate || '2025-12-14',
+      completionDate: completionDate,
+      claimed: false,
+      claimTxId: null,
+      totalTokens: challengeData.totalTokens || 1800,
+      totalSessions: challengeData.totalSessions || 41,
+      totalMinutes: challengeData.totalMinutes || 7380,
+      wallet: window.walletPublicKey || localStorage.getItem('currentJourneyWallet') || 'N/A'
+    };
+    
+    // Get existing completed challenges
+    let completedChallenges = [];
+    try {
+      completedChallenges = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+    } catch (e) {
+      console.log('No existing challenges found, creating new array');
+    }
+    
+    // Check if this challenge already exists
+    const exists = completedChallenges.some(c => c.challengeId === completedChallenge.challengeId);
+    
+    if (!exists) {
+      completedChallenges.push(completedChallenge);
+      localStorage.setItem('completedChallenges', JSON.stringify(completedChallenges));
+      
+      // Show success message
+      alert(`✅ Test challenge added!\n\nChallenge ID: ${completedChallenge.challengeId}\nCompletion Date: ${completedChallenge.completionDate}\nTokens: ${completedChallenge.totalTokens}\n\nRefresh page to see claim modal.`);
+      
+      // Optional: Auto-refresh after 2 seconds
+      setTimeout(() => {
+        if (confirm('Refresh page now to see the changes?')) {
+          location.reload();
+        }
+      }, 2000);
+    } else {
+      alert('⚠️ This challenge already exists in completed challenges.');
+    }
+    
+  } catch (error) {
+    console.error('Error adding test challenge:', error);
+    alert('❌ Error adding test challenge: ' + error.message);
+  }
+}
+
+function clearTestChallenges() {
+  if (confirm('Clear all completed challenges?\nThis will remove any real completed challenges too.')) {
+    localStorage.removeItem('completedChallenges');
+    alert('✅ All completed challenges cleared.');
+    
+    // Optional: Add back empty array structure
+    localStorage.setItem('completedChallenges', '[]');
+    
+    setTimeout(() => {
+      if (confirm('Refresh page?')) {
+        location.reload();
+      }
+    }, 1000);
+  }
+}
 
 function showChallengeCompletedModal() {
   const modal = document.getElementById('challenge-completed-modal');
@@ -8114,7 +8211,7 @@ function handleVisibilityChange() {
   if (!localStorage.getItem('currentJourneyWallet')) {
   localStorage.setItem('currentJourneyWallet', window.walletPublicKey);
   }
-   await window.fetchYogiChallengeFromSupabase();
+   //await window.fetchYogiChallengeFromSupabase();
   updateWalletUI();
   hideSyncAuthBanner();
   if (window.supabase && window.supabase.auth && window.supabase.auth.setSession) {
@@ -8547,7 +8644,7 @@ async function ensureAuthenticated() {
     if (result.success && result.token) {
       localStorage.setItem('jwtToken', result.token);  
 	  updateWalletUI();
-	   await window.fetchYogiChallengeFromSupabase();
+	   //await window.fetchYogiChallengeFromSupabase();
       return result.token;
     } else {
       statusDiv.textContent = `Auth failed: ${result.error}`;
@@ -16491,7 +16588,7 @@ window.addEventListener('online', () => {
   window.authenticateWithWallet = authenticateWithWallet;
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
-  startCallPolling();
+  //startCallPolling();
   
 </script>
 
