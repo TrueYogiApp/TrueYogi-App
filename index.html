@@ -5470,6 +5470,64 @@ function showYellowIndicator(duration = 1500) {
     }
   }
   // --- End: DB clear logic ---
+  
+  // --- NEW: Save completed challenge to history if qualified ---
+try {
+  const challenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
+  const jwtToken = localStorage.getItem('jwtToken');
+  const currentJourneyWallet = localStorage.getItem('currentJourneyWallet');
+  const onChainJourney = jwtToken && currentJourneyWallet;
+
+  let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+  const spaceshipKeyAtStart = challenge.spaceshipKeyAtStart || null;
+  const spaceshipKeyNow = localStorage.getItem('spaceshipKey') || null;
+  const completedPureOffline = spaceshipKeyAtStart && spaceshipKeyAtStart === spaceshipKeyNow;
+
+  if (
+    challenge.startDate &&
+    challenge.currentDay >= 21 &&
+    !onChainJourney
+  ) {
+    const mode = completedPureOffline ? 'spaceship' : 'offline';
+    const alreadyInHistory = history.some(
+      h => h.startDate === challenge.startDate && h.mode === mode
+    );
+    if (!alreadyInHistory) {
+      history.push({
+        startDate: challenge.startDate,
+        endDate: new Date().toISOString(),
+        days: challenge.currentDay,
+        mode,
+        sessionsCompleted: challenge.sessionsCompleted || [],
+        totalSessions: challenge.totalSessions || 0,
+        totalMinutes: challenge.totalMinutes || 0,
+      });
+      localStorage.setItem('challengeHistory', JSON.stringify(history));
+    }
+  } else if (
+    challenge.startDate &&
+    challenge.currentDay >= 41 &&
+    onChainJourney
+  ) {
+    const mode = 'online';
+    const alreadyInHistory = history.some(
+      h => h.startDate === challenge.startDate && h.mode === mode
+    );
+    if (!alreadyInHistory) {
+      history.push({
+        startDate: challenge.startDate,
+        endDate: new Date().toISOString(),
+        days: challenge.currentDay,
+        mode,
+        sessionsCompleted: challenge.sessionsCompleted || [],
+        totalSessions: challenge.totalSessions || 0,
+        totalMinutes: challenge.totalMinutes || 0,
+      });
+      localStorage.setItem('challengeHistory', JSON.stringify(history));
+    }
+  }
+} catch (e) { /* ignore errors, do not block reset */ }
+
   // Reset all Yogi stats to 0 except resetCount
   const currentResetCount = challengeData.resetCount || 0; // Preserve reset count
   
