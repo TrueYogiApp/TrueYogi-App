@@ -5328,7 +5328,7 @@ function showWelcomeModal() {
 	  // Check if challenge has ended
   if (challengeData.endDate) {
     const now = new Date();
-    const endDate = new Date(challengeData.endDate + "T00:00:00");
+    const endDate = new Date(challengeData.endDate + "T23:59:59");
     if (now > endDate) {
       // Challenge has ended, don't show next session info
       // Instead, you could show a different message or do nothing
