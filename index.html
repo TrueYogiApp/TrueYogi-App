@@ -6635,8 +6635,9 @@ function isSessionMissedOnPreviousDays(sessionTime, today) {
     }
 
     function formatDateOrDay(date, today) {
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
+  const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const tomorrow = new Date(todayMidnight);
+  tomorrow.setDate(tomorrow.getDate() + 1);
   
   if (date.toDateString() === today.toDateString()) return "today";
   if (date.toDateString() === tomorrow.toDateString()) return "tomorrow";
@@ -6705,7 +6706,8 @@ function isSessionMissedOnPreviousDays(sessionTime, today) {
 
   // If no remaining sessions today, find first session tomorrow
   if (remainingSessions.length === 0) {
-    const tomorrow = new Date(now);
+    const todayMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(todayMidnight);
     tomorrow.setDate(tomorrow.getDate() + 1);
     
     // Find first session of tomorrow (sorted by time)
