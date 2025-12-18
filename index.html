@@ -13779,19 +13779,47 @@ function stopMeditationMusicOnClose() {
 // Simpler, more reliable swipe detection
 let touchStartX = 0;
 let isSwipeActive = false;
-const SWIPE_THRESHOLD = 60; // Pixels to swipe
+const SWIPE_THRESHOLD = 120; // Pixels to swipe
 const SWIPE_AREA = 30; // Width from left edge to detect start
 
 let mouseStartX = 0;
 let isMouseSwipe = false;
 
+// Helper function to check if swipe is allowed
+function isSwipeAllowed() {
+  // Check if in app interface (Flow or Yogi mode)
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) {
+    return false;
+  }
+  
+  // Check if in active session
+  if (typeof sessionActive !== 'undefined' && sessionActive) {
+    return false;
+  }
+  
+  // Check if in post-session screens
+  const completeSection = document.getElementById('complete-section');
+  const finalSection = document.getElementById('final-section');
+  if ((completeSection && !completeSection.classList.contains('hidden')) ||
+      (finalSection && !finalSection.classList.contains('hidden'))) {
+    return false;
+  }
+  
+  // Check if in any modal
+  const missedModal = document.getElementById('missed-session-modal');
+  const mobileModal = document.getElementById('mobile-required-modal');
+  if ((missedModal && !missedModal.classList.contains('hidden')) ||
+      (mobileModal && !mobileModal.classList.contains('hidden'))) {
+    return false;
+  }
+  
+  return true;
+}
+
 // Touch events for mobile
 document.addEventListener('touchstart', (e) => {
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) return;
-  
-  // BLOCK SWIPE DURING ACTIVE SESSION
-  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  if (!isSwipeAllowed()) return;
   
   // Only activate if touch starts within left edge area
   if (e.touches[0].clientX < SWIPE_AREA) {
@@ -13805,13 +13833,7 @@ document.addEventListener('touchstart', (e) => {
 });
 
 document.addEventListener('touchmove', (e) => {
-  if (!isSwipeActive) return;
-  
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) return;
-  
-  // BLOCK SWIPE DURING ACTIVE SESSION
-  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  if (!isSwipeActive || !isSwipeAllowed()) return;
   
   const currentX = e.touches[0].clientX;
   const swipeDistance = currentX - touchStartX; // Positive = right swipe
@@ -13825,13 +13847,7 @@ document.addEventListener('touchmove', (e) => {
 });
 
 document.addEventListener('touchend', (e) => {
-  if (!isSwipeActive) return;
-  
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) return;
-  
-  // BLOCK SWIPE DURING ACTIVE SESSION
-  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  if (!isSwipeActive || !isSwipeAllowed()) return;
   
   const touchEndX = e.changedTouches[0].clientX;
   const swipeDistance = touchEndX - touchStartX; // Positive = right swipe
@@ -13853,13 +13869,9 @@ document.addEventListener('touchend', (e) => {
   touchStartX = 0;
 });
 
-// Also handle mouse for desktop testing
+// Mouse events for desktop testing
 document.addEventListener('mousedown', (e) => {
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) return;
-  
-  // BLOCK SWIPE DURING ACTIVE SESSION
-  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  if (!isSwipeAllowed()) return;
   
   if (e.clientX < SWIPE_AREA) {
     mouseStartX = e.clientX;
@@ -13871,13 +13883,7 @@ document.addEventListener('mousedown', (e) => {
 });
 
 document.addEventListener('mousemove', (e) => {
-  if (!isMouseSwipe) return;
-  
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) return;
-  
-  // BLOCK SWIPE DURING ACTIVE SESSION
-  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  if (!isMouseSwipe || !isSwipeAllowed()) return;
   
   const currentX = e.clientX;
   const swipeDistance = currentX - mouseStartX;
@@ -13890,13 +13896,7 @@ document.addEventListener('mousemove', (e) => {
 });
 
 document.addEventListener('mouseup', (e) => {
-  if (!isMouseSwipe) return;
-  
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) return;
-  
-  // BLOCK SWIPE DURING ACTIVE SESSION
-  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  if (!isMouseSwipe || !isSwipeAllowed()) return;
   
   const mouseEndX = e.clientX;
   const swipeDistance = mouseEndX - mouseStartX;
