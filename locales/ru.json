@@ -380,6 +380,7 @@
   "yogichallenges.label": "Йога-вызовы",
 "yogichallenges.duration.21": "(21 день)",
 "yogispaceshipchallenges.label": "Йога-космические испытания",
-"cacheReloaded": "Приложение перезагружено! Сейчас вы просматриваете последний контент."
+"cacheReloaded": "Приложение перезагружено! Сейчас вы просматриваете последний контент.",
+"challengeCompleted": "Задание завершено"
   
 }

@@ -384,6 +384,7 @@
 "yogichallenges.label": "Défis Yogi",
 "yogichallenges.duration.21": "(21 Jours)",
 "yogispaceshipchallenges.label": "Défis Yogi vaisseau spatial",
-"cacheReloaded": "Application rechargée ! Vous consultez maintenant le dernier contenu."
+"cacheReloaded": "Application rechargée ! Vous consultez maintenant le dernier contenu.",
+"challengeCompleted": "Défi terminé"
 
 }
