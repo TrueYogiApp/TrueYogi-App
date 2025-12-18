@@ -6485,8 +6485,10 @@ async function updateSessionTimesDisplay() {
   const [ey, em, ed] = challengeData.endDate.split('-').map(Number);
   const endDate = new Date(ey, em - 1, ed);
 
-  // FIX: Check if today is after challenge end date
-  const isChallengeEnded = now > endDate;
+// FIX: Show "challenge completed" only from the day AFTER challenge ends
+const endDatePlusOne = new Date(endDate.getTime());
+endDatePlusOne.setDate(endDatePlusOne.getDate() + 1);
+const isChallengeEnded = now >= endDatePlusOne;
 
   let hasMissedSession = false;
   let todayCompleted = challengeData.sessionsCompleted.filter(s => s.date === today).length;
@@ -16549,7 +16551,7 @@ window.addEventListener('online', () => {
   window.authenticateWithWallet = authenticateWithWallet;
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
-  //startCallPolling();
+  startCallPolling();
   
 </script>
 
