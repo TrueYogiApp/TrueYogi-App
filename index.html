@@ -2128,6 +2128,35 @@ body.lock-scroll {
   50% { background-size: 120% 120%; }
 }
 
+
+.swipe-indicator {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 0 50% 50% 0; /* Keep right side rounded */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.2s;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.swipe-indicator.show {
+  opacity: 1;
+}
+
+.swipe-indicator i {
+  color: white;
+  font-size: 24px;
+  margin-left: 10px; /* Add some margin to center arrow better */
+}
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -3916,6 +3945,10 @@ body.lock-scroll {
 </div>
 
 <div id="challenge-completed-modal" class="hidden"></div>
+
+<div id="swipe-indicator" class="swipe-indicator">
+  <i class="fas fa-arrow-right"></i> <!-- Changed from fa-arrow-left to fa-arrow-right -->
+</div>
 
   <script>
     // State Management
@@ -13741,6 +13774,146 @@ function stopMeditationMusicOnClose() {
     truemeditateImg.style.filter = '';
   }
 }
+
+
+// Simpler, more reliable swipe detection
+let touchStartX = 0;
+let isSwipeActive = false;
+const SWIPE_THRESHOLD = 60; // Pixels to swipe
+const SWIPE_AREA = 30; // Width from left edge to detect start
+
+let mouseStartX = 0;
+let isMouseSwipe = false;
+
+// Touch events for mobile
+document.addEventListener('touchstart', (e) => {
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) return;
+  
+  // BLOCK SWIPE DURING ACTIVE SESSION
+  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  
+  // Only activate if touch starts within left edge area
+  if (e.touches[0].clientX < SWIPE_AREA) {
+    touchStartX = e.touches[0].clientX;
+    isSwipeActive = true;
+    
+    // Show swipe indicator
+    const indicator = document.getElementById('swipe-indicator');
+    if (indicator) indicator.classList.add('show');
+  }
+});
+
+document.addEventListener('touchmove', (e) => {
+  if (!isSwipeActive) return;
+  
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) return;
+  
+  // BLOCK SWIPE DURING ACTIVE SESSION
+  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  
+  const currentX = e.touches[0].clientX;
+  const swipeDistance = currentX - touchStartX; // Positive = right swipe
+  
+  // Visual feedback: move indicator with swipe
+  const indicator = document.getElementById('swipe-indicator');
+  if (indicator && swipeDistance > 0) {
+    const translateX = Math.min(swipeDistance / 2, 40);
+    indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
+  }
+});
+
+document.addEventListener('touchend', (e) => {
+  if (!isSwipeActive) return;
+  
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) return;
+  
+  // BLOCK SWIPE DURING ACTIVE SESSION
+  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  
+  const touchEndX = e.changedTouches[0].clientX;
+  const swipeDistance = touchEndX - touchStartX; // Positive = right swipe
+  
+  // Reset indicator
+  const indicator = document.getElementById('swipe-indicator');
+  if (indicator) {
+    indicator.style.transform = 'translateY(-50%)';
+    indicator.classList.remove('show');
+  }
+  
+  // Check if swipe meets threshold (swiped right enough)
+  if (swipeDistance > SWIPE_THRESHOLD) {
+    returnToModeSelection();
+  }
+  
+  // Reset
+  isSwipeActive = false;
+  touchStartX = 0;
+});
+
+// Also handle mouse for desktop testing
+document.addEventListener('mousedown', (e) => {
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) return;
+  
+  // BLOCK SWIPE DURING ACTIVE SESSION
+  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  
+  if (e.clientX < SWIPE_AREA) {
+    mouseStartX = e.clientX;
+    isMouseSwipe = true;
+    
+    const indicator = document.getElementById('swipe-indicator');
+    if (indicator) indicator.classList.add('show');
+  }
+});
+
+document.addEventListener('mousemove', (e) => {
+  if (!isMouseSwipe) return;
+  
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) return;
+  
+  // BLOCK SWIPE DURING ACTIVE SESSION
+  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  
+  const currentX = e.clientX;
+  const swipeDistance = currentX - mouseStartX;
+  
+  const indicator = document.getElementById('swipe-indicator');
+  if (indicator && swipeDistance > 0) {
+    const translateX = Math.min(swipeDistance / 2, 40);
+    indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
+  }
+});
+
+document.addEventListener('mouseup', (e) => {
+  if (!isMouseSwipe) return;
+  
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) return;
+  
+  // BLOCK SWIPE DURING ACTIVE SESSION
+  if (typeof sessionActive !== 'undefined' && sessionActive) return;
+  
+  const mouseEndX = e.clientX;
+  const swipeDistance = mouseEndX - mouseStartX;
+  
+  const indicator = document.getElementById('swipe-indicator');
+  if (indicator) {
+    indicator.style.transform = 'translateY(-50%)';
+    indicator.classList.remove('show');
+  }
+  
+  if (swipeDistance > SWIPE_THRESHOLD) {
+    returnToModeSelection();
+  }
+  
+  isMouseSwipe = false;
+  mouseStartX = 0;
+});
 
   </script>
 	
