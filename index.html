@@ -6685,7 +6685,7 @@ function isSessionMissedOnPreviousDays(sessionTime, today) {
   })}`;
 }
 
-    function showNextSessionTime() {
+     function showNextSessionTime() {
   // First check if we have session data
   if (userSessionTimes.length === 0) {
     // Try to load config if missing
@@ -6698,25 +6698,29 @@ function isSessionMissedOnPreviousDays(sessionTime, today) {
     }
   }
 
-  const now = new Date();
-  const startDate = new Date(challengeData.startDate);
-  
-  // If before startDate, show the first session on startDate + 1 day
-  if (now < startDate) {
-    const nextSession = userSessionTimes[0];
-    const displayDate = new Date(startDate);
-    displayDate.setDate(displayDate.getDate() + 1);
-    
-    showNextSessionModal(
-      formatTime(nextSession.time), 
-      formatDuration(nextSession.duration), 
-      `on ${displayDate.toLocaleDateString('en-US', { 
-        month: 'short', 
-        day: 'numeric'
-      })}`
-    );
-    return;
-  }
+function getLocalDateString(dt) {
+  return dt.getFullYear() + "-" +
+    String(dt.getMonth()+1).padStart(2, "0") + "-" +
+    String(dt.getDate()).padStart(2, "0");
+}
+
+const now = new Date();
+const todayStr = getLocalDateString(new Date());
+if (todayStr < challengeData.startDate) {
+  const nextSession = userSessionTimes[0];
+  const [y, m, d] = challengeData.startDate.split('-').map(Number);
+  const displayDate = new Date(y, m - 1, d);
+
+  showNextSessionModal(
+    formatTime(nextSession.time),
+    formatDuration(nextSession.duration),
+    `on ${displayDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    })}`
+  );
+  return;
+}
 
   const currentHours = now.getHours();
   const currentMinutes = now.getMinutes();
@@ -7045,11 +7049,16 @@ if (hasMissedSession()) {
   let selectedSession = null;
 
   // Check if before start date
-  const startDate = new Date(challengeData.startDate);
-  if (now < startDate) {
-    showSessionTimeModal();
-    return;
-  }
+function getLocalDateString(dt) {
+  return dt.getFullYear() + "-" +
+    String(dt.getMonth()+1).padStart(2, "0") + "-" +
+    String(dt.getDate()).padStart(2, "0");
+}
+const todayStr = getLocalDateString(new Date());
+if (todayStr < challengeData.startDate) {
+  showSessionTimeModal();
+  return;
+}
 
   for (const session of userSessionTimes) {
     const [hours, minutes] = session.time.split(':').map(Number);
