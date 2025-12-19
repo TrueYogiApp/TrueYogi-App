@@ -2157,6 +2157,36 @@ body.lock-scroll {
   margin-left: 10px; /* Add some margin to center arrow better */
 }
 
+/* Right edge swipe indicator - mirror of left */
+.swipe-indicator-right {
+  position: fixed;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 50% 0 0 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.2s;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.swipe-indicator-right.show {
+  opacity: 1;
+}
+
+.swipe-indicator-right i {
+  color: white;
+  font-size: 24px;
+  margin-right: 10px;
+  transform: rotate(180deg);
+}
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -3948,6 +3978,11 @@ body.lock-scroll {
 
 <div id="swipe-indicator" class="swipe-indicator">
   <i class="fas fa-arrow-right"></i> <!-- Changed from fa-arrow-left to fa-arrow-right -->
+</div>
+
+<!-- Right swipe indicator for FAQ -->
+<div id="swipe-indicator-right" class="swipe-indicator-right">
+  <i class="fas fa-arrow-right"></i>
 </div>
 
   <script>
@@ -13781,21 +13816,14 @@ function stopMeditationMusicOnClose() {
 // Simpler, more reliable swipe detection
 let touchStartX = 0;
 let isSwipeActive = false;
-const SWIPE_THRESHOLD = 120; // Pixels to swipe
-const SWIPE_AREA = 30; // Width from left edge to detect start
-const SHOW_INDICATOR_THRESHOLD = SWIPE_THRESHOLD * 0.3; // 30% of total threshold
+let swipeType = null; // 'back' or 'faq' - replaces isBackSwipe/isFAQSwipe
+const SWIPE_THRESHOLD = 120;
+const SWIPE_AREA = 30;
+const RIGHT_SWIPE_AREA = 30;
+const SHOW_INDICATOR_THRESHOLD = SWIPE_THRESHOLD * 0.3;
 
-let mouseStartX = 0;
-let isMouseSwipe = false;
-
-// Helper function to check if swipe is allowed
-function isSwipeAllowed() {
-  // Check if in app interface (Flow or Yogi mode)
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) {
-    return false;
-  }
-  
+// Helper function for common swipe checks
+function commonSwipeChecks() {
   // Check if in active session
   if (typeof sessionActive !== 'undefined' && sessionActive) {
     return false;
@@ -13820,64 +13848,124 @@ function isSwipeAllowed() {
   return true;
 }
 
+// Helper function to check if BACK swipe is allowed
+function isBackSwipeAllowed() {
+  // Check if in app interface (Flow or Yogi mode)
+  const appInterface = document.getElementById('app-interface');
+  if (!appInterface || appInterface.classList.contains('hidden')) {
+    return false;
+  }
+  
+  return commonSwipeChecks();
+}
+
+// Helper function to check if FAQ swipe is allowed
+function isFAQSwipeAllowed() {
+  // Check if FAQ is already open
+  const faqModal = document.getElementById('faq-modal');
+  if (faqModal && !faqModal.classList.contains('hidden')) {
+    return false;
+  }
+  
+  return commonSwipeChecks();
+}
+
 // Touch events for mobile
 document.addEventListener('touchstart', (e) => {
-  if (!isSwipeAllowed()) return;
+  const touchX = e.touches[0].clientX;
+  const windowWidth = window.innerWidth;
   
-  // Only activate if touch starts within left edge area
-  if (e.touches[0].clientX < SWIPE_AREA) {
-    touchStartX = e.touches[0].clientX;
+  // Left edge swipe (back)
+  if (touchX < SWIPE_AREA && isBackSwipeAllowed()) {
+    touchStartX = touchX;
     isSwipeActive = true;
+    swipeType = 'back';
+  }
+  
+  // Right edge swipe (FAQ)
+  else if (touchX > windowWidth - RIGHT_SWIPE_AREA && isFAQSwipeAllowed()) {
+    touchStartX = touchX;
+    isSwipeActive = true;
+    swipeType = 'faq';
     
-    // Show swipe indicator
-    //const indicator = document.getElementById('swipe-indicator');
-    //if (indicator) indicator.classList.add('show');
+    const rightIndicator = document.getElementById('swipe-indicator-right');
+    if (rightIndicator) rightIndicator.classList.add('show');
   }
 });
 
 document.addEventListener('touchmove', (e) => {
-  if (!isSwipeActive || !isSwipeAllowed()) return;
+  if (!isSwipeActive) return;
   
   const currentX = e.touches[0].clientX;
-  const swipeDistance = currentX - touchStartX; // Positive = right swipe
+  const swipeDistance = currentX - touchStartX;
+  const isAllowed = swipeType === 'back' ? isBackSwipeAllowed() : isFAQSwipeAllowed();
   
-  // Visual feedback: move indicator with swipe
-  const indicator = document.getElementById('swipe-indicator');
-  if (indicator && swipeDistance > 0) {
-    const translateX = Math.min(swipeDistance / 2, 40);
+  if (!isAllowed) return;
+  
+  const isRightSwipe = swipeDistance > 0;
+  const indicatorId = swipeType === 'back' ? 'swipe-indicator' : 'swipe-indicator-right';
+  const indicator = document.getElementById(indicatorId);
+  
+  if (!indicator) return;
+  
+  // Determine movement direction and limits
+  if ((swipeType === 'back' && isRightSwipe) || (swipeType === 'faq' && !isRightSwipe)) {
+    const translateX = isRightSwipe ? 
+      Math.min(swipeDistance / 2, 40) : 
+      Math.max(swipeDistance / 2, -40);
+    
     indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
     
-    // SHOW indicator only after reaching 30% threshold
-    if (swipeDistance > SHOW_INDICATOR_THRESHOLD) {
-      indicator.classList.add('show');
-    } else {
-      indicator.classList.remove('show');
-    }
+    const showCondition = swipeType === 'back' ? 
+      swipeDistance > SHOW_INDICATOR_THRESHOLD : 
+      Math.abs(swipeDistance) > SHOW_INDICATOR_THRESHOLD;
+    
+    indicator.classList.toggle('show', showCondition);
   }
 });
 
 document.addEventListener('touchend', (e) => {
-  if (!isSwipeActive || !isSwipeAllowed()) return;
+  if (!isSwipeActive) return;
   
   const touchEndX = e.changedTouches[0].clientX;
-  const swipeDistance = touchEndX - touchStartX; // Positive = right swipe
+  const swipeDistance = touchEndX - touchStartX;
+  const isAllowed = swipeType === 'back' ? isBackSwipeAllowed() : isFAQSwipeAllowed();
   
-  // Reset indicator
-  const indicator = document.getElementById('swipe-indicator');
-  if (indicator) {
-    indicator.style.transform = 'translateY(-50%)';
-    indicator.classList.remove('show');
+  if (!isAllowed) {
+    resetSwipeState();
+    return;
   }
   
-  // Check if swipe meets threshold (swiped right enough)
-  if (swipeDistance > SWIPE_THRESHOLD) {
+  // Reset indicators
+  const leftIndicator = document.getElementById('swipe-indicator');
+  const rightIndicator = document.getElementById('swipe-indicator-right');
+  
+  if (leftIndicator) {
+    leftIndicator.style.transform = 'translateY(-50%)';
+    leftIndicator.classList.remove('show');
+  }
+  
+  if (rightIndicator) {
+    rightIndicator.style.transform = 'translateY(-50%)';
+    rightIndicator.classList.remove('show');
+  }
+  
+  // Check threshold and trigger action
+  if (swipeType === 'back' && swipeDistance > SWIPE_THRESHOLD) {
     returnToModeSelection();
+  } else if (swipeType === 'faq' && Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
+    openFAQModal();
   }
   
-  // Reset
-  isSwipeActive = false;
-  touchStartX = 0;
+  resetSwipeState();
 });
+
+// Helper function to reset swipe state
+function resetSwipeState() {
+  isSwipeActive = false;
+  swipeType = null;
+  touchStartX = 0;
+}
 
   </script>
 	
