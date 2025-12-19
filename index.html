@@ -13816,7 +13816,7 @@ function stopMeditationMusicOnClose() {
 // Simpler, more reliable swipe detection
 let touchStartX = 0;
 let isSwipeActive = false;
-let swipeType = null; // 'back' or 'faq' - replaces isBackSwipe/isFAQSwipe
+let swipeType = null; // 'back' or 'faq'
 const SWIPE_THRESHOLD = 120;
 const SWIPE_AREA = 30;
 const RIGHT_SWIPE_AREA = 30;
@@ -13888,8 +13888,9 @@ document.addEventListener('touchstart', (e) => {
     isSwipeActive = true;
     swipeType = 'faq';
     
-    const rightIndicator = document.getElementById('swipe-indicator-right');
-    if (rightIndicator) rightIndicator.classList.add('show');
+    // REMOVED: Don't show indicator here! Wait for touchmove
+    // const rightIndicator = document.getElementById('swipe-indicator-right');
+    // if (rightIndicator) rightIndicator.classList.add('show');
   }
 });
 
@@ -13902,25 +13903,27 @@ document.addEventListener('touchmove', (e) => {
   
   if (!isAllowed) return;
   
-  const isRightSwipe = swipeDistance > 0;
   const indicatorId = swipeType === 'back' ? 'swipe-indicator' : 'swipe-indicator-right';
   const indicator = document.getElementById(indicatorId);
   
   if (!indicator) return;
   
-  // Determine movement direction and limits
-  if ((swipeType === 'back' && isRightSwipe) || (swipeType === 'faq' && !isRightSwipe)) {
-    const translateX = isRightSwipe ? 
-      Math.min(swipeDistance / 2, 40) : 
-      Math.max(swipeDistance / 2, -40);
-    
+  // Handle back swipe (right movement from left edge)
+  if (swipeType === 'back' && swipeDistance > 0) {
+    const translateX = Math.min(swipeDistance / 2, 40);
     indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
     
-    const showCondition = swipeType === 'back' ? 
-      swipeDistance > SHOW_INDICATOR_THRESHOLD : 
-      Math.abs(swipeDistance) > SHOW_INDICATOR_THRESHOLD;
+    // Show indicator after 30% threshold (36px)
+    indicator.classList.toggle('show', swipeDistance > SHOW_INDICATOR_THRESHOLD);
+  }
+  
+  // Handle FAQ swipe (left movement from right edge)
+  else if (swipeType === 'faq' && swipeDistance < 0) {
+    const translateX = Math.max(swipeDistance / 2, -40);
+    indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
     
-    indicator.classList.toggle('show', showCondition);
+    // Show indicator after 30% threshold (36px of left movement)
+    indicator.classList.toggle('show', Math.abs(swipeDistance) > SHOW_INDICATOR_THRESHOLD);
   }
 });
 
