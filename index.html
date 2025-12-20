@@ -5721,7 +5721,7 @@ function showYellowIndicator(duration = 1500) {
   }
   // --- End: DB clear logic ---
   
-  // --- NEW: Save completed challenge to history if qualified ---
+// --- NEW: Save completed challenge to history if qualified ---
 try {
   const challenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
   const jwtToken = localStorage.getItem('jwtToken');
@@ -5733,51 +5733,103 @@ try {
   const spaceshipKeyNow = localStorage.getItem('spaceshipKey') || null;
   const completedPureOffline = spaceshipKeyAtStart && spaceshipKeyAtStart === spaceshipKeyNow;
 
-  if (
-    challenge.startDate &&
-    challenge.currentDay >= 21 &&
-    !onChainJourney
-  ) {
+  // 🆕 NEW: Get these variables BEFORE using them
+  const omUserId = localStorage.getItem('omUserId');
+  const challengeId = challenge.challengeId;
+
+  if (challenge.startDate && challenge.currentDay >= 21 && !onChainJourney) {
     const mode = completedPureOffline ? 'spaceship' : 'offline';
-    const alreadyInHistory = history.some(
-      h => h.startDate === challenge.startDate && h.mode === mode
-    );
-    if (!alreadyInHistory) {
-      history.push({
-        startDate: challenge.startDate,
-        endDate: new Date().toISOString(),
-        days: challenge.currentDay,
-        mode,
-        sessionsCompleted: challenge.sessionsCompleted || [],
-        totalSessions: challenge.totalSessions || 0,
-        totalMinutes: challenge.totalMinutes || 0,
+    
+    // 🆕 NEW: Create the historyEntry variable first
+    const historyEntry = {
+      startDate: challenge.startDate,
+      endDate: new Date().toISOString(),
+      days: challenge.currentDay,
+      mode: mode,
+      sessionsCompleted: challenge.sessionsCompleted || [],
+      totalSessions: challenge.totalSessions || 0,
+      totalMinutes: challenge.totalMinutes || 0,
+    };
+    
+    history.push(historyEntry);
+    localStorage.setItem('challengeHistory', JSON.stringify(history));
+
+    // 🆕 NEW: Send to backend DB if we have the required data
+    if (omUserId && challengeId) {
+      const payload = {
+        om_user_id: omUserId,
+        challenge_id: challengeId,
+        start_date: challenge.startDate,
+        end_date: historyEntry.endDate,
+        days_completed: challenge.currentDay,
+        mode: historyEntry.mode,
+        sessions_completed: historyEntry.sessionsCompleted,
+        total_sessions: historyEntry.totalSessions,
+        total_minutes: historyEntry.totalMinutes,
+        user_agent: navigator.userAgent,
+        device_type: getDeviceType?.() || 'unknown',
+      };
+
+      // Non-blocking call to save history to server
+      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch((error) => { 
+        console.error('Failed to save challenge history during reconfigure:', error);
+        /* ignore network errors for this non-critical sync */ 
       });
-      localStorage.setItem('challengeHistory', JSON.stringify(history));
     }
-  } else if (
-    challenge.startDate &&
-    challenge.currentDay >= 41 &&
-    onChainJourney
-  ) {
+    
+  } else if (challenge.startDate && challenge.currentDay >= 41 && onChainJourney) {
     const mode = 'online';
-    const alreadyInHistory = history.some(
-      h => h.startDate === challenge.startDate && h.mode === mode
-    );
-    if (!alreadyInHistory) {
-      history.push({
-        startDate: challenge.startDate,
-        endDate: new Date().toISOString(),
-        days: challenge.currentDay,
-        mode,
-        sessionsCompleted: challenge.sessionsCompleted || [],
-        totalSessions: challenge.totalSessions || 0,
-        totalMinutes: challenge.totalMinutes || 0,
+    
+    // 🆕 NEW: Also create historyEntry for online completion
+    const historyEntry = {
+      startDate: challenge.startDate,
+      endDate: new Date().toISOString(),
+      days: challenge.currentDay,
+      mode: mode,
+      sessionsCompleted: challenge.sessionsCompleted || [],
+      totalSessions: challenge.totalSessions || 0,
+      totalMinutes: challenge.totalMinutes || 0,
+    };
+    
+    history.push(historyEntry);
+    localStorage.setItem('challengeHistory', JSON.stringify(history));
+
+    // 🆕 NEW: Also save online completions to DB
+    if (omUserId && challengeId) {
+      const payload = {
+        om_user_id: omUserId,
+        challenge_id: challengeId,
+        start_date: challenge.startDate,
+        end_date: historyEntry.endDate,
+        days_completed: challenge.currentDay,
+        mode: 'online',
+        sessions_completed: historyEntry.sessionsCompleted,
+        total_sessions: historyEntry.totalSessions,
+        total_minutes: historyEntry.totalMinutes,
+        user_agent: navigator.userAgent,
+        device_type: getDeviceType?.() || 'unknown',
+      };
+
+      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch((error) => {
+        console.error('Failed to save online challenge history during reconfigure:', error);
       });
-      localStorage.setItem('challengeHistory', JSON.stringify(history));
     }
   }
-} catch (e) { /* ignore errors, do not block reset */ }
+} catch (e) { 
+  console.error('Error saving challenge history during reconfigure:', e);
+  /* ignore errors, do not block reset */ 
+}
 
+  await deleteOfflineChallenge();
+  
   // Reset all Yogi stats to 0 except resetCount
   const currentResetCount = challengeData.resetCount || 0; // Preserve reset count
   
@@ -5915,31 +5967,65 @@ try {
   const spaceshipKeyNow = localStorage.getItem('spaceshipKey') || null;
   const completedPureOffline = spaceshipKeyAtStart && spaceshipKeyAtStart === spaceshipKeyNow;
 
+  // 🆕 NEW: Get these variables BEFORE using them
+  const omUserId = localStorage.getItem('omUserId');
+  const challengeId = challenge.challengeId;
+
   // If user completes 21-day offline, check spaceship first!
   if (
     challenge.startDate &&
-    challenge.currentDay >= 21 &&
+    challenge.currentDay >= 21 &&  // Note: you changed this from 21 to 1
     !onChainJourney
   ) {
-    history.push({
+    // 🆕 NEW: Create the historyEntry variable first
+    const historyEntry = {
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
-      // Key: spaceship or regular?
       mode: completedPureOffline ? 'spaceship' : 'offline',
       sessionsCompleted: challenge.sessionsCompleted || [],
       totalSessions: challenge.totalSessions || 0,
       totalMinutes: challenge.totalMinutes || 0,
-    });
+    };
+    
+    history.push(historyEntry);
     localStorage.setItem('challengeHistory', JSON.stringify(history));
 
+    // 🆕 NEW: Send to backend DB if we have the required data
+    if (omUserId && challengeId) {
+      const payload = {
+        om_user_id: omUserId,
+        challenge_id: challengeId,
+        start_date: challenge.startDate,
+        end_date: historyEntry.endDate,
+        days_completed: challenge.currentDay,
+        mode: historyEntry.mode,
+        sessions_completed: historyEntry.sessionsCompleted,
+        total_sessions: historyEntry.totalSessions,
+        total_minutes: historyEntry.totalMinutes,
+        user_agent: navigator.userAgent,
+        device_type: getDeviceType?.() || 'unknown',
+      };
+
+      // Non-blocking call to save history to server
+      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch((error) => { 
+        console.error('Failed to save challenge history:', error);
+        /* ignore network errors for this non-critical sync */ 
+      });
+    }
+	  
   // If user completes 41-day online
   } else if (
     challenge.startDate &&
     challenge.currentDay >= 41 &&
     onChainJourney
   ) {
-    history.push({
+    // 🆕 NEW: Also create historyEntry for online completion
+    const historyEntry = {
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
@@ -5947,10 +6033,40 @@ try {
       sessionsCompleted: challenge.sessionsCompleted || [],
       totalSessions: challenge.totalSessions || 0,
       totalMinutes: challenge.totalMinutes || 0,
-    });
+    };
+    
+    history.push(historyEntry);
     localStorage.setItem('challengeHistory', JSON.stringify(history));
+
+    // 🆕 NEW: Also save online completions to DB
+    if (omUserId && challengeId) {
+      const payload = {
+        om_user_id: omUserId,
+        challenge_id: challengeId,
+        start_date: challenge.startDate,
+        end_date: historyEntry.endDate,
+        days_completed: challenge.currentDay,
+        mode: 'online',
+        sessions_completed: historyEntry.sessionsCompleted,
+        total_sessions: historyEntry.totalSessions,
+        total_minutes: historyEntry.totalMinutes,
+        user_agent: navigator.userAgent,
+        device_type: getDeviceType?.() || 'unknown',
+      };
+
+      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch((error) => {
+        console.error('Failed to save online challenge history:', error);
+      });
+    }
   }
-} catch (e) { /* ignore */ }
+} catch (e) { 
+  console.error('Error saving challenge history:', e);
+  /* ignore */ 
+}
 
   await deleteOfflineChallenge();
 	
