@@ -11639,15 +11639,17 @@ async function showCountryStatsOnEarthGrid() {
   const stats = await fetchCountryStats();
   const statsLabel = document.getElementById('gridStatsLabel');
   if (!statsLabel) return;
+
   if (stats.length === 0) {
     statsLabel.innerHTML = "No Power Node hours recorded yet.";
     return;
   }
 
   const content = stats.map(stat => {
+    const correctedCountryName = getDisplayCountryName(stat.country);
     const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
     return `
-      <span class="scroll-flag" data-country="${stat.country}" style="display:inline-flex;align-items:center;margin:0 15px;">
+      <span class="scroll-flag" data-country="${correctedCountryName}" style="display:inline-flex;align-items:center;margin:0 15px;">
        <img src="https://flagcdn.com/w40/${code}.png"
            style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
         <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
@@ -11659,17 +11661,17 @@ async function showCountryStatsOnEarthGrid() {
 
   statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
 
-  // Attach popup handlers for desktop and mobile **AFTER** innerHTML set
-statsLabel.querySelectorAll('.scroll-flag').forEach(el => {
-  el.onclick = function(e) {
-    showFlagPopup(el.getAttribute('data-country'), e, true);
-  };
-  el.ontouchstart = function(e) {
-    showFlagPopup(el.getAttribute('data-country'), e, true);
-  };
-});
+  // Attach handlers for popups
+  statsLabel.querySelectorAll('.scroll-flag').forEach(el => {
+    el.onclick = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e, true);
+    };
+    el.ontouchstart = function(e) {
+      showFlagPopup(el.getAttribute('data-country'), e, true);
+    };
+  });
 
-  // Add CSS for scrolling animation (only once)
+  // Add CSS for scrolling animation (once)
   if (!document.getElementById('country-scroll-ticker-style')) {
     const style = document.createElement('style');
     style.id = 'country-scroll-ticker-style';
@@ -13612,6 +13614,7 @@ function getDisplayCountryName(zoneName) {
   if (!zoneName) return '';
   const name = zoneName.toLowerCase();
   if (name.includes('united states')) return 'United States';
+  if (name.includes('united states america')) return 'United States of America';
   // Add more custom aliases here if needed (e.g., UK, UAE)
   return zoneName.replace(/_/g, ' ');
 }
