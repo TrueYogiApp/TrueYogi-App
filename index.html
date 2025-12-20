@@ -13964,21 +13964,22 @@ function stopMeditationMusicOnClose() {
 
 // Simpler, more reliable swipe detection
 let touchStartX = 0;
+let touchStartY = 0;
 let isSwipeActive = false;
-let swipeType = null; // 'back' or 'faq'
+let swipeType = null;
 const SWIPE_THRESHOLD = 120;
 const SWIPE_AREA = 30;
 const RIGHT_SWIPE_AREA = 30;
 const SHOW_INDICATOR_THRESHOLD = SWIPE_THRESHOLD * 0.3;
 
-// Helper function for common swipe checks
-function commonSwipeChecks() {
-  // Check if in active session
+// Simple function to check if we can swipe
+function canSwipe() {
+  // Don't swipe during active session
   if (typeof sessionActive !== 'undefined' && sessionActive) {
     return false;
   }
   
-  // Check if in post-session screens
+  // Don't swipe in post-session screens
   const completeSection = document.getElementById('complete-section');
   const finalSection = document.getElementById('final-section');
   if ((completeSection && !completeSection.classList.contains('hidden')) ||
@@ -13986,7 +13987,7 @@ function commonSwipeChecks() {
     return false;
   }
   
-  // Check if in any modal (except FAQ for closing)
+  // Check if in any blocking modal
   const missedModal = document.getElementById('missed-session-modal');
   const mobileModal = document.getElementById('mobile-required-modal');
   if ((missedModal && !missedModal.classList.contains('hidden')) ||
@@ -13997,105 +13998,90 @@ function commonSwipeChecks() {
   return true;
 }
 
-// Helper function to check if BACK swipe is allowed
-function isBackSwipeAllowed() {
-  // Check if in app interface (Flow or Yogi mode)
-  const appInterface = document.getElementById('app-interface');
-  if (!appInterface || appInterface.classList.contains('hidden')) {
-    return false;
-  }
+// Check which mode button was touched
+function getModeFromTouch(touchY) {
+  const flowBtn = document.getElementById('flow-mode-btn-select');
+  const yogiBtn = document.getElementById('yogi-mode-btn-select');
   
-  return commonSwipeChecks();
-}
-
-// Helper function to check if FAQ swipe is allowed
-function isFAQSwipeAllowed() {
-  // Check if FAQ is already open
-  const faqModal = document.getElementById('faq-modal');
-  if (faqModal && !faqModal.classList.contains('hidden')) {
-    return false;
-  }
-  
-  return commonSwipeChecks();
-}
-
-// Touch events for mobile
-document.addEventListener('touchstart', (e) => {
-  const touchX = e.touches[0].clientX;
-  const windowWidth = window.innerWidth;
-  
-  // Check if FAQ is open
-  const faqModal = document.getElementById('faq-modal');
-  const isFAQOpen = faqModal && !faqModal.classList.contains('hidden');
-  
-  // Left edge swipe
-  if (touchX < SWIPE_AREA) {
-    // Allow left swipe if either:
-    // 1. FAQ is open (to close it) OR
-    // 2. We're in a mode and back swipe is allowed
-    if (isFAQOpen || (!isFAQOpen && isBackSwipeAllowed())) {
-      touchStartX = touchX;
-      isSwipeActive = true;
-      swipeType = 'back';
+  if (flowBtn && yogiBtn) {
+    const flowRect = flowBtn.getBoundingClientRect();
+    const yogiRect = yogiBtn.getBoundingClientRect();
+    
+    if (touchY >= flowRect.top && touchY <= flowRect.bottom) {
+      return 'flow';
+    }
+    if (touchY >= yogiRect.top && touchY <= yogiRect.bottom) {
+      return 'yogi';
     }
   }
   
-  // Right edge swipe (only to OPEN FAQ when it's closed)
-  else if (touchX > windowWidth - RIGHT_SWIPE_AREA && !isFAQOpen && isFAQSwipeAllowed()) {
+  return null;
+}
+
+// TOUCH START
+document.addEventListener('touchstart', (e) => {
+  if (!canSwipe()) return;
+  
+  const touchX = e.touches[0].clientX;
+  const touchY = e.touches[0].clientY;
+  const windowWidth = window.innerWidth;
+  
+  // Left edge (for back OR entering modes)
+  if (touchX < SWIPE_AREA) {
+    touchStartX = touchX;
+    touchStartY = touchY;
+    isSwipeActive = true;
+    swipeType = 'left';
+  }
+  
+  // Right edge (for FAQ)
+  else if (touchX > windowWidth - RIGHT_SWIPE_AREA) {
+    // Check if FAQ is already open
+    const faqModal = document.getElementById('faq-modal');
+    if (faqModal && !faqModal.classList.contains('hidden')) {
+      return; // FAQ is already open
+    }
+    
     touchStartX = touchX;
     isSwipeActive = true;
-    swipeType = 'faq';
+    swipeType = 'right';
   }
 });
 
+// TOUCH MOVE
 document.addEventListener('touchmove', (e) => {
-  if (!isSwipeActive) return;
+  if (!isSwipeActive || !canSwipe()) return;
   
   const currentX = e.touches[0].clientX;
   const swipeDistance = currentX - touchStartX;
   
-  // Check if swipe should be allowed (special handling for back when FAQ is open)
-  let isAllowed = false;
-  const faqModal = document.getElementById('faq-modal');
-  const isFAQOpen = faqModal && !faqModal.classList.contains('hidden');
-  
-  if (swipeType === 'back') {
-    isAllowed = isFAQOpen || isBackSwipeAllowed();
-  } else if (swipeType === 'faq') {
-    isAllowed = isFAQSwipeAllowed();
+  // Left edge swipe (moving right)
+  if (swipeType === 'left' && swipeDistance > 0) {
+    const indicator = document.getElementById('swipe-indicator');
+    if (indicator) {
+      const translateX = Math.min(swipeDistance / 2, 40);
+      indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
+      indicator.classList.toggle('show', swipeDistance > SHOW_INDICATOR_THRESHOLD);
+    }
   }
   
-  if (!isAllowed) return;
-  
-  const indicatorId = swipeType === 'back' ? 'swipe-indicator' : 'swipe-indicator-right';
-  const indicator = document.getElementById(indicatorId);
-  
-  if (!indicator) return;
-  
-  // Handle back swipe (right movement from left edge)
-  if (swipeType === 'back' && swipeDistance > 0) {
-    const translateX = Math.min(swipeDistance / 2, 40);
-    indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
-    indicator.classList.toggle('show', swipeDistance > SHOW_INDICATOR_THRESHOLD);
-  }
-  
-  // Handle FAQ swipe (left movement from right edge)
-  else if (swipeType === 'faq' && swipeDistance < 0) {
-    const translateX = Math.max(swipeDistance / 2, -40);
-    indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
-    indicator.classList.toggle('show', Math.abs(swipeDistance) > SHOW_INDICATOR_THRESHOLD);
+  // Right edge swipe (moving left)
+  else if (swipeType === 'right' && swipeDistance < 0) {
+    const indicator = document.getElementById('swipe-indicator-right');
+    if (indicator) {
+      const translateX = Math.max(swipeDistance / 2, -40);
+      indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
+      indicator.classList.toggle('show', Math.abs(swipeDistance) > SHOW_INDICATOR_THRESHOLD);
+    }
   }
 });
 
+// TOUCH END
 document.addEventListener('touchend', (e) => {
   if (!isSwipeActive) return;
   
   const touchEndX = e.changedTouches[0].clientX;
   const swipeDistance = touchEndX - touchStartX;
-  
-  // Check if FAQ is open
-  const faqModal = document.getElementById('faq-modal');
-  const isFAQOpen = faqModal && !faqModal.classList.contains('hidden');
   
   // Reset indicators
   const leftIndicator = document.getElementById('swipe-indicator');
@@ -14111,27 +14097,45 @@ document.addEventListener('touchend', (e) => {
     rightIndicator.classList.remove('show');
   }
   
-  // Check threshold and trigger action
-  if (swipeType === 'back' && swipeDistance > SWIPE_THRESHOLD) {
+  // LEFT EDGE SWIPE (right movement)
+  if (swipeType === 'left' && swipeDistance > SWIPE_THRESHOLD) {
+    const faqModal = document.getElementById('faq-modal');
+    const isFAQOpen = faqModal && !faqModal.classList.contains('hidden');
+    
     if (isFAQOpen) {
-      closeFAQModal(); // Close FAQ
+      // Close FAQ
+      closeFAQModal();
     } else {
-      returnToModeSelection(); // Regular back action
+      // Check if we're touching a mode button
+      const mode = getModeFromTouch(touchStartY);
+      if (mode) {
+        // Enter the mode
+        selectMode(mode);
+      } else {
+        // Go back (only works inside modes, not in main interface)
+        const appInterface = document.getElementById('app-interface');
+        if (appInterface && !appInterface.classList.contains('hidden')) {
+          // Check if we're inside a mode (has back button)
+          const backBtn = document.getElementById('back-to-mode');
+          if (backBtn && !backBtn.classList.contains('hidden')) {
+            returnToModeSelection();
+          }
+        }
+      }
     }
-  } 
-  else if (swipeType === 'faq' && Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
+  }
+  
+  // RIGHT EDGE SWIPE (left movement)
+  else if (swipeType === 'right' && Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
     openFAQModal();
   }
   
-  resetSwipeState();
-});
-
-// Helper function to reset swipe state
-function resetSwipeState() {
+  // Reset
   isSwipeActive = false;
   swipeType = null;
   touchStartX = 0;
-}
+  touchStartY = 0;
+});
 
   </script>
 	
