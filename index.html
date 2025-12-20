@@ -10137,7 +10137,7 @@ async function addCount() {
   let id = localStorage.getItem('omPresenceId');
   if (id) {
     // Validate it with backend
-    const res = await fetch('https://trueyogi-backend-test.onrender.com/check-om', {
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/check-om', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id })
