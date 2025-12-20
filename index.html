@@ -4540,6 +4540,45 @@ function fixUnknownSessionIds() {
   localStorage.setItem('meditationSessions', JSON.stringify(sessions));
 }
 
+function syncOfflineChallengeToServer() {
+  const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+  if (!challenge.startDate) return;
+
+  const payload = {
+    om_user_id: localStorage.getItem('omUserId'),
+    challenge_id: challenge.challengeId,
+    start_date: challenge.startDate,
+    end_date: challenge.endDate,
+    current_day: challenge.currentDay || 1,
+    required_sessions: challenge.requiredSessions || 1,
+    sessions_completed: challenge.sessionsCompleted || [],
+    last_session_date: challenge.lastSessionDate,
+    total_sessions: challenge.totalSessions || 0,
+    total_minutes: challenge.totalMinutes || 0,
+    device_type: getDeviceType?.() || 'unknown',
+    user_agent: navigator.userAgent,
+  };
+
+  fetch('https://trueyogi-backend-knkq.onrender.com/api/offline_challenge', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(payload)
+  }).catch(() => {});
+}
+
+async function deleteOfflineChallenge() {
+  const omUserId = localStorage.getItem('omUserId');
+  if (!omUserId) return; // No offline user
+
+  try {
+    await fetch('https://trueyogi-backend-knkq.onrender.com/api/offline_challenge', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ om_user_id: omUserId })
+    });
+  } catch (e) { /* ignore errors for now */ }
+}
+
 function setupFAQTabs() {
   const meditationTab = document.getElementById('meditation-faq-tab');
   const dappTab = document.getElementById('dapp-faq-tab');
@@ -5913,6 +5952,8 @@ try {
   }
 } catch (e) { /* ignore */ }
 
+  await deleteOfflineChallenge();
+	
   // Proceed with local reset regardless (or, if you want, only if resetSuccess)
   localStorage.removeItem('yogiConfig');
   localStorage.removeItem('yogiChallenge');
@@ -7618,6 +7659,7 @@ const completionDateLocal = getLocalDateString(new Date(startTime || Date.now())
     updateBackButtonVisibility();
     checkJourneyCompletion();
 	showCompletionStats();
+	syncOfflineChallengeToServer();
 	if (window.walletPublicKey) {
 	fixUnknownSessionIds();
 	const journeyWallet = localStorage.getItem('currentJourneyWallet');
@@ -7679,6 +7721,7 @@ function saveSession(minutes, sessionTime) {
   challengeData.challenge_source = window.location.origin; 
   localStorage.setItem('yogiChallenge', JSON.stringify(challengeData));
   updateProgressDisplay();
+  syncOfflineChallengeToServer();
   
   // Also update the stats display immediately
   if (currentMode === 'yogi') {
