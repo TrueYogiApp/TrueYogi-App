@@ -14049,6 +14049,7 @@ document.addEventListener('touchstart', (e) => {
 });
 
 // TOUCH MOVE
+// TOUCH MOVE
 document.addEventListener('touchmove', (e) => {
   if (!isSwipeActive || !canSwipe()) return;
   
@@ -14057,11 +14058,28 @@ document.addEventListener('touchmove', (e) => {
   
   // Left edge swipe (moving right)
   if (swipeType === 'left' && swipeDistance > 0) {
-    const indicator = document.getElementById('swipe-indicator');
-    if (indicator) {
-      const translateX = Math.min(swipeDistance / 2, 40);
-      indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
-      indicator.classList.toggle('show', swipeDistance > SHOW_INDICATOR_THRESHOLD);
+    const indicator = document.getElementById('swipe-indicator'); // FIX: Add this
+    if (!indicator) return; // FIX: Add this
+    
+    const translateX = Math.min(swipeDistance / 2, 40);
+    indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
+    indicator.classList.toggle('show', swipeDistance > SHOW_INDICATOR_THRESHOLD);
+    
+    // Color change based on start position
+    const mode = getModeFromTouch(touchStartY);
+    if (mode === 'flow') {
+      indicator.style.background = 'rgba(59, 130, 246, 0.2)';
+      const icon = indicator.querySelector('i');
+      if (icon) icon.style.color = '#3b82f6';
+    } else if (mode === 'yogi') {
+      indicator.style.background = 'rgba(234, 179, 8, 0.2)';
+      const icon = indicator.querySelector('i');
+      if (icon) icon.style.color = '#eab308';
+    } else {
+      // Reset to default
+      indicator.style.background = '';
+      const icon = indicator.querySelector('i');
+      if (icon) icon.style.color = '';
     }
   }
   
@@ -14075,6 +14093,7 @@ document.addEventListener('touchmove', (e) => {
     }
   }
 });
+
 
 // TOUCH END
 document.addEventListener('touchend', (e) => {
@@ -14090,6 +14109,11 @@ document.addEventListener('touchend', (e) => {
   if (leftIndicator) {
     leftIndicator.style.transform = 'translateY(-50%)';
     leftIndicator.classList.remove('show');
+    
+    // Reset colors to default
+    leftIndicator.style.background = '';
+    const leftIcon = leftIndicator.querySelector('i');
+    if (leftIcon) leftIcon.style.color = '';
   }
   
   if (rightIndicator) {
