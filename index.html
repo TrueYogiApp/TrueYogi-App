@@ -6252,6 +6252,8 @@ function enforceClaimBeforeProceeding() {
 
     function selectMode(mode) {
   currentMode = mode;
+  // Remove yogi-mode-active class first
+  document.body.classList.remove('yogi-mode-active');
   document.getElementById('mode-selection').classList.add('hidden');
   document.getElementById('app-interface').classList.remove('hidden');
   updateBackButtonVisibility();
@@ -6306,6 +6308,9 @@ function enforceClaimBeforeProceeding() {
 }
 
     function returnToModeSelection() {
+        // Remove yogi-mode-active class when leaving
+  document.body.classList.remove('yogi-mode-active');
+  
   const today = new Date();
   const todayStr = getLocalDateString(new Date());
   const endDate = challengeData.endDate;	
@@ -6364,9 +6369,9 @@ if (bgMusicPlayer) {
   localStorage.removeItem('lastVisit');
   currentMode = null;
   currentSessionTime = null;
-  updateEndDateDisplay();
-  updateStartDateDisplay();
-  updateNowDisplay();
+  //updateEndDateDisplay();
+  //updateStartDateDisplay();
+  //updateNowDisplay();
   updateFAQVisibility();
   updateYogiIcon();
   updateLangSwitcherVisibility();
@@ -6406,6 +6411,11 @@ if (bgMusicPlayer) {
 	updateStartDateDisplay();
 	updateNowDisplay();
 	updateFAQVisibility();
+    // Add this line
+    document.body.classList.add('yogi-mode-active');
+  } else {
+    // Remove this line when switching away from yogi
+    document.body.classList.remove('yogi-mode-active');
   }
   updateStats();
 }
