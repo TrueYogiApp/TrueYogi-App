@@ -136,7 +136,7 @@
   "walletRequiredDescriptionLine2": "Das stellt sicher, dass dein Fortschritt und deine Belohnungen geschützt sind.",
   "walletRequiredDescriptionLine3": "Oder du kannst die Herausforderung zurücksetzen und wieder bei Tag 1 beginnen.",
   "walletRequiredButtonConnect": "Wallet verbinden",
-  "walletRequiredButtonReset": "Herausforderung zurücksetzen",
+  "walletRequiredButtonReset": "Herausforderung Speichern & Zurücksetzen",
   "claimRequiredHeading": "Anspruch erforderlich",
   "claimRequiredDescription": "Bitte beanspruche deine YOGI-Tokens, bevor du eine neue Reise beginnst.",
   "journeyCompleteHeading": "Glückwunsch, WahrerYogi!",

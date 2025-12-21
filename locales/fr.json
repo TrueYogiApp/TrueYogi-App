@@ -136,7 +136,7 @@
   "walletRequiredDescriptionLine2": "Cela garantit la sécurité de votre progression et de vos récompenses.",
   "walletRequiredDescriptionLine3": "Ou vous pouvez réinitialiser le défi et recommencer depuis le jour 1.",
   "walletRequiredButtonConnect": "Connecter le portefeuille",
-  "walletRequiredButtonReset": "Réinitialiser le défi",
+  "walletRequiredButtonReset": "Enregistrer et Réinitialiser le Défi",
   "claimRequiredHeading": "Réclamation requise",
   "claimRequiredDescription": "Veuillez réclamer vos tokens YOGI avant de commencer un nouveau parcours.",
   "journeyCompleteHeading": "Félicitations, VraiYogi !",

@@ -136,7 +136,7 @@
   "walletRequiredDescriptionLine2": "This ensures your progress and rewards are secure.",
   "walletRequiredDescriptionLine3": "Or you can reset the challenge and start again from day 1.",
   "walletRequiredButtonConnect": "Connect Wallet",
-  "walletRequiredButtonReset": "Reset Challenge",
+  "walletRequiredButtonReset": "Save & Reset Challenge",
   "claimRequiredHeading": "Claim Required",
   "claimRequiredDescription": "Please claim your YOGI tokens before starting a new journey.",
   "journeyCompleteHeading": "Congratulations, TrueYogi!",

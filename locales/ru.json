@@ -136,7 +136,7 @@
   "walletRequiredDescriptionLine2": "Это гарантирует сохранность прогресса и наград.",
   "walletRequiredDescriptionLine3": "Или вы можете сбросить задание и начать сначала с первого дня.",
   "walletRequiredButtonConnect": "Подключить кошелек",
-  "walletRequiredButtonReset": "Сбросить испытание",
+  "walletRequiredButtonReset": "Сохранить и Сбросить челлендж",
   "claimRequiredHeading": "Требуется подтверждение",
   "claimRequiredDescription": "Пожалуйста, получите токены Йог перед началом нового пути.",
   "journeyCompleteHeading": "Поздравляем, Истинный Йог!",

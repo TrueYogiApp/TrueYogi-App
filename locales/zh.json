@@ -136,7 +136,7 @@
   "walletRequiredDescriptionLine2": "这样可保证你的进度和奖励安全。",
   "walletRequiredDescriptionLine3": "或者，您可以重置挑战并从第1天重新开始。",
   "walletRequiredButtonConnect": "连接钱包",
-  "walletRequiredButtonReset": "重置挑战",
+  "walletRequiredButtonReset": "保存并重置挑战",
   "claimRequiredHeading": "需要领取",
   "claimRequiredDescription": "请在开始新旅程前领取你的瑜伽士代币。",
   "journeyCompleteHeading": "恭喜你，真正的瑜伽士！",
