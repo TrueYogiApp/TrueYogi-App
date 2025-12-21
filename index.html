@@ -4563,6 +4563,12 @@ function fixUnknownSessionIds() {
 }
 
 function syncOfflineChallengeToServer() {
+  // Skip if user is connected with a wallet (online user)
+  if (localStorage.getItem('currentJourneyWallet')) {
+    // Optionally: console.log('Skipping offline sync, user is online.');
+    return;
+  }
+  
   const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
   if (!challenge.startDate) return;
 
