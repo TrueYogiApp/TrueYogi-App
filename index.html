@@ -5708,17 +5708,32 @@ function showYellowIndicator(duration = 1500) {
   }, duration);
 }
 
+function validateSpaceshipMode() {
+  const challenge = JSON.parse(localStorage.getItem("yogiChallenge")) || {};
+  const spaceshipKeyAtStart = challenge.spaceshipKeyAtStart || null;
+  const currentSpaceshipKey = localStorage.getItem("spaceshipKey") || null;
+
+  // Validate and persist the mode
+  if (spaceshipKeyAtStart && spaceshipKeyAtStart === currentSpaceshipKey) {
+    challenge.savedMode = "spaceship"; // Save spaceship mode persistently
+  } else {
+    challenge.savedMode = "offline"; // Default to offline if mismatched
+  }
+  localStorage.setItem("yogiChallenge", JSON.stringify(challenge)); // Save updated challenge object
+}
+
 async function syncSpaceshipChallengesToServer() {
-  let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+  let history = JSON.parse(localStorage.getItem("challengeHistory") || "[]");
   let changed = false;
 
-  // Use for...of so you can await fetch one at a time and reliably update/mark synced!
   for (let idx = 0; idx < history.length; idx++) {
     let entry = history[idx];
+    // Validate eligibility for syncing
     if (entry.mode === "spaceship" && !entry.synced) {
-      // Ensure om_user_id is present
-      const omUserId = entry.om_user_id || localStorage.getItem('omUserId');
-      if (!omUserId || !entry.challengeId) continue;
+      const omUserId = entry.om_user_id || localStorage.getItem("omUserId");
+      if (!omUserId || !entry.challengeId) {
+        continue;
+      }
 
       // Prepare payload
       const payload = {
@@ -5732,23 +5747,26 @@ async function syncSpaceshipChallengesToServer() {
         total_sessions: entry.totalSessions,
         total_minutes: entry.totalMinutes,
         user_agent: navigator.userAgent,
-        device_type: (typeof getDeviceType === "function") ? getDeviceType() : 'unknown',
+        device_type: typeof getDeviceType === "function" ? getDeviceType() : "unknown",
       };
-
       try {
-        const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
+        const resp = await fetch(
+          "https://trueyogi-backend-knkq.onrender.com/api/challenge_history",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          }
+        );
+
+        const responseText = await resp.text();
         if (resp.ok) {
           entry.synced = true;
           changed = true;
-          // Immediately save localStorage after each sync!
-          localStorage.setItem('challengeHistory', JSON.stringify(history));
+          console.log("Marked as synced:", entry);
+          localStorage.setItem("challengeHistory", JSON.stringify(history));
         } else {
-          const errTxt = await resp.text();
-          console.error("Sync failed for spaceship challenge:", errTxt, payload);
+          console.error("Failed to sync challenge:", responseText, payload);
         }
       } catch (e) {
         console.error("Network error trying to sync spaceship challenge:", e, payload);
@@ -5786,7 +5804,7 @@ if (navigator.onLine) syncSpaceshipChallengesToServer();
   // --- Start: Also clear from Supabase if wallet is connected ---
   if (walletKey && jwtToken) {
     try {
-      await fetch('https://trueyogi-backend-test.onrender.com/api/yogi-reset', {
+      await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi-reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -5817,8 +5835,9 @@ try {
   const omUserId = localStorage.getItem('omUserId');
   const challengeId = challenge.challengeId;
 
-  if (challenge.startDate && challenge.currentDay >= 21 && !onChainJourney) {
-    const mode = completedPureOffline ? 'spaceship' : 'offline';
+  if (challenge.startDate && challenge.currentDay >= 1 && !onChainJourney) {
+    const mode = challenge.savedMode || 
+               (completedPureOffline ? 'spaceship' : (!onChainJourney ? 'offline' : 'online'));
     
     // 🆕 NEW: Create the historyEntry variable first
     const historyEntry = {
@@ -5845,7 +5864,7 @@ try {
         start_date: challenge.startDate,
         end_date: historyEntry.endDate,
         days_completed: challenge.currentDay,
-        mode: historyEntry.mode,
+        mode: mode,
         sessions_completed: historyEntry.sessionsCompleted,
         total_sessions: historyEntry.totalSessions,
         total_minutes: historyEntry.totalMinutes,
@@ -6057,6 +6076,9 @@ try {
   const spaceshipKeyNow = localStorage.getItem('spaceshipKey') || null;
   const completedPureOffline = spaceshipKeyAtStart && spaceshipKeyAtStart === spaceshipKeyNow;
 
+  const mode = challenge.savedMode || 
+               (completedPureOffline ? 'spaceship' : (!onChainJourney ? 'offline' : 'online'));
+			   
   // 🆕 NEW: Get these variables BEFORE using them
   const omUserId = localStorage.getItem('omUserId');
   const challengeId = challenge.challengeId;
@@ -6064,7 +6086,7 @@ try {
   // If user completes 21-day offline, check spaceship first!
   if (
     challenge.startDate &&
-    challenge.currentDay >= 21 &&  // Note: you changed this from 21 to 1
+    challenge.currentDay >= 1 &&  // Note: you changed this from 21 to 1
     !onChainJourney
   ) {
     // 🆕 NEW: Create the historyEntry variable first
@@ -6074,7 +6096,7 @@ try {
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
-      mode: completedPureOffline ? 'spaceship' : 'offline',
+      mode: mode,
       sessionsCompleted: challenge.sessionsCompleted || [],
       totalSessions: challenge.totalSessions || 0,
       totalMinutes: challenge.totalMinutes || 0,
@@ -6092,7 +6114,7 @@ try {
         start_date: challenge.startDate,
         end_date: historyEntry.endDate,
         days_completed: challenge.currentDay,
-        mode: historyEntry.mode,
+        mode: mode,
         sessions_completed: historyEntry.sessionsCompleted,
         total_sessions: historyEntry.totalSessions,
         total_minutes: historyEntry.totalMinutes,
@@ -6115,7 +6137,6 @@ try {
 	  console.error('Failed to save challenge history during reconfigure:', error);
 	  /* ignore network errors for this non-critical sync */ 
 	});
-
     }
 	  
   // If user completes 41-day online
