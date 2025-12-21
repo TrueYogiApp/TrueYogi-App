@@ -5708,6 +5708,58 @@ function showYellowIndicator(duration = 1500) {
   }, duration);
 }
 
+async function syncSpaceshipChallengesToServer() {
+  let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+  let changed = false;
+
+  // Use for...of so you can await fetch one at a time and reliably update/mark synced!
+  for (let idx = 0; idx < history.length; idx++) {
+    let entry = history[idx];
+    if (entry.mode === "spaceship" && !entry.synced) {
+      // Ensure om_user_id is present
+      const omUserId = entry.om_user_id || localStorage.getItem('omUserId');
+      if (!omUserId || !entry.challengeId) continue;
+
+      // Prepare payload
+      const payload = {
+        om_user_id: omUserId,
+        challenge_id: entry.challengeId,
+        start_date: entry.startDate,
+        end_date: entry.endDate,
+        days_completed: entry.days,
+        mode: entry.mode,
+        sessions_completed: entry.sessionsCompleted,
+        total_sessions: entry.totalSessions,
+        total_minutes: entry.totalMinutes,
+        user_agent: navigator.userAgent,
+        device_type: (typeof getDeviceType === "function") ? getDeviceType() : 'unknown',
+      };
+
+      try {
+        const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        if (resp.ok) {
+          entry.synced = true;
+          changed = true;
+          // Immediately save localStorage after each sync!
+          localStorage.setItem('challengeHistory', JSON.stringify(history));
+        } else {
+          const errTxt = await resp.text();
+          console.error("Sync failed for spaceship challenge:", errTxt, payload);
+        }
+      } catch (e) {
+        console.error("Network error trying to sync spaceship challenge:", e, payload);
+      }
+    }
+  }
+}
+
+// Sync spaceship challenges on startup and when network comes online
+if (navigator.onLine) syncSpaceshipChallengesToServer();
+
  async function reconfigureChallenge() {
   // --- Start: Also clear from Supabase if wallet is connected ---
   const walletKey = window.walletPublicKey;
@@ -5734,7 +5786,7 @@ function showYellowIndicator(duration = 1500) {
   // --- Start: Also clear from Supabase if wallet is connected ---
   if (walletKey && jwtToken) {
     try {
-      await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi-reset', {
+      await fetch('https://trueyogi-backend-test.onrender.com/api/yogi-reset', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -5770,6 +5822,8 @@ try {
     
     // 🆕 NEW: Create the historyEntry variable first
     const historyEntry = {
+	  om_user_id: omUserId,
+	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
@@ -5777,6 +5831,7 @@ try {
       sessionsCompleted: challenge.sessionsCompleted || [],
       totalSessions: challenge.totalSessions || 0,
       totalMinutes: challenge.totalMinutes || 0,
+	  synced: false,
     };
     
     history.push(historyEntry);
@@ -5799,14 +5854,20 @@ try {
       };
 
       // Non-blocking call to save history to server
-      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch((error) => { 
-        console.error('Failed to save challenge history during reconfigure:', error);
-        /* ignore network errors for this non-critical sync */ 
-      });
+	fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+	  method: 'POST',
+	  headers: { 'Content-Type': 'application/json' },
+	  body: JSON.stringify(payload)
+	}).then(resp => {
+	  if (resp.ok) {
+		// Mark the entry as synced!
+		historyEntry.synced = true;
+		localStorage.setItem('challengeHistory', JSON.stringify(history));
+	  }
+	}).catch((error) => { 
+	  console.error('Failed to save challenge history during reconfigure:', error);
+	  /* ignore network errors for this non-critical sync */ 
+	});
     }
     
   } else if (challenge.startDate && challenge.currentDay >= 41 && onChainJourney) {
@@ -5814,6 +5875,7 @@ try {
     
     // 🆕 NEW: Also create historyEntry for online completion
     const historyEntry = {
+	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
@@ -6007,6 +6069,8 @@ try {
   ) {
     // 🆕 NEW: Create the historyEntry variable first
     const historyEntry = {
+	  om_user_id: omUserId,
+	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
@@ -6014,6 +6078,7 @@ try {
       sessionsCompleted: challenge.sessionsCompleted || [],
       totalSessions: challenge.totalSessions || 0,
       totalMinutes: challenge.totalMinutes || 0,
+	  synced: false,
     };
     
     history.push(historyEntry);
@@ -6036,14 +6101,21 @@ try {
       };
 
       // Non-blocking call to save history to server
-      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch((error) => { 
-        console.error('Failed to save challenge history:', error);
-        /* ignore network errors for this non-critical sync */ 
-      });
+	fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+	  method: 'POST',
+	  headers: { 'Content-Type': 'application/json' },
+	  body: JSON.stringify(payload)
+	}).then(resp => {
+	  if (resp.ok) {
+		// Mark the entry as synced!
+		historyEntry.synced = true;
+		localStorage.setItem('challengeHistory', JSON.stringify(history));
+	  }
+	}).catch((error) => { 
+	  console.error('Failed to save challenge history during reconfigure:', error);
+	  /* ignore network errors for this non-critical sync */ 
+	});
+
     }
 	  
   // If user completes 41-day online
@@ -6054,6 +6126,7 @@ try {
   ) {
     // 🆕 NEW: Also create historyEntry for online completion
     const historyEntry = {
+	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
       endDate: new Date().toISOString(),
       days: challenge.currentDay,
