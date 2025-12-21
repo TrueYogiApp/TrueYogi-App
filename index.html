@@ -358,26 +358,30 @@
 }
 
 /* Add this to your existing style section */
-  .end-date-display {
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    font-size: 0.75rem;
-    color: rgba(255, 255, 255, 0.5);
-    background: transparent;
-    padding: 4px 8px;
-    border-radius: 12px;
-    z-index: 100;
-    transition: all 0.3s ease;
-  }
-  .end-date-display:hover {
-    color: rgba(255, 255, 255, 0.8);
-    background: transparent;
-  }
-  
-  #start-date-display {
+/* Your positioning styles */
+.end-date-display {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  background: transparent;
+  padding: 4px 8px;
+  border-radius: 12px;
+  z-index: 100;
+  transition: all 0.3s ease;
+  /* Hide by default */
+  display: none !important;
+}
+
+.end-date-display:hover {
+  color: rgba(255, 255, 255, 0.8);
+  background: transparent;
+}
+
+#start-date-display {
   left: 10px;
-  bottom: 10px; /* Positions it above the end date */
+  bottom: 10px;
 }
 
 #now-date-display {
@@ -386,7 +390,12 @@
   right: auto;
   transform: translateX(-50%);
   bottom: 10px;
-  /* Same as .end-date-display otherwise */
+}
+
+/* === SIMPLE FIX === */
+/* Only show date displays when body has yogi-mode-active class AND element doesn't have .hidden */
+body.yogi-mode-active .end-date-display:not(.hidden) {
+  display: block !important;
 }
 
 /* Auto-hide loader after 6 seconds */
