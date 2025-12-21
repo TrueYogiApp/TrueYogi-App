@@ -2187,6 +2187,19 @@ body.lock-scroll {
   transform: rotate(180deg);
 }
 
+/* Hide date displays in app-interface */
+#app-interface ~ .end-date-display,
+#app-interface ~ #start-date-display,
+#app-interface ~ #now-date-display,
+#app-interface ~ #end-date-display {
+  display: none !important;
+}
+
+/* Only show in yogi-mode */
+#yogi-mode .end-date-display:not(.hidden) {
+  display: block;
+}
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
