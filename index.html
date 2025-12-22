@@ -6430,6 +6430,15 @@ function enforceClaimBeforeProceeding() {
     return;
   }
 
+    // Day-21 validateSpaceship check (only in Yogi mode)
+  if (
+    currentMode === 'yogi' &&
+    challengeData.currentDay >= 21 &&
+    (!window.walletPublicKey || !localStorage.getItem('jwtToken'))
+  ) {
+	validateSpaceshipMode();
+  }
+  
   // Otherwise, go home as before
   document.getElementById('app-interface').classList.add('hidden');
   document.getElementById('timer-section').classList.add('hidden');
