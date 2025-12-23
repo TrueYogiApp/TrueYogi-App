@@ -6984,7 +6984,7 @@ async function updateSessionTimesDisplay() {
 	  return;
 	}
 
-  // Await completion of any expired session before proceeding
+  // Await completion of any expired session before proceeding.
   if (typeof completeExpiredSessionIfNeeded === 'function') {
     await completeExpiredSessionIfNeeded();
   }
