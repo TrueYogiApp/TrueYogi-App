@@ -134,8 +134,9 @@
   "walletRequiredHeading": "Connecter le portefeuille",
   "walletRequiredDescriptionLine1": "Pour poursuivre votre parcours sacré au-delà de 21 jours, veuillez connecter et vérifier votre portefeuille.",
   "walletRequiredDescriptionLine2": "Cela garantit la sécurité de votre progression et de vos récompenses.",
+  "walletRequiredDescriptionLine3": "Ou vous pouvez réinitialiser le défi et recommencer depuis le jour 1.",
   "walletRequiredButtonConnect": "Connecter le portefeuille",
-  "walletRequiredButtonReset": "Réinitialiser le défi",
+  "walletRequiredButtonReset": "Enregistrer et Réinitialiser le Défi",
   "claimRequiredHeading": "Réclamation requise",
   "claimRequiredDescription": "Veuillez réclamer vos tokens YOGI avant de commencer un nouveau parcours.",
   "journeyCompleteHeading": "Félicitations, VraiYogi !",
@@ -198,7 +199,7 @@
   "dapp_faq_q2": "Pourquoi dois-je vérifier mon identité chaque jour ?",
   "dapp_faq_a2": "Votre identité est renouvelée quotidiennement. Comme une respiration consciente, une vérification quotidienne protège votre chemin et reconnaît votre présence.",
   "dapp_faq_q3": "Mes données sont-elles privées?",
-  "dapp_faq_a3": "Vos données de méditation restent privées jusqu'à ce que vous choisissiez de connecter votre portefeuille et de les vérifier.",
+  "dapp_faq_a3": "Votre identité est privée. Nous collectons des statistiques de méditation anonymes. Même la connexion au portefeuille ne fait que vérifier l'achèvement du défi sans vous identifier.",
   "dapp_faq_q4": "Que sont les tokens YOGI?",
   "dapp_faq_a4": "Les tokens YOGI sont des récompenses spirituelles – des symboles de votre présence constante sur le parcours des 41 jours.",
   "dapp_faq_q5": "Comment réclamer mes tokens YOGI?",
@@ -379,6 +380,12 @@
 "spaceship_mode_heading": "🛸 Mode Vaisseau Spatial",
 "technical_tools_heading": "🛠️ Outils Techniques",
 "wallet_copied": "Copié !",
-"wallet_connected": "Connecté"
+"wallet_connected": "Connecté",
+"yogichallenges.label": "Défis Yogi",
+"yogichallenges.duration.21": "(21 Jours)",
+"yogispaceshipchallenges.label": "Défis Yogi vaisseau spatial",
+"cacheReloaded": "Application rechargée ! Vous consultez maintenant le dernier contenu.",
+"challengeCompleted": "Défi terminé",
+"liveMeditatorsTooltip": "Méditants en direct"
 
 }

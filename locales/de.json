@@ -134,8 +134,9 @@
   "walletRequiredHeading": "Wallet verbinden",
   "walletRequiredDescriptionLine1": "Um deine heilige Reise über 21 Tage hinaus fortzusetzen, verbinde und verifiziere bitte deine Wallet.",
   "walletRequiredDescriptionLine2": "Das stellt sicher, dass dein Fortschritt und deine Belohnungen geschützt sind.",
+  "walletRequiredDescriptionLine3": "Oder du kannst die Herausforderung zurücksetzen und wieder bei Tag 1 beginnen.",
   "walletRequiredButtonConnect": "Wallet verbinden",
-  "walletRequiredButtonReset": "Herausforderung zurücksetzen",
+  "walletRequiredButtonReset": "Herausforderung Speichern & Zurücksetzen",
   "claimRequiredHeading": "Anspruch erforderlich",
   "claimRequiredDescription": "Bitte beanspruche deine YOGI-Tokens, bevor du eine neue Reise beginnst.",
   "journeyCompleteHeading": "Glückwunsch, WahrerYogi!",
@@ -198,7 +199,7 @@
   "dapp_faq_q2": "Warum verifiziere ich meine Identität täglich?",
   "dapp_faq_a2": "Deine Identität wird täglich aktualisiert. Wie ein achtsamer Atemzug hält das tägliche Einchecken deinen Pfad geschützt und deine Präsenz anerkannt.",
   "dapp_faq_q3": "Sind meine Daten privat?",
-  "dapp_faq_a3": "Deine Meditationsdaten bleiben privat, bis du deine Wallet verbindest und verifizierst.",
+  "dapp_faq_a3": "Ihre Identität ist privat. Wir erfassen anonyme Meditationsstatistiken. Selbst die Wallet-Verbindung dient nur zur Verifizierung des abgeschlossenen Challenges, ohne Sie zu identifizieren.",
   "dapp_faq_q4": "Was sind YOGI-Tokens?",
   "dapp_faq_a4": "YOGI-Tokens sind spirituelle Belohnungen – Symbole deiner konsequenten Präsenz auf dem 41-Tage-Weg.",
   "dapp_faq_q5": "Wie beanspruche ich meine YOGI-Tokens?",
@@ -374,5 +375,11 @@
 "spaceship_mode_heading": "🛸 Spaceship-Modus",
 "technical_tools_heading": "🛠️ Technische Werkzeuge",
   "wallet_copied": "Kopiert!",
-  "wallet_connected": "Verbunden"
+  "wallet_connected": "Verbunden",
+  "yogichallenges.label": "Yogi-Herausforderungen",
+"yogichallenges.duration.21": "(21 Tage)",
+"yogispaceshipchallenges.label": "Yogi-Raumschiff-Herausforderungen",
+"cacheReloaded": "App neu geladen! Sie sehen nun die neuesten Inhalte.",
+"challengeCompleted": "Herausforderung abgeschlossen",
+"liveMeditatorsTooltip": "Live-Meditierende"
 }
