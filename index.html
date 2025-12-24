@@ -7583,6 +7583,47 @@ if (todayStr < challengeData.startDate) {
   showStartMeditationModal();
 }
 
+
+// Function to setup realtime subscription
+function setupLiveMeditationCounter() {
+  // Subscribe to INSERT events on meditation_starts table
+  const channel = supabase
+    .channel('meditation-live-counter')
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'meditation_starts'
+      },
+      (payload) => {
+        // When someone starts meditation, update count
+        updateLiveCount();
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'DELETE',
+        schema: 'public',
+        table: 'meditation_starts'
+      },
+      (payload) => {
+        // If someone's session gets deleted, update count
+        updateLiveCount();
+      }
+    )
+    .subscribe();
+
+  // Initial fetch
+  updateLiveCount();
+  
+  // Cleanup on page unload (optional)
+  window.addEventListener('beforeunload', () => {
+    supabase.removeChannel(channel);
+  });
+}
+
 // Update function (same as before)
 async function updateLiveCount() {
   try {
