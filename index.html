@@ -3492,6 +3492,13 @@ body.lock-scroll {
         <p id="yogi-quote" class="text-sm md:text-base text-blue-300 italic p-3 bg-gray-800 rounded-lg inline-block"></p>
       </div>
 
+<!-- Updated Live Count Section <div style="width: 10px; height: 10px; background: green; border-radius: 50%; animation: pulse 2s infinite;"></div> --> 
+<div id="live-count-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 3px;">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <span class="live-count rainbow-number" style="font-size: 1.6rem; font-weight: bold;">0</span>
+  </div>
+</div>
+
       <!-- Avatar -->
       <div class="avatar-container mt-9">
         <div class="pulse"></div>
@@ -3500,13 +3507,6 @@ body.lock-scroll {
 			onerror="if(this.src.indexOf('yogi-avatar-fallback.gif')==-1){this.src='https://assets.trueyogi.app/assets/yogi-avatar.gif';}else{this.style.display='none'; this.parentNode.style.background='#fde047';}"
 		>
       </div>
-
-<!-- Updated Live Count Section <div style="width: 10px; height: 10px; background: green; border-radius: 50%; animation: pulse 2s infinite;"></div> --> 
-<div id="live-count-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 3px;">
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <span class="live-count rainbow-number" style="font-size: 1.6rem; font-weight: bold;">0</span>
-  </div>
-</div>
 
       <!-- Yogi Mode Progress -->
       <div id="yogi-progress" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
