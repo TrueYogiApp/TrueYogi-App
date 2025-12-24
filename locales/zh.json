@@ -134,9 +134,8 @@
   "walletRequiredHeading": "连接你的钱包",
   "walletRequiredDescriptionLine1": "如欲继续21天后的神圣旅程，请连接并验证你的钱包。",
   "walletRequiredDescriptionLine2": "这样可保证你的进度和奖励安全。",
-  "walletRequiredDescriptionLine3": "或者，您可以重置挑战并从第1天重新开始。",
   "walletRequiredButtonConnect": "连接钱包",
-  "walletRequiredButtonReset": "保存并重置挑战",
+  "walletRequiredButtonReset": "重置挑战",
   "claimRequiredHeading": "需要领取",
   "claimRequiredDescription": "请在开始新旅程前领取你的瑜伽士代币。",
   "journeyCompleteHeading": "恭喜你，真正的瑜伽士！",
@@ -199,7 +198,7 @@
   "dapp_faq_q2": "为什么要每日验证身份？",
   "dapp_faq_a2": "你的身份每日更新。如同正念呼吸，每日签到守护你的道路并让你的临在被认可。",
   "dapp_faq_q3": "我的数据私密吗？",
-  "dapp_faq_a3": "您的身份是私密的。我们收集匿名的冥想统计数据。即使是钱包连接也仅用于验证挑战完成，不会识别您的身份。",
+  "dapp_faq_a3": "你的冥想数据在未连接和验证钱包前始终是私密的。",
   "dapp_faq_q4": "瑜伽士代币是什么？",
   "dapp_faq_a4": "瑜伽士代币是灵性奖励——是你在41天之路上持续临在的象征。",
   "dapp_faq_q5": "如何领取我的瑜伽士代币？",
@@ -376,10 +375,5 @@
 "spaceship_mode_heading": "🛸 太空船模式",
 "technical_tools_heading": "🛠️ 技术工具",
  "wallet_copied": "已复制！",
- "wallet_connected": "已连接",
- "yogichallenges.label": "瑜伽挑战",
-"yogichallenges.duration.21": "(21天)",
-"yogispaceshipchallenges.label": "瑜伽太空挑战",
-"cacheReloaded": "应用程序已重新加载！您现在正在查看最新内容。",
-"challengeCompleted": "挑战已完成"
+ "wallet_connected": "已连接"
 }

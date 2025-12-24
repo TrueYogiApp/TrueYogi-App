@@ -134,9 +134,8 @@
   "walletRequiredHeading": "Connect Your Wallet",
   "walletRequiredDescriptionLine1": "To continue your sacred journey beyond 21 days, please connect and verify your wallet.",
   "walletRequiredDescriptionLine2": "This ensures your progress and rewards are secure.",
-  "walletRequiredDescriptionLine3": "Or you can reset the challenge and start again from day 1.",
   "walletRequiredButtonConnect": "Connect Wallet",
-  "walletRequiredButtonReset": "Save & Reset Challenge",
+  "walletRequiredButtonReset": "Reset Challenge",
   "claimRequiredHeading": "Claim Required",
   "claimRequiredDescription": "Please claim your YOGI tokens before starting a new journey.",
   "journeyCompleteHeading": "Congratulations, TrueYogi!",
@@ -199,7 +198,7 @@
   "dapp_faq_q2": "Why do I verify my identity daily?",
   "dapp_faq_a2": "Your identity is refreshed daily. Like a mindful breath, a daily check-in keeps your path protected and your presence recognized.",
   "dapp_faq_q3": "Is my data private?",
-  "dapp_faq_a3": "Your identity is private. We collect anonymous meditation stats. Even wallet connection only verifies challenge completion without identifying you.",
+  "dapp_faq_a3": "Your meditation data remains private until you choose to connect your wallet and verify it.",
   "dapp_faq_q4": "What are YOGI tokens?",
   "dapp_faq_a4": "YOGI tokens are Spiritual rewards—symbols of your consistent presence on the 41-day path.",
   "dapp_faq_q5": "How do I claim my YOGI tokens?",
@@ -380,11 +379,6 @@
 "spaceship_mode_heading": "🛸 Spaceship Mode",
 "technical_tools_heading": "🛠️ Technical Tools",
 "wallet_copied": "Copied!",
-"wallet_connected": "Connected",
-"yogichallenges.label": "Yogi Challenges",
-"yogichallenges.duration.21": "(21 Day)",
-"yogispaceshipchallenges.label": "Yogi Spaceship Challenges",
-"cacheReloaded": "App Reloaded! You’re now viewing the latest content.",
-"challengeCompleted": "Challenge Completed"
+"wallet_connected": "Connected"
 
 }

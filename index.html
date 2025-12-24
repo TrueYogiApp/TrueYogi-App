@@ -2235,6 +2235,31 @@ body.lock-scroll {
   100% { background-position: 100% 50%; }
 }
 
+.live-tooltip-text {
+  display: none;
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #232946ee;
+  color: #fde68a;
+  padding: 7px 20px;
+  border-radius: 11px;
+  font-size: 1.05em;
+  box-shadow: 0 2px 14px #0008;
+  white-space: nowrap;
+  z-index: 20;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+  text-align: center;
+}
+
+.live-count-tooltip-trigger:hover + .live-tooltip-text,
+.live-count-tooltip-trigger:focus + .live-tooltip-text {
+  display: block;
+  animation: fadeIn 0.2s;
+}
 
 </style>
   
@@ -3492,13 +3517,6 @@ body.lock-scroll {
         <p id="yogi-quote" class="text-sm md:text-base text-blue-300 italic p-3 bg-gray-800 rounded-lg inline-block"></p>
       </div>
 
-<!-- Updated Live Count Section <div style="width: 10px; height: 10px; background: green; border-radius: 50%; animation: pulse 2s infinite;"></div> --> 
-<div id="live-count-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 3px;">
-  <div style="display: flex; align-items: center; gap: 10px;">
-    <span class="live-count rainbow-number" style="font-size: 1.6rem; font-weight: bold;">0</span>
-  </div>
-</div>
-
       <!-- Avatar -->
       <div class="avatar-container mt-9">
         <div class="pulse"></div>
@@ -3507,6 +3525,21 @@ body.lock-scroll {
 			onerror="if(this.src.indexOf('yogi-avatar-fallback.gif')==-1){this.src='https://assets.trueyogi.app/assets/yogi-avatar.gif';}else{this.style.display='none'; this.parentNode.style.background='#fde047';}"
 		>
       </div>
+
+<!-- Updated Live Count Section <div style="width: 10px; height: 10px; background: green; border-radius: 50%; animation: pulse 2s infinite;"></div> --> 
+<div id="live-count-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 3px;">
+  <div style="display: flex; align-items: center; gap: 10px; position: relative;">
+    <span 
+      class="live-count rainbow-number live-count-tooltip-trigger"
+      style="font-size: 1.6rem; font-weight: bold; cursor: pointer;"
+      tabindex="0"
+    >0</span>
+	<span class="live-tooltip-text">
+	  <img src="/assets/yogimeditators.svg" alt="Meditator Icon" style="height:1.1em;width:1.1em;vertical-align:-4px;margin-right:7px;display:inline-block;">
+	  Live Meditators
+	</span>
+  </div>
+</div>
 
       <!-- Yogi Mode Progress -->
       <div id="yogi-progress" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
@@ -9926,6 +9959,13 @@ if (technicalTools) technicalTools.textContent = t('technical_tools_heading');
 document.querySelector('#challenge-streak-container .text-gray-400').textContent = t('yogichallenges.label');
 document.getElementById('challenge-duration-label').textContent = t('yogichallenges.duration.21');
 document.querySelector('#spaceship-challenge-streak-container .text-gray-400').textContent = t('yogispaceshipchallenges.label');
+
+  // Live meditators tooltip
+  const meditatorsTooltipEl = document.getElementById('live-meditators-tooltip');
+  if (meditatorsTooltipEl) {
+    meditatorsTooltipEl.innerHTML =
+      `<img src="/assets/yogimeditators.svg" alt="Meditator Icon" style="height:1.1em;width:1.1em;vertical-align:-4px;margin-right:7px;display:inline-block;"> ${t('liveMeditatorsTooltip')}`;
+  }
   
 }
 

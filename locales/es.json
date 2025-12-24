@@ -134,9 +134,8 @@
   "walletRequiredHeading": "Conecta tu Wallet",
   "walletRequiredDescriptionLine1": "Para continuar tu viaje sagrado más allá de los 21 días, conecta y verifica tu wallet.",
   "walletRequiredDescriptionLine2": "Esto asegura que tu progreso y recompensas estén protegidos.",
-  "walletRequiredDescriptionLine3": "O puedes reiniciar el desafío y comenzar de nuevo desde el día 1.",
   "walletRequiredButtonConnect": "Conectar Wallet",
-  "walletRequiredButtonReset": "Guardar y Reiniciar Desafío",
+  "walletRequiredButtonReset": "Restablecer Reto",
   "claimRequiredHeading": "Reclamo Requerido",
   "claimRequiredDescription": "Por favor reclama tus tokens YOGI antes de iniciar un nuevo viaje.",
   "journeyCompleteHeading": "¡Felicidades, VerdaderoYogi!",
@@ -199,7 +198,7 @@
   "dapp_faq_q2": "¿Por qué verifico mi identidad diariamente?",
   "dapp_faq_a2": "Tu identidad se refresca diariamente. Como una respiración consciente, el registro diario mantiene tu camino protegido y tu presencia reconocida.",
   "dapp_faq_q3": "¿Mis datos son privados?",
-  "dapp_faq_a3": "Tu identidad es privada. Recopilamos estadísticas de meditación anónimas. Incluso la conexión de la billetera solo verifica la finalización del desafío sin identificarte.",
+  "dapp_faq_a3": "Tus datos de meditación permanecen privados hasta que decides conectar y verificar tu wallet.",
   "dapp_faq_q4": "¿Qué son los tokens YOGI?",
   "dapp_faq_a4": "Los tokens YOGI son recompensas espirituales—símbolos de tu presencia constante en el camino de 41 días.",
   "dapp_faq_q5": "¿Cómo reclamo mis tokens YOGI?",
@@ -375,10 +374,5 @@
 "spaceship_mode_heading": "🛸 Modo Nave Espacial",
 "technical_tools_heading": "🛠️ Herramientas Técnicas",
   "wallet_copied": "¡Copiado!",
-  "wallet_connected": "Conectado",
-  "yogichallenges.label": "Desafíos Yogi",
-"yogichallenges.duration.21": "(21 Días)",
-"yogispaceshipchallenges.label": "Desafíos Nave Espacial Yogi",
-"cacheReloaded": "¡Aplicación recargado! Ahora ves el contenido más reciente.",
-"challengeCompleted": "Desafío completado"
+  "wallet_connected": "Conectado"
 }
