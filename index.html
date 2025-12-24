@@ -2209,6 +2209,33 @@ body.lock-scroll {
   display: block;
 }
 
+
+.rainbow-number {
+  /* transparent text and background-clip for gradient */
+  background: linear-gradient(
+    90deg,
+    #ff0000,   /* Red */
+    #ff9900,   /* Orange */
+    #ffee00,   /* Yellow */
+    #33ff00,   /* Green */
+    #00cfff,   /* Blue */
+    #1a0fff,   /* Indigo */
+    #a700ff,   /* Violet */
+    #ff0000    /* Red again for looping */
+  );
+  background-size: 400%;
+  color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
+  animation: rainbow-move 3s linear infinite;
+  font-weight: bold;
+}
+@keyframes rainbow-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -3473,6 +3500,13 @@ body.lock-scroll {
 			onerror="if(this.src.indexOf('yogi-avatar-fallback.gif')==-1){this.src='https://assets.trueyogi.app/assets/yogi-avatar.gif';}else{this.style.display='none'; this.parentNode.style.background='#fde047';}"
 		>
       </div>
+
+<!-- Updated Live Count Section <div style="width: 10px; height: 10px; background: green; border-radius: 50%; animation: pulse 2s infinite;"></div> --> 
+<div id="live-count-section" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 3px;">
+  <div style="display: flex; align-items: center; gap: 10px;">
+    <span class="live-count rainbow-number" style="font-size: 1.3rem; font-weight: bold;">0</span>
+  </div>
+</div>
 
       <!-- Yogi Mode Progress -->
       <div id="yogi-progress" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
@@ -6228,6 +6262,7 @@ try {
 }
 
     function restoreActiveSessionUI() {
+	  updateLiveCountVisibility();
 	  startMeditationBackground();
       document.getElementById('mode-selection').classList.add('hidden');
       document.getElementById('app-interface').classList.remove('hidden');
@@ -6352,6 +6387,7 @@ function enforceClaimBeforeProceeding() {
 
     function selectMode(mode) {
   currentMode = mode;
+  updateLiveCountVisibility();
   // Remove yogi-mode-active class first
   document.body.classList.remove('yogi-mode-active');
   document.getElementById('mode-selection').classList.add('hidden');
@@ -7547,8 +7583,50 @@ if (todayStr < challengeData.startDate) {
   showStartMeditationModal();
 }
 
+// Update function (same as before)
+async function updateLiveCount() {
+  try {
+    const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_stats');
+    const data = await response.json();
+    
+    document.querySelectorAll('.live-count').forEach(el => {
+      el.textContent = data.live_count || '0';
+    });
+  } catch (error) {
+    console.error('Failed to update live count:', error);
+  }
+}
+
+// Call this when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setupLiveMeditationCounter();
+});
+
+function updateLiveCountVisibility() {
+  const liveCountSection = document.getElementById('live-count-section');
+  const completeSection = document.getElementById('complete-section');
+  const finalSection = document.getElementById('final-section');
+
+  // Is either completion or final section visible?
+  const isCompleteOrFinal =
+    (completeSection && !completeSection.classList.contains('hidden')) ||
+    (finalSection && !finalSection.classList.contains('hidden'));
+
+  if (currentMode === 'yogi' && !isCompleteOrFinal) {
+    liveCountSection.style.display = 'flex'; // Show the live count section
+  } else {
+    liveCountSection.style.display = 'none'; // Hide the live count section
+  }
+}
+
+// Call this function whenever mode or session state changes
+document.addEventListener('DOMContentLoaded', () => {
+  updateLiveCountVisibility();
+});
+
 // This is the actual meditation start that gets called after confirmation
 async function beginMeditationSession() {
+  updateLiveCountVisibility();
   startMeditationBackground();
   updateHideUiBtnVisibility();
   updateHideUiButtonVisibility();
@@ -7562,7 +7640,25 @@ async function beginMeditationSession() {
   endTime = startTime + (targetDuration * 1000);
   sessionActive = true;
   
-
+  // 🆕 ADD THIS SIMPLE BLOCK - Save meditation start
+  try {
+    const startData = {
+      timestamp: new Date().toISOString(),
+      mode: currentMode,
+      duration: targetDuration,
+      device_type: deviceType
+    };
+    
+    // Non-blocking - don't wait for response
+    fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_starts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(startData)
+    });
+  } catch (e) {
+    // Ignore errors - don't break meditation
+  }
+  
 	// Hide FAQ tab (add this line)
   document.getElementById('faq-tab').style.display = 'none';
   // Set up session info display
@@ -7802,6 +7898,7 @@ function updateTimer() {
     updateSessionTimesDisplay();
     stopMeditationBackground();
 	showCompletionStats();
+	updateLiveCountVisibility();
 
     const bell = document.getElementById('bell');
     if (bell) {
