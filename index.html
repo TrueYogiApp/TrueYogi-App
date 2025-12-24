@@ -7722,13 +7722,16 @@ async function beginMeditationSession() {
   endTime = startTime + (targetDuration * 1000);
   sessionActive = true;
   
+     let omUserId = localStorage.getItem('omUserId');
+	 
   // 🆕 ADD THIS SIMPLE BLOCK - Save meditation start
   try {
     const startData = {
       timestamp: new Date().toISOString(),
       mode: currentMode,
       duration: targetDuration,
-      device_type: deviceType
+      device_type: deviceType,
+	  omUserId
     };
     
     // Non-blocking - don't wait for response
