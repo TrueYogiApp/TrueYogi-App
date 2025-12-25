@@ -6302,47 +6302,46 @@ try {
   updateStats();
 }
 
-    function restoreActiveSessionUI() {
-	  updateLiveCountVisibility();
-	  startMeditationBackground();
-      document.getElementById('mode-selection').classList.add('hidden');
-      document.getElementById('app-interface').classList.remove('hidden');
-      document.getElementById('start-section').classList.add('hidden');
-      document.getElementById('session-stats').classList.add('hidden');
-      document.getElementById('timer-section').classList.remove('hidden');
-      document.getElementById('yogi-progress').classList.add('hidden');
-      document.getElementById('session-timing-display').classList.add('hidden');
-      updateBackButtonVisibility();
-	  updateHideUiBtnVisibility();
-	  requestWakeLock();
-      enableMobileAudioResume();
+function restoreActiveSessionUI() {
+  startMeditationBackground();
+  updateLiveCountVisibility();
+  document.getElementById('mode-selection').classList.add('hidden');
+  document.getElementById('app-interface').classList.remove('hidden');
+  document.getElementById('start-section').classList.add('hidden');
+  document.getElementById('session-stats').classList.add('hidden');
+  document.getElementById('timer-section').classList.remove('hidden');
+  document.getElementById('yogi-progress').classList.add('hidden');
+  document.getElementById('session-timing-display').classList.add('hidden');
+  updateBackButtonVisibility();
+  updateHideUiBtnVisibility();
+  requestWakeLock();
+  enableMobileAudioResume();
 
+  const appFlowBtn = document.getElementById('flow-mode-btn-app');
+  const appYogiBtn = document.getElementById('yogi-mode-btn-app');
+  appFlowBtn.classList.toggle('hidden', currentMode === 'yogi');
+  appYogiBtn.classList.toggle('hidden', currentMode === 'flow');
 
-      const appFlowBtn = document.getElementById('flow-mode-btn-app')
-      const appYogiBtn = document.getElementById('yogi-mode-btn-app');
-      appFlowBtn.classList.toggle('hidden', currentMode === 'yogi');
-      appYogiBtn.classList.toggle('hidden', currentMode === 'flow');
+  const sessionInfoEl = document.getElementById('current-session-info');
+  const badgeEl = document.getElementById('session-info-badge');
+  const durationText = formatDuration(targetDuration);
+  sessionInfoEl.textContent = `${durationText} `;
+  badgeEl.classList.remove('flow-mode', 'yogi-mode');
+  badgeEl.classList.add(currentMode === 'flow' ? 'flow-mode' : 'yogi-mode');
 
-      const sessionInfoEl = document.getElementById('current-session-info');
-      const badgeEl = document.getElementById('session-info-badge');
-      const durationText = formatDuration(targetDuration);
-      sessionInfoEl.textContent = `${durationText} `;
-      badgeEl.classList.remove('flow-mode', 'yogi-mode');
-      badgeEl.classList.add(currentMode === 'flow' ? 'flow-mode' : 'yogi-mode');
+  document.getElementById('duration-selector').classList.toggle('hidden', currentMode === 'yogi');
 
-      document.getElementById('duration-selector').classList.toggle('hidden', currentMode === 'yogi');
+  if (document.getElementById('music-toggle').checked) {
+    const bgMusicPlayer = document.getElementById('bg-music-player');
+    bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
+    bgMusicPlayer.currentTime = 0;
+    bgMusicPlayer.loop = true;
+    bgMusicPlayer.volume = 0.5;
+    backgroundAudio = bgMusicPlayer;
+    if (backgroundAudio) {
+      const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+      backgroundAudio.currentTime = Math.min(elapsedTime, backgroundAudio.duration || Infinity);
 
-      if (document.getElementById('music-toggle').checked) {
-        const bgMusicPlayer = document.getElementById('bg-music-player');
-		bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
-		bgMusicPlayer.currentTime = 0;
-		bgMusicPlayer.loop = true;
-		bgMusicPlayer.volume = 0.5;
-		backgroundAudio = bgMusicPlayer;
-        if (backgroundAudio) {
-          const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
-          backgroundAudio.currentTime = Math.min(elapsedTime, backgroundAudio.duration || Infinity);
-          
       const playAudio = async () => {
         try {
           // Only resume if audioContext exists and has resume function
@@ -6355,21 +6354,27 @@ try {
           }
         } catch (e) {
           // Silently ignore errors about null resume/play
-          // Optionally log only unexpected errors:
           if (!(e && e.message && e.message.includes('resume'))) {
             console.log("Restore play error:", e);
           }
-          // Optionally, do not retry if audioContext is missing
-          // Or: setTimeout(playAudio, 200);
         }
       };
-          playAudio();
-        }
-      }
-
-      requestAnimationFrame(updateTimer);
-      document.addEventListener('visibilitychange', handleVisibilityChange);
+      playAudio();
     }
+  }
+
+  // ---------- SESSION EXPIRY CHECK ----------
+  // If resuming from background and session should be over, immediately finish it and play bell.
+  if (sessionActive && endTime && Date.now() >= endTime) {
+    sessionActive = false;
+    timerRunning = false;
+    updateTimer(); // This processes session end, including bell sound and UI
+  } else if (sessionActive) {
+    // If not expired, keep timer running as usual
+    requestAnimationFrame(updateTimer);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+  }
+}
 
     function updateBackButtonVisibility() {
       const backButtonContainer = document.getElementById('back-to-mode-container');
