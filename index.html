@@ -4387,6 +4387,16 @@ function tryResumeAudio(e) {
       bell.muted = wasMuted;
     });
   }
+  
+    // --- If session has finished while app was closed, play bell now ---
+  if (pendingBellSound) {
+    if (bell) {
+      bell.muted = false;
+      bell.currentTime = 0;
+      bell.play().catch(() => {});
+    }
+    pendingBellSound = false;
+  }
 }
 
 function disableMobileAudioResume() {
