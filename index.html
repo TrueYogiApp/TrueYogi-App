@@ -4373,20 +4373,20 @@ function tryResumeAudio(e) {
     });
   }
 
-  // --- PRIME THE BELL AUDIO ---
+  // --- PRIME THE BELL AUDIO, BUT KEEP IT SILENT DURING PRIMING ---
   const bell = document.getElementById('bell');
   if (bell) {
-    bell.muted = false;
-    // Prime the bell by playing and pausing at zero so browser allows future play
+    const wasMuted = bell.muted;
+    bell.muted = true;       // Mute for priming
     bell.currentTime = 0;
     bell.play().then(() => {
       bell.pause();
       bell.currentTime = 0;
+      bell.muted = wasMuted; // Restore previous muted state
     }).catch(() => {
-      // ignore error, bell will still be unmuted
+      bell.muted = wasMuted;
     });
   }
-
 }
 
 function disableMobileAudioResume() {
