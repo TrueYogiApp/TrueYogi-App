@@ -4361,7 +4361,7 @@ function enableMobileAudioResume() {
 }
 
 function tryResumeAudio(e) {
-  // Try to resume context first
+  // Resume context if needed
   if (window.audioContext && window.audioContext.state === 'suspended') {
     window.audioContext.resume().then(() => {
       // Resume all audio elements if paused and not at beginning
@@ -4373,9 +4373,22 @@ function tryResumeAudio(e) {
     });
   }
 
+  // --- PRIME THE BELL AUDIO ---
+  const bell = document.getElementById('bell');
+  if (bell) {
+    bell.muted = false;
+    // Prime the bell by playing and pausing at zero so browser allows future play
+    bell.currentTime = 0;
+    bell.play().then(() => {
+      bell.pause();
+      bell.currentTime = 0;
+    }).catch(() => {
+      // ignore error, bell will still be unmuted
+    });
+  }
+
   // If session expired while in background, play bell after next tap
   if (pendingBellSound) {
-    const bell = document.getElementById('bell');
     if (bell) {
       bell.muted = false;
       bell.play().catch(e => console.log("Bell sound error:", e));
