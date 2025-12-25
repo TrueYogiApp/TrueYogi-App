@@ -8055,6 +8055,7 @@ function isSyncAuthBannerVisible() {
   updateHideUiBtnVisibility();
   updateSessionTimesDisplay();
   updateStats();
+  onSessionCompleted();
 
   // Check for challenge completion (last session of last day)
   let showCongrats = false;
@@ -8344,59 +8345,53 @@ if (todaySessions >= challengeData.requiredSessions) {
 }
 }
 
-    function checkDayReset() {
+ function checkDayReset() {
   if (!challengeData.startDate) return;
 
   const today = getLocalMidnight(new Date());
   const todayStr = getLocalDateString(today);
   const startDate = getLocalMidnight(challengeData.startDate);
-  const endDate = new Date(challengeData.endDate);
 
-  // Only proceed if today is on or after the start date
   if (today < startDate) {
-    challengeData.currentDay = 1; // Keep at day 1 until start date
+    challengeData.currentDay = 1;
     challengeData.lastSessionDate = null;
     challengeData.streakDays = 0;
     saveChallengeData();
-    updateSessionTimesDisplay();
     return;
   }
 
   const diffTime = today - startDate;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-  
+
   if (diffDays > challengeData.currentDay) {
+    // Only reset streak if yesterday was incomplete
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
     const yesterdayStr = getLocalDateString(yesterday);
-    
+
     const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
-    if (yesterdaySessions < challengeData.requiredSessions && today > startDate) {
-      const yesterdayMissed = userSessionTimes.some(sessionTime => {
-        return !challengeData.sessionsCompleted.some(
-          s => s.date === yesterdayStr && s.time === sessionTime.time
-        );
-      });
-      if (yesterdayMissed) {
-        showMissedSessionModal();
-      }
+    if (yesterdaySessions < challengeData.requiredSessions) {
+      challengeData.streakDays = 0;
+      showMissedSessionModal();
     }
 
-    const lastSessionDate = challengeData.lastSessionDate ? new Date(challengeData.lastSessionDate) : startDate;
-    const lastSessionDiff = Math.floor((today - lastSessionDate) / (1000 * 60 * 60 * 24));
-    
-    if (lastSessionDiff > 1 || (yesterdaySessions < challengeData.requiredSessions && today > startDate)) {
-  challengeData.streakDays = 0;
-} else if (yesterdaySessions >= challengeData.requiredSessions) {
-  challengeData.streakDays++;
-}
-
-    challengeData.currentDay = Math.min(diffDays, 41); // Cap at 41 days
-    challengeData.lastSessionDate = todayStr;
+    challengeData.currentDay = Math.min(diffDays, 41);
     saveChallengeData();
   }
-  updateSessionTimesDisplay();
 }
+
+function onSessionCompleted() {
+  const todayStr = getLocalDateString(getLocalMidnight(new Date()));
+  const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
+
+  if (todaySessions === challengeData.requiredSessions) {
+    challengeData.streakDays++;
+    challengeData.lastSessionDate = todayStr;
+    saveChallengeData();
+    updateProgressDisplay();
+  }
+}
+
 
 function connectWalletForDay21() {
   document.getElementById('wallet-required-modal').classList.add('hidden');
