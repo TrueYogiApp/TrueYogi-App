@@ -4686,6 +4686,7 @@ function syncOfflineChallengeToServer() {
     total_minutes: challenge.totalMinutes || 0,
     device_type: getDeviceType?.() || 'unknown',
     user_agent: navigator.userAgent,
+	reset_count: challenge.resetCount || 0
   };
 
   fetch('https://trueyogi-backend-knkq.onrender.com/api/offline_challenge', {
@@ -6042,6 +6043,7 @@ try {
   
   // Reset all Yogi stats to 0 except resetCount
   const currentResetCount = challengeData.resetCount || 0; // Preserve reset count
+  const newResetCount = currentResetCount + 1; // increment by 1
   
   challengeData = {
     startDate: null,
@@ -6053,7 +6055,7 @@ try {
     streakDays: 0,
     totalSessions: 0,
     totalMinutes: 0,
-    resetCount: currentResetCount, // Keep the existing reset count
+    resetCount: newResetCount, // Keep the existing reset count
     challengeStreak: 0
   };
   
