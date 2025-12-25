@@ -4387,14 +4387,6 @@ function tryResumeAudio(e) {
     });
   }
 
-  // If session expired while in background, play bell after next tap
-  if (pendingBellSound) {
-    if (bell) {
-      bell.muted = false;
-      bell.play().catch(e => console.log("Bell sound error:", e));
-    }
-    pendingBellSound = false;
-  }
 }
 
 function disableMobileAudioResume() {
