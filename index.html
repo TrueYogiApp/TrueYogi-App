@@ -4245,7 +4245,7 @@ body.lock-scroll {
 	let wakeLock = null;
     let isWakeLockSupported = 'wakeLock' in navigator;	
 	let omUserId = localStorage.getItem('omUserId');
-	let pendingBellSound = false;
+	let pendingBellSound = false; // <-- Add this near your globals
 
 	
     // Challenge Data
@@ -4364,6 +4364,7 @@ function tryResumeAudio(e) {
   // Try to resume context first
   if (window.audioContext && window.audioContext.state === 'suspended') {
     window.audioContext.resume().then(() => {
+      // Resume all audio elements if paused and not at beginning
       document.querySelectorAll('audio').forEach(audio => {
         if (audio.paused && audio.currentTime > 0) {
           audio.play().catch(() => {});
@@ -4372,16 +4373,14 @@ function tryResumeAudio(e) {
     });
   }
 
-  // ---- NEW: Play bell sound if pending (ONLY if session ended) ----
+  // If session expired while in background, play bell after next tap
   if (pendingBellSound) {
     const bell = document.getElementById('bell');
-    if (bell && typeof bell.play === 'function') {
+    if (bell) {
       bell.muted = false;
-      bell.play().catch((e) => {
-        console.log("Bell resume error:", e);
-      });
-      pendingBellSound = false;
+      bell.play().catch(e => console.log("Bell sound error:", e));
     }
+    pendingBellSound = false;
   }
 }
 
@@ -6380,8 +6379,8 @@ function restoreActiveSessionUI() {
   if (sessionActive && endTime && Date.now() >= endTime) {
     sessionActive = false;
     timerRunning = false;
-	pendingBellSound = true; 
-    updateTimer(); // This processes session end, including bell sound and UI
+	pendingBellSound = true;
+    showCompletionStats(); // This processes session end, including bell sound and UI
   } else if (sessionActive) {
     // If not expired, keep timer running as usual
     requestAnimationFrame(updateTimer);
