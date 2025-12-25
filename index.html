@@ -8241,7 +8241,13 @@ function getCurrentDay(challengeStartDate, sessionsCompleted, totalDays = 41) {
   // Get unique dates in sorted order
   const uniqueDates = Array.from(new Set(sessionsCompleted.map(s => s.date))).sort();
 
-  if (!uniqueDates.length) return 0; // No sessions
+  if (!uniqueDates.length) {
+    // Show 0 before start, 1 on/after start date, even if no sessions done
+    const now = getLocalMidnight(new Date());
+    const challengeStart = getLocalMidnight(challengeStartDate);
+    if (now < challengeStart) return 0;
+    return 1;
+  }
   
   let streak = 1;
   let lastDate = new Date(challengeStartDate);
