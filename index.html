@@ -8238,41 +8238,23 @@ const PROGRESS_SEGMENTS = [
   { color: "#8b5cf6", days: 5 },   // violet
 ];
 
-function getCurrentDay(challengeStartDate, sessionsCompleted, totalDays = 41) {
-  // Get unique dates in sorted order
-  const uniqueDates = Array.from(new Set(sessionsCompleted.map(s => s.date))).sort();
+function getCurrentDay(challengeStartDate, totalDays = 41) {
+  // If no start date (null, undefined, empty), no challenge is running
+  if (!challengeStartDate) return 0;
 
-  if (!uniqueDates.length) {
-    // Show 0 before start, 1 on/after start date, even if no sessions done
-    const now = getLocalMidnight(new Date());
-    const challengeStart = getLocalMidnight(challengeStartDate);
-    if (now < challengeStart) return 0;
-    return 1;
-  }
-  
-  let streak = 1;
-  let lastDate = new Date(challengeStartDate);
+  const now = getLocalMidnight(new Date());
+  const challengeStart = getLocalMidnight(challengeStartDate);
 
-  for (let i = 1; i < uniqueDates.length && streak < totalDays; i++) {
-    const expected = new Date(lastDate);
-    expected.setDate(expected.getDate() + 1);
-    const thisDate = new Date(uniqueDates[i]);
-    if (
-      expected.getFullYear() !== thisDate.getFullYear() ||
-      expected.getMonth() !== thisDate.getMonth() ||
-      expected.getDate() !== thisDate.getDate()
-    ) {
-      // Gap detected, streak ends here
-      break;
-    }
-    streak++;
-    lastDate = thisDate;
-  }
-  return streak;
+  // Invalid challenge date or challenge not started yet
+  if (isNaN(challengeStart.getTime()) || now < challengeStart) return 0;
+
+  const diffTime = now - challengeStart;
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  return Math.min(diffDays + 1, totalDays);
 }
 
 function updateProgressDisplay() {
-  challengeData.currentDay = getCurrentDay(challengeData.startDate, challengeData.sessionsCompleted);
+  challengeData.currentDay = getCurrentDay(challengeData.startDate, 41);
   document.getElementById('current-day-display').textContent = challengeData.currentDay;
   const today = getLocalDateString();
   const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === today).length;
