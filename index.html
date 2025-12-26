@@ -7989,6 +7989,7 @@ function updateTimer() {
 	releaseWakeLock();
 	disableMobileAudioResume();
 	stopMeditationSelfHeal();
+	cleanupAfterSessionEnd();
     
     const modal = document.getElementById('end-meditation-modal');
     if (!modal.classList.contains('hidden')) {
@@ -10175,8 +10176,41 @@ window.beginMeditationSession = async function(...args) {
 };
 
 function cleanupAfterSessionEnd() {
-  updateHideUiButtonVisibility();
-  // ...rest of your session cleanup logic...
+  // Reset `uiHiddenForMeditation` and session flags
+  uiHiddenForMeditation = false;
+  sessionActive = false;
+
+  // Restore all UI elements and default states
+  hideBtn.style.display = 'none'; // Hide the toggle button
+  appInterface.classList.remove('hidden-by-meditation'); // Ensure app interface is visible
+  meditationCanvas.style.visibility = 'hidden';         // Hide meditation visuals
+  liveCount.classList.remove('show-live-counter-over'); // Restore live counter visibility
+  avatarContainer.classList.remove('show-avatar-over'); // Restore avatar visibility
+
+  // Trigger the completion section and stats
+  document.getElementById('timer-section').classList.add('hidden');
+  document.getElementById('complete-section').classList.remove('hidden'); // Show completion section
+  document.getElementById('session-stats').classList.remove('hidden');   // Show stats
+
+  // Stop visuals and finalize session cleanup
+  stopMeditationBackground(); // Stop ongoing visuals in the canvas
+  showCompletionStats();      // Display stats and any additional logic
+
+  // Handle audio reset
+  const bell = document.getElementById('bell');
+  if (bell) {
+    bell.muted = false;
+    bell.play().catch((e) => console.log("Bell sound error:", e));
+  }
+
+  const bgMusicPlayer = document.getElementById('bg-music-player');
+  if (bgMusicPlayer) {
+    bgMusicPlayer.pause();
+    bgMusicPlayer.currentTime = 0;
+  }
+
+  // Cleanup event listeners
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
 
 // Call cleanupAfterSessionEnd() in your updateTimer() at session completion and in confirmEndMeditation()
