@@ -2268,6 +2268,25 @@ body.lock-scroll {
   pointer-events: auto;
 }
 
+.hidden-by-meditation {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.show-live-counter-over {
+  visibility: visible !important;
+  pointer-events: auto !important;
+  /* Remove position: fixed, top, left, transform, padding, bg, etc */
+}
+
+.show-avatar-over {
+  visibility: visible !important;
+  pointer-events: auto !important;
+  /* Optionally add position: fixed/top/left if you want to move it, 
+     but leave these off to keep original location */
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -3526,7 +3545,7 @@ body.lock-scroll {
       </div>
 
       <!-- Avatar -->
-      <div class="avatar-container mt-9">
+      <div class="avatar-container mt-9" id="avatar-container">
         <div class="pulse"></div>
         <div class="pulse pulse-2"></div>
         <img src="https://trueyogi.app/assets/yogi-avatar.gif" alt="Meditating Avatar" class="w-44 h-44 mx-auto rounded-full mb-6 shadow-lg object-scale-down object-center"
@@ -10110,24 +10129,29 @@ const hideBtn = document.getElementById('hide-ui-btn');
 const appInterface = document.getElementById('app-interface');
 const modeSelection = document.getElementById('mode-selection');
 const meditationCanvas = document.getElementById('meditation-canvas');
+const avatarContainer = document.getElementById('avatar-container');
+const liveCount = document.getElementById('live-count-section');
 
 // Toggle UI when button clicked
 hideBtn.addEventListener('click', () => {
-  if (!sessionActive) return; // Only work during meditation
+  if (!sessionActive) return;
   uiHiddenForMeditation = !uiHiddenForMeditation;
+  const liveCount = document.getElementById('live-count-section');
   if (uiHiddenForMeditation) {
-    // Hide all UI except the canvas
-    appInterface.classList.add('hidden');
+    appInterface.classList.add('hidden-by-meditation');
     modeSelection.classList.add('hidden');
     meditationCanvas.classList.remove('hidden');
-    hideBtn.textContent = '🌜'; // Show "restore" icon
+    hideBtn.textContent = '🌜';
     hideBtn.title = '';
+    liveCount.classList.add('show-live-counter-over');
+	avatarContainer.classList.add('show-avatar-over');
   } else {
-    // Restore all UI
-    appInterface.classList.remove('hidden');
+    appInterface.classList.remove('hidden-by-meditation');
     meditationCanvas.classList.remove('hidden');
-    hideBtn.textContent = '🌞'; // Show "hide" icon
+    hideBtn.textContent = '🌞';
     hideBtn.title = '';
+    liveCount.classList.remove('show-live-counter-over');
+	avatarContainer.classList.remove('show-avatar-over');
   }
 });
 
