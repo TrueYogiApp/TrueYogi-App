@@ -2268,24 +2268,6 @@ body.lock-scroll {
   pointer-events: auto;
 }
 
-.hidden-by-meditation {
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-.show-live-counter-over {
-  visibility: visible !important;
-  pointer-events: auto !important;
-  /* Remove position: fixed, top, left, transform, padding, bg, etc */
-}
-
-.show-avatar-over {
-  visibility: visible !important;
-  pointer-events: auto !important;
-  /* Optionally add position: fixed/top/left if you want to move it, 
-     but leave these off to keep original location */
-}
-
 
 </style>
   
@@ -10130,8 +10112,6 @@ const hideBtn = document.getElementById('hide-ui-btn');
 const appInterface = document.getElementById('app-interface');
 const modeSelection = document.getElementById('mode-selection');
 const meditationCanvas = document.getElementById('meditation-canvas');
-const avatarContainer = document.getElementById('avatar-container');
-const liveCount = document.getElementById('live-count-section');
 
 // Toggle UI when button clicked
 hideBtn.addEventListener('click', () => {
@@ -10182,8 +10162,6 @@ function cleanupAfterSessionEnd() {
   hideBtn.style.display = 'none'; // Hide the toggle button
   appInterface.classList.remove('hidden-by-meditation'); // Ensure app interface is visible
   meditationCanvas.style.visibility = 'hidden';         // Hide meditation visuals
-  liveCount.classList.remove('show-live-counter-over'); // Restore live counter visibility
-  avatarContainer.classList.remove('show-avatar-over'); // Restore avatar visibility
 
   // Trigger the completion section and stats
   document.getElementById('timer-section').classList.add('hidden');
