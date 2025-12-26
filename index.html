@@ -10115,19 +10115,20 @@ const meditationCanvas = document.getElementById('meditation-canvas');
 
 // Toggle UI when button clicked
 hideBtn.addEventListener('click', () => {
-  if (!sessionActive) return;
+  if (!sessionActive) return; // Only work during meditation
   uiHiddenForMeditation = !uiHiddenForMeditation;
-  const liveCount = document.getElementById('live-count-section');
   if (uiHiddenForMeditation) {
+    // Hide all UI except the canvas
     appInterface.classList.add('hidden');
     modeSelection.classList.add('hidden');
     meditationCanvas.classList.remove('hidden');
-    hideBtn.textContent = '🌜';
+    hideBtn.textContent = '🌜'; // Show "restore" icon
     hideBtn.title = '';
   } else {
+    // Restore all UI
     appInterface.classList.remove('hidden');
     meditationCanvas.classList.remove('hidden');
-    hideBtn.textContent = '🌞';
+    hideBtn.textContent = '🌞'; // Show "hide" icon
     hideBtn.title = '';
   }
 });
@@ -10137,11 +10138,15 @@ function updateHideUiButtonVisibility() {
   if (sessionActive) {
     hideBtn.style.display = 'block';
     hideBtn.textContent = uiHiddenForMeditation ? '🌞' : '🌞';
+    // ENSURE CANVAS IS VISIBLE
+    meditationCanvas.classList.remove('hidden');
+    meditationCanvas.style.visibility = '';
   } else {
     hideBtn.style.display = 'none';
     uiHiddenForMeditation = false;
     appInterface.classList.remove('hidden');
     meditationCanvas.classList.remove('hidden');
+    meditationCanvas.style.visibility = '';
   }
 }
 
