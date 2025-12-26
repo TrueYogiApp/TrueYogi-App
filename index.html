@@ -8251,7 +8251,32 @@ function getCurrentDay(challengeStartDate, totalDays = 41) {
 
   const diffTime = now - challengeStart;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-  return Math.min(diffDays + 1, totalDays);
+  
+  // Day 1 (start date) always shows as 1/41
+  if (diffDays === 0) return 1;
+  
+  // Check if ALL previous days had required sessions
+  let currentDay = 1; // Start at day 1
+  
+  // We need to check from day 2 onward
+  for (let day = 2; day <= diffDays + 1; day++) {
+    // Check the previous day (day-1)
+    const prevDate = new Date(challengeStart);
+    prevDate.setDate(challengeStart.getDate() + (day - 2)); // day-2 because day 1 is index 0
+    const prevDateStr = getLocalDateString(prevDate);
+    
+    const prevDaySessions = challengeData.sessionsCompleted.filter(s => s.date === prevDateStr).length;
+    
+    if (prevDaySessions >= challengeData.requiredSessions) {
+      // Previous day was complete, we can show today as current day
+      currentDay = day;
+    } else {
+      // Previous day was incomplete - stop here
+      break;
+    }
+  }
+  
+  return Math.min(currentDay, totalDays);
 }
 
 function updateProgressDisplay() {
