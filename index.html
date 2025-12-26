@@ -10119,13 +10119,13 @@ hideBtn.addEventListener('click', () => {
   uiHiddenForMeditation = !uiHiddenForMeditation;
   const liveCount = document.getElementById('live-count-section');
   if (uiHiddenForMeditation) {
-    appInterface.classList.add('hidden-by-meditation');
+    appInterface.classList.add('hidden');
     modeSelection.classList.add('hidden');
     meditationCanvas.classList.remove('hidden');
     hideBtn.textContent = '🌜';
     hideBtn.title = '';
   } else {
-    appInterface.classList.remove('hidden-by-meditation');
+    appInterface.classList.remove('hidden');
     meditationCanvas.classList.remove('hidden');
     hideBtn.textContent = '🌞';
     hideBtn.title = '';
