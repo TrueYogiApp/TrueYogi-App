@@ -8408,28 +8408,16 @@ function checkDayReset() {
 
   updateSessionTimesDisplay();
 
-  // ============ NEW CODE ADDED HERE ============
-  // Check if yesterday was completed but streak wasn't updated
+  // ============ FIXED STREAK LOGIC ============
+  // Check which day we should update streak for
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
   const yesterdayStr = getLocalDateString(yesterday);
   
-  const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
-  if (
-    yesterday >= startDate &&
-    yesterdaySessions >= challengeData.requiredSessions &&
-    challengeData.lastSessionDate !== yesterdayStr
-  ) {
-    // Yesterday was completed but streak wasn't updated (user closed app)
-    challengeData.streakDays++;
-    challengeData.lastSessionDate = yesterdayStr;
-    saveChallengeData();
-    updateProgressDisplay && updateProgressDisplay();
-  }
-  // ============ END NEW CODE ============
-
-  // --------- KEEP EXISTING TODAY CHECK ---------
   const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
+  const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
+  
+  // Priority: Update streak for TODAY first if complete
   if (
     today >= startDate &&
     todaySessions >= challengeData.requiredSessions &&
@@ -8440,7 +8428,21 @@ function checkDayReset() {
     saveChallengeData();
     updateProgressDisplay && updateProgressDisplay();
   }
+  // Only check yesterday if today is NOT complete AND yesterday WAS complete
+  else if (
+    yesterday >= startDate &&
+    yesterdaySessions >= challengeData.requiredSessions &&
+    challengeData.lastSessionDate !== yesterdayStr
+  ) {
+    // Yesterday was completed but streak wasn't updated (user closed app)
+    challengeData.streakDays++;
+    challengeData.lastSessionDate = yesterdayStr;
+    saveChallengeData();
+    updateProgressDisplay && updateProgressDisplay();
+  }
+  // ============ END FIX ============
 }
+
 
 function connectWalletForDay21() {
   document.getElementById('wallet-required-modal').classList.add('hidden');
