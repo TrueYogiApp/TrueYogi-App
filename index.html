@@ -8408,21 +8408,46 @@ function checkDayReset() {
 
   updateSessionTimesDisplay();
 
-  // --------- STREAK UPDATE LOGIC HERE ---------
-  // Only increment the streak if:
-  // - today's sessions are complete
-  // - today is after startDate (not before challenge)
-  // - streak for today has not already been incremented (uses lastSessionDate as flag)
+  // ========== FIX #1: Check YESTERDAY's completed sessions first ==========
+  // This handles the case where user completed yesterday but closed app
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayStr = getLocalDateString(yesterday);
+  
+  const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
+  if (
+    yesterday >= startDate && // Yesterday was during challenge
+    yesterdaySessions >= challengeData.requiredSessions && // Yesterday completed
+    challengeData.lastSessionDate !== yesterdayStr && // Not already counted
+    challengeData.lastSessionDate !== todayStr // Not counted today already
+  ) {
+    challengeData.streakDays++;
+    challengeData.lastSessionDate = yesterdayStr;
+    saveChallengeData();
+    updateProgressDisplay && updateProgressDisplay();
+  }
+
+  // ========== FIX #2: Check TODAY's sessions + CAP streak ==========
   const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
   if (
     today >= startDate &&
     todaySessions >= challengeData.requiredSessions &&
-    challengeData.lastSessionDate !== todayStr // <--- Only increment ONCE per day
+    challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
   ) {
-    challengeData.streakDays++;
+    // CAP streak at currentDay to prevent streak > currentDay
+    if (challengeData.streakDays < challengeData.currentDay) {
+      challengeData.streakDays++;
+    }
     challengeData.lastSessionDate = todayStr;
     saveChallengeData();
     updateProgressDisplay && updateProgressDisplay();
+  }
+
+  // ========== ADDITIONAL SAFEGUARD ==========
+  // Ensure streak never exceeds currentDay (in case of data corruption)
+  if (challengeData.streakDays > challengeData.currentDay) {
+    challengeData.streakDays = challengeData.currentDay;
+    saveChallengeData();
   }
 }
 
