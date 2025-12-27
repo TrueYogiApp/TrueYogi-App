@@ -8364,15 +8364,17 @@ if (todaySessions >= challengeData.requiredSessions) {
 }
 }
 
-function checkDayReset() {
+    function checkDayReset() {
   if (!challengeData.startDate) return;
 
   const today = getLocalMidnight(new Date());
   const todayStr = getLocalDateString(today);
   const startDate = getLocalMidnight(challengeData.startDate);
+  const endDate = new Date(challengeData.endDate);
 
+  // Only proceed if today is on or after the start date
   if (today < startDate) {
-    challengeData.currentDay = 1;
+    challengeData.currentDay = 1; // Keep at day 1 until start date
     challengeData.lastSessionDate = null;
     challengeData.streakDays = 0;
     saveChallengeData();
@@ -8382,13 +8384,12 @@ function checkDayReset() {
 
   const diffTime = today - startDate;
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
-
+  
   if (diffDays > challengeData.currentDay) {
-    // Only reset streak if yesterday was incomplete
     const yesterday = new Date(today);
     yesterday.setDate(today.getDate() - 1);
     const yesterdayStr = getLocalDateString(yesterday);
-
+    
     const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
     if (yesterdaySessions < challengeData.requiredSessions && today > startDate) {
       const yesterdayMissed = userSessionTimes.some(sessionTime => {
@@ -8399,31 +8400,22 @@ function checkDayReset() {
       if (yesterdayMissed) {
         showMissedSessionModal();
       }
-      challengeData.streakDays = 0;
     }
 
-    challengeData.currentDay = Math.min(diffDays, 41);
-    saveChallengeData();
-  }
+    const lastSessionDate = challengeData.lastSessionDate ? new Date(challengeData.lastSessionDate) : startDate;
+    const lastSessionDiff = Math.floor((today - lastSessionDate) / (1000 * 60 * 60 * 24));
+    
+    if (lastSessionDiff > 1 || (yesterdaySessions < challengeData.requiredSessions && today > startDate)) {
+  challengeData.streakDays = 0;
+} else if (yesterdaySessions >= challengeData.requiredSessions) {
+  challengeData.streakDays++;
+}
 
-  updateSessionTimesDisplay();
-
-  // --------- STREAK UPDATE LOGIC HERE ---------
-  // Only increment the streak if:
-  // - today's sessions are complete
-  // - today is after startDate (not before challenge)
-  // - streak for today has not already been incremented (uses lastSessionDate as flag)
-  const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
-  if (
-    today >= startDate &&
-    todaySessions >= challengeData.requiredSessions &&
-    challengeData.lastSessionDate !== todayStr // <--- Only increment ONCE per day
-  ) {
-    challengeData.streakDays++;
+    challengeData.currentDay = Math.min(diffDays, 41); // Cap at 41 days
     challengeData.lastSessionDate = todayStr;
     saveChallengeData();
-    updateProgressDisplay && updateProgressDisplay();
   }
+  updateSessionTimesDisplay();
 }
 
 
