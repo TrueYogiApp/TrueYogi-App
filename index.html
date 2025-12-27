@@ -8408,39 +8408,22 @@ function checkDayReset() {
 
   updateSessionTimesDisplay();
 
-  // ============ FIXED STREAK LOGIC ============
-  // Check which day we should update streak for
-  const yesterday = new Date(today);
-  yesterday.setDate(today.getDate() - 1);
-  const yesterdayStr = getLocalDateString(yesterday);
-  
+  // --------- STREAK UPDATE LOGIC HERE ---------
+  // Only increment the streak if:
+  // - today's sessions are complete
+  // - today is after startDate (not before challenge)
+  // - streak for today has not already been incremented (uses lastSessionDate as flag)
   const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
-  const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
-  
-  // Priority: Update streak for TODAY first if complete
   if (
     today >= startDate &&
     todaySessions >= challengeData.requiredSessions &&
-    challengeData.lastSessionDate !== todayStr
+    challengeData.lastSessionDate !== todayStr // <--- Only increment ONCE per day
   ) {
     challengeData.streakDays++;
     challengeData.lastSessionDate = todayStr;
     saveChallengeData();
     updateProgressDisplay && updateProgressDisplay();
   }
-  // Only check yesterday if today is NOT complete AND yesterday WAS complete
-  else if (
-    yesterday >= startDate &&
-    yesterdaySessions >= challengeData.requiredSessions &&
-    challengeData.lastSessionDate !== yesterdayStr
-  ) {
-    // Yesterday was completed but streak wasn't updated (user closed app)
-    challengeData.streakDays++;
-    challengeData.lastSessionDate = yesterdayStr;
-    saveChallengeData();
-    updateProgressDisplay && updateProgressDisplay();
-  }
-  // ============ END FIX ============
 }
 
 
