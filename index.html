@@ -16317,7 +16317,7 @@ function isInAnyModeSection() {
     hideSaver();
     if (timeout) clearTimeout(timeout);
     if (isInAnyModeSection()) {
-      timeout = setTimeout(showSaver, 3000); // 30s idle
+      timeout = setTimeout(showSaver, 30000); // 30s idle
     }
   }
   document.addEventListener('DOMContentLoaded', resetIdle);
