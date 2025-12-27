@@ -2292,6 +2292,7 @@ body.lock-scroll {
 <body class="text-white flex items-center justify-center min-h-screen px-4 py-8">
 <canvas id="particles-canvas" class="hidden fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-10"></canvas>
 <canvas id="meditation-canvas" class="hidden"></canvas>
+<canvas id="spiritual-canvas" class="hidden fixed top-0 left-0 w-full h-full z-20" style="pointer-events:none;"></canvas>
 
 <!-- Persistent Sync Auth Banner -->
 <div id="sync-auth-banner" style="display:none; background:#fde68a; color:#1e293b; font-weight:bold; text-align:center; padding:0.75em; z-index:1001; position:fixed; top:0; left:0; width:100%;">
@@ -16263,6 +16264,163 @@ function hideScreensaver() {
 
 // Start timer initially
 resetIdleTimer();
+</script>
+
+<script>
+// --- Moving Through the Photon Belt: Powerful Energy Screensaver ---
+
+(function() {
+  const canvas = document.getElementById('spiritual-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let active = false, timeout, animationFrameId;
+
+  function resize() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  // Visibility logic matches your previous setup
+function isInAnyModeSection() {
+  const app = document.getElementById('app-interface');
+  const timer = document.getElementById('timer-section');
+  const complete = document.getElementById('complete-section');
+  const final = document.getElementById('final-section');
+  return app && !app.classList.contains('hidden')
+      && timer && timer.classList.contains('hidden')
+      && complete && complete.classList.contains('hidden')
+      && final && final.classList.contains('hidden');
+}
+
+  function showSaver() {
+    if (!isInAnyModeSection()) return;
+    active = true;
+    canvas.classList.remove('hidden');
+    animate();
+  }
+
+  function hideSaver() {
+    active = false;
+    canvas.classList.add('hidden');
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    clearTimeout(timeout);
+    timeout = null;
+  }
+
+  ['mousemove','keydown','touchstart'].forEach(evt => 
+    document.addEventListener(evt, resetIdle, true)
+  );
+
+  function resetIdle() {
+    hideSaver();
+    if (timeout) clearTimeout(timeout);
+    if (isInAnyModeSection()) {
+      timeout = setTimeout(showSaver, 3000); // 30s idle
+    }
+  }
+  document.addEventListener('DOMContentLoaded', resetIdle);
+  window.addEventListener('TrueYogiModeChanged', resetIdle);
+
+  // --- Photon-belt animation variables ---
+  const NUM_STREAMS = 55, PARTICLES_PER_STREAM = 14;
+  let t = 0;
+
+  // Particle objects move toward the viewer
+  let particles = [];
+  function initParticles() {
+    particles = [];
+    for (let i = 0; i < NUM_STREAMS * PARTICLES_PER_STREAM; i++) {
+      particles.push({
+        angle: (i % NUM_STREAMS) * (Math.PI * 2 / NUM_STREAMS) + Math.random() * 0.06,
+        z: Math.random() * 1,
+        r: 0.33 + Math.random() * 0.42,
+        size: 15 + Math.random() * 13 + Math.random() * 7,
+        speed: 0.004 + Math.random() * 0.009 + (Math.random() < 0.065 ? 0.016 : 0)
+      });
+    }
+  }
+  initParticles();
+
+  function animate() {
+    if (!active) return;
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    const w = canvas.width, h = canvas.height;
+    // Tunnel: streaking rays
+    for (let i=0; i<NUM_STREAMS; i++) {
+      ctx.save();
+      ctx.globalAlpha = 0.10 + 0.07*Math.sin(t*1.6 + i);
+      let inner = 90 + 48*Math.sin(t*0.22 + i*0.29);
+      let outer = Math.min(w,h) * 0.6;
+      let a = (i / NUM_STREAMS) * Math.PI*2 + Math.sin(i+t)*0.02;
+      ctx.beginPath();
+      ctx.moveTo(w/2 + Math.cos(a+0.04)*inner, h/2 + Math.sin(a+0.04)*inner);
+      ctx.lineTo(w/2 + Math.cos(a)*outer, h/2 + Math.sin(a)*outer);
+      ctx.lineWidth = 2.4 + 2.2*Math.sin(t+i);
+      ctx.strokeStyle = `hsla(${55+155*(i/NUM_STREAMS)},98%,${77+17*Math.sin(t*0.28 + i*1.5)}%,${0.55 + 0.16*Math.sin(i+t*2.1)})`;
+      ctx.shadowColor = "#fffbe6";
+      ctx.shadowBlur = 10;
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    // Central "energy wave"
+    ctx.save();
+    ctx.globalAlpha = 0.13;
+    for(let k=0; k<4; k++){
+      ctx.beginPath();
+      ctx.ellipse(w/2, h/2,
+        w/2.9 + Math.sin(t*0.9+k)*33,
+        85 + 21*Math.sin(t*1.2+k),
+        0, 0, 2*Math.PI);
+      ctx.fillStyle = `rgba(245,234,233,0.4)`;
+      ctx.fill();
+    }
+    ctx.restore();
+
+    // Dynamic photon particles (moving towards the user)
+    if (particles.length < NUM_STREAMS*PARTICLES_PER_STREAM*0.97) initParticles();
+    for (const p of particles) {
+      // Perspective projection
+      const fx = Math.cos(p.angle) * p.r;
+      const fy = Math.sin(p.angle) * p.r;
+      const perspective = 0.28 + 1.5*(1-p.z); // Near=Big, Far=Small
+      const x = w/2 + fx * w * 0.9 * p.z;
+      const y = h/2 + fy * h * 0.40 * p.z;
+      const size = p.size * perspective * (0.8 + 0.3 * Math.abs(Math.sin(t + p.angle*8)));
+      // Color by progress through the belt (more gold/violet/blue)
+      let grad = ctx.createRadialGradient(x, y, 0, x, y, size);
+      let progress = 1 - p.z;
+      grad.addColorStop(0, `hsla(${55+180*progress},100%,${77+18*progress}%,.94)`);
+      grad.addColorStop(0.47, `hsla(${155+200*progress},100%,80%,.25)`);
+      grad.addColorStop(1, `rgba(216,238,255,0.00)`);
+      ctx.save();
+      ctx.globalAlpha = 0.52 + 0.19*Math.sin(p.angle*2 + t*2.6);
+      ctx.beginPath();
+      ctx.arc(x, y, size, 0, Math.PI*2);
+      ctx.fillStyle = grad;
+      ctx.shadowColor = "#fffbe6";
+      ctx.shadowBlur = Math.min(w,h)/32;
+      ctx.fill();
+      ctx.restore();
+
+      // Move the particle towards the viewer
+      p.z -= p.speed;
+      if (p.z < 0.02) {
+        p.z = 1;
+        p.angle = p.angle + (Math.random()-0.5)*0.33;
+        p.r = 0.33 + Math.random() * 0.42;
+        p.size = 15+Math.random()*13+Math.random()*7;
+        p.speed = 0.004 + Math.random()*0.009 + (Math.random() < 0.065 ? 0.016 : 0);
+      }
+    }
+
+    t += 0.015 + 0.006*Math.sin(t*0.5);
+    animationFrameId = requestAnimationFrame(animate);
+  }
+})();
 </script>
 
 <script>
