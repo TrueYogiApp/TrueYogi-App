@@ -5718,6 +5718,15 @@ function showWelcomeModal() {
       return;
     }
   }
+  
+   if (
+	  currentMode === 'yogi' &&
+	  challengeData.currentDay >= 22 &&
+	  (!window.walletPublicKey || !localStorage.getItem('jwtToken'))
+	) {
+	  return;
+	}
+
 
   const modal = document.getElementById('next-session-modal');
   if (!modal) return;
