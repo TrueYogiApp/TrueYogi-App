@@ -16307,6 +16307,17 @@ resetIdleTimer();
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let active = false, animationFrameId;
+  let animationStartTime = null;
+
+  // Configuration for ramping up particles
+  const BASE_NUM_STREAMS = 5, BASE_PARTICLES_PER_STREAM = 2;
+  const MAX_NUM_STREAMS = 30, MAX_PARTICLES_PER_STREAM = 8;
+  const INCREMENT_INTERVAL_MS = 3 * 60 * 1000; // 3 minutes
+
+  let NUM_STREAMS = BASE_NUM_STREAMS;
+  let PARTICLES_PER_STREAM = BASE_PARTICLES_PER_STREAM;
+  let t = 0;
+  let particles = [];
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -16315,11 +16326,34 @@ resetIdleTimer();
   window.addEventListener('resize', resize);
   resize();
 
-  // -- These replaced the screen saver logic --
+  function calculateParticleCounts(elapsedMs) {
+    const steps = Math.floor(elapsedMs / INCREMENT_INTERVAL_MS);
+    const numStreams = Math.min(BASE_NUM_STREAMS + steps * 5, MAX_NUM_STREAMS);
+    const particlesPerStream = Math.min(BASE_PARTICLES_PER_STREAM + steps * 2, MAX_PARTICLES_PER_STREAM);
+    return [numStreams, particlesPerStream];
+  }
+
+  function initParticles() {
+    particles = [];
+    for (let i = 0; i < NUM_STREAMS * PARTICLES_PER_STREAM; i++) {
+      particles.push({
+        angle: (i % NUM_STREAMS) * (Math.PI * 2 / NUM_STREAMS) + Math.random() * 0.06,
+        z: Math.random() * 1,
+        r: 0.33 + Math.random() * 0.42,
+        size: 15 + Math.random() * 13 + Math.random() * 7,
+        speed: 0.002 + Math.random() * 0.004 + (Math.random() < 0.065 ? 0.007 : 0)
+      });
+    }
+  }
+
   function showSpiritualCanvas() {
-    if (active) return;
+    if (active) return; // Prevent multiple loops
     active = true;
     canvas.classList.remove('hidden');
+    animationStartTime = performance.now();
+    NUM_STREAMS = BASE_NUM_STREAMS;
+    PARTICLES_PER_STREAM = BASE_PARTICLES_PER_STREAM;
+    initParticles();
     animate();
   }
 
@@ -16334,26 +16368,21 @@ resetIdleTimer();
   window.showSpiritualCanvas = showSpiritualCanvas;
   window.hideSpiritualCanvas = hideSpiritualCanvas;
 
-  // --- Photon-belt animation variables ---
-  const NUM_STREAMS = 16, PARTICLES_PER_STREAM = 4;
-  let t = 0;
-  let particles = [];
-  function initParticles() {
-    particles = [];
-    for (let i = 0; i < NUM_STREAMS * PARTICLES_PER_STREAM; i++) {
-      particles.push({
-        angle: (i % NUM_STREAMS) * (Math.PI * 2 / NUM_STREAMS) + Math.random() * 0.06,
-        z: Math.random() * 1,
-        r: 0.33 + Math.random() * 0.42,
-        size: 15 + Math.random() * 13 + Math.random() * 7,
-        speed: 0.002 + Math.random() * 0.004 + (Math.random() < 0.065 ? 0.007 : 0)
-      });
-    }
-  }
-  initParticles();
-
-  function animate() {
+  function animate(now) {
     if (!active) return;
+    if (!animationStartTime) animationStartTime = now || performance.now();
+
+    // Dynamic computation for particles & streams ramp up
+    const elapsed = (now || performance.now()) - animationStartTime;
+    const [newNumStreams, newParticlesPerStream] = calculateParticleCounts(elapsed);
+
+    // If particle count changed, update and re-init
+    if (newNumStreams !== NUM_STREAMS || newParticlesPerStream !== PARTICLES_PER_STREAM) {
+      NUM_STREAMS = newNumStreams;
+      PARTICLES_PER_STREAM = newParticlesPerStream;
+      initParticles();
+    }
+
     ctx.clearRect(0,0,canvas.width,canvas.height);
     const w = canvas.width, h = canvas.height;
 
@@ -16374,20 +16403,6 @@ resetIdleTimer();
       ctx.stroke();
       ctx.restore();
     }
-
-    // Central "energy wave"
-    ctx.save();
-    ctx.globalAlpha = 0.13;
-    for(let k=0; k<4; k++){
-      ctx.beginPath();
-      ctx.ellipse(w/2, h/2,
-        w/2.9 + Math.sin(t*0.9+k)*33,
-        85 + 21*Math.sin(t*1.2+k),
-        0, 0, 2*Math.PI);
-      ctx.fillStyle = `rgba(245,234,233,0.4)`;
-      ctx.fill();
-    }
-    ctx.restore();
 
     // Dynamic photon particles (moving towards the user)
     if (particles.length < NUM_STREAMS*PARTICLES_PER_STREAM*0.97) initParticles();
