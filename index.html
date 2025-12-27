@@ -16368,67 +16368,80 @@ resetIdleTimer();
   window.showSpiritualCanvas = showSpiritualCanvas;
   window.hideSpiritualCanvas = hideSpiritualCanvas;
 
-  function animate(now) {
-    if (!active) return;
-    if (!animationStartTime) animationStartTime = now || performance.now();
+	function animate(now) {
+	  if (!active) return;
+	  if (!animationStartTime) animationStartTime = now || performance.now();
 
-    // Dynamic computation for particles & streams ramp up
-    const elapsed = (now || performance.now()) - animationStartTime;
-    const [newNumStreams, newParticlesPerStream] = calculateParticleCounts(elapsed);
+	  // Get current avatar position
+	  const avatar = document.querySelector('.avatar-container');
+	  let centerX, centerY;
+	  
+	  if (avatar) {
+		const rect = avatar.getBoundingClientRect();
+		centerX = rect.left + rect.width / 2;
+		centerY = rect.top + rect.height / 2;
+	  } else {
+		centerX = canvas.width / 2;
+		centerY = canvas.height / 2;
+	  }
 
-    // If particle count changed, update and re-init
-    if (newNumStreams !== NUM_STREAMS || newParticlesPerStream !== PARTICLES_PER_STREAM) {
-      NUM_STREAMS = newNumStreams;
-      PARTICLES_PER_STREAM = newParticlesPerStream;
-      initParticles();
-    }
+	  // Dynamic computation for particles & streams ramp up
+	  const elapsed = (now || performance.now()) - animationStartTime;
+	  const [newNumStreams, newParticlesPerStream] = calculateParticleCounts(elapsed);
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    const w = canvas.width, h = canvas.height;
+	  // If particle count changed, update and re-init
+	  if (newNumStreams !== NUM_STREAMS || newParticlesPerStream !== PARTICLES_PER_STREAM) {
+		NUM_STREAMS = newNumStreams;
+		PARTICLES_PER_STREAM = newParticlesPerStream;
+		initParticles();
+	  }
 
-	// Define VIBGYOR hues for 7 chakras/rays (in degrees, from violet to red)
-	const VIBGYOR = [
-	  270, // Violet
-	  245, // Indigo
-	  210, // Blue
-	  120, // Green
-	   55, // Yellow (classic yellow, can try 60 or 55)
-	   30, // Orange
-		0  // Red
-	];
+	  ctx.clearRect(0,0,canvas.width,canvas.height);
+	  const w = canvas.width, h = canvas.height;
 
-	// 7 beautiful chakra rays!
-	for (let i = 0; i < 7; i++) {
-	  ctx.save();
-	  ctx.globalAlpha = 0.17 + 0.09 * Math.sin(t * 1.3 + i);
-	  let inner = 90 + 48 * Math.sin(t * 0.28 + i * 0.5);
-	  let outer = Math.min(w, h) * 0.7;
-	  let a = (i / 7) * Math.PI * 2 + Math.sin(i + t) * 0.05;
-	  ctx.beginPath();
-	  ctx.moveTo(
-		w / 2 + Math.cos(a + 0.07) * inner,
-		h / 2 + Math.sin(a + 0.07) * inner
-	  );
-	  ctx.lineTo(
-		w / 2 + Math.cos(a) * outer,
-		h / 2 + Math.sin(a) * outer
-	  );
-	  ctx.lineWidth = 2 + 1 * Math.sin(t + i);
-	  ctx.strokeStyle = `hsla(${VIBGYOR[i]}, 97%, 66%, 0.68)`;
-	  ctx.shadowColor = `hsla(${VIBGYOR[i]},95%,89%,1)`;
-	  ctx.shadowBlur = 18;
-	  ctx.stroke();
-	  ctx.restore();
-	}
+	  // Define VIBGYOR hues for 7 chakras/rays (in degrees, from violet to red)
+	  const VIBGYOR = [
+		270, // Violet
+		245, // Indigo
+		210, // Blue
+		120, // Green
+		 55, // Yellow (classic yellow, can try 60 or 55)
+		 30, // Orange
+		  0  // Red
+	  ];
 
-    // Dynamic photon particles (moving towards the user)
-    if (particles.length < NUM_STREAMS*PARTICLES_PER_STREAM*0.97) initParticles();
-    for (const p of particles) {
-      const fx = Math.cos(p.angle) * p.r;
-      const fy = Math.sin(p.angle) * p.r;
-      const perspective = 0.28 + 1.5*(1-p.z);
-      const x = w/2 + fx * w * 0.9 * p.z;
-      const y = h/2 + fy * h * 0.40 * p.z;
+	  // 7 beautiful chakra rays!
+	  for (let i = 0; i < 7; i++) {
+		ctx.save();
+		ctx.globalAlpha = 0.17 + 0.09 * Math.sin(t * 1.3 + i);
+		let inner = 90 + 48 * Math.sin(t * 0.28 + i * 0.5);
+		let outer = Math.min(w, h) * 0.7;
+		let a = (i / 7) * Math.PI * 2 + Math.sin(i + t) * 0.05;
+		ctx.beginPath();
+		ctx.moveTo(
+		  centerX + Math.cos(a + 0.07) * inner,
+		  centerY + Math.sin(a + 0.07) * inner
+		);
+		ctx.lineTo(
+		  centerX + Math.cos(a) * outer,
+		  centerY + Math.sin(a) * outer
+		);
+		ctx.lineWidth = 2 + 1 * Math.sin(t + i);
+		ctx.strokeStyle = `hsla(${VIBGYOR[i]}, 97%, 66%, 0.68)`;
+		ctx.shadowColor = `hsla(${VIBGYOR[i]},95%,89%,1)`;
+		ctx.shadowBlur = 18;
+		ctx.stroke();
+		ctx.restore();
+	  }
+
+	  // Dynamic photon particles (moving towards the user)
+	  if (particles.length < NUM_STREAMS*PARTICLES_PER_STREAM*0.97) initParticles();
+	  for (const p of particles) {
+		const fx = Math.cos(p.angle) * p.r;
+		const fy = Math.sin(p.angle) * p.r;
+		const perspective = 0.28 + 1.5*(1-p.z);
+		const x = centerX + fx * w * 0.9 * p.z;
+		const y = centerY + fy * h * 0.40 * p.z;
       const size = p.size * perspective * (0.8 + 0.3 * Math.abs(Math.sin(t + p.angle*8)));
 
       let grad = ctx.createRadialGradient(x, y, 0, x, y, size);
