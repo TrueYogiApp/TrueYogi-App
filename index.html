@@ -11404,6 +11404,11 @@ dtStyle.textContent = `
 }`;
 document.head.appendChild(dtStyle);
 
+function isModeSelectionActive() {
+  const modeSection = document.getElementById('mode-selection');
+  return modeSection && !modeSection.classList.contains('hidden');
+}
+
 // Minimal avatar music with basic health guard and single-init protection
 document.addEventListener('DOMContentLoaded', function() {
   // Guard: init only once
@@ -11438,6 +11443,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  function syncSpiritualCanvasWithState() {
+    const musicActive = avatarSound && avatarPlaying;
+    if (!isModeSelectionActive() && musicActive) {
+      if (window.showSpiritualCanvas) window.showSpiritualCanvas();
+    } else {
+      if (window.hideSpiritualCanvas) window.hideSpiritualCanvas();
+    }
+  }
+  
   // Only try to auto-restart if the pause happened because tab was hidden
   if (avatarSound) {
     avatarSound.addEventListener('pause', () => {
@@ -11447,11 +11461,21 @@ document.addEventListener('DOMContentLoaded', function() {
             avatarSound.play().catch(err => {
               console.log('Avatar visibility restart failed:', err);
               avatarPlaying = false;
-              stopAvatarHealthCheck();
+             syncSpiritualCanvasWithState();
             });
           }
         }, 100);
       }
+    });
+    // Also always hide canvas on ended or error
+    avatarSound.addEventListener('ended', () => {
+      avatarPlaying = false;
+	  syncSpiritualCanvasWithState();
+      if (window.hideSpiritualCanvas) window.hideSpiritualCanvas();
+    });
+    avatarSound.addEventListener('error', () => {
+      avatarPlaying = false;
+      if (window.hideSpiritualCanvas) window.hideSpiritualCanvas();
     });
   }
 
@@ -11477,11 +11501,12 @@ document.addEventListener('DOMContentLoaded', function() {
             avatarSound.play().catch(()=>{});
             avatarPlaying = true;
             startAvatarHealthCheck();
-            // optional visual feedback: showAvatarFeedback(centerX, centerY);
+            syncSpiritualCanvasWithState();
           } catch (err) {
             console.log('Avatar play failed:', err);
             avatarPlaying = false;
             stopAvatarHealthCheck();
+           syncSpiritualCanvasWithState();
           }
         } else {
           // Stop: stop health-check first to avoid immediate restart
@@ -11491,9 +11516,16 @@ document.addEventListener('DOMContentLoaded', function() {
             avatarSound.currentTime = 0;
           } catch (err) { console.warn(err); }
           avatarPlaying = false;
+          syncSpiritualCanvasWithState();
         }
       }
     });
+  }
+    // Observe mode selection section for show/hide
+  const modeSection = document.getElementById('mode-selection');
+  if (modeSection) {
+    const observer = new MutationObserver(syncSpiritualCanvasWithState);
+    observer.observe(modeSection, { attributes: true, attributeFilter: ['class'] });
   }
 });
 
@@ -16266,13 +16298,13 @@ resetIdleTimer();
 </script>
 
 <script>
-// --- Moving Through the Photon Belt: Powerful Energy Screensaver ---
+// --- Moving Through the Photon Belt: Powerful Energy Canvas Animation ---
 
 (function() {
   const canvas = document.getElementById('spiritual-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let active = false, timeout, animationFrameId;
+  let active = false, animationFrameId;
 
   function resize() {
     canvas.width = window.innerWidth;
@@ -16281,52 +16313,28 @@ resetIdleTimer();
   window.addEventListener('resize', resize);
   resize();
 
-  // Visibility logic matches your previous setup
-function isInAnyModeSection() {
-  const app = document.getElementById('app-interface');
-  const timer = document.getElementById('timer-section');
-  const complete = document.getElementById('complete-section');
-  const final = document.getElementById('final-section');
-  return app && !app.classList.contains('hidden')
-      && timer && timer.classList.contains('hidden')
-      && complete && complete.classList.contains('hidden')
-      && final && final.classList.contains('hidden');
-}
-
-  function showSaver() {
-    if (!isInAnyModeSection()) return;
+  // -- These replaced the screen saver logic --
+  function showSpiritualCanvas() {
+    if (active) return;
     active = true;
     canvas.classList.remove('hidden');
     animate();
   }
 
-  function hideSaver() {
+  function hideSpiritualCanvas() {
     active = false;
     canvas.classList.add('hidden');
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    clearTimeout(timeout);
-    timeout = null;
+    animationFrameId = null;
   }
 
-  ['mousemove','keydown','touchstart'].forEach(evt => 
-    document.addEventListener(evt, resetIdle, true)
-  );
-
-  function resetIdle() {
-    hideSaver();
-    if (timeout) clearTimeout(timeout);
-    if (isInAnyModeSection()) {
-      timeout = setTimeout(showSaver, 3000); // 30s idle
-    }
-  }
-  document.addEventListener('DOMContentLoaded', resetIdle);
-  window.addEventListener('TrueYogiModeChanged', resetIdle);
+  // Expose these for external use
+  window.showSpiritualCanvas = showSpiritualCanvas;
+  window.hideSpiritualCanvas = hideSpiritualCanvas;
 
   // --- Photon-belt animation variables ---
-  const NUM_STREAMS = 15, PARTICLES_PER_STREAM = 4;
+  const NUM_STREAMS = 16, PARTICLES_PER_STREAM = 4;
   let t = 0;
-
-  // Particle objects move toward the viewer
   let particles = [];
   function initParticles() {
     particles = [];
@@ -16345,8 +16353,8 @@ function isInAnyModeSection() {
   function animate() {
     if (!active) return;
     ctx.clearRect(0,0,canvas.width,canvas.height);
-
     const w = canvas.width, h = canvas.height;
+
     // Tunnel: streaking rays
     for (let i=0; i<NUM_STREAMS; i++) {
       ctx.save();
@@ -16382,14 +16390,13 @@ function isInAnyModeSection() {
     // Dynamic photon particles (moving towards the user)
     if (particles.length < NUM_STREAMS*PARTICLES_PER_STREAM*0.97) initParticles();
     for (const p of particles) {
-      // Perspective projection
       const fx = Math.cos(p.angle) * p.r;
       const fy = Math.sin(p.angle) * p.r;
-      const perspective = 0.28 + 1.5*(1-p.z); // Near=Big, Far=Small
+      const perspective = 0.28 + 1.5*(1-p.z);
       const x = w/2 + fx * w * 0.9 * p.z;
       const y = h/2 + fy * h * 0.40 * p.z;
       const size = p.size * perspective * (0.8 + 0.3 * Math.abs(Math.sin(t + p.angle*8)));
-      // Color by progress through the belt (more gold/violet/blue)
+
       let grad = ctx.createRadialGradient(x, y, 0, x, y, size);
       let progress = 1 - p.z;
       grad.addColorStop(0, `hsla(${55+180*progress},100%,${77+18*progress}%,.94)`);
