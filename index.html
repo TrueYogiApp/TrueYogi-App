@@ -8399,7 +8399,22 @@ function checkDayReset() {
       if (yesterdayMissed) {
         showMissedSessionModal();
       }
-      challengeData.streakDays = 0;
+      
+      // ============ WALLET/JWT CHECK FOR BLOCKED USERS ============
+      // Only reset streak if user is NOT blocked from continuing
+      // Get current mode - adjust based on how you store it
+      const currentMode = localStorage.getItem('currentMode') || 'yogi'; 
+      
+      // Check if user is blocked (day >= 22, no wallet/JWT)
+      const isBlocked = currentMode === 'yogi' && 
+                        challengeData.currentDay >= 22 && 
+                        (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
+      
+      // Only reset streak if NOT blocked
+      if (!isBlocked) {
+        challengeData.streakDays = 0;
+      }
+      // If blocked, streak stays as is (user can't continue anyway)
     }
 
     challengeData.currentDay = Math.min(diffDays, 41);
@@ -8421,10 +8436,19 @@ function checkDayReset() {
     challengeData.lastSessionDate !== yesterdayStr && // Not already counted
     challengeData.lastSessionDate !== todayStr // Not counted today already
   ) {
-    challengeData.streakDays++;
-    challengeData.lastSessionDate = yesterdayStr;
-    saveChallengeData();
-    updateProgressDisplay && updateProgressDisplay();
+    // ============ WALLET/JWT CHECK FOR INCREMENT TOO ============
+    // Don't increment streak if user is blocked from continuing
+    const currentMode = localStorage.getItem('currentMode') || 'yogi';
+    const isBlocked = currentMode === 'yogi' && 
+                      challengeData.currentDay >= 22 && 
+                      (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
+    
+    if (!isBlocked) {
+      challengeData.streakDays++;
+      challengeData.lastSessionDate = yesterdayStr;
+      saveChallengeData();
+      updateProgressDisplay && updateProgressDisplay();
+    }
   }
 
   // ========== FIX #2: Check TODAY's sessions + CAP streak ==========
@@ -8434,13 +8458,22 @@ function checkDayReset() {
     todaySessions >= challengeData.requiredSessions &&
     challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
   ) {
-    // CAP streak at currentDay to prevent streak > currentDay
-    if (challengeData.streakDays < challengeData.currentDay) {
-      challengeData.streakDays++;
+    // ============ WALLET/JWT CHECK FOR INCREMENT TOO ============
+    // Don't increment streak if user is blocked from continuing
+    const currentMode = localStorage.getItem('currentMode') || 'yogi';
+    const isBlocked = currentMode === 'yogi' && 
+                      challengeData.currentDay >= 22 && 
+                      (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
+    
+    if (!isBlocked) {
+      // CAP streak at currentDay to prevent streak > currentDay
+      if (challengeData.streakDays < challengeData.currentDay) {
+        challengeData.streakDays++;
+      }
+      challengeData.lastSessionDate = todayStr;
+      saveChallengeData();
+      updateProgressDisplay && updateProgressDisplay();
     }
-    challengeData.lastSessionDate = todayStr;
-    saveChallengeData();
-    updateProgressDisplay && updateProgressDisplay();
   }
 
   // ========== ADDITIONAL SAFEGUARD ==========
