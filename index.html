@@ -7986,7 +7986,6 @@ function updateTimer() {
 	releaseWakeLock();
 	disableMobileAudioResume();
 	stopMeditationSelfHeal();
-	cleanupAfterSessionEnd();
     
     const modal = document.getElementById('end-meditation-modal');
     if (!modal.classList.contains('hidden')) {
@@ -8019,6 +8018,7 @@ function updateTimer() {
         document.getElementById('yogi-total-sessions').textContent = challengeData.totalSessions;
         document.getElementById('yogi-total-minutes').textContent = challengeData.totalMinutes;
         document.getElementById('current-streak').textContent = challengeData.streakDays;
+		cleanupAfterSessionEnd();
       }
     }
 
