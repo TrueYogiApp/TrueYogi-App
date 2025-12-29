@@ -5964,16 +5964,21 @@ try {
   const omUserId = localStorage.getItem('omUserId');
   const challengeId = challenge.challengeId;
 
-  if (challenge.startDate && challenge.currentDay >= 21 && !onChainJourney) {
+  if (challenge.startDate && challenge.currentDay >= 1 && !onChainJourney) {
     const mode = challenge.savedMode || 
                (completedPureOffline ? 'spaceship' : (!onChainJourney ? 'offline' : 'online'));
     
+	  // Calculate the actual end date: start date + 20 days (21 days total)
+  const startDate = new Date(challenge.startDate);
+  const actualEndDate = new Date(startDate);
+  actualEndDate.setDate(startDate.getDate() + 20); // Day 0 to Day 20 = 21 days
+  
     // 🆕 NEW: Create the historyEntry variable first
     const historyEntry = {
 	  om_user_id: omUserId,
 	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
-      endDate: new Date().toISOString(),
+      endDate: actualEndDate.toISOString(),
       days: challenge.currentDay,
       mode: mode,
       sessionsCompleted: challenge.sessionsCompleted || [],
@@ -5991,7 +5996,7 @@ try {
         om_user_id: omUserId,
         challenge_id: challengeId,
         start_date: challenge.startDate,
-        end_date: historyEntry.endDate,
+        end_date: actualEndDate.toISOString(),
         days_completed: challenge.currentDay,
         mode: mode,
         sessions_completed: historyEntry.sessionsCompleted,
@@ -6002,7 +6007,7 @@ try {
       };
 
       // Non-blocking call to save history to server
-	fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+	fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
 	  method: 'POST',
 	  headers: { 'Content-Type': 'application/json' },
 	  body: JSON.stringify(payload)
@@ -6021,11 +6026,16 @@ try {
   } else if (challenge.startDate && challenge.currentDay >= 41 && onChainJourney) {
     const mode = 'online';
     
+	  // Calculate the actual end date for 41-day challenge: start date + 40 days
+  const startDate = new Date(challenge.startDate);
+  const actualEndDate = new Date(startDate);
+  actualEndDate.setDate(startDate.getDate() + 40); // Day 0 to Day 40 = 41 days
+  
     // 🆕 NEW: Also create historyEntry for online completion
     const historyEntry = {
 	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
-      endDate: new Date().toISOString(),
+      endDate: actualEndDate.toISOString(),
       days: challenge.currentDay,
       mode: mode,
       sessionsCompleted: challenge.sessionsCompleted || [],
@@ -6042,7 +6052,7 @@ try {
         om_user_id: omUserId,
         challenge_id: challengeId,
         start_date: challenge.startDate,
-        end_date: historyEntry.endDate,
+        end_date: actualEndDate.toISOString(),
         days_completed: challenge.currentDay,
         mode: 'online',
         sessions_completed: historyEntry.sessionsCompleted,
@@ -6052,7 +6062,7 @@ try {
         device_type: getDeviceType?.() || 'unknown',
       };
 
-      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+      fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -6213,18 +6223,37 @@ try {
   const omUserId = localStorage.getItem('omUserId');
   const challengeId = challenge.challengeId;
 
+  // Helper function to calculate end date
+  function calculateEndDate(startDate, challengeDuration) {
+    const start = new Date(startDate);
+    const endDate = new Date(start);
+    
+    if (challengeDuration === 21) {
+      endDate.setDate(start.getDate() + 20); // Day 0 to Day 20 = 21 days
+    } else if (challengeDuration === 41) {
+      endDate.setDate(start.getDate() + 40); // Day 0 to Day 40 = 41 days
+    }
+    
+    return endDate.toISOString();
+  }
+
   // If user completes 21-day offline, check spaceship first!
   if (
     challenge.startDate &&
     challenge.currentDay >= 21 &&  // Note: you changed this from 21 to 1
     !onChainJourney
   ) {
+    // Determine if this is actually a 21-day challenge or just early reset
+    // You might want to check if currentDay >= 21 for actual completion
+    const is21DayChallenge = challenge.currentDay >= 21;
+    const endDate = calculateEndDate(challenge.startDate, 21);
+    
     // 🆕 NEW: Create the historyEntry variable first
     const historyEntry = {
 	  om_user_id: omUserId,
 	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
-      endDate: new Date().toISOString(),
+      endDate: endDate,
       days: challenge.currentDay,
       mode: mode,
       sessionsCompleted: challenge.sessionsCompleted || [],
@@ -6242,18 +6271,18 @@ try {
         om_user_id: omUserId,
         challenge_id: challengeId,
         start_date: challenge.startDate,
-        end_date: historyEntry.endDate,
+        end_date: endDate,
         days_completed: challenge.currentDay,
         mode: mode,
-        sessions_completed: historyEntry.sessionsCompleted,
-        total_sessions: historyEntry.totalSessions,
-        total_minutes: historyEntry.totalMinutes,
+        sessions_completed: challenge.sessionsCompleted || [],
+        total_sessions: challenge.totalSessions || 0,
+        total_minutes: challenge.totalMinutes || 0,
         user_agent: navigator.userAgent,
         device_type: getDeviceType?.() || 'unknown',
       };
 
       // Non-blocking call to save history to server
-	fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+	fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
 	  method: 'POST',
 	  headers: { 'Content-Type': 'application/json' },
 	  body: JSON.stringify(payload)
@@ -6275,11 +6304,13 @@ try {
     challenge.currentDay >= 41 &&
     onChainJourney
   ) {
+    const endDate = calculateEndDate(challenge.startDate, 41);
+    
     // 🆕 NEW: Also create historyEntry for online completion
     const historyEntry = {
 	  challengeId: challenge.challengeId,
       startDate: challenge.startDate,
-      endDate: new Date().toISOString(),
+      endDate: endDate,
       days: challenge.currentDay,
       mode: 'online',
       sessionsCompleted: challenge.sessionsCompleted || [],
@@ -6296,17 +6327,17 @@ try {
         om_user_id: omUserId,
         challenge_id: challengeId,
         start_date: challenge.startDate,
-        end_date: historyEntry.endDate,
+        end_date: endDate,
         days_completed: challenge.currentDay,
         mode: 'online',
-        sessions_completed: historyEntry.sessionsCompleted,
-        total_sessions: historyEntry.totalSessions,
-        total_minutes: historyEntry.totalMinutes,
+        sessions_completed: challenge.sessionsCompleted || [],
+        total_sessions: challenge.totalSessions || 0,
+        total_minutes: challenge.totalMinutes || 0,
         user_agent: navigator.userAgent,
         device_type: getDeviceType?.() || 'unknown',
       };
 
-      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+      fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
