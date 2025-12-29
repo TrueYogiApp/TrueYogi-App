@@ -2268,6 +2268,11 @@ body.lock-scroll {
   pointer-events: auto;
 }
 
+#challenge-history-modal {
+  max-width: 500px;
+  width: 95vw;
+  /* Other styles as needed */
+}
 
 </style>
   
@@ -8865,30 +8870,34 @@ function shortDate(d) {
 }	
 let rows = history.map((h, i) =>
   `<tr>
-    <td class="pr-2 w-[10%]">${i + 1}.</td>
-    <td class="w-[35%]">${h.startDate ? shortDate(h.startDate) : '-'}</td>
-    <td class="w-[35%]">${h.endDate ? shortDate(h.endDate) : '-'}</td>
-    <td class="text-right w-[10%]">${h.totalSessions || 0}</td>
-    <td class="text-right w-[10%]">${h.totalMinutes || 0}</td>
-  </tr>`).join('');
+    <td class="pr-2 w-[10%] whitespace-nowrap">${i + 1}.</td>
+    <td class="w-[35%] whitespace-nowrap">${h.startDate ? shortDate(h.startDate) : '-'}</td>
+    <td class="w-[35%] whitespace-nowrap">${h.endDate ? shortDate(h.endDate) : '-'}</td>
+    <td class="text-right w-[10%] whitespace-nowrap">${h.totalSessions || 0}</td>
+    <td class="text-right w-[10%] whitespace-nowrap">${h.totalMinutes || 0}</td>
+  </tr>`
+).join('');
 
 modal.innerHTML = `
-  <div class="mb-3 text-center font-bold text-2xl" style="background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; color: transparent;">
+  <div class="mb-3 text-center font-bold text-2xl" 
+       style="background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; color:transparent;">
       Challenge History
   </div>
-  <hr style="height:3px; background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); border:none; margin-bottom:10px;" />
-  <table class="w-full text-xs mb-2">
-    <thead>
-      <tr>
-        <th style="color:red"></th>
-        <th style="color:orange">Start</th>
-        <th style="color:yellow">End</th>
-        <th style="color:green">Sessions</th>
-        <th style="color:blue">Minutes</th>
-      </tr>
-    </thead>
-    <tbody>${rows}</tbody>
-  </table>
+  <hr style="height:3px; background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); border:none; margin-bottom:10px;" />
+  <div class="overflow-x-auto">
+    <table style="min-width:420px; width:100%;">
+      <thead>
+        <tr>
+          <th class="whitespace-nowrap" style="color:red"></th>
+          <th class="whitespace-nowrap" style="color:orange">Start</th>
+          <th class="whitespace-nowrap" style="color:yellow">End</th>
+          <th class="whitespace-nowrap" style="color:green">Sessions</th>
+          <th class="whitespace-nowrap" style="color:blue">Minutes</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>
   <div class="mt-2 border-t border-gray-700 pt-2 text-center font-bold text-base">
     <span style="color:green">Total:</span> 
     <span style="color:red">${history.length} </span>
