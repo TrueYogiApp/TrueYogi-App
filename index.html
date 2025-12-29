@@ -5964,7 +5964,7 @@ try {
   const omUserId = localStorage.getItem('omUserId');
   const challengeId = challenge.challengeId;
 
-  if (challenge.startDate && challenge.currentDay >= 1 && !onChainJourney) {
+  if (challenge.startDate && challenge.currentDay >= 21 && !onChainJourney) {
     const mode = challenge.savedMode || 
                (completedPureOffline ? 'spaceship' : (!onChainJourney ? 'offline' : 'online'));
     
