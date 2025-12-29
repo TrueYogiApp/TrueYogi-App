@@ -382,5 +382,15 @@
 "yogispaceshipchallenges.label": "瑜伽太空挑战",
 "cacheReloaded": "应用程序已重新加载！您现在正在查看最新内容。",
 "challengeCompleted": "挑战已完成",
-"liveMeditatorsTooltip": " 在线冥想者"
+"liveMeditatorsTooltip": " 在线冥想者",
+    "challenge_history_title": "挑战历史",
+    "challenge_history_start": "开始",
+    "challenge_history_end": "结束",
+    "challenge_history_sessions": "会话",
+    "challenge_history_minutes": "分钟",
+    "challenge_history_total": "总计：",
+    "challenge_history_challenges": "挑战，",
+    "challenge_history_sessions_label": "会话，",
+    "challenge_history_minutes_label": "分钟",
+    "challenge_history_close": "关闭"
 }

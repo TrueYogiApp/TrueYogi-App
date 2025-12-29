@@ -386,6 +386,16 @@
 "yogispaceshipchallenges.label": "Yogi Spaceship Challenges",
 "cacheReloaded": "App Reloaded! You’re now viewing the latest content.",
 "challengeCompleted": "Challenge Completed",
-"liveMeditatorsTooltip": "Live Meditators"
+"liveMeditatorsTooltip": "Live Meditators",
+    "challenge_history_title": "Challenge History",
+    "challenge_history_start": "Start",
+    "challenge_history_end": "End",
+    "challenge_history_sessions": "Sessions",
+    "challenge_history_minutes": "Minutes",
+    "challenge_history_total": "Total:",
+    "challenge_history_challenges": "Challenges,",
+    "challenge_history_sessions_label": "Sessions,",
+    "challenge_history_minutes_label": "Minutes",
+    "challenge_history_close": "Close"
 
 }

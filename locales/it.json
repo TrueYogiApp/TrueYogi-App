@@ -382,5 +382,15 @@
 "yogispaceshipchallenges.label": "Sfide Yogi Astronave",
 "cacheReloaded": "Applicazione ricaricato! Ora stai visualizzando i contenuti più recenti.",
 "challengeCompleted": "Sfida completata",
-"liveMeditatorsTooltip": "Meditatori in diretta"
+"liveMeditatorsTooltip": "Meditatori in diretta",
+    "challenge_history_title": "Storico delle Sfide",
+    "challenge_history_start": "Inizio",
+    "challenge_history_end": "Fine",
+    "challenge_history_sessions": "Sessioni",
+    "challenge_history_minutes": "Minuti",
+    "challenge_history_total": "Totale:",
+    "challenge_history_challenges": "Sfide,",
+    "challenge_history_sessions_label": "Sessioni,",
+    "challenge_history_minutes_label": "Minuti",
+    "challenge_history_close": "Chiudi"
 }

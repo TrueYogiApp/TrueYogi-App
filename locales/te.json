@@ -385,5 +385,15 @@
 "yogispaceshipchallenges.label": "యోగి స్పేస్ షిప్ చాలెంజీలు",
 "cacheReloaded": "యాప్ రీలోడ్ చేయబడింది! మీరు ఇప్పుడు తాజా కంటెంట్ ని చూస్తున్నారు.",
 "challengeCompleted": "సవాలు పూర్తైంది",
-"liveMeditatorsTooltip": "ప్రత్యక్ష ధ్యానులు"
+"liveMeditatorsTooltip": "ప్రత్యక్ష ధ్యానులు",
+    "challenge_history_title": "ఛాలెంజ్ చరిత్ర",
+    "challenge_history_start": "ప్రారంభం",
+    "challenge_history_end": "ముగింపు",
+    "challenge_history_sessions": "సెషన్లు",
+    "challenge_history_minutes": "నిమిషాలు",
+    "challenge_history_total": "మొత్తం:",
+    "challenge_history_challenges": "ఛాలెంజీలు,",
+    "challenge_history_sessions_label": "సెషన్లు,",
+    "challenge_history_minutes_label": "నిమిషాలు",
+    "challenge_history_close": "మూసివేయి"
 }

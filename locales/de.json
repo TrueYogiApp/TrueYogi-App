@@ -381,5 +381,15 @@
 "yogispaceshipchallenges.label": "Yogi-Raumschiff-Herausforderungen",
 "cacheReloaded": "App neu geladen! Sie sehen nun die neuesten Inhalte.",
 "challengeCompleted": "Herausforderung abgeschlossen",
-"liveMeditatorsTooltip": "Live-Meditierende"
+"liveMeditatorsTooltip": "Live-Meditierende",
+    "challenge_history_title": "Herausforderungsverlauf",
+    "challenge_history_start": "Beginn",
+    "challenge_history_end": "Ende",
+    "challenge_history_sessions": "Sitzungen",
+    "challenge_history_minutes": "Minuten",
+    "challenge_history_total": "Gesamt:",
+    "challenge_history_challenges": "Herausforderungen,",
+    "challenge_history_sessions_label": "Sitzungen,",
+    "challenge_history_minutes_label": "Minuten",
+    "challenge_history_close": "Schließen"
 }

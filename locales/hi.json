@@ -381,5 +381,15 @@
 "yogispaceshipchallenges.label": "योगी स्पेसशिप चुनौतियाँ",
 "cacheReloaded": "ऐप पुनः लोड हो गया! अब आप नवीनतम सामग्री देख रहे हैं।",
 "challengeCompleted": "चुनौती पूरी हुई",
-"liveMeditatorsTooltip": "लाइव ध्यानकर्ता"
+"liveMeditatorsTooltip": "लाइव ध्यानकर्ता",
+    "challenge_history_title": "चैलेंज इतिहास",
+    "challenge_history_start": "प्रारंभ",
+    "challenge_history_end": "समाप्ति",
+    "challenge_history_sessions": "सत्र",
+    "challenge_history_minutes": "मिनट",
+    "challenge_history_total": "कुल:",
+    "challenge_history_challenges": "चैलेंज,",
+    "challenge_history_sessions_label": "सत्र,",
+    "challenge_history_minutes_label": "मिनट",
+    "challenge_history_close": "बंद करें"
 }

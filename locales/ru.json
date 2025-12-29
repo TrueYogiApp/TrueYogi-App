@@ -382,6 +382,16 @@
 "yogispaceshipchallenges.label": "Йога-космические испытания",
 "cacheReloaded": "Приложение перезагружено! Сейчас вы просматриваете последний контент.",
 "challengeCompleted": "Задание завершено",
-"liveMeditatorsTooltip": "Медитаторы онлайн"
+"liveMeditatorsTooltip": "Медитаторы онлайн",
+    "challenge_history_title": "История испытаний",
+    "challenge_history_start": "Начало",
+    "challenge_history_end": "Конец",
+    "challenge_history_sessions": "Сессии",
+    "challenge_history_minutes": "Минуты",
+    "challenge_history_total": "Итого:",
+    "challenge_history_challenges": "Испытания,",
+    "challenge_history_sessions_label": "Сессии,",
+    "challenge_history_minutes_label": "Минуты",
+    "challenge_history_close": "Закрыть"
   
 }

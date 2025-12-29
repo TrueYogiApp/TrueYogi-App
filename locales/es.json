@@ -381,5 +381,15 @@
 "yogispaceshipchallenges.label": "Desafíos Nave Espacial Yogi",
 "cacheReloaded": "¡Aplicación recargado! Ahora ves el contenido más reciente.",
 "challengeCompleted": "Desafío completado",
-"liveMeditatorsTooltip": "Meditadores en vivo"
+"liveMeditatorsTooltip": "Meditadores en vivo",
+    "challenge_history_title": "Historial de Desafíos",
+    "challenge_history_start": "Inicio",
+    "challenge_history_end": "Fin",
+    "challenge_history_sessions": "Sesiones",
+    "challenge_history_minutes": "Minutos",
+    "challenge_history_total": "Total:",
+    "challenge_history_challenges": "Desafíos,",
+    "challenge_history_sessions_label": "Sesiones,",
+    "challenge_history_minutes_label": "Minutos",
+    "challenge_history_close": "Cerrar"
 }

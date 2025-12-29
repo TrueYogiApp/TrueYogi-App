@@ -8874,9 +8874,9 @@ let rows = history.map((h, i) =>
 ).join('');
 
 modal.innerHTML = `
-  <div class="mb-3 text-center font-bold text-2xl" 
-       style="background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; color:transparent;">
-      Challenge History
+  <div class="mb-3 text-center font-bold text-2xl"
+   style="background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; color:transparent;">
+      ${t('challenge_history_title')}
   </div>
   <hr style="height:3px; background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); border:none; margin-bottom:10px;" />
   <div class="overflow-x-auto">
@@ -8884,25 +8884,25 @@ modal.innerHTML = `
       <thead>
         <tr>
           <th class="whitespace-nowrap" style="color:red"></th>
-          <th class="whitespace-nowrap" style="color:orange">Start</th>
-          <th class="whitespace-nowrap" style="color:yellow">End</th>
-          <th class="whitespace-nowrap" style="color:green">Sessions</th>
-          <th class="whitespace-nowrap" style="color:blue">Minutes</th>
+          <th class="whitespace-nowrap" style="color:orange">${t('challenge_history_start')}</th>
+          <th class="whitespace-nowrap" style="color:yellow">${t('challenge_history_end')}</th>
+          <th class="whitespace-nowrap" style="color:green">${t('challenge_history_sessions')}</th>
+          <th class="whitespace-nowrap" style="color:blue">${t('challenge_history_minutes')}</th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
     </table>
   </div>
   <div class="mt-2 border-t border-gray-700 pt-2 text-center font-bold text-base">
-    <span style="color:green">Total:</span> 
+    <span style="color:green">${t('challenge_history_total')}</span> 
     <span style="color:red">${history.length} </span>
-    <span style="color:orange">Challenges, </span>
+    <span style="color:orange">${t('challenge_history_challenges')}</span>
     <span style="color:blue">${totalSessions} </span>
-    <span style="color:indigo">Sessions, </span>
+    <span style="color:indigo">${t('challenge_history_sessions_label')}</span>
     <span style="color:violet">${totalMinutes}</span>
-    <span style="color:yellow"> Minutes</span>
+    <span style="color:yellow">${t('challenge_history_minutes_label')}</span>
   </div>
-  <button id="challenge-history-close" class="block mx-auto mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Close</button>
+  <button id="challenge-history-close" class="block mx-auto mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">${t('challenge_history_close')}</button>
 `;
 
   modal.classList.remove('hidden');
