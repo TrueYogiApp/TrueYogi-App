@@ -4231,13 +4231,14 @@ body.lock-scroll {
   <i class="fas fa-arrow-right"></i>
 </div>
 
-<!-- Modal Overlay + Modal Window -->
+<!-- Modal Overlay and Window -->
 <div id="challenge-history-modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-40"></div>
-<div 
+<div
   id="challenge-history-modal"
-  class="hidden fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white rounded-lg shadow-xl p-4 z-50 w-11/12 max-w-md max-h-[60vh] overflow-y-auto text-center"
-  style="min-width: 0;"> <!-- min-width:0 fixes iOS overflow -->
-  <!-- content filled by JS -->
+  class="hidden fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white rounded-lg shadow-xl p-4 z-50 w-[95%] max-w-[500px] max-h-[70vh] overflow-y-auto text-center"
+  style="min-width: 0;">
+  <!-- Additional styles added for responsiveness -->
+  <!-- Content filled by JS -->
 </div>
 
   <script>
@@ -8833,11 +8834,11 @@ function shortDate(d) {
 }	
 let rows = history.map((h, i) =>
   `<tr>
-    <td class="pr-2">${i + 1}.</td>
-    <td>${h.startDate ? shortDate(h.startDate) : '-'}</td>
-    <td>${h.endDate ? shortDate(h.endDate) : '-'}</td>
-    <td class="text-right">${h.totalSessions || 0}</td>
-    <td class="text-right">${h.totalMinutes || 0}</td>
+    <td class="pr-2 w-[10%]">${i + 1}.</td>
+    <td class="w-[35%]">${h.startDate ? shortDate(h.startDate) : '-'}</td>
+    <td class="w-[35%]">${h.endDate ? shortDate(h.endDate) : '-'}</td>
+    <td class="text-right w-[10%]">${h.totalSessions || 0}</td>
+    <td class="text-right w-[10%]">${h.totalMinutes || 0}</td>
   </tr>`).join('');
 
 modal.innerHTML = `
