@@ -4231,6 +4231,15 @@ body.lock-scroll {
   <i class="fas fa-arrow-right"></i>
 </div>
 
+<!-- Modal Overlay + Modal Window -->
+<div id="challenge-history-modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-40"></div>
+<div 
+  id="challenge-history-modal"
+  class="hidden fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-900 text-white rounded-lg shadow-xl p-4 z-50 w-11/12 max-w-md max-h-[60vh] overflow-y-auto text-center"
+  style="min-width: 0;"> <!-- min-width:0 fixes iOS overflow -->
+  <!-- content filled by JS -->
+</div>
+
   <script>
     // State Management
     let endTime = 0;
@@ -8797,6 +8806,97 @@ function updateStats() {
 	}
 
 }
+
+
+const streakCountElem = document.getElementById('challenge-streak');
+const modal = document.getElementById('challenge-history-modal');
+const overlay = document.getElementById('challenge-history-modal-overlay');
+
+streakCountElem.addEventListener('click', (e) => {
+  let history = [];
+  try { history = JSON.parse(localStorage.getItem('challengeHistory')) || []; } catch (e) {}
+
+  let totalSessions = 0, totalMinutes = 0;
+  history.forEach(h => {
+    totalSessions += h.totalSessions || 0;
+    totalMinutes += h.totalMinutes || 0;
+  });
+
+function shortDate(d) {
+  if (!d) return "-";
+  // If ISO string (has "T"), just take the date portion before "T"
+  if (d.includes("T")) d = d.split("T")[0]; // Now d = "YYYY-MM-DD"
+  const [y, m, day] = d.split('-');
+  const monthNames = ["Jan", "Feb", "Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  if (!y || !m || !day) return d; // fallback if bad format
+  return `${parseInt(day)} ${monthNames[parseInt(m)-1]}`;
+}	
+let rows = history.map((h, i) =>
+  `<tr>
+    <td class="pr-2">${i + 1}.</td>
+    <td>${h.startDate ? shortDate(h.startDate) : '-'}</td>
+    <td>${h.endDate ? shortDate(h.endDate) : '-'}</td>
+    <td class="text-right">${h.totalSessions || 0}</td>
+    <td class="text-right">${h.totalMinutes || 0}</td>
+  </tr>`).join('');
+
+modal.innerHTML = `
+  <div class="mb-3 text-center font-bold text-2xl" style="background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); -webkit-background-clip: text; color: transparent;">
+      Challenge History
+  </div>
+  <hr style="height:3px; background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); border:none; margin-bottom:10px;" />
+  <table class="w-full text-xs mb-2">
+    <thead>
+      <tr>
+        <th style="color:red"></th>
+        <th style="color:orange">Start</th>
+        <th style="color:yellow">End</th>
+        <th style="color:green">Sessions</th>
+        <th style="color:blue">Minutes</th>
+      </tr>
+    </thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="mt-2 border-t border-gray-700 pt-2 text-center font-bold text-base">
+    <span style="color:green">Total:</span> 
+    <span style="color:red">${history.length} </span>
+    <span style="color:orange">Challenges, </span>
+    <span style="color:blue">${totalSessions} </span>
+    <span style="color:indigo">Sessions, </span>
+    <span style="color:violet">${totalMinutes}</span>
+    <span style="color:yellow"> Minutes</span>
+  </div>
+  <button id="challenge-history-close" class="block mx-auto mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">Close</button>
+`;
+
+  modal.classList.remove('hidden');
+  overlay.classList.remove('hidden');
+
+  // Prevent background scroll
+  document.body.style.overflow = 'hidden';
+
+  // Close modal on clicking overlay or button
+  document.getElementById('challenge-history-close').onclick = () => {
+    modal.classList.add('hidden');
+    overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+  overlay.onclick = () => {
+    modal.classList.add('hidden');
+    overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  };
+})
+
+// Optional: Hide on Esc
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape') {
+    modal.classList.add('hidden');
+    overlay.classList.add('hidden');
+    document.body.style.overflow = '';
+  }
+});
+
 
 function showCompletionStats() {
   const mode = localStorage.getItem('lastCompletedMode') || currentMode;
