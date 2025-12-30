@@ -361,7 +361,7 @@
 /* Your positioning styles */
 .end-date-display {
   position: fixed;
-  bottom: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   right: 10px;
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.5);
@@ -381,7 +381,7 @@
 
 #start-date-display {
   left: 10px;
-  bottom: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
 #now-date-display {
@@ -389,7 +389,7 @@
   left: 50%;
   right: auto;
   transform: translateX(-50%);
-  bottom: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
 }
 
 /* === SIMPLE FIX === */
@@ -508,10 +508,18 @@ body.yogi-mode-active .end-date-display:not(.hidden) {
   z-index: 3;
 }
 
+.loader-overlay, .cosmic-bg {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: env(safe-area-inset-bottom, 0px);
+}
+
 /* FAQ Tab Styles */
 #faq-tab {
   position: fixed;
-  bottom: 10px;
+  bottom: calc(10px + env(safe-area-inset-bottom, 0px));
   left: 100%;
   transform: translateX(-50%);
   background-color: rgba(30, 41, 59, 0.8);
