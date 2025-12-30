@@ -392,12 +392,6 @@
   bottom: 10px;
 }
 
-/* === SIMPLE FIX === */
-/* Only show date displays when body has yogi-mode-active class AND element doesn't have .hidden */
-body.yogi-mode-active .end-date-display:not(.hidden) {
-  display: block !important;
-}
-
 /* Auto-hide loader after 6 seconds */
 #app-loader {
   animation: hideLoader 6s forwards;
@@ -2199,20 +2193,6 @@ body.lock-scroll {
   margin-right: 10px;
   transform: rotate(180deg);
 }
-
-/* Hide date displays in app-interface */
-#app-interface ~ .end-date-display,
-#app-interface ~ #start-date-display,
-#app-interface ~ #now-date-display,
-#app-interface ~ #end-date-display {
-  display: none !important;
-}
-
-/* Only show in yogi-mode */
-#yogi-mode .end-date-display:not(.hidden) {
-  display: block;
-}
-
 
 .rainbow-number {
   /* transparent text and background-clip for gradient */
@@ -6670,9 +6650,9 @@ if (bgMusicPlayer) {
   localStorage.removeItem('lastVisit');
   currentMode = null;
   currentSessionTime = null;
-  //updateEndDateDisplay();
-  //updateStartDateDisplay();
-  //updateNowDisplay();
+  updateEndDateDisplay();
+  updateStartDateDisplay();
+  updateNowDisplay();
   updateFAQVisibility();
   updateYogiIcon();
   updateLangSwitcherVisibility();
@@ -6712,11 +6692,6 @@ if (bgMusicPlayer) {
 	updateStartDateDisplay();
 	updateNowDisplay();
 	updateFAQVisibility();
-    // Add this line
-    document.body.classList.add('yogi-mode-active');
-  } else {
-    // Remove this line when switching away from yogi
-    document.body.classList.remove('yogi-mode-active');
   }
   updateStats();
 }
