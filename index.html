@@ -2268,6 +2268,24 @@ body.lock-scroll {
   pointer-events: auto;
 }
 
+/* Ensure time input works well on mobile */
+input[type="time"] {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Prevent zoom on focus for mobile */
+@media screen and (max-width: 640px) {
+  input[type="time"],
+  select {
+    font-size: 16px; /* Prevents iOS zoom */
+  }
+  
+  .session-time-block {
+    width: 100%;
+  }
+}
+
 
 </style>
   
