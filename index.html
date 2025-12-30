@@ -3556,6 +3556,7 @@ input[type="time"] {
       <img src="/assets/yogimeditators.svg" alt="Meditator Icon" 
            style="height:1.1em;width:1.1em;vertical-align:-4px;margin-right:7px;display:inline-block;">
       <span id="live-meditators-tooltip-text">Live Meditators</span>
+	  <div id="live-meditators-list" style="margin-top:8px; text-align:left; font-size:13px; max-height:140px; overflow-y:auto;"></div>
     </span>
   </div>
 </div>
@@ -7760,10 +7761,45 @@ async function updateLiveCount() {
   try {
     const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_stats');
     const data = await response.json();
-    
+
+    // Set the count
     document.querySelectorAll('.live-count').forEach(el => {
       el.textContent = data.live_count || '0';
     });
+
+    // Render the users list
+    const listEl = document.getElementById('live-meditators-list');
+    if (!listEl) return;
+
+    if (!data.live_users || !data.live_users.length) {
+      listEl.innerHTML = '<span style="color:#fec">No other meditators right now.</span>';
+      return;
+    }
+
+    const currentOmUserId = localStorage.getItem('omUserId') || '';
+    let out = `
+      <hr style="border:0;border-top:1.5px solid #222444;margin:6px 0 8px 0;">
+      <table style="width:100%;font-size:13px;border-collapse:collapse;">
+        <tbody>`;
+
+    data.live_users.forEach((user, i) => {
+      const id = user.omuserid || 'Anonymous';
+      const shortId = id.length > 6
+        ? `${id.slice(0,3)}...${id.slice(-3)}`
+        : id;
+      const isCurrentUser = id && id === currentOmUserId;
+
+      out += `
+        <tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
+          <td style="padding:0 4px 0 0;${isCurrentUser ? 'color:#fff;font-weight:700;' : 'color:#8be9fd;'}">
+            ${i + 1}. <span style="color:#777">ID:</span>
+            <span style="color:#fde68a;">${shortId}${isCurrentUser ? " <span style='color:#6ee7b7;'>🟢</span>" : ""}</span>
+          </td>
+          <td style="padding:0 0 0 4px;color:#bbf;text-align:right;">${Math.floor(user.duration/60)}m</td>
+        </tr>`;
+    });
+    out += '</tbody></table>';
+    listEl.innerHTML = out;
   } catch (error) {
     console.error('Failed to update live count:', error);
   }
