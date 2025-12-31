@@ -7856,8 +7856,8 @@ async function updateLiveCount() {
 	  out += `
 		<tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
 		  <td style="padding:0 4px 0 0;color:${isCurrentUser ? '#fff' : color};font-weight:${isCurrentUser ? '700' : '400'};">
-			${i + 1}. <span style="color:#777">ID:</span>
-			<span style="${currentDay ? `color:${color};` : 'color:#777;'}">${shortId}</span>${userMode}
+			${i + 1}. <span style="color:${color}">ID:</span>
+			<span style="color:#fde68a;">${shortId}</span>${userMode}
 			${isCurrentUser ? "<span class='pulsing-star' style='color:#facc15;font-size:1.2em;'>⭐️</span>" : ""}
 		  </td>
 		  <td style="padding:0 0 0 4px;color:#bbf;text-align:right;">${Math.floor(user.duration / 60)}m</td>
