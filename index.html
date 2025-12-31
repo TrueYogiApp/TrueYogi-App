@@ -2269,6 +2269,28 @@ input[type="time"] {
 }
 
 
+#live-meditators-list {
+  max-height: 140px;
+  overflow-y: auto;
+  /* Optional: for even smoother appearance */
+  scrollbar-width: thin;
+  scrollbar-color: #666 #222444;
+}
+
+/* Apply similar effect to the SVG */
+.rainbow-svg {
+  filter: hue-rotate(0deg);
+  animation: rainbowHue 3s linear infinite;
+}
+
+@keyframes rainbowHue {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -3554,7 +3576,8 @@ input[type="time"] {
     >0</span>
     <span id="live-meditators-tooltip" class="live-tooltip-text">
       <img src="/assets/yogimeditators.svg" alt="Meditator Icon" 
-           style="height:1.1em;width:1.1em;vertical-align:-4px;margin-right:7px;display:inline-block;">
+           style="height:1.2em;width:1.2em;vertical-align:-4px;margin-right:7px;display:inline-block;"
+           class="rainbow-svg">
       <span id="live-meditators-tooltip-text">Live Meditators</span>
 	  <div id="live-meditators-list" style="margin-top:8px; text-align:left; font-size:13px; max-height:140px; overflow-y:auto;"></div>
     </span>
@@ -7767,14 +7790,26 @@ async function updateLiveCount() {
       el.textContent = data.live_count || '0';
     });
 
+    // Get the SVG image element
+    const svgImg = document.querySelector('#live-meditators-tooltip img[alt="Meditator Icon"]');
+    
+    // Toggle rainbow class based on whether meditators are active
+    if (svgImg) {
+      if (data.live_count > 0) {
+        svgImg.classList.add('rainbow-svg');
+      } else {
+        svgImg.classList.remove('rainbow-svg');
+      }
+    }
+
     // Render the users list
     const listEl = document.getElementById('live-meditators-list');
     if (!listEl) return;
 
-	if (!data.live_users || !data.live_users.length) {
-	  listEl.innerHTML = '';
-	  return;
-	}
+    if (!data.live_users || !data.live_users.length) {
+      listEl.innerHTML = '';
+      return;
+    }
 
     const currentOmUserId = localStorage.getItem('omUserId') || '';
     let out = `
@@ -7788,12 +7823,14 @@ async function updateLiveCount() {
         ? `${id.slice(0,3)}...${id.slice(-3)}`
         : id;
       const isCurrentUser = id && id === currentOmUserId;
+      const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
 
       out += `
         <tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
           <td style="padding:0 4px 0 0;${isCurrentUser ? 'color:#fff;font-weight:700;' : 'color:#8be9fd;'}">
+            ${isCurrentUser ? "<span style='color:#facc15;font-size:1.1em;vertical-align:middle;'>⭐️</span>&nbsp;" : ""}
             ${i + 1}. <span style="color:#777">ID:</span>
-            <span style="color:#fde68a;">${shortId}${isCurrentUser ? " <span style='color:#6ee7b7;'>🟢</span>" : ""}</span>
+            <span style="color:#fde68a;">${shortId}</span>${userMode}
           </td>
           <td style="padding:0 0 0 4px;color:#bbf;text-align:right;">${Math.floor(user.duration/60)}m</td>
         </tr>`;
