@@ -7794,7 +7794,7 @@ function setupLiveMeditationCounter() {
 // Update function (same as before)
 async function updateLiveCount() {
   try {
-    const response = await fetch('https://trueyogi-backend-test.onrender.com/api/meditation_stats');
+    const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_stats');
     const data = await response.json();
 
     // Set the count
@@ -7883,7 +7883,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // This is the actual meditation start that gets called after confirmation
 async function beginMeditationSession() {
-  updateLiveCountVisibility();
   startMeditationBackground();
   updateHideUiBtnVisibility();
   updateHideUiButtonVisibility();
@@ -7915,6 +7914,7 @@ async function beginMeditationSession() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(startData)
     });
+	setTimeout(updateLiveCountVisibility, 350);
   } catch (e) {
     // Ignore errors - don't break meditation
   }
