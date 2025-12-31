@@ -7771,10 +7771,10 @@ async function updateLiveCount() {
     const listEl = document.getElementById('live-meditators-list');
     if (!listEl) return;
 
-    if (!data.live_users || !data.live_users.length) {
-      listEl.innerHTML = '<span style="color:#fec">No other meditators right now.</span>';
-      return;
-    }
+	if (!data.live_users || !data.live_users.length) {
+	  listEl.innerHTML = '';
+	  return;
+	}
 
     const currentOmUserId = localStorage.getItem('omUserId') || '';
     let out = `
