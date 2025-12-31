@@ -7829,24 +7829,40 @@ async function updateLiveCount() {
       <table style="width:100%;font-size:13px;border-collapse:collapse;">
         <tbody>`;
 
-    data.live_users.forEach((user, i) => {
-      const id = user.omuserid || 'Anonymous';
-      const shortId = id.length > 6
-        ? `${id.slice(0,3)}...${id.slice(-3)}`
-        : id;
-      const isCurrentUser = id && id === currentOmUserId;
-      const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
+	data.live_users.forEach((user, i) => {
+	  const id = user.omuserid || 'Anonymous';
+	  const shortId = id.length > 6
+		? `${id.slice(0,3)}...${id.slice(-3)}`
+		: id;
 
-      out += `
-        <tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
-          <td style="padding:0 4px 0 0;${isCurrentUser ? 'color:#fff;font-weight:700;' : 'color:#8be9fd;'}">
-            ${i + 1}. <span style="color:#777">ID:</span>
-            <span style="color:#fde68a;">${shortId}</span>${userMode}
+	  const isCurrentUser = id === localStorage.getItem('omUserId');
+	  const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
+
+	  // Default gray for users without valid current_day
+	  let color = '#777777';
+	  const currentDay = user.current_day || 0; // Make sure backend includes `current_day`
+
+	  // Determine rainbow color based on currentDay
+	  if (currentDay) {
+		if (currentDay >= 1 && currentDay <= 6) color = '#ff0000';       // Red
+		else if (currentDay >= 7 && currentDay <= 13) color = '#ffa500'; // Orange
+		else if (currentDay >= 14 && currentDay <= 20) color = '#ffff00'; // Yellow
+		else if (currentDay >= 21 && currentDay <= 27) color = '#008000'; // Green
+		else if (currentDay >= 28 && currentDay <= 34) color = '#0000ff'; // Blue
+		else if (currentDay >= 35 && currentDay <= 40) color = '#4b0082'; // Indigo
+		else if (currentDay >= 41) color = '#9400d3';                   // Violet
+	  }
+
+	  out += `
+		<tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
+		  <td style="padding:0 4px 0 0;color:${isCurrentUser ? '#fff' : color};font-weight:${isCurrentUser ? '700' : '400'};">
+			${i + 1}. <span style="color:#777">ID:</span>
+			<span style="${currentDay ? `color:${color};` : 'color:#777;'}">${shortId}</span>${userMode}
 			${isCurrentUser ? "<span class='pulsing-star' style='color:#facc15;font-size:1.2em;'>⭐️</span>" : ""}
-          </td>
-          <td style="padding:0 0 0 4px;color:#bbf;text-align:right;">${Math.floor(user.duration/60)}m</td>
-        </tr>`;
-    });
+		  </td>
+		  <td style="padding:0 0 0 4px;color:#bbf;text-align:right;">${Math.floor(user.duration / 60)}m</td>
+		</tr>`;
+	});
     out += '</tbody></table>';
     listEl.innerHTML = out;
   } catch (error) {
