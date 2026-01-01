@@ -11621,6 +11621,26 @@ function playZoneSound(zone) {
   }
 }
 
+// In your subscription:
+supabase
+  .channel('om-flame-broadcast')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'om_sound_events' },
+    payload => {
+      // Check local OM presence before playing sound!
+      const omPresenceId = localStorage.getItem('omPresenceId');
+      if (!omPresenceId) return; // Not present--do NOT play
+      
+      // Optionally, if you want to double check with user_id as well:
+      // const omUserId = localStorage.getItem('omUserId');
+      // if (!myUserIsInOMPresence()) return;
+
+      playZoneSound(payload.new.zone);
+    }
+  )
+  .subscribe();
+  
 // Show zone-specific icon with different colors
 function showZoneIcon(x, y, zone) {
   const iconDiv = document.createElement('div');
