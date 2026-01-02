@@ -7550,9 +7550,52 @@ function showStartMeditationModal() {
   if (firstButton) firstButton.focus();
 }
 
+async function saveMeditationStart(startData, retries = 3) {
+  try {
+    const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_starts', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(startData),
+    });
+    if (!response.ok) throw new Error("Meditation start save failed.");
+  } catch (e) {
+    if (retries > 0) {
+      console.warn(`Retrying saving meditation start (${3 - retries} retries left)...`);
+      await saveMeditationStart(startData, retries - 1); // Retry the request
+    } else {
+      console.error('Failed to save meditation start despite retries:', e);
+    }
+  }
+}
+
 function confirmStartMeditation() {
   document.getElementById('start-meditation-modal').classList.add('hidden');
   beginMeditationSession(); // Proceed with the original meditation start
+
+  // Save session data earlier
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const deviceType = isMobile ? "mobile" : "desktop";  
+  const startTime = Date.now();
+  
+  let omUserId = localStorage.getItem('omUserId');
+  let yogiChallenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+  
+  const startData = {
+    timestamp: new Date(startTime).toISOString(),
+    mode: currentMode,
+    duration: targetDuration,
+    device_type: deviceType,
+    omUserId,
+    challengeId: yogiChallenge.challengeId || null,
+    startDate: yogiChallenge.startDate || null,
+    endDate: yogiChallenge.endDate || null,
+    currentDay: yogiChallenge.currentDay || 0, // Default to day 0 if no challenge
+  };
+
+  // Retry logic for saving meditation start
+  saveMeditationStart(startData);
+  
+  setTimeout(updateLiveCountVisibility, 350);
 }
 
 function cancelStartMeditation() {
@@ -7912,38 +7955,7 @@ async function beginMeditationSession() {
   startTime = Date.now();
   endTime = startTime + (targetDuration * 1000);
   sessionActive = true;
-  
-     let omUserId = localStorage.getItem('omUserId');
-	 let yogiChallenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
-	 
-	// 🆕 Add challenge info to meditation start
-	try {
-	  const startData = {
-		timestamp: new Date().toISOString(),
-		mode: currentMode,
-		duration: targetDuration,
-		device_type: deviceType,
-		omUserId,
-		// Challenge-specific fields
-		challengeId: yogiChallenge.challengeId || null,
-		startDate: yogiChallenge.startDate || null,
-		endDate: yogiChallenge.endDate || null,
-		currentDay: yogiChallenge.currentDay || 0, // Default to day 0 if no challenge
-	  };
-
-	  // Non-blocking - don't wait for response
-	  fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_starts', {
-		method: 'POST',
-		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify(startData)
-	  }).catch((e) => console.error("Meditation start API failed:", e));
-
-	  setTimeout(updateLiveCountVisibility, 350);
-	} catch (e) {
-	  console.error('Failed to initiate meditation start:', e);
-	  // Ignore errors — don't break meditation experience
-	}
-  
+    
 	// Hide FAQ tab (add this line)
   document.getElementById('faq-tab').style.display = 'none';
   // Set up session info display
