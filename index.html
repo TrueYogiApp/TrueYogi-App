@@ -11599,7 +11599,6 @@ function getTapZone(x, y) {
 }
 
 // Play zone-specific sound
-// Play zone-specific sound - UPDATED VERSION
 function playZoneSound(zone) {
   const soundFiles = {
     'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',
@@ -11626,16 +11625,17 @@ function playZoneSound(zone) {
 
 // After a special user triggers their sound (maybe inside double-tap logic)
 function handleZoneSoundTrigger(zone) {
-  // Play the sound for the sender
-  playZoneSound(zone);
+  const omUserId = localStorage.getItem('omUserId'); 
 
-  // Send broadcast to backend for other present users
+  playZoneSound(zone); // Play for sender
+
+  // Broadcast API request
   fetch('https://trueyogi-backend-knkq.onrender.com/api/om-sound', {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      user_id: omUserId, // From your local storage/session
-      sound_type: zoneToSoundType(zone), // Convert zone to sound type
+      user_id: omUserId, // Correct sender ID
+      sound_type: zoneToSoundType(zone),
       zone: zone
     })
   }).catch(e => console.error('Failed to broadcast OM sound', e));
@@ -11662,14 +11662,15 @@ supabase
     'postgres_changes',
     { event: 'INSERT', schema: 'public', table: 'om_sound_events' },
     payload => {
-      // Only play if event is NOT triggered by yourself!
       const myUserId = localStorage.getItem('omUserId');
-      if (!payload.new || payload.new.user_id === myUserId) return; // Don't play sound a 2nd time if I'm sender
+      console.log("Supabase event user_id:", payload.new.user_id, "My user_id:", myUserId);
 
-      // Check local presence as before
+      // Prevent playing sound if the event was triggered by myself
+      if (!payload.new || payload.new.user_id === myUserId) return;
+
+      // Play sound for all others
       const omPresenceId = localStorage.getItem('omPresenceId');
-      if (!omPresenceId) return; // Not present--do NOT play
-
+      if (!omPresenceId) return; // Only for users present in OM
       playZoneSound(payload.new.zone);
     }
   )
