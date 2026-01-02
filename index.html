@@ -4302,6 +4302,7 @@ input[type="time"] {
     let isWakeLockSupported = 'wakeLock' in navigator;	
 	let omUserId = localStorage.getItem('omUserId');
 	let pendingBellSound = false; // <-- Add this near your globals
+	let broadcastMode = false;	
 
 	
     // Challenge Data
@@ -11574,6 +11575,9 @@ if (truemeditateImg && (e.target === truemeditateImg || truemeditateImg.contains
     
     // Play zone-specific sound
     playZoneSound(zone);
+		if (broadcastMode) {
+  handleZoneSoundTrigger(zone); // Now it broadcasts ONLY if checked!
+}
     
     // Show zone-specific icon
     showZoneIcon(e.changedTouches[0].clientX, e.changedTouches[0].clientY, zone);
@@ -11620,6 +11624,58 @@ function playZoneSound(zone) {
   }
 }
 
+// After a special user triggers their sound (maybe inside double-tap logic)
+function handleZoneSoundTrigger(zone) {
+  // Play the sound for the sender
+  playZoneSound(zone);
+
+  // Send broadcast to backend for other present users
+  fetch('https://trueyogi-backend-knkq.onrender.com/api/om-sound', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({
+      user_id: omUserId, // From your local storage/session
+      sound_type: zoneToSoundType(zone), // Convert zone to sound type
+      zone: zone
+    })
+  }).catch(e => console.error('Failed to broadcast OM sound', e));
+}
+
+// Map zones to sound types (adjust to your setup)
+function zoneToSoundType(zone) {
+  const mapping = {
+    'top-left': 'bell',
+    'top-right': 'bowl',
+    'bottom-left': 'chimes',
+    'bottom-right': 'gong'
+  };
+  return mapping[zone];
+}
+
+// Before subscribing, ensure you set omPresenceId when user joins OM
+// localStorage.setItem('omPresenceId', data.id); // when joining OM
+
+// In your subscription:
+supabase
+  .channel('om-flame-broadcast')
+  .on(
+    'postgres_changes',
+    { event: 'INSERT', schema: 'public', table: 'om_sound_events' },
+    payload => {
+      // Only play if event is NOT triggered by yourself!
+      const myUserId = localStorage.getItem('omUserId');
+      if (!payload.new || payload.new.user_id === myUserId) return; // Don't play sound a 2nd time if I'm sender
+
+      // Check local presence as before
+      const omPresenceId = localStorage.getItem('omPresenceId');
+      if (!omPresenceId) return; // Not present--do NOT play
+
+      playZoneSound(payload.new.zone);
+    }
+  )
+  .subscribe();
+  
+  
 // Show zone-specific icon with different colors
 function showZoneIcon(x, y, zone) {
   const iconDiv = document.createElement('div');
@@ -12907,6 +12963,29 @@ async function fetchUserWithHighestDuration() {
   return maxId; // This user should be allowed the call icon
 }
 
+async function canUserBroadcast() {
+  try {
+    const userId = localStorage.getItem('omUserId');
+    if (!userId) return false;
+    
+    const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/can-broadcast', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ userId: userId })
+    });
+    
+    if (response.ok) {
+      const data = await response.json();
+      return data.canBroadcast === true;
+    }
+    return false;
+  } catch (error) {
+    console.error('Error checking broadcast permission:', error);
+    return false;
+  }
+}
+
 // --- Main renderer (called whenever data changes or grid opens) ---
 function renderEarthGrid() {
   // --- Setup container, canvas, and label ---
@@ -13749,7 +13828,7 @@ userIdDisplay.innerHTML = `Grid ID: <span style="font-family:monospace;font-size
 
 userIdDisplay.style.cursor = 'pointer'; // Show it's clickable
 
-userIdDisplay.onclick = function(e) {
+userIdDisplay.onclick = async function(e) {
   const userId = localStorage.getItem('omUserId');
   const userRow = livePresenceRows.find(row => row.user_id === userId);
   if (!userRow) return;
@@ -13804,6 +13883,9 @@ userIdDisplay.onclick = function(e) {
   const oldPopup = document.getElementById('current-user-mins-popup');
   if (oldPopup) oldPopup.remove();
 
+// Check broadcast permission BEFORE creating popup
+const canBroadcast = await canUserBroadcast();
+
   // Build your popup with heartbeat warning color and countdown
   const popup = document.createElement('div');
   popup.id = 'current-user-mins-popup';
@@ -13823,6 +13905,14 @@ popup.innerHTML = `
       <span style="font-size:0.95em;color:${missedHeartbeat?'#ff9944':'#29D884'};font-weight:600;">
         ${missedHeartbeat?'Resonance interrupted!':'Resonance active'}
       </span>
+	    ${canBroadcast ? `
+    <div style="margin-top:8px; margin-bottom:8px;">
+      <label style="display:flex;align-items:center;gap:6px;font-size:0.93em;color:#ffeb99;cursor:pointer;">
+        <input type="checkbox" id="broadcast-toggle" style="accent-color:#ffd700; width:1.1em; height:1.1em;" ${broadcastMode ? 'checked' : ''} />
+        <span style="user-select:none;">Broadcast Mode</span>
+      </label>
+    </div>
+  ` : ''}
     </span>
   </div>
   <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
@@ -13865,6 +13955,15 @@ ${missedHeartbeat
   `;
   document.body.appendChild(popup);
   setTimeout(() => popup.style.opacity = 1, 10);
+
+const broadcastToggle = popup.querySelector('#broadcast-toggle');
+if (broadcastToggle) {
+  broadcastToggle.checked = broadcastMode; // initial state
+  broadcastToggle.addEventListener('change', function(e) {
+    broadcastMode = e.target.checked;
+    // You may optionally persist this in localStorage if you wish
+  });
+}
 
 // --- Live countdown update for heartbeat ---
 if (nextHeartbeatDate) {
