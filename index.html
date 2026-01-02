@@ -5612,6 +5612,7 @@ if (musicChoiceEl) {
 	  updateLangSwitcherVisibility();
 	  await validateOmPresence();
 	  updateCount();
+	  preloadAudio();
     // Hide loader when app is ready
     document.getElementById('app-loader').classList.add('hidden');
     });
@@ -11469,36 +11470,49 @@ document.addEventListener('touchend', function(e) {
 // Audio Manager for better sound management
 class AudioManager {
   constructor() {
+    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
     this.audioElements = new Map();
     this.maxSimultaneous = 9;
+
+    this.unlocked = false;
+  }
+
+  unlockAudio() {
+    if (!this.unlocked && this.audioContext.state !== 'running') {
+      document.body.addEventListener('click', () => {
+        this.audioContext.resume();
+        this.unlocked = true;
+      }, { once: true });
+    }
   }
 
   playSound(src, volume = 1.0, loop = false) {
+    this.unlockAudio(); // Ensure audio context is resumed
     this.cleanup();
-    
+
     const audio = new Audio();
     audio.src = src;
     audio.volume = volume;
     audio.loop = loop;
     audio.preload = 'auto';
-    
+
     const audioId = Date.now() + Math.random();
     this.audioElements.set(audioId, audio);
-    
+
     audio.play().catch(e => {
       console.log('Audio play failed:', e);
     });
-    
+
     if (!loop) {
       audio.onended = () => {
         this.audioElements.delete(audioId);
       };
     }
-    
+
     if (this.audioElements.size > this.maxSimultaneous) {
       this.removeOldestNonLooping();
     }
-    
+
     return audioId;
   }
 
@@ -11522,6 +11536,27 @@ class AudioManager {
     }
   }
 }
+
+document.addEventListener('touchend', () => {
+  audioManager.unlockAudio(); // Ensure audio context is resumed
+});
+
+function preloadAudio() {
+  const zoneSounds = {
+    'top-left': 'https://assets.trueyogi.app/assets/bell.m4a',
+    'top-right': 'https://assets.trueyogi.app/assets/harmony-bell.m4a',
+    'bottom-left': 'https://assets.trueyogi.app/assets/tamtam-gong.m4a',
+    'bottom-right': 'https://assets.trueyogi.app/assets/tao-chi-gong.m4a'
+  };
+
+  Object.values(zoneSounds).forEach(src => {
+    const audio = new Audio();
+    audio.src = src;
+    audio.preload = 'auto';
+    audio.load();
+  });
+}
+
 
 // Create the audio manager
 const audioManager = new AudioManager();
