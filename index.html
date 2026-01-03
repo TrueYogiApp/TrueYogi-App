@@ -12306,9 +12306,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 function canShowSwipeEffect(e) {
-  if (!(typeof sessionActive !== "undefined" && sessionActive)) return false;
+  // Swipe is allowed in three major "active" areas:
+  // 1. Active meditation (timer)
+  // 2. Complete Section ("session complete" display)
+  // 3. Final Section (congrats)
+
+  // Timer (during session)
   const timerSection = document.getElementById('timer-section');
-  if (!timerSection || timerSection.classList.contains('hidden')) return false;
+  const completeSection = document.getElementById('complete-section');
+  const finalSection = document.getElementById('final-section');
+
+  const isActive = (timerSection && !timerSection.classList.contains('hidden'))
+                || (completeSection && !completeSection.classList.contains('hidden'))
+                || (finalSection && !finalSection.classList.contains('hidden'));
+
+  if (!isActive) return false;
 
   // Ignore if tap is on avatar, logo, or UI buttons
   const avatarEl = document.querySelector('.avatar-container');
