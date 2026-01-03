@@ -5782,14 +5782,7 @@ function showWelcomeModal() {
 	  return;
 	}
 
-   if (
-	  currentMode === 'yogi' &&
-	  challengeData.currentDay >= 22 &&
-	  !isMobile()
-	) {
-	  return;
-	}
-	
+
   const modal = document.getElementById('next-session-modal');
   if (!modal) return;
   const textElement = document.getElementById('next-session-text');
@@ -7194,16 +7187,6 @@ async function updateSessionTimesDisplay() {
 	  return;
 	}
 
-	  // Day-21 device check (only in Yogi mode)
-	if (
-	  currentMode === 'yogi' &&
-	  challengeData.currentDay >= 22 &&
-	  !isMobile()
-	) {
-	  closeMissedSessionModal();
-	  return;
-	}
-	
   // Await completion of any expired session before proceeding.
   if (typeof completeExpiredSessionIfNeeded === 'function') {
     await completeExpiredSessionIfNeeded();
