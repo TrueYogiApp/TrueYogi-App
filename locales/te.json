@@ -228,6 +228,7 @@
   "reset_confirm_button": "యాప్ సెట్టింగ్స్ మరియు డేటాను రీసెట్",
   "reset_confirm_cancel": "రద్దు",
   "removeSessionTime": "తొలగించు",
+  "maxSessionTimesAllowed": "గరిష్టంగా 3 సెషన్ సమయాలు అనుమతించబడతాయి.",
   "faqHeading": "తరచుగా అడిగే ప్రశ్నలు",
   "faqTokenAddressQuestion": "అధికారిక YOGI టోకెన్ చిరునామా ఏమిటి?",
   "faqTokenAddressAnswer": "అధికారిక TRUE YOGI టోకెన్ (YOGI) సోలానా బ్లాక్ చైన్ లో విడుదల చేయబడింది.",

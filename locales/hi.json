@@ -229,6 +229,7 @@
   "reset_confirm_button": "सेटिंग्स और डेटा रीसेट करें",
   "reset_confirm_cancel": "रद्द करें",
   "removeSessionTime": "हटाएँ",
+  "maxSessionTimesAllowed": "अधिकतम 3 सत्र समय स्वीकार्य हैं।",
   "faqHeading": "अक्सर पूछे जाने वाले प्रश्न",
   "faqTokenAddressQuestion": "आधिकारिक योगी टोकन पता क्या है?",
   "faqTokenAddressAnswer": "आधिकारिक TRUE YOGI (YOGI) टोकन सोलाना ब्लॉकचेन पर जारी किया गया है।",

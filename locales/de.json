@@ -229,6 +229,7 @@
   "reset_confirm_button": "Einstellungen & Daten zurücksetzen",
   "reset_confirm_cancel": "Abbrechen",
   "removeSessionTime": "Entfernen",
+  "maxSessionTimesAllowed": "Maximal 3 Sitzungszeiten erlaubt.",
   "faqHeading": "Häufig gestellte Fragen",
   "faqTokenAddressQuestion": "Was ist die offizielle YOGI-Token-Adresse?",
   "faqTokenAddressAnswer": "Der offizielle TRUE YOGI Token (YOGI) wird auf der Solana-Blockchain ausgegeben.",

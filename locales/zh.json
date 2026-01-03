@@ -229,6 +229,7 @@
   "reset_confirm_button": "重置设置和数据",
   "reset_confirm_cancel": "取消",
   "removeSessionTime": "移除",
+  "maxSessionTimesAllowed": "最多允许3个会话时间。",
   "faqHeading": "常见问题",
   "faqTokenAddressQuestion": "瑜伽士官方代币地址是什么？",
   "faqTokenAddressAnswer": "官方TRUE YOGI (YOGI)代币发行于Solana区块链。",

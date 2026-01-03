@@ -229,6 +229,7 @@
   "reset_confirm_button": "Reimposta impostazioni e dati",
   "reset_confirm_cancel": "Annulla",
   "removeSessionTime": "Rimuovi",
+  "maxSessionTimesAllowed": "Massimo 3 orari di sessione consentiti.",
   "faqHeading": "Domande Frequenti",
   "faqTokenAddressQuestion": "Qual è l’indirizzo ufficiale del token YOGI?",
   "faqTokenAddressAnswer": "Il vero token TRUE YOGI (YOGI) è su blockchain Solana.",

@@ -229,6 +229,7 @@
   "reset_confirm_button": "Réinitialiser les réglages et les données",
   "reset_confirm_cancel": "Annuler",
   "removeSessionTime": "Supprimer",
+  "maxSessionTimesAllowed": "Maximum 3 horaires de séance autorisés.",
   "faqHeading": "Questions fréquemment posées",
   "faqTokenAddressQuestion": "Quelle est l'adresse officielle du jeton YOGI ?",
   "faqTokenAddressAnswer": "Le jeton officiel TRUE YOGI (YOGI) est émis sur la blockchain Solana.",

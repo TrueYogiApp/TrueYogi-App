@@ -6896,7 +6896,7 @@ function getLocalTimeString() {
   // Check maximum 3 sessions
   if (inputs >= 3) {
     const errorElement = document.getElementById('config-error');
-    errorElement.textContent = 'Maximum 3 session times allowed.';
+    errorElement.textContent = t('maxSessionTimesAllowed');
     errorElement.classList.remove('hidden');
     return;
   }

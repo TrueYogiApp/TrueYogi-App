@@ -229,6 +229,7 @@
   "reset_confirm_button": "Сбросить настройки и данные",
   "reset_confirm_cancel": "Отмена",
   "removeSessionTime": "Удалить",
+  "maxSessionTimesAllowed": "Максимум 3 времени сеанса разрешено.", 
   "faqHeading": "Часто задаваемые вопросы",
   "faqTokenAddressQuestion": "Какой адрес официального Йог токена?",
   "faqTokenAddressAnswer": "Официальный TRUE YOGI (YOGI) токен — на блокчейне Solana.",
