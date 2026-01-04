@@ -2292,13 +2292,34 @@ input[type="time"] {
   }
 }
 
-@keyframes pulse2 {
-  0% { box-shadow:0 0 0 0 #facc1544; }
-  70% { box-shadow:0 0 0 7px #facc1500; }
-  100% { box-shadow:0 0 0 0 #facc1500; }
+/* chakra and Pulsing for livecount*/
+.chakra-spinner {
+  height: 14px; 
+  width: 14px; 
+  animation: rotate 1.5s infinite linear; 
 }
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .pulsing-star {
   animation: pulse2 1.2s infinite;
+}
+@keyframes pulse2 {
+  0% { 
+    box-shadow:0 0 0 0 #facc1544; 
+  }
+  70% { 
+    box-shadow:0 0 0 7px #facc1500; 
+  }
+  100% { 
+    box-shadow:0 0 0 0 #facc1500; 
+  }
 }
 
 
@@ -2351,6 +2372,8 @@ input[type="time"] {
 	<video src="https://assets.trueyogi.app/assets/Avatars/Mother-Teresa.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
 	<video src="https://assets.trueyogi.app/assets/Avatars/Lao-Tzu.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
     <video src="https://assets.trueyogi.app/assets/Avatars/Lord-Krishna.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>	
+    <video src="https://assets.trueyogi.app/assets/Avatars/Mahavira.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
+    <video src="https://assets.trueyogi.app/assets/Avatars/Quan-Yin.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>	
 	
 	
    <!-- <video src="/assets/mandala.mp4" class="cosmic-bg" autoplay loop muted playsinline preload="none"></video>
@@ -7834,6 +7857,11 @@ function setupLiveMeditationCounter() {
   });
 }
 
+// Call this when page loads
+document.addEventListener('DOMContentLoaded', () => {
+  setupLiveMeditationCounter();
+});
+
 // Update function (same as before)
 async function updateLiveCount() {
   try {
@@ -7872,41 +7900,44 @@ async function updateLiveCount() {
       <table style="width:100%;font-size:13px;border-collapse:collapse;">
         <tbody>`;
 
-	data.live_users.forEach((user, i) => {
-	  const id = user.omuserid || 'Anonymous';
-	  const shortId = id.length > 6
-		? `${id.slice(0,3)}...${id.slice(-3)}`
-		: id;
+    data.live_users.forEach((user, i) => {
+      const id = user.omuserid || 'Anonymous';
+      const shortId = id.length > 6
+        ? `${id.slice(0, 3)}...${id.slice(-3)}`
+        : id;
 
-	  const isCurrentUser = id === localStorage.getItem('omUserId');
-	  const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
+      const isCurrentUser = id === localStorage.getItem('omUserId');
+      const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
 
-	  // Default gray for users without valid current_day
-	  let color = '#777777';
-	  const currentDay = user.current_day || 0; // Make sure backend includes `current_day`
+      // Default gray for users without valid current_day
+      let color = '#777777';
+      const currentDay = user.current_day || 0;
 
-	  // Determine rainbow color based on currentDay
-	  if (currentDay) {
-		if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';       // Red
-		else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42'; // Orange
-		else if (currentDay >= 13 && currentDay <= 18) color = '#eab308'; // Yellow
-		else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e'; // Green
-		else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc'; // Blue
-		else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1'; // Indigo
-		else if (currentDay >= 37) color = '#8b5cf6';                   // Violet
-	  }
+      // Determine rainbow color based on currentDay
+      if (currentDay) {
+        if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';       // Red
+        else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42'; // Orange
+        else if (currentDay >= 13 && currentDay <= 18) color = '#eab308'; // Yellow
+        else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e'; // Green
+        else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc'; // Blue
+        else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1'; // Indigo
+        else if (currentDay >= 37) color = '#8b5cf6';                   // Violet
+      }
 
-	  out += `
-		<tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
-		  <td style="padding:0 4px 0 0;color:${isCurrentUser ? '#fff' : '#777777'};font-weight:${isCurrentUser ? '700' : '400'};">
-			<span style="color:#fde68a;">${i + 1}.</span> <!-- Serial number styling -->
-			<span style="color:${color};">ID:</span> <!-- 'ID' styling -->
-			<span style="color:${color};">${shortId}</span>${userMode} <!-- Short ID styling -->
-			${isCurrentUser ? "<span class='pulsing-star' style='color:#facc15;font-size:1.2em;'>⭐️</span>" : ""}
-		  </td>
-		  <td style="padding:0 0 0 4px;color:#bbf;text-align:right;">${Math.floor(user.duration / 60)}m</td>
-		</tr>`;
-	});
+  out += `
+<tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
+  <td style="padding:0 4px 0 0;color:${isCurrentUser ? '#fff' : '#777777'};font-weight:${isCurrentUser ? '700' : '400'}; display: flex; gap: 5px; align-items: center; justify-content: space-between;">
+    <span style="color:#fde68a;">${i + 1}.</span> <!-- Serial number styling -->
+    <span style="color:${color};">ID:</span> <!-- 'ID' styling -->
+    <span style="color:${color};">${shortId}</span>${userMode} <!-- Short ID styling -->
+    <img src="/assets/chakra.svg" alt="Chakra Spinner" class="chakra-spinner" style="
+      height: 14px; width: 14px; animation: rotate 1.5s infinite linear; filter: drop-shadow(0px 0px 3px ${color});
+    "/> <!-- Chakra spinner -->
+    ${isCurrentUser ? "<span class='pulsing-star' style='color:#facc15;font-size:1.2em;'>⭐️</span>" : ""}
+  </td>
+  <td style="padding:0 0 0 14px;color:#bbf;text-align:right;">${Math.floor(user.duration / 60)}m</td>
+</tr>`;
+});
     out += '</tbody></table>';
     listEl.innerHTML = out;
   } catch (error) {
@@ -7914,10 +7945,6 @@ async function updateLiveCount() {
   }
 }
 
-// Call this when page loads
-document.addEventListener('DOMContentLoaded', () => {
-  setupLiveMeditationCounter();
-});
 
 function updateLiveCountVisibility() {
   const liveCountSection = document.getElementById('live-count-section');
