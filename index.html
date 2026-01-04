@@ -13821,6 +13821,13 @@ if (isConnected) {
 }
 resonanceMsg.style.display = "";
 
+// Remove any existing animation
+resonanceMsg.style.animation = 'none';
+// Force reflow to reset animation state
+void resonanceMsg.offsetWidth;
+// Apply the animation
+resonanceMsg.style.animation = 'scrollMsg 25s linear infinite';
+
 // --- Grid ID display ---
 let userIdDisplay = document.getElementById('userIdDisplay');
 if (!userIdDisplay) {
