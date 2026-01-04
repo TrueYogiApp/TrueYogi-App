@@ -12453,6 +12453,36 @@ new ElementalSwipe();
 let earthGridOpen = false;
 let gridChannel = null;
 let livePresenceRows = [];
+let renderDebounceTimer = null;
+
+// ADD THESE 3 LINES FOR CACHING - Add them right here
+let cachedCountries = null;
+let lastCountryFetch = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// ADD THIS FUNCTION RIGHT HERE
+function getCountryData() {
+  const now = Date.now();
+  
+  // Return cached data if it's fresh
+  if (cachedCountries && (now - lastCountryFetch) < CACHE_DURATION) {
+    return Promise.resolve(cachedCountries);
+  }
+  
+  // Otherwise fetch fresh data
+  return fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
+    .then(res => res.json())
+    .then(data => {
+      cachedCountries = data;
+      lastCountryFetch = now;
+      return data;
+    })
+    .catch(error => {
+      console.error('Failed to fetch country data:', error);
+      // Return empty array on error
+      return [];
+    });
+}
 
 // Example: Fetch country stats on Earth Grid open
 async function fetchCountryStats() {
@@ -14158,141 +14188,142 @@ const baseX = canvas.width / 2;
 const baseY = canvas.height / 2;
 const radius = 120;
 const dots = [];
-fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
-  .then(res => res.json())
-  .then(allCountries => {
-    const flagPromises = [];
-    zones.forEach((z, i) => {
-            let zoneName = typeof z === 'object' ? z.zone : z;
-	  // Normalize any USA variant to "United States"
-	  if (zoneName && zoneName.toLowerCase().includes('united states')) {
-	   zoneName = 'United States';
-	  } 
-      let coords;
-      const country = allCountries.find(c => 
-        c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
-        c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
-        c.cca2 === zoneName ||
-        c.cca3 === zoneName
-      );
-      if (country && country.latlng) {
-        coords = { lat: country.latlng[0], lon: country.latlng[1] };
-      } else {
-        const angle = (i / zones.length) * 2 * Math.PI;
-        coords = { lat: Math.sin(angle) * 60, lon: (angle / Math.PI) * 180 };
-      }
-      const x = baseX + (coords.lon / 180) * radius * 0.9;
-      const y = baseY - (coords.lat / 90) * radius * 0.45;
-      const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
-      let countryCode = 'un';
-      if (country && country.cca2) countryCode = country.cca2.toLowerCase();
-      const codeMap = {
-        'USA': 'us', 'US': 'us', 'United_States': 'us',
-		'United States of America': 'us',
-		'United States of America (the)': 'us',
-        'India': 'in', 'IN': 'in',
-        'China': 'cn', 'CN': 'cn',
-        'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
-        'Australia': 'au', 'AU': 'au',
-        'Brazil': 'br', 'BR': 'br',
-        'Russia': 'ru', 'RU': 'ru',
-        'Japan': 'jp', 'JP': 'jp',
-        'Canada': 'ca', 'CA': 'ca',
-        'Mexico': 'mx', 'MX': 'mx',
-        'South_Africa': 'za', 'ZA': 'za',
-        'Egypt': 'eg', 'EG': 'eg',
-        'Indonesia': 'id', 'ID': 'id',
-        'Argentina': 'ar', 'AR': 'ar'
-      };
-      countryCode = codeMap[zoneName] || countryCode;
 
-      // Only do the presenceRow lookup ONCE
-      const presenceRow = livePresenceRows.find(row => row.country === zoneName);
-      const id = presenceRow ? presenceRow.id : null;
-
-      const flagImg = new Image();
-      flagImg.crossOrigin = "anonymous";
-      const flagPromise = new Promise((resolve) => {
-        flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color, id });
-        flagImg.onerror = () => resolve({ img: null, x, y, zone: z, color, id });
-        flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
-      });
-      flagPromises.push(flagPromise);
-
-      dots.push({ x, y, zone: z, color, id });
-    });
-
-    Promise.all(flagPromises).then(flags => {
-      flags.forEach(({ img, x, y, zone, color, id }) => {
-        // Compare this dot's id to your saved omPresenceId
-        if (id && omPresenceId && id.toString() === omPresenceId.toString()) {
-          // Draw shine/glow under your flag
-          ctx.save();
-          ctx.beginPath();
-          ctx.ellipse(x, y + 1, 9, 5, 0, 0, 1 * Math.PI);
-          ctx.fillStyle = '#fffde0';
-          ctx.globalAlpha = 0.38;
-          ctx.shadowColor = '#ffd700';
-          ctx.shadowBlur = 28;
-          ctx.fill();
-          ctx.restore();
-        }
-
-        // Draw the flag as usual
-        if (img) {
-          ctx.drawImage(img, x - 6, y - 4, 12, 9);
+// DEBOUNCED AND CACHED VERSION
+if (renderDebounceTimer) clearTimeout(renderDebounceTimer);
+renderDebounceTimer = setTimeout(() => {
+  getCountryData()
+    .then(allCountries => {
+      const flagPromises = [];
+      zones.forEach((z, i) => {
+        let zoneName = typeof z === 'object' ? z.zone : z;
+        // Normalize any USA variant to "United States"
+        if (zoneName && zoneName.toLowerCase().includes('united states')) {
+          zoneName = 'United States';
+        } 
+        let coords;
+        const country = allCountries.find(c => 
+          c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+          c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
+          c.cca2 === zoneName ||
+          c.cca3 === zoneName
+        );
+        if (country && country.latlng) {
+          coords = { lat: country.latlng[0], lon: country.latlng[1] };
         } else {
-          ctx.beginPath();
-          ctx.arc(x, y, 4, 0, Math.PI * 2);
-          ctx.fillStyle = color;
-          ctx.shadowColor = color;
-          ctx.globalAlpha = 0.18;
-          ctx.shadowBlur = 15;
-          ctx.fill();
-          ctx.beginPath();
-          ctx.arc(x, y, 6, 0, Math.PI * 2);
-          ctx.strokeStyle = color + '40';
-          ctx.lineWidth = 1;
-          ctx.stroke();
+          const angle = (i / zones.length) * 2 * Math.PI;
+          coords = { lat: Math.sin(angle) * 60, lon: (angle / Math.PI) * 180 };
+        }
+        const x = baseX + (coords.lon / 180) * radius * 0.9;
+        const y = baseY - (coords.lat / 90) * radius * 0.45;
+        const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
+        let countryCode = 'un';
+        if (country && country.cca2) countryCode = country.cca2.toLowerCase();
+        const codeMap = {
+          'USA': 'us', 'US': 'us', 'United_States': 'us',
+          'United States of America': 'us',
+          'United States of America (the)': 'us',
+          'India': 'in', 'IN': 'in',
+          'China': 'cn', 'CN': 'cn',
+          'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
+          'Australia': 'au', 'AU': 'au',
+          'Brazil': 'br', 'BR': 'br',
+          'Russia': 'ru', 'RU': 'ru',
+          'Japan': 'jp', 'JP': 'jp',
+          'Canada': 'ca', 'CA': 'ca',
+          'Mexico': 'mx', 'MX': 'mx',
+          'South_Africa': 'za', 'ZA': 'za',
+          'Egypt': 'eg', 'EG': 'eg',
+          'Indonesia': 'id', 'ID': 'id',
+          'Argentina': 'ar', 'AR': 'ar'
+        };
+        countryCode = codeMap[zoneName] || countryCode;
+
+        // Only do the presenceRow lookup ONCE
+        const presenceRow = livePresenceRows.find(row => row.country === zoneName);
+        const id = presenceRow ? presenceRow.id : null;
+
+        const flagImg = new Image();
+        flagImg.crossOrigin = "anonymous";
+        const flagPromise = new Promise((resolve) => {
+          flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color, id });
+          flagImg.onerror = () => resolve({ img: null, x, y, zone: z, color, id });
+          flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
+        });
+        flagPromises.push(flagPromise);
+
+        dots.push({ x, y, zone: z, color, id });
+      });
+
+      Promise.all(flagPromises).then(flags => {
+        flags.forEach(({ img, x, y, zone, color, id }) => {
+          // Compare this dot's id to your saved omPresenceId
+          if (id && omPresenceId && id.toString() === omPresenceId.toString()) {
+            // Draw shine/glow under your flag
+            ctx.save();
+            ctx.beginPath();
+            ctx.ellipse(x, y + 1, 9, 5, 0, 0, 1 * Math.PI);
+            ctx.fillStyle = '#fffde0';
+            ctx.globalAlpha = 0.38;
+            ctx.shadowColor = '#ffd700';
+            ctx.shadowBlur = 28;
+            ctx.fill();
+            ctx.restore();
+          }
+
+          // Draw the flag as usual
+          if (img) {
+            ctx.drawImage(img, x - 6, y - 4, 12, 9);
+          } else {
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = color;
+            ctx.shadowColor = color;
+            ctx.globalAlpha = 0.18;
+            ctx.shadowBlur = 15;
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(x, y, 6, 0, Math.PI * 2);
+            ctx.strokeStyle = color + '40';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+          }
+        });
+      });
+      
+      // zonepopup 
+      getUserCountryInfo().then(userCountryInfo => {
+        const omPresenceId = localStorage.getItem('omPresenceId');
+        const isUserActive = !!omPresenceId;
+
+        // Try to find user's country among active nodes/dots
+        const userZoneDot = dots.find(dot => {
+          let zoneName = typeof dot.zone === 'object' ? dot.zone.zone : dot.zone;
+          return zoneName === userCountryInfo.country;
+        });
+
+        const canvasRect = canvas.getBoundingClientRect();
+
+        if (userZoneDot) {
+          // Show normal popup (with count)
+          showZonePopup(
+            typeof userZoneDot.zone === 'object' ? userZoneDot.zone : { zone: userZoneDot.zone, count: userZoneDot.count },
+            userZoneDot.x + canvasRect.left,
+            userZoneDot.y + canvasRect.top
+          );
+        } else {
+          // Show minimal popup at default flag location (center or calculated)
+          const centerX = canvasRect.left + canvas.width / 2;
+          const centerY = canvasRect.top + canvas.height / 2;
+
+          // Create a minimal zone object
+          const minimalZone = { zone: userCountryInfo.country, count: null };
+
+          showZonePopup(minimalZone, centerX, centerY);
         }
       });
     });
-// zonepopup 
-getUserCountryInfo().then(userCountryInfo => {
-  const omPresenceId = localStorage.getItem('omPresenceId');
-  const isUserActive = !!omPresenceId;
-
-  // Try to find user's country among active nodes/dots
-  const userZoneDot = dots.find(dot => {
-    let zoneName = typeof dot.zone === 'object' ? dot.zone.zone : dot.zone;
-    return zoneName === userCountryInfo.country;
-  });
-
-  const canvasRect = canvas.getBoundingClientRect();
-
-  if (userZoneDot) {
-    // Show normal popup (with count)
-    showZonePopup(
-      typeof userZoneDot.zone === 'object' ? userZoneDot.zone : { zone: userZoneDot.zone, count: userZoneDot.count },
-      userZoneDot.x + canvasRect.left,
-      userZoneDot.y + canvasRect.top
-    );
-  } else {
-    // Show minimal popup at default flag location (center or calculated)
-    // Option 1: Center of canvas
-    const centerX = canvasRect.left + canvas.width / 2;
-    const centerY = canvasRect.top + canvas.height / 2;
-
-    // Option 2: Calculate flag position using restcountries lat/lng
-    // (if you want, but center is simplest fallback)
-
-    // Create a minimal zone object
-    const minimalZone = { zone: userCountryInfo.country, count: null };
-
-    showZonePopup(minimalZone, centerX, centerY);
-  }
-});
-  });
+}, 100); // 100ms delay before fetching
 
   let glowActive = false;
 
@@ -14778,6 +14809,18 @@ function startCallPolling() {
 function closeEarthGrid() {
   earthGridOpen = false;
 
+  // Clear animation intervals
+  if (flameTimerInterval) {
+    clearInterval(flameTimerInterval);
+    flameTimerInterval = null;
+  }
+  
+    // Clear debounce timer
+  if (renderDebounceTimer) {
+    clearTimeout(renderDebounceTimer);
+    renderDebounceTimer = null;
+  }
+  
   // Remove ALL zone popups + other tooltips
   document.querySelectorAll('.earthzone-popup').forEach(el => el.remove());
 
