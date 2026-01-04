@@ -12460,6 +12460,10 @@ let cachedCountries = null;
 let lastCountryFetch = 0;
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
+// ADD THESE 2 LINES FOR STARFIELD CACHE
+let starfieldCanvas = null;
+let starfieldCtx = null;
+
 // ADD THIS FUNCTION RIGHT HERE
 function getCountryData() {
   const now = Date.now();
@@ -12482,6 +12486,60 @@ function getCountryData() {
       // Return empty array on error
       return [];
     });
+}
+
+function renderStarfield(targetCanvas) {
+  // If we haven't created the offscreen canvas yet, create and draw stars once
+  if (!starfieldCanvas) {
+    starfieldCanvas = document.createElement('canvas');
+    starfieldCanvas.width = targetCanvas.width;
+    starfieldCanvas.height = targetCanvas.height;
+    starfieldCtx = starfieldCanvas.getContext('2d');
+    
+    // --- COPY YOUR EXISTING STARFIELD CODE HERE, BUT USE starfieldCtx ---
+    const starLayers = [
+      { count: 60, minR: 0.2, maxR: 1.1, minA: 0.35, maxA: 0.75 },
+      { count: 26, minR: 1.0, maxR: 2.4, minA: 0.10, maxA: 0.26 },
+      { count: 8,  minR: 2.8, maxR: 5.0, minA: 0.05, maxA: 0.12 }
+    ];
+    
+    for (const layer of starLayers) {
+      for (let i = 0; i < layer.count; i++) {
+        const starX = Math.random() * starfieldCanvas.width;
+        const starY = Math.random() * starfieldCanvas.height;
+        const size = layer.minR + Math.random() * (layer.maxR - layer.minR);
+        const alpha = layer.minA + Math.random() * (layer.maxA - layer.minA);
+        starfieldCtx.save();
+        starfieldCtx.globalAlpha = alpha;
+        starfieldCtx.beginPath();
+        starfieldCtx.fillStyle = '#ffffff';
+        starfieldCtx.arc(starX, starY, size, 0, Math.PI * 2);
+        starfieldCtx.fill();
+        
+        if (size > 1.2) {
+          starfieldCtx.beginPath();
+          starfieldCtx.fillStyle = `rgba(255,240,200,${Math.min(0.08, alpha * 0.18)})`;
+          starfieldCtx.arc(starX, starY, size * 3.5, 0, Math.PI * 2);
+          starfieldCtx.fill();
+        }
+        
+        if (size > 0.9 && size <= 2.5) {
+          starfieldCtx.shadowColor = 'rgba(255, 220, 170, 0.08)';
+          starfieldCtx.shadowBlur = size * 4;
+          starfieldCtx.beginPath();
+          starfieldCtx.fillStyle = '#ffffff';
+          starfieldCtx.arc(starX, starY, 0.6, 0, Math.PI * 2);
+          starfieldCtx.fill();
+          starfieldCtx.shadowBlur = 0;
+        }
+        starfieldCtx.restore();
+      }
+    }
+  }
+  
+  // Now just copy the pre-rendered starfield to the actual canvas
+  const ctx = targetCanvas.getContext('2d');
+  ctx.drawImage(starfieldCanvas, 0, 0);
 }
 
 // Example: Fetch country stats on Earth Grid open
@@ -14133,42 +14191,8 @@ setAuraColor();
   setTimeout(() => container.style.opacity = 1, 10);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  // --- Layered starfield (unchanged) ---
-  const starLayers = [
-    { count: 60, minR: 0.2, maxR: 1.1, minA: 0.35, maxA: 0.75 },
-    { count: 26, minR: 1.0, maxR: 2.4, minA: 0.10, maxA: 0.26 },
-    { count: 8,  minR: 2.8, maxR: 5.0, minA: 0.05, maxA: 0.12 }
-  ];
-  for (const layer of starLayers) {
-    for (let i = 0; i < layer.count; i++) {
-      const starX = Math.random() * canvas.width;
-      const starY = Math.random() * canvas.height;
-      const size = layer.minR + Math.random() * (layer.maxR - layer.minR);
-      const alpha = layer.minA + Math.random() * (layer.maxA - layer.minA);
-      ctx.save();
-      ctx.globalAlpha = alpha;
-      ctx.beginPath();
-      ctx.fillStyle = '#ffffff';
-      ctx.arc(starX, starY, size, 0, Math.PI * 2);
-      ctx.fill();
-      if (size > 1.2) {
-        ctx.beginPath();
-        ctx.fillStyle = `rgba(255,240,200,${Math.min(0.08, alpha * 0.18)})`;
-        ctx.arc(starX, starY, size * 3.5, 0, Math.PI * 2);
-        ctx.fill();
-      }
-      if (size > 0.9 && size <= 2.5) {
-        ctx.shadowColor = 'rgba(255, 220, 170, 0.08)';
-        ctx.shadowBlur = size * 4;
-        ctx.beginPath();
-        ctx.fillStyle = '#ffffff';
-        ctx.arc(starX, starY, 0.6, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.shadowBlur = 0;
-      }
-      ctx.restore();
-    }
-  }
+  // --- OPTIMIZED: Use cached starfield ---
+  renderStarfield(canvas);
 
 // ---- LIVE ZONE/COUNTRY CALCULATION ----
 const countryCounts = {};
@@ -14820,6 +14844,10 @@ function closeEarthGrid() {
     clearTimeout(renderDebounceTimer);
     renderDebounceTimer = null;
   }
+  
+    // Clear starfield cache
+  starfieldCanvas = null;
+  starfieldCtx = null;
   
   // Remove ALL zone popups + other tooltips
   document.querySelectorAll('.earthzone-popup').forEach(el => el.remove());
