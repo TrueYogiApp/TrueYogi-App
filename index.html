@@ -7892,6 +7892,9 @@ function showStartMeditationModal() {
   if (firstButton) firstButton.focus();
 }
 
+
+let meditationStartSaved = false; // Outside the functions, at global scope
+
 async function saveMeditationStart(startData, retries = 3) {
   try {
     const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_starts', {
@@ -7900,7 +7903,14 @@ async function saveMeditationStart(startData, retries = 3) {
       body: JSON.stringify(startData),
     });
     if (!response.ok) throw new Error("Meditation start save failed.");
+    meditationStartSaved = true;  // Mark as saved!
+    // Optionally, for persistence across reloads:
+    localStorage.setItem('meditationStartSaved', 'true');
+    localStorage.setItem('meditationStartData', JSON.stringify(startData));
   } catch (e) {
+    meditationStartSaved = false;
+    localStorage.setItem('meditationStartSaved', 'false');
+    localStorage.setItem('meditationStartData', JSON.stringify(startData));
     if (retries > 0) {
       console.warn(`Retrying saving meditation start (${3 - retries} retries left)...`);
       await saveMeditationStart(startData, retries - 1); // Retry the request
@@ -8293,6 +8303,19 @@ async function beginMeditationSession() {
   updateHideUiBtnVisibility();
   updateHideUiButtonVisibility();
   requestWakeLock();
+  
+    // At the end OR at the start of the function, check if not saved:
+  meditationStartSaved = (localStorage.getItem('meditationStartSaved') === 'true');
+
+  if (!meditationStartSaved) {
+    // Get the data again, or from localStorage (if you saved it earlier for retry)
+    const startData = JSON.parse(localStorage.getItem('meditationStartData') || '{}');
+    // Try one more time to save if session started
+    if (startData && startData.timestamp) {
+      await saveMeditationStart(startData, 2); // Try twice more
+    }
+  }
+  
   if ("vibrate" in navigator) navigator.vibrate(20);
     // Device type detection
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
