@@ -6500,6 +6500,20 @@ function closeResetConfirmation() {
   goBackToFirstStep();
 }
 
+    // Helper function to calculate end date
+    function calculateEndDate(startDate, challengeDuration) {
+      const start = new Date(startDate);
+      const endDate = new Date(start);
+      
+      if (challengeDuration === 21) {
+        endDate.setDate(start.getDate() + 20); // Day 0 to Day 20 = 21 days
+      } else if (challengeDuration === 41) {
+        endDate.setDate(start.getDate() + 40); // Day 0 to Day 40 = 41 days
+      }
+      
+      return endDate.toISOString();
+    }
+	
 // Your existing confirmResetChallenge function stays EXACTLY THE SAME
 async function confirmResetChallenge() {
   // Clear timer
@@ -6585,20 +6599,6 @@ async function confirmResetChallenge() {
     // 🆕 NEW: Get these variables BEFORE using them
     const omUserId = localStorage.getItem('omUserId');
     const challengeId = challenge.challengeId;
-
-    // Helper function to calculate end date
-    function calculateEndDate(startDate, challengeDuration) {
-      const start = new Date(startDate);
-      const endDate = new Date(start);
-      
-      if (challengeDuration === 21) {
-        endDate.setDate(start.getDate() + 20); // Day 0 to Day 20 = 21 days
-      } else if (challengeDuration === 41) {
-        endDate.setDate(start.getDate() + 40); // Day 0 to Day 40 = 41 days
-      }
-      
-      return endDate.toISOString();
-    }
 
     // If user completes 21-day offline, check spaceship first!
     if (
@@ -9141,19 +9141,57 @@ try {
   const jwtToken = localStorage.getItem('jwtToken');
   const walletKey = window.walletPublicKey || localStorage.getItem('currentJourneyWallet');
   // Only for 41+ days & wallet connected
-  if (challenge.startDate && Number(challenge.currentDay) >= 41 && jwtToken && walletKey) {
-    let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
-    history.push({
-      startDate: challenge.startDate,
-      endDate: new Date().toISOString(),
-      days: challenge.currentDay,
+if (
+  challenge.startDate &&
+  Number(challenge.currentDay) >= 41 &&
+  jwtToken &&
+  walletKey
+) {
+  let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+  const endDate = calculateEndDate(challenge.startDate, 41);
+
+  // Prepare the entry
+  const historyEntry = {
+    challengeId: challenge.challengeId,
+    startDate: challenge.startDate,
+    endDate: endDate,
+    days: challenge.currentDay,
+    mode: 'online',
+    sessionsCompleted: challenge.sessionsCompleted || [],
+    totalSessions: challenge.totalSessions || 0,
+    totalMinutes: challenge.totalMinutes || 0,
+  };
+  history.push(historyEntry);
+  localStorage.setItem('challengeHistory', JSON.stringify(history));
+
+  // Also save to DB like in confirmResetChallenge
+  const omUserId = localStorage.getItem('omUserId');
+  const challengeId = challenge.challengeId;
+
+  if (omUserId && challengeId) {
+    const payload = {
+      om_user_id: omUserId,
+      challenge_id: challengeId,
+      start_date: challenge.startDate,
+      end_date: endDate,
+      days_completed: challenge.currentDay,
       mode: 'online',
-      sessionsCompleted: challenge.sessionsCompleted || [],
-      totalSessions: challenge.totalSessions || 0,
-      totalMinutes: challenge.totalMinutes || 0,
+      sessions_completed: challenge.sessionsCompleted || [],
+      total_sessions: challenge.totalSessions || 0,
+      total_minutes: challenge.totalMinutes || 0,
+      user_agent: navigator.userAgent,
+      device_type: typeof getDeviceType === 'function' ? getDeviceType() : 'unknown',
+    };
+
+    fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    }).catch((error) => {
+      console.error('Failed to save online challenge history:', error);
     });
-    localStorage.setItem('challengeHistory', JSON.stringify(history));
   }
+}
 } catch (e) { /* ignore */ }
   
   localStorage.removeItem('yogiConfig');
