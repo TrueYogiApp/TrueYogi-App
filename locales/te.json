@@ -403,7 +403,10 @@
 	"progressLossSessions": "{n} పూర్తైన సెషన్లు",
   "typeResetConfirmation": "\"RESET\" టైప్ చేసి ధృవీకరించండి:",
   "typeConfirmationPlaceholder": "ఇక్కడ టైప్ చేయండి...",
-  "resetUnderstandCheckbox": "నా పురోగతిని శాశ్వతంగా తొలగించబడుతుంది మరియు తిరిగి సమీకరించబడదు అనే విషయం నాకు తెలుసు."
+  "resetUnderstandCheckbox": "నా పురోగతిని శాశ్వతంగా తొలగించబడుతుంది మరియు తిరిగి సమీకరించబడదు అనే విషయం నాకు తెలుసు.",
+  "confirmResetButton": "రీసెట్ ధృవీకరించండి",
+"countdownTimerSuffix": "seconds",
+"goBackButton": "తిరిగి వెళ్ళండి"
 
 
 }

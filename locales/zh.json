@@ -400,5 +400,8 @@
 "progressLossSessions": "{n} 场完成的会话",
 "typeResetConfirmation": "键入\"RESET\"以确认：",
 "typeConfirmationPlaceholder": "在这里输入...",
-"resetUnderstandCheckbox": "我明白这将永久删除我的进度且无法撤销。"
+"resetUnderstandCheckbox": "我明白这将永久删除我的进度且无法撤销。",
+"confirmResetButton": "确认重置",
+"countdownTimerSuffix": "秒",
+"goBackButton": "返回"
 }

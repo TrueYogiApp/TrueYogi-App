@@ -400,5 +400,8 @@
 "progressLossSessions": "{n} sessioni completate",
 "typeResetConfirmation": "Digita \"RESET\" per confermare:",
 "typeConfirmationPlaceholder": "Scrivi qui...",
-"resetUnderstandCheckbox": "Capisco che questo cancellerà permanentemente i miei progressi e non potrà essere annullato."
+"resetUnderstandCheckbox": "Capisco che questo cancellerà permanentemente i miei progressi e non potrà essere annullato.",
+"confirmResetButton": "Conferma reset",
+"countdownTimerSuffix": "secondi",
+"goBackButton": "Indietro"
 }

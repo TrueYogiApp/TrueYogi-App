@@ -399,5 +399,8 @@
 "progressLossSessions": "{n} sesiones completas",
 "typeResetConfirmation": "Escribe \"RESET\" para confirmar:",
 "typeConfirmationPlaceholder": "Escribe aquí...",
-"resetUnderstandCheckbox": "Entiendo que esto eliminará permanentemente mi progreso y no se puede deshacer."
+"resetUnderstandCheckbox": "Entiendo que esto eliminará permanentemente mi progreso y no se puede deshacer.",
+"confirmResetButton": "Confirmar reinicio",
+"countdownTimerSuffix": "segundos",
+"goBackButton": "Regresar"
 }

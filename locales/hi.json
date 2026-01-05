@@ -399,5 +399,8 @@
 "progressLossSessions": "{n} पूरा किए गए सत्र",
 "typeResetConfirmation": "\"RESET\" टाइप करके पुष्टि करें:",
 "typeConfirmationPlaceholder": "यहां टाइप करें...",
-"resetUnderstandCheckbox": "मैं समझता हूं कि यह मेरी प्रगति को स्थायी रूप से हटा देगा और इसे पूर्ववत नहीं किया जा सकता है।"
+"resetUnderstandCheckbox": "मैं समझता हूं कि यह मेरी प्रगति को स्थायी रूप से हटा देगा और इसे पूर्ववत नहीं किया जा सकता है।",
+"confirmResetButton": "पुनः रात्रि की पुष्टि करें",
+"countdownTimerSuffix": "सेकंड",
+"goBackButton": "वापस जाएं"
 }

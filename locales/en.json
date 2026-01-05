@@ -404,5 +404,8 @@
 "progressLossSessions": "{n} completed sessions",
   "typeResetConfirmation": "Type \"RESET\" to confirm:",
   "typeConfirmationPlaceholder": "Type here...",
-  "resetUnderstandCheckbox": "I understand this will permanently delete my progress and cannot be undone."
+  "resetUnderstandCheckbox": "I understand this will permanently delete my progress and cannot be undone.",
+  "confirmResetButton": "Confirm Reset",
+"countdownTimerSuffix": "s",
+"goBackButton": "Go Back"
 }

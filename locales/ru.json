@@ -400,6 +400,9 @@
 "progressLossSessions": "{n} завершенных сеансов",
 "typeResetConfirmation": "Введите \"RESET\", чтобы подтвердить:",
 "typeConfirmationPlaceholder": "Введите здесь...",
-"resetUnderstandCheckbox": "Я понимаю, что это навсегда удалит мой прогресс и не может быть отменено."
+"resetUnderstandCheckbox": "Я понимаю, что это навсегда удалит мой прогресс и не может быть отменено.",
+"confirmResetButton": "Подтвердить сброс",
+"countdownTimerSuffix": "сек.",
+"goBackButton": "Назад"
   
 }

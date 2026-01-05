@@ -404,7 +404,10 @@
 "progressLossSessions": "{n} sessions complétées",
   "typeResetConfirmation": "Tapez \"RESET\" pour confirmer :",
   "typeConfirmationPlaceholder": "Tapez ici...",
-  "resetUnderstandCheckbox": "Je comprends que cette action supprimera définitivement mon progrès et ne pourra pas être annulée."
+  "resetUnderstandCheckbox": "Je comprends que cette action supprimera définitivement mon progrès et ne pourra pas être annulée.",
+  "confirmResetButton": "Confirmer la réinitialisation",
+"countdownTimerSuffix": "s",
+"goBackButton": "Retour"
 
 
 }

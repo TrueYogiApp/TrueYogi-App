@@ -2646,7 +2646,8 @@ button[disabled] {
               class="px-4 py-2 bg-gradient-to-r from-red-700 to-red-800 text-white font-bold rounded-lg disabled:opacity-40 disabled:cursor-not-allowed hover:from-red-800 hover:to-red-900 transition-all cursor-pointer">
         Confirm Reset (<span id="countdown-timer">30</span>s)
       </button>
-      <button onclick="goBackToFirstStep()" 
+      <button id="go-back-button"
+			  onclick="goBackToFirstStep()" 
               class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white font-medium rounded-lg cursor-pointer">
         Go Back
       </button>
@@ -10735,6 +10736,8 @@ document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(
 document.querySelector('#extra-confirmation p').textContent = t('typeResetConfirmation');
 document.getElementById('reset-type-confirmation').setAttribute('placeholder', t('typeConfirmationPlaceholder'));
 document.getElementById('reset-understand-checkbox').nextElementSibling.textContent = t('resetUnderstandCheckbox');
+document.getElementById('confirm-reset-final-btn').innerHTML = `${t('confirmResetButton')} (<span id="countdown-timer">30</span>${t('countdownTimerSuffix')})`;
+document.getElementById('go-back-button').textContent = t('goBackButton');
 }
 
 document.addEventListener('DOMContentLoaded', updateUILanguage);
