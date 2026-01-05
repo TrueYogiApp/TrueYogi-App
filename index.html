@@ -10725,6 +10725,9 @@ document.querySelector('#spaceship-challenge-streak-container .text-gray-400').t
 
 document.getElementById('live-meditators-tooltip-text').textContent = t('liveMeditatorsTooltip');  
 
+const daysProgressLost = challengeData ? (challengeData.currentDay || 0) : 0;
+const streakDaysLost = challengeData ? (challengeData.streakDays || 0) : 0;
+const totalSessionsLost = challengeData ? (challengeData.totalSessions || 0) : 0;
 document.getElementById('progress-loss-warning').querySelector('p').textContent = t('progressLossWarning');
 document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(1)').innerHTML = '• ' + t('progressLossDays', { n: daysProgressLost });
 document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(2)').innerHTML = '• ' + t('progressLossStreak', { n: streakDaysLost });
