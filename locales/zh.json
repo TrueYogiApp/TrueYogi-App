@@ -393,5 +393,12 @@
     "challenge_history_challenges": "挑战，",
     "challenge_history_sessions_label": "会话，",
     "challenge_history_minutes_label": "分钟",
-    "challenge_history_close": "关闭"
+    "challenge_history_close": "关闭",
+"progressLossWarning": "⚠️ 您将失去：",
+"progressLossDays": "{n} 天挑战进度",
+"progressLossStreak": "{n} 天连续纪录",
+"progressLossSessions": "{n} 场完成的会话",
+"typeResetConfirmation": "键入\"RESET\"以确认：",
+"typeConfirmationPlaceholder": "在这里输入...",
+"resetUnderstandCheckbox": "我明白这将永久删除我的进度且无法撤销。"
 }

@@ -396,5 +396,14 @@
     "challenge_history_challenges": "ఛాలెంజీలు,",
     "challenge_history_sessions_label": "సెషన్లు,",
     "challenge_history_minutes_label": "నిమిషాలు",
-    "challenge_history_close": "మూసివేయి"
+    "challenge_history_close": "మూసివేయి",
+	"progressLossWarning": "⚠️ మీకు ఇవి పోతాయి:",
+	"progressLossDays": "{n} రోజు ప్రవేశ పురోగతి",
+	"progressLossStreak": "{n} రోజుల స్ట్రీక్",
+	"progressLossSessions": "{n} పూర్తైన సెషన్లు",
+  "typeResetConfirmation": "\"RESET\" టైప్ చేసి ధృవీకరించండి:",
+  "typeConfirmationPlaceholder": "ఇక్కడ టైప్ చేయండి...",
+  "resetUnderstandCheckbox": "నా పురోగతిని శాశ్వతంగా తొలగించబడుతుంది మరియు తిరిగి సమీకరించబడదు అనే విషయం నాకు తెలుసు."
+
+
 }

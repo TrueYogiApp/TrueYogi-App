@@ -397,6 +397,14 @@
     "challenge_history_challenges": "Défis,",
     "challenge_history_sessions_label": "Sessions,",
     "challenge_history_minutes_label": "Minutes",
-    "challenge_history_close": "Fermer"
+    "challenge_history_close": "Fermer",
+		"progressLossWarning": "⚠️ Vous allez perdre:",
+"progressLossDays": "{n} jours de progression du défi",
+"progressLossStreak": "{n} jours de série",
+"progressLossSessions": "{n} sessions complétées",
+  "typeResetConfirmation": "Tapez \"RESET\" pour confirmer :",
+  "typeConfirmationPlaceholder": "Tapez ici...",
+  "resetUnderstandCheckbox": "Je comprends que cette action supprimera définitivement mon progrès et ne pourra pas être annulée."
+
 
 }

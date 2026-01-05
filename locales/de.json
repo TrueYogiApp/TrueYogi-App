@@ -392,5 +392,12 @@
     "challenge_history_challenges": "Herausforderungen,",
     "challenge_history_sessions_label": "Sitzungen,",
     "challenge_history_minutes_label": "Minuten",
-    "challenge_history_close": "Schließen"
+    "challenge_history_close": "Schließen",
+"progressLossWarning": "⚠️ Du wirst verlieren:",
+"progressLossDays": "{n} Tage Fortschritt der Herausforderung",
+"progressLossStreak": "{n} Tage am Stück",
+"progressLossSessions": "{n} abgeschlossene Sitzungen",
+"typeResetConfirmation": "Geben Sie \"RESET\" ein, um zu bestätigen:",
+"typeConfirmationPlaceholder": "Hier eingeben...",
+"resetUnderstandCheckbox": "Ich verstehe, dass dies meinen Fortschritt dauerhaft löschen wird und nicht rückgängig gemacht werden kann."
 }

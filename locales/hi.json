@@ -392,5 +392,12 @@
     "challenge_history_challenges": "चैलेंज,",
     "challenge_history_sessions_label": "सत्र,",
     "challenge_history_minutes_label": "मिनट",
-    "challenge_history_close": "बंद करें"
+    "challenge_history_close": "बंद करें",
+"progressLossWarning": "⚠️ आप इसे खो देंगे:",
+"progressLossDays": "{n} दिन की चुनौती प्रगति",
+"progressLossStreak": "{n} दिन की स्ट्रीक",
+"progressLossSessions": "{n} पूरा किए गए सत्र",
+"typeResetConfirmation": "\"RESET\" टाइप करके पुष्टि करें:",
+"typeConfirmationPlaceholder": "यहां टाइप करें...",
+"resetUnderstandCheckbox": "मैं समझता हूं कि यह मेरी प्रगति को स्थायी रूप से हटा देगा और इसे पूर्ववत नहीं किया जा सकता है।"
 }

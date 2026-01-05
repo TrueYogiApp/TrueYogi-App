@@ -2323,6 +2323,80 @@ input[type="time"] {
 }
 
 
+/* Reset CSS */
+  @keyframes shake-warning {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .shake-warning {
+    animation: shake-warning 0.5s ease-in-out;
+  }
+  
+  @keyframes pulse-warning {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+  .pulse-warning {
+    animation: pulse-warning 2s infinite;
+  }
+  
+  .glow-button {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.7), 
+              0 0 30px rgba(239, 68, 68, 0.4),
+              inset 0 0 10px rgba(255, 255, 255, 0.1);
+  animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.7), 
+                0 0 30px rgba(239, 68, 68, 0.4),
+                inset 0 0 10px rgba(255, 255, 255, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), 
+                0 0 40px rgba(239, 68, 68, 0.6),
+                inset 0 0 15px rgba(255, 255, 255, 0.2);
+  }
+}
+
+#confirm-reset-final-btn:not(:disabled):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Ensure disabled button styles are strong */
+#confirm-reset-final-btn:disabled {
+  opacity: 0.4 !important;
+  cursor: not-allowed !important;
+  box-shadow: none !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+/* When button is enabled but not glowing yet */
+#confirm-reset-final-btn:not(:disabled) {
+  opacity: 1;
+  cursor: pointer;
+}
+
+/* Glowing state */
+#confirm-reset-final-btn.glow-button {
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.7), 
+              0 0 30px rgba(239, 68, 68, 0.4),
+              inset 0 0 10px rgba(255, 255, 255, 0.1);
+  animation: pulse-glow 2s infinite;
+  transform: scale(1.02);
+  transition: all 0.3s ease;
+}
+
+/* Remove pointer events from disabled button wrapper if needed */
+button[disabled] {
+  pointer-events: none;
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -6069,7 +6143,7 @@ try {
       };
 
       // Non-blocking call to save history to server
-	fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
+	fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
 	  method: 'POST',
 	  headers: { 'Content-Type': 'application/json' },
 	  body: JSON.stringify(payload)
@@ -6124,7 +6198,7 @@ try {
         device_type: getDeviceType?.() || 'unknown',
       };
 
-      fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
+      fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
@@ -6179,22 +6253,25 @@ try {
       selectMode('flow');
     }
 
-    function showResetConfirmation() {
-  
+let resetConfirmationTimer;
+let countdownSeconds = 30;
+let currentDayAtReset = 0;
+
+ function showResetConfirmation() {
   const journeyWallet = localStorage.getItem('currentJourneyWallet');
   const walletIsConnected = !!window.walletPublicKey;
 
-  // If journey wallet is set, but wallet is not connected
+  // Your existing wallet checks...
   if (journeyWallet && !walletIsConnected) {
     showConnectWalletRequiredModal();
     return;
   }
-  // If wallet is connected but is NOT journey wallet
+  
   if (journeyWallet && walletIsConnected && window.walletPublicKey !== journeyWallet) {
     showWalletSwitchBlockModal(journeyWallet, window.walletPublicKey);
     return;
   }
-  // 2.5. Block and trigger verification if not verified (no valid JWT)
+  
   const jwtToken = localStorage.getItem('jwtToken');
   const tokenValid = jwtToken && getJwtExpiry(jwtToken) > Date.now();
 
@@ -6204,24 +6281,194 @@ try {
     walletIsConnected &&
     !tokenValid
   ) {
-    // Show verify identity modal and after user verifies, start meditation seamlessly
     window.afterIdentityVerified = function() {
-      showStartMeditationModal();
+      showEnhancedResetModal(); // Show our enhanced modal
       window.afterIdentityVerified = null;
     };
     showAuthRequiredModal();
     return;
   }
-  // Otherwise show the normal reset confirmation modal
-  document.getElementById('reset-confirmation-modal').classList.remove('hidden');
+  
+  // Show the enhanced modal
+  showEnhancedResetModal();
 }
 
-    function closeResetConfirmation() {
-      document.getElementById('reset-confirmation-modal').classList.add('hidden');
-    }
-
-   async function confirmResetChallenge() {
+// Update the calculation function
+function showEnhancedResetModal() {
+  // Get current progress
+  const challenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
+  
+  // Calculate what will be lost
+  const currentDay = challenge.currentDay || 1;
+  const currentStreak = challenge.streakDays || 0;
+  const totalSessions = challenge.totalSessions || 0;
+  const challengeStreak = challenge.challengeStreak || 0;
+  
+  // What gets reset to 0
+  const daysProgressLost = Math.max(0, currentDay - 1);
+  const streakDaysLost = currentStreak;
+  const totalSessionsLost = totalSessions;
+  
+  // Update the display
+  //document.getElementById('days-progress-lost').textContent = daysProgressLost;
+  //document.getElementById('streak-days-lost').textContent = streakDaysLost;
+  //document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
+  
+  // Show warning if anything will be lost
+  const warningDiv = document.getElementById('progress-loss-warning');
+  const willLoseProgress = daysProgressLost > 0 || streakDaysLost > 0 || totalSessionsLost > 0;
+  
+  if (willLoseProgress) {
+    warningDiv.classList.remove('hidden');
     
+    // Add visual warning for significant loss
+    if (daysProgressLost > 10 || streakDaysLost > 10) {
+      warningDiv.classList.add('pulse-warning');
+    }
+  } else {
+    warningDiv.classList.add('hidden');
+  }
+  
+  // Show modal
+  document.getElementById('reset-confirmation-modal').classList.remove('hidden');
+  
+  // Add shake effect if significant progress
+  if (daysProgressLost > 5 || streakDaysLost > 5) {
+    const proceedBtn = document.getElementById('proceed-to-reset-btn');
+    proceedBtn.classList.add('shake-warning');
+    setTimeout(() => {
+      proceedBtn.classList.remove('shake-warning');
+    }, 500);
+  }
+}
+
+function proceedToFinalConfirmation() {
+  // Show extra confirmation steps
+  document.getElementById('first-step-buttons').classList.add('hidden');
+  document.getElementById('extra-confirmation').classList.remove('hidden');
+  document.getElementById('final-confirmation-buttons').classList.remove('hidden');
+  
+  // Reset confirmation state
+  document.getElementById('reset-type-confirmation').value = '';
+  document.getElementById('reset-understand-checkbox').checked = false;
+  
+  const confirmBtn = document.getElementById('confirm-reset-final-btn');
+  confirmBtn.disabled = true;
+  confirmBtn.classList.remove('glow-button');  // REMOVE GLOW ON START
+  
+  // Start countdown
+  countdownSeconds = 30;
+  document.getElementById('countdown-timer').textContent = countdownSeconds;
+  
+  if (resetConfirmationTimer) clearInterval(resetConfirmationTimer);
+  
+  resetConfirmationTimer = setInterval(() => {
+    countdownSeconds--;
+    document.getElementById('countdown-timer').textContent = countdownSeconds;
+    
+    if (countdownSeconds <= 0) {
+      clearInterval(resetConfirmationTimer);
+    }
+  }, 1000);
+}
+
+function goBackToFirstStep() {
+  // Go back to first step
+  document.getElementById('extra-confirmation').classList.add('hidden');
+  document.getElementById('final-confirmation-buttons').classList.add('hidden');
+  document.getElementById('first-step-buttons').classList.remove('hidden');
+  
+  // Clear timer
+  if (resetConfirmationTimer) {
+    clearInterval(resetConfirmationTimer);
+  }
+}
+
+function validateResetText() {
+  const typedText = document.getElementById('reset-type-confirmation').value;
+  const checkbox = document.getElementById('reset-understand-checkbox');
+  const checkboxChecked = checkbox.checked;
+  const correctText = "RESET";
+  
+  const isTypedCorrectly = typedText.toUpperCase() === correctText;
+  const allConditionsMet = isTypedCorrectly && checkboxChecked;
+  
+  const confirmBtn = document.getElementById('confirm-reset-final-btn');
+  
+  console.log('Typed:', typedText, 'Correct:', isTypedCorrectly, 'Checkbox:', checkboxChecked, 'AllMet:', allConditionsMet);
+  
+  // Set disabled property properly
+  confirmBtn.disabled = !allConditionsMet;
+  
+  // Also set aria-disabled for accessibility
+  confirmBtn.setAttribute('aria-disabled', !allConditionsMet);
+  
+  // Add glowing effect when button is enabled
+  if (allConditionsMet) {
+    confirmBtn.classList.add('glow-button');
+    confirmBtn.style.cursor = 'pointer';
+    confirmBtn.style.opacity = '1';
+  } else {
+    confirmBtn.classList.remove('glow-button');
+    confirmBtn.style.cursor = 'not-allowed';
+    confirmBtn.style.opacity = '0.4';
+  }
+  
+  // Visual feedback for typing
+  const inputField = document.getElementById('reset-type-confirmation');
+  if (typedText === '') {
+    inputField.classList.remove('border-green-500', 'border-red-500');
+    inputField.classList.add('border-gray-600');
+  } else if (isTypedCorrectly) {
+    inputField.classList.remove('border-gray-600', 'border-red-500');
+    inputField.classList.add('border-green-500');
+  } else {
+    inputField.classList.remove('border-gray-600', 'border-green-500');
+    inputField.classList.add('border-red-500');
+  }
+  
+  // Also trigger checkbox change event listener
+  if (checkbox) {
+    checkbox.onchange = function() {
+      validateResetText();
+    };
+  }
+}
+
+function closeResetConfirmation() {
+  // Clear timer
+  if (resetConfirmationTimer) {
+    clearInterval(resetConfirmationTimer);
+  }
+  
+  // Reset modal state
+  document.getElementById('reset-confirmation-modal').classList.add('hidden');
+  goBackToFirstStep();
+}
+
+// Your existing confirmResetChallenge function stays EXACTLY THE SAME
+async function confirmResetChallenge() {
+  // Clear timer
+  if (resetConfirmationTimer) {
+    clearInterval(resetConfirmationTimer);
+  }
+  
+  // Save original button HTML to restore later
+  const confirmBtn = document.getElementById('confirm-reset-final-btn');
+  const originalButtonHTML = confirmBtn.innerHTML;
+  
+  // Show processing indicator
+  document.getElementById('confirm-reset-final-btn').disabled = true;
+  document.getElementById('confirm-reset-final-btn').innerHTML = 
+    '<i class="fas fa-spinner fa-spin mr-2"></i> Resetting...';
+  
+  // Add a small delay to show processing
+  await new Promise(resolve => setTimeout(resolve, 500));
+  
+  // YOUR EXISTING confirmResetChallenge CODE GOES HERE
+  // I'll put a marker where it should be inserted
+  /* ========== EXISTING confirmResetChallenge CODE START ========== */
+  
   let oldChallenge = {};
   try {
     oldChallenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
@@ -6264,157 +6511,157 @@ try {
     }, 1500);
   }
 
-// --- 1. Save completed 21-day offline challenge to history --- //
-try {
-  const challenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
-  const jwtToken = localStorage.getItem('jwtToken');
-  const currentJourneyWallet = localStorage.getItem('currentJourneyWallet');
-  const onChainJourney = jwtToken && currentJourneyWallet;
+  // --- 1. Save completed 21-day offline challenge to history --- //
+  try {
+    const challenge = JSON.parse(localStorage.getItem('yogiChallenge')) || {};
+    const jwtToken = localStorage.getItem('jwtToken');
+    const currentJourneyWallet = localStorage.getItem('currentJourneyWallet');
+    const onChainJourney = jwtToken && currentJourneyWallet;
 
-  let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+    let history = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
 
-  // SPACESHIP (pure offline) detection:
-  const spaceshipKeyAtStart = challenge.spaceshipKeyAtStart || null;
-  const spaceshipKeyNow = localStorage.getItem('spaceshipKey') || null;
-  const completedPureOffline = spaceshipKeyAtStart && spaceshipKeyAtStart === spaceshipKeyNow;
+    // SPACESHIP (pure offline) detection:
+    const spaceshipKeyAtStart = challenge.spaceshipKeyAtStart || null;
+    const spaceshipKeyNow = localStorage.getItem('spaceshipKey') || null;
+    const completedPureOffline = spaceshipKeyAtStart && spaceshipKeyAtStart === spaceshipKeyNow;
 
-  const mode = challenge.savedMode || 
-               (completedPureOffline ? 'spaceship' : (!onChainJourney ? 'offline' : 'online'));
-			   
-  // 🆕 NEW: Get these variables BEFORE using them
-  const omUserId = localStorage.getItem('omUserId');
-  const challengeId = challenge.challengeId;
+    const mode = challenge.savedMode || 
+                 (completedPureOffline ? 'spaceship' : (!onChainJourney ? 'offline' : 'online'));
+               
+    // 🆕 NEW: Get these variables BEFORE using them
+    const omUserId = localStorage.getItem('omUserId');
+    const challengeId = challenge.challengeId;
 
-  // Helper function to calculate end date
-  function calculateEndDate(startDate, challengeDuration) {
-    const start = new Date(startDate);
-    const endDate = new Date(start);
-    
-    if (challengeDuration === 21) {
-      endDate.setDate(start.getDate() + 20); // Day 0 to Day 20 = 21 days
-    } else if (challengeDuration === 41) {
-      endDate.setDate(start.getDate() + 40); // Day 0 to Day 40 = 41 days
+    // Helper function to calculate end date
+    function calculateEndDate(startDate, challengeDuration) {
+      const start = new Date(startDate);
+      const endDate = new Date(start);
+      
+      if (challengeDuration === 21) {
+        endDate.setDate(start.getDate() + 20); // Day 0 to Day 20 = 21 days
+      } else if (challengeDuration === 41) {
+        endDate.setDate(start.getDate() + 40); // Day 0 to Day 40 = 41 days
+      }
+      
+      return endDate.toISOString();
     }
-    
-    return endDate.toISOString();
-  }
 
-  // If user completes 21-day offline, check spaceship first!
-  if (
-    challenge.startDate &&
-    challenge.currentDay >= 21 &&  // Note: you changed this from 21 to 1
-    !onChainJourney
-  ) {
-    // Determine if this is actually a 21-day challenge or just early reset
-    // You might want to check if currentDay >= 21 for actual completion
-    const is21DayChallenge = challenge.currentDay >= 21;
-    const endDate = calculateEndDate(challenge.startDate, 21);
-    
-    // 🆕 NEW: Create the historyEntry variable first
-    const historyEntry = {
-	  om_user_id: omUserId,
-	  challengeId: challenge.challengeId,
-      startDate: challenge.startDate,
-      endDate: endDate,
-      days: challenge.currentDay,
-      mode: mode,
-      sessionsCompleted: challenge.sessionsCompleted || [],
-      totalSessions: challenge.totalSessions || 0,
-      totalMinutes: challenge.totalMinutes || 0,
-	  synced: false,
-    };
-    
-    history.push(historyEntry);
-    localStorage.setItem('challengeHistory', JSON.stringify(history));
-
-    // 🆕 NEW: Send to backend DB if we have the required data
-    if (omUserId && challengeId) {
-      const payload = {
+    // If user completes 21-day offline, check spaceship first!
+    if (
+      challenge.startDate &&
+      challenge.currentDay >= 21 &&  // Note: you changed this from 21 to 1
+      !onChainJourney
+    ) {
+      // Determine if this is actually a 21-day challenge or just early reset
+      // You might want to check if currentDay >= 21 for actual completion
+      const is21DayChallenge = challenge.currentDay >= 21;
+      const endDate = calculateEndDate(challenge.startDate, 21);
+      
+      // 🆕 NEW: Create the historyEntry variable first
+      const historyEntry = {
         om_user_id: omUserId,
-        challenge_id: challengeId,
-        start_date: challenge.startDate,
-        end_date: endDate,
-        days_completed: challenge.currentDay,
+        challengeId: challenge.challengeId,
+        startDate: challenge.startDate,
+        endDate: endDate,
+        days: challenge.currentDay,
         mode: mode,
-        sessions_completed: challenge.sessionsCompleted || [],
-        total_sessions: challenge.totalSessions || 0,
-        total_minutes: challenge.totalMinutes || 0,
-        user_agent: navigator.userAgent,
-        device_type: getDeviceType?.() || 'unknown',
+        sessionsCompleted: challenge.sessionsCompleted || [],
+        totalSessions: challenge.totalSessions || 0,
+        totalMinutes: challenge.totalMinutes || 0,
+        synced: false,
       };
+      
+      history.push(historyEntry);
+      localStorage.setItem('challengeHistory', JSON.stringify(history));
 
-      // Non-blocking call to save history to server
-	fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
-	  method: 'POST',
-	  headers: { 'Content-Type': 'application/json' },
-	  body: JSON.stringify(payload)
-	}).then(resp => {
-	  if (resp.ok) {
-		// Mark the entry as synced!
-		historyEntry.synced = true;
-		localStorage.setItem('challengeHistory', JSON.stringify(history));
-	  }
-	}).catch((error) => { 
-	  console.error('Failed to save challenge history during reconfigure:', error);
-	  /* ignore network errors for this non-critical sync */ 
-	});
-    }
-	  
-  // If user completes 41-day online
-  } else if (
-    challenge.startDate &&
-    challenge.currentDay >= 41 &&
-    onChainJourney
-  ) {
-    const endDate = calculateEndDate(challenge.startDate, 41);
-    
-    // 🆕 NEW: Also create historyEntry for online completion
-    const historyEntry = {
-	  challengeId: challenge.challengeId,
-      startDate: challenge.startDate,
-      endDate: endDate,
-      days: challenge.currentDay,
-      mode: 'online',
-      sessionsCompleted: challenge.sessionsCompleted || [],
-      totalSessions: challenge.totalSessions || 0,
-      totalMinutes: challenge.totalMinutes || 0,
-    };
-    
-    history.push(historyEntry);
-    localStorage.setItem('challengeHistory', JSON.stringify(history));
+      // 🆕 NEW: Send to backend DB if we have the required data
+      if (omUserId && challengeId) {
+        const payload = {
+          om_user_id: omUserId,
+          challenge_id: challengeId,
+          start_date: challenge.startDate,
+          end_date: endDate,
+          days_completed: challenge.currentDay,
+          mode: mode,
+          sessions_completed: challenge.sessionsCompleted || [],
+          total_sessions: challenge.totalSessions || 0,
+          total_minutes: challenge.totalMinutes || 0,
+          user_agent: navigator.userAgent,
+          device_type: getDeviceType?.() || 'unknown',
+        };
 
-    // 🆕 NEW: Also save online completions to DB
-    if (omUserId && challengeId) {
-      const payload = {
-        om_user_id: omUserId,
-        challenge_id: challengeId,
-        start_date: challenge.startDate,
-        end_date: endDate,
-        days_completed: challenge.currentDay,
+        // Non-blocking call to save history to server
+        fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).then(resp => {
+          if (resp.ok) {
+            // Mark the entry as synced!
+            historyEntry.synced = true;
+            localStorage.setItem('challengeHistory', JSON.stringify(history));
+          }
+        }).catch((error) => { 
+          console.error('Failed to save challenge history during reconfigure:', error);
+          /* ignore network errors for this non-critical sync */ 
+        });
+      }
+        
+    // If user completes 41-day online
+    } else if (
+      challenge.startDate &&
+      challenge.currentDay >= 41 &&
+      onChainJourney
+    ) {
+      const endDate = calculateEndDate(challenge.startDate, 41);
+      
+      // 🆕 NEW: Also create historyEntry for online completion
+      const historyEntry = {
+        challengeId: challenge.challengeId,
+        startDate: challenge.startDate,
+        endDate: endDate,
+        days: challenge.currentDay,
         mode: 'online',
-        sessions_completed: challenge.sessionsCompleted || [],
-        total_sessions: challenge.totalSessions || 0,
-        total_minutes: challenge.totalMinutes || 0,
-        user_agent: navigator.userAgent,
-        device_type: getDeviceType?.() || 'unknown',
+        sessionsCompleted: challenge.sessionsCompleted || [],
+        totalSessions: challenge.totalSessions || 0,
+        totalMinutes: challenge.totalMinutes || 0,
       };
+      
+      history.push(historyEntry);
+      localStorage.setItem('challengeHistory', JSON.stringify(history));
 
-      fetch('https://trueyogi-backend-test.onrender.com/api/challenge_history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch((error) => {
-        console.error('Failed to save online challenge history:', error);
-      });
+      // 🆕 NEW: Also save online completions to DB
+      if (omUserId && challengeId) {
+        const payload = {
+          om_user_id: omUserId,
+          challenge_id: challengeId,
+          start_date: challenge.startDate,
+          end_date: endDate,
+          days_completed: challenge.currentDay,
+          mode: 'online',
+          sessions_completed: challenge.sessionsCompleted || [],
+          total_sessions: challenge.totalSessions || 0,
+          total_minutes: challenge.totalMinutes || 0,
+          user_agent: navigator.userAgent,
+          device_type: getDeviceType?.() || 'unknown',
+        };
+
+        fetch('https://trueyogi-backend-knkq.onrender.com/api/challenge_history', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        }).catch((error) => {
+          console.error('Failed to save online challenge history:', error);
+        });
+      }
     }
+  } catch (e) { 
+    console.error('Error saving challenge history:', e);
+    /* ignore */ 
   }
-} catch (e) { 
-  console.error('Error saving challenge history:', e);
-  /* ignore */ 
-}
 
   await deleteOfflineChallenge();
-	
+    
   // Proceed with local reset regardless (or, if you want, only if resetSuccess)
   localStorage.removeItem('yogiConfig');
   localStorage.removeItem('yogiChallenge');
@@ -6448,6 +6695,24 @@ try {
   updateBackButtonVisibility();
   showYogiConfig();
   updateStats();
+  
+  /* ========== EXISTING confirmResetChallenge CODE END ========== */
+  
+  // Close modal
+  document.getElementById('reset-confirmation-modal').classList.add('hidden');
+  
+  // RESTORE BUTTON TO ORIGINAL STATE
+  setTimeout(() => {
+    confirmBtn.innerHTML = originalButtonHTML;
+    confirmBtn.disabled = false;
+    confirmBtn.classList.remove('glow-button');
+    // Reset the countdown text if needed
+    const countdownSpan = confirmBtn.querySelector('#countdown-timer');
+    if (countdownSpan) {
+      countdownSpan.textContent = '10'; // or whatever your default countdown is
+    }
+  }, 100);
+  
 }
 
 function restoreActiveSessionUI() {
@@ -10406,6 +10671,14 @@ document.getElementById('challenge-duration-label').textContent = t('yogichallen
 document.querySelector('#spaceship-challenge-streak-container .text-gray-400').textContent = t('yogispaceshipchallenges.label');
 
 document.getElementById('live-meditators-tooltip-text').textContent = t('liveMeditatorsTooltip');  
+
+document.getElementById('progress-loss-warning').querySelector('p').textContent = t('progressLossWarning');
+document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(1)').innerHTML = '• ' + t('progressLossDays', { n: daysProgressLost });
+document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(2)').innerHTML = '• ' + t('progressLossStreak', { n: streakDaysLost });
+document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(3)').innerHTML = '• ' + t('progressLossSessions', { n: totalSessionsLost });
+document.querySelector('#extra-confirmation p').textContent = t('typeResetConfirmation');
+document.getElementById('reset-type-confirmation').setAttribute('placeholder', t('typeConfirmationPlaceholder'));
+document.getElementById('reset-understand-checkbox').nextElementSibling.textContent = t('resetUnderstandCheckbox');
 }
 
 document.addEventListener('DOMContentLoaded', updateUILanguage);

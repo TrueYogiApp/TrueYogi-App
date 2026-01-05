@@ -397,6 +397,12 @@
     "challenge_history_challenges": "Challenges,",
     "challenge_history_sessions_label": "Sessions,",
     "challenge_history_minutes_label": "Minutes",
-    "challenge_history_close": "Close"
-
+    "challenge_history_close": "Close",
+"progressLossWarning": "⚠️ You will lose:",
+"progressLossDays": "{n} days of challenge progress",
+"progressLossStreak": "{n} day streak",
+"progressLossSessions": "{n} completed sessions",
+  "typeResetConfirmation": "Type \"RESET\" to confirm:",
+  "typeConfirmationPlaceholder": "Type here...",
+  "resetUnderstandCheckbox": "I understand this will permanently delete my progress and cannot be undone."
 }

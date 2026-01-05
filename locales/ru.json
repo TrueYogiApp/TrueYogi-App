@@ -393,6 +393,13 @@
     "challenge_history_challenges": "Испытания,",
     "challenge_history_sessions_label": "Сессии,",
     "challenge_history_minutes_label": "Минуты",
-    "challenge_history_close": "Закрыть"
+    "challenge_history_close": "Закрыть",
+"progressLossWarning": "⚠️ Вы потеряете:",
+"progressLossDays": "{n} дней прогресса задачи",
+"progressLossStreak": "{n} дней в серии",
+"progressLossSessions": "{n} завершенных сеансов",
+"typeResetConfirmation": "Введите \"RESET\", чтобы подтвердить:",
+"typeConfirmationPlaceholder": "Введите здесь...",
+"resetUnderstandCheckbox": "Я понимаю, что это навсегда удалит мой прогресс и не может быть отменено."
   
 }
