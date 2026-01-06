@@ -7303,7 +7303,7 @@ function getLocalTimeString() {
 	  updateTokenPreview();
     }
 
-    function saveYogiConfig() {
+   async function saveYogiConfig() {
 	const journeyWallet = localStorage.getItem('currentJourneyWallet');
 const walletIsConnected = !!window.walletPublicKey;
 const jwtToken = localStorage.getItem('jwtToken');
@@ -7455,9 +7455,20 @@ if (!navigator.onLine || !isActuallyOnline()) {
   updateBackButtonVisibility();
   updateSessionTimesDisplay();
   checkSessionNotifications();
-  if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiConfigToSupabase === "function") {
-    window.syncYogiConfigToSupabase();
-  }
+	if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiConfigToSupabase === "function") {
+	  try {
+		await window.syncYogiConfigToSupabase();
+	  } catch (error) {
+		console.error('Sync Yogi Config failed. Retrying in 5 seconds...', error);
+		setTimeout(async () => {
+		  try {
+			await window.syncYogiConfigToSupabase();
+		  } catch (retryError) {
+			console.error('Retry of Sync Yogi Config failed.', retryError);
+		  }
+		}, 5000); // Retry after 5 seconds
+	  }
+	}
 }
 
 function completeExpiredSessionIfNeeded() {
@@ -18503,42 +18514,57 @@ window.fetchSessionsFromSupabase = async function() {
 
 // 1️⃣ Sync local yogi_config to Supabase (Local → Cloud)
 window.syncYogiConfigToSupabase = async function() {
+  // Ensure wallet is connected
   if (!window.walletPublicKey) {
-    alert('Connect wallet first!');
+    console.warn('Cannot sync Yogi Config: Wallet not connected.');
     return;
   }
+  
+  // Get local Yogi Config
   const yogiConfig = JSON.parse(localStorage.getItem('yogiConfig') || '{}');
   if (!yogiConfig || !yogiConfig.startDate) {
-    alert('No yogi config to sync!');
+    console.warn('Cannot sync Yogi Config: No local config found.');
     return;
   }
-  // Compose backend row
+
+  // Check if sync is needed (skip if already synced)
+  if (yogiConfig.sync_status === 'synced') {
+    console.log('Yogi Config already synced; skipping API call.');
+    return;
+  }
+
+  // Prepare the payload for the API
   const configRow = {
     ...yogiConfig,
     user_id: window.walletPublicKey,
     sync_status: 'synced',
-    local_updated_at: new Date().toISOString()
+    local_updated_at: new Date().toISOString(),
   };
+
   try {
+    // Send the config to the Supabase backend
     const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi_config', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+        'Authorization': 'Bearer ' + localStorage.getItem('jwtToken'),
       },
       body: JSON.stringify({ yogi_config: configRow }),
     });
     const result = await resp.json();
-    if (!result.success) {
-      // --- Only alert if it's a real error, NOT if no config is found ---
-      if (result.error && !/no rows returned|not found/i.test(result.error)) {
-        alert('Backend yogi_config fetch error: ' + (result.error || 'Unknown error'));
-      }
+
+    if (result.success) {
+      console.info('Yogi Config synced successfully.');
+      // Update local status
+      yogiConfig.sync_status = 'synced';
+      yogiConfig.last_synced = new Date().toISOString();
+      localStorage.setItem('yogiConfig', JSON.stringify(yogiConfig));
+    } else {
+      console.warn('Backend returned an error while syncing Yogi Config:', result.error || 'Unknown error');
     }
-  } catch (err) {
-   // alert('Network error syncing yogi config: ' + err.message);
+  } catch (error) {
+    console.error('Network error syncing Yogi Config:', error.message);
   }
-  // Optionally show UI sync indicator
 };
 
 // 2️⃣ Fetch yogi_config from Supabase (Cloud → Local)
@@ -18694,9 +18720,13 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	 fixUnknownSessionIds();
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
-	  await window.fetchYogiConfigFromSupabase();
-      await window.fetchYogiChallengeFromSupabase();
+	  //await window.fetchYogiConfigFromSupabase();
+      //await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
+  }
+      // Sync the Yogi Config (new logic includes skip for already synced)
+  if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiConfigToSupabase === "function") {
+    await window.syncYogiConfigToSupabase();
   }
   });
 
