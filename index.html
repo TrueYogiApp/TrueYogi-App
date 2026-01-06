@@ -15310,17 +15310,17 @@ document.addEventListener('DOMContentLoaded', function() {
   const langSwitch = document.getElementById('lang-switch');
   
   // Store original options with full names
-  const languageMap = {
-    'en': 'English',
-    'te': 'Telugu', 
-    'hi': 'Hindi',
-    'es': 'Spanish',
-    'fr': 'French',
-    'de': 'German',
-    'zh': 'Chinese',
-    'ru': 'Russian',
-    'it': 'Italian'		
-  };
+const languageMap = {
+  'en': 'English',
+  'te': 'తెలుగు',     // Telugu
+  'hi': 'हिन्दी',      // Hindi
+  'es': 'Español',     // Spanish
+  'fr': 'Français',    // French
+  'de': 'Deutsch',     // German
+  'zh': '中文',        // Chinese
+  'ru': 'Русский',     // Russian
+  'it': 'Italiano',    // Italian
+};
   
   // Show full names when dropdown opens
   langSwitch.addEventListener('mousedown', function() {
