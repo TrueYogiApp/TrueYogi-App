@@ -10885,7 +10885,7 @@ window.addEventListener('load', function() {
 	
 	
 // --- Meditation Hide UI Toggle Button ---
-let uiHiddenForMeditation = false;
+let uiHiddenForMeditation = 0;
 
 const hideBtn = document.getElementById('hide-ui-btn');
 const appInterface = document.getElementById('app-interface');
@@ -10894,21 +10894,48 @@ const meditationCanvas = document.getElementById('meditation-canvas');
 
 // Toggle UI when button clicked
 hideBtn.addEventListener('click', () => {
-  if (!sessionActive) return; // Only work during meditation
-  uiHiddenForMeditation = !uiHiddenForMeditation;
-  if (uiHiddenForMeditation) {
-    // Hide all UI except the canvas
-    appInterface.classList.add('hidden');
-    modeSelection.classList.add('hidden');
-    meditationCanvas.classList.remove('hidden');
-    hideBtn.textContent = '🌜'; // Show "restore" icon
-    hideBtn.title = '';
+  if (!sessionActive) return;
+  
+  // Cycle through 3 states: 0 → 1 → 2 → 0
+  uiHiddenForMeditation = (uiHiddenForMeditation + 1) % 3;
+  
+  if (uiHiddenForMeditation === 1) {
+    // State 1: Hide everything EXCEPT avatar
+    const appInterfaceChildren = appInterface.children;
+    for (let child of appInterfaceChildren) {
+      if (child.id !== 'avatar-container') {
+        child.style.visibility = 'hidden';
+        child.style.opacity = '0';
+      }
+    }
+    // Keep avatar visible
+    document.getElementById('avatar-container').style.visibility = '';
+    document.getElementById('avatar-container').style.opacity = '';
+    
+    hideBtn.textContent = '🌓'; // Half moon for partial hide
+    hideBtn.title = 'Hide all';
+    
+  } else if (uiHiddenForMeditation === 2) {
+    // State 2: Hide everything INCLUDING avatar
+    const appInterfaceChildren = appInterface.children;
+    for (let child of appInterfaceChildren) {
+      child.style.visibility = 'hidden';
+      child.style.opacity = '0';
+    }
+    
+    hideBtn.textContent = '🌑'; // New moon for full hide
+    hideBtn.title = 'Show all';
+    
   } else {
-    // Restore all UI
-    appInterface.classList.remove('hidden');
-    meditationCanvas.classList.remove('hidden');
-    hideBtn.textContent = '🌞'; // Show "hide" icon
-    hideBtn.title = '';
+    // State 0: Show everything
+    const appInterfaceChildren = appInterface.children;
+    for (let child of appInterfaceChildren) {
+      child.style.visibility = '';
+      child.style.opacity = '';
+    }
+    
+    hideBtn.textContent = '🌕'; // Full moon for show all
+    hideBtn.title = 'Hide UI';
   }
 });
 
@@ -10916,14 +10943,54 @@ hideBtn.addEventListener('click', () => {
 function updateHideUiButtonVisibility() {
   if (sessionActive) {
     hideBtn.style.display = 'block';
-    hideBtn.textContent = uiHiddenForMeditation ? '🌞' : '🌞';
-    // ENSURE CANVAS IS VISIBLE
-    meditationCanvas.classList.remove('hidden');
-    meditationCanvas.style.visibility = '';
+    
+    // Set button state based on uiHiddenForMeditation
+    if (uiHiddenForMeditation === 1) {
+      hideBtn.textContent = '🌓';
+      hideBtn.title = 'Hide all';
+      // Apply partial hide (hide everything except avatar)
+      const appInterfaceChildren = appInterface.children;
+      for (let child of appInterfaceChildren) {
+        if (child.id !== 'avatar-container') {
+          child.style.visibility = 'hidden';
+          child.style.opacity = '0';
+        }
+      }
+      document.getElementById('avatar-container').style.visibility = '';
+      document.getElementById('avatar-container').style.opacity = '';
+      
+    } else if (uiHiddenForMeditation === 2) {
+      hideBtn.textContent = '🌑';
+      hideBtn.title = 'Show all';
+      // Apply full hide (hide everything including avatar)
+      const appInterfaceChildren = appInterface.children;
+      for (let child of appInterfaceChildren) {
+        child.style.visibility = 'hidden';
+        child.style.opacity = '0';
+      }
+      
+    } else {
+      hideBtn.textContent = '🌕';
+      hideBtn.title = 'Hide UI';
+      // Show everything
+      const appInterfaceChildren = appInterface.children;
+      for (let child of appInterfaceChildren) {
+        child.style.visibility = '';
+        child.style.opacity = '';
+      }
+    }
+    
   } else {
     hideBtn.style.display = 'none';
-    uiHiddenForMeditation = false;
-    appInterface.classList.remove('hidden');
+    uiHiddenForMeditation = 0;
+    
+    // Reset everything to visible state
+    const appInterfaceChildren = appInterface.children;
+    for (let child of appInterfaceChildren) {
+      child.style.visibility = '';
+      child.style.opacity = '';
+    }
+    
     meditationCanvas.classList.remove('hidden');
     meditationCanvas.style.visibility = '';
   }
@@ -10939,8 +11006,15 @@ window.beginMeditationSession = async function(...args) {
 
 function cleanupAfterSessionEnd() {
   // Reset `uiHiddenForMeditation` and session flags
-  uiHiddenForMeditation = false;
+  uiHiddenForMeditation = 0;
   sessionActive = false;
+  
+    // Reset all children visibility
+  const appInterfaceChildren = appInterface.children;
+  for (let child of appInterfaceChildren) {
+    child.style.visibility = '';
+    child.style.opacity = '';
+  }
 
   // Restore all UI elements and default states
   hideBtn.style.display = 'none'; // Hide the toggle button
@@ -10980,7 +11054,7 @@ document.addEventListener('DOMContentLoaded', updateHideUiButtonVisibility);
 	
 function updateHideUiBtnVisibility() {
   document.getElementById('hide-ui-btn').style.display = sessionActive ? 'block' : 'none';
-}	
+}
 
 let wisdoms = [];
 let wisdomShownCount = 0;
