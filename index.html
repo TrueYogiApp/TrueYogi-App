@@ -8256,7 +8256,7 @@ async function updateLiveCount() {
       // Determine rainbow color based on currentDay
       if (currentDay) {
         if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';       // Red
-        else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42'; // Orange
+        else if (currentDay >= 7 && currentDay <= 12) color = '#f97316'; // Orange
         else if (currentDay >= 13 && currentDay <= 18) color = '#facc15'; // Yellow
         else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e'; // Green
         else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc'; // Blue
@@ -8781,7 +8781,7 @@ function saveSession(minutes, sessionTime) {
 
 function getStreakFireColor(day) {
   if (day <= 6) return '#ef4444';      // red
-  if (day <= 12) return '#f59e42';     // orange
+  if (day <= 12) return '#f97316';     // orange
   if (day <= 18) return '#facc15';     // yellow
   if (day <= 24) return '#22c55e';     // green
   if (day <= 30) return '#7dd3fc';     // blue 3b82f6
@@ -8791,7 +8791,7 @@ function getStreakFireColor(day) {
 
 const PROGRESS_SEGMENTS = [
   { color: "#ef4444", days: 6 },   // Red
-  { color: "#f59e42", days: 6 },   // Orange
+  { color: "#f97316", days: 6 },   // Orange
   { color: "#facc15", days: 6 },   // Yellow
   { color: "#22c55e", days: 6 },   // green
   { color: "#7dd3fc", days: 6 },   // Light Blue
