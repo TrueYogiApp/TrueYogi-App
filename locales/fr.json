@@ -407,7 +407,9 @@
   "resetUnderstandCheckbox": "Je comprends que cette action supprimera définitivement mon progrès et ne pourra pas être annulée.",
   "confirmResetButton": "Confirmer la réinitialisation",
 "countdownTimerSuffix": "s",
-"goBackButton": "Retour"
+"goBackButton": "Retour",
+"config.confirm.seed.strong": "Je plante cette graine de pratique",
+"config.confirm.seed.body": "avec l’intention entière de la cultiver chaque jour, marchant sur ce chemin avec une dévotion consciente envers mon vrai moi."
 
 
 }

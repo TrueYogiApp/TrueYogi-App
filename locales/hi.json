@@ -402,5 +402,7 @@
 "resetUnderstandCheckbox": "मैं समझता हूं कि यह मेरी प्रगति को स्थायी रूप से हटा देगा और इसे पूर्ववत नहीं किया जा सकता है।",
 "confirmResetButton": "पुनः रात्रि की पुष्टि करें",
 "countdownTimerSuffix": "सेकंड",
-"goBackButton": "वापस जाएं"
+"goBackButton": "वापस जाएं",
+"config.confirm.seed.strong": "मैं अभ्यास का यह बीज बोता हूँ",
+"config.confirm.seed.body": "इसे रोज़ विकसित करने के पूरे इरादे के साथ, अपने सच्चे स्वरूप के प्रति जागरूक समर्पण के साथ इस मार्ग पर चलता हूँ।"
 }

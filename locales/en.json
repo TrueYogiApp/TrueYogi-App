@@ -407,5 +407,7 @@
   "resetUnderstandCheckbox": "I understand this will permanently delete my progress and cannot be undone.",
   "confirmResetButton": "Confirm Reset",
 "countdownTimerSuffix": "s",
-"goBackButton": "Go Back"
+"goBackButton": "Go Back",
+"config.confirm.seed.strong": "I plant this seed of practice",
+"config.confirm.seed.body": "with full intention to cultivate it daily, walking this path with conscious devotion to my true self."
 }

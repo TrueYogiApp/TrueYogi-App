@@ -403,5 +403,7 @@
 "resetUnderstandCheckbox": "Capisco che questo cancellerà permanentemente i miei progressi e non potrà essere annullato.",
 "confirmResetButton": "Conferma reset",
 "countdownTimerSuffix": "secondi",
-"goBackButton": "Indietro"
+"goBackButton": "Indietro",
+"config.confirm.seed.strong": "Pianto questo seme di pratica",
+"config.confirm.seed.body": "con la piena intenzione di coltivarla ogni giorno, percorrendo questo percorso con devozione consapevole al mio vero sé."
 }

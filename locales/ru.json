@@ -403,6 +403,8 @@
 "resetUnderstandCheckbox": "Я понимаю, что это навсегда удалит мой прогресс и не может быть отменено.",
 "confirmResetButton": "Подтвердить сброс",
 "countdownTimerSuffix": "сек.",
-"goBackButton": "Назад"
+"goBackButton": "Назад",
+"config.confirm.seed.strong": "Я сажаю это семя практики",
+"config.confirm.seed.body": "с полным намерением взращивать его каждый день, идя этим путем с осознанной преданностью своему истинному «я»."
   
 }

@@ -402,5 +402,7 @@
 "resetUnderstandCheckbox": "Ich verstehe, dass dies meinen Fortschritt dauerhaft löschen wird und nicht rückgängig gemacht werden kann.",
 "confirmResetButton": "Zurücksetzen bestätigen",
 "countdownTimerSuffix": "sek.",
-"goBackButton": "Zurückgehen"
+"goBackButton": "Zurückgehen",
+"config.confirm.seed.strong": "Ich pflanze diesen Samen der Praxis",
+"config.confirm.seed.body": "mit voller Absicht, ihn täglich zu pflegen, und gehe diesen Weg mit bewusster Hingabe zu meinem wahren Selbst."
 }
