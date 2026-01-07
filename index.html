@@ -2251,18 +2251,24 @@ body.lock-scroll {
 }
 
 /* Ensure time input works well on mobile */
-input[type="time"] {
-  -webkit-appearance: none;
-  appearance: none;
+input[type="date"],
+input[type="time"],
+select {
+  max-width: 100%;      /* Prevent overflow */
+  box-sizing: border-box; /* Includes padding and border in width calculation */
+  width: 100%;            /* Stretch to fill container but not overflow */
 }
 
 /* Prevent zoom on focus for mobile */
 @media screen and (max-width: 640px) {
+  input[type="date"],
   input[type="time"],
   select {
-    font-size: 16px; /* Prevents iOS zoom */
+    font-size: 16px;
+    max-width: 100%;
+    box-sizing: border-box;
+    width: 100%;
   }
-  
   .session-time-block {
     width: 100%;
   }
