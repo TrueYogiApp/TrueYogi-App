@@ -8561,7 +8561,6 @@ function updateTimer() {
         document.getElementById('yogi-total-sessions').textContent = challengeData.totalSessions;
         document.getElementById('yogi-total-minutes').textContent = challengeData.totalMinutes;
         document.getElementById('current-streak').textContent = challengeData.streakDays;
-		cleanupAfterSessionEnd();
       }
     }
 
@@ -8577,9 +8576,10 @@ function updateTimer() {
     updateBackButtonVisibility();
     updateSessionTimesDisplay();
     stopMeditationBackground();
-	showCompletionStats();
-	updateLiveCountVisibility();
-
+    cleanupAfterSessionEnd();
+	  showCompletionStats();
+	  updateLiveCountVisibility();
+    
     const bell = document.getElementById('bell');
     if (bell) {
       bell.muted = false;
