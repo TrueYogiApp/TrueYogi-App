@@ -10354,7 +10354,8 @@ document.addEventListener('visibilitychange', async function() {
           document.querySelector('#app-interface #flow-mode-btn-app').classList.add('hidden');
           document.querySelector('#app-interface #yogi-mode-btn-app').classList.add('hidden');
           updateBackButtonVisibility();
-		  showCompletionStats();
+          cleanupAfterSessionEnd();
+		      showCompletionStats();
 		  // --- FIX: STOP MUSIC ---
 		const bgMusicPlayer = document.getElementById('bg-music-player');
 		if (bgMusicPlayer) {
