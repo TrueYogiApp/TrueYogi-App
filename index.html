@@ -4484,6 +4484,18 @@ button[disabled] {
       challengeStreak: 0 // Add this line
     };
 
+    // COnfiguration Form checkbox
+document.getElementById('config-confirm').addEventListener('change', function() {
+  document.getElementById('begin-journey').disabled = !this.checked;
+  if (this.checked) {
+    document.getElementById('begin-journey').classList.remove('bg-gray-700', 'text-gray-400');
+    document.getElementById('begin-journey').classList.add('bg-yellow-500', 'text-gray-900');
+  } else {
+    document.getElementById('begin-journey').classList.add('bg-gray-700', 'text-gray-400');
+    document.getElementById('begin-journey').classList.remove('bg-yellow-500', 'text-gray-900');
+  }
+});
+
 function showChallengeCompletedModal() {
   const modal = document.getElementById('challenge-completed-modal');
   
