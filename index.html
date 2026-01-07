@@ -10904,7 +10904,7 @@ hideBtn.addEventListener('click', () => {
     // State 1: Hide everything EXCEPT avatar
     const appInterfaceChildren = appInterface.children;
     for (let child of appInterfaceChildren) {
-      if (child.id !== 'avatar-container') {
+      if (child.id !== 'avatar-container' && child.id !== 'live-count-section') {
         child.style.visibility = 'hidden';
         child.style.opacity = '0';
       }
@@ -10952,7 +10952,7 @@ function updateHideUiButtonVisibility() {
       // Apply partial hide (hide everything except avatar)
       const appInterfaceChildren = appInterface.children;
       for (let child of appInterfaceChildren) {
-        if (child.id !== 'avatar-container') {
+        if (child.id !== 'avatar-container' && child.id !== 'live-count-section') {
           child.style.visibility = 'hidden';
           child.style.opacity = '0';
         }
