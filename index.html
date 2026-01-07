@@ -2657,7 +2657,8 @@ button[disabled] {
 
 <!-- TrueYogi Configuration Modal -->
   <div id="yogi-config-modal" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true">
-    <div class="config-modal max-w-md mx-4 p-6 rounded-xl text-center max-h-[80vh] overflow-y-auto relative">
+    <div class="config-modal max-w-md mx-4 p-6 rounded-xl text-center max-h-[80vh] overflow-y-auto relative"
+     style="padding-bottom: calc(1.5rem + env(safe-area-inset-bottom, 0px));">
 	
       <button onclick="returnToModeSelection()" class="absolute top-2 right-2 text-gray-400 hover:text-white text-lg font-bold cursor-pointer">
         <i class="fa-solid fa-circle-xmark fa-1xs" style="color: #FFD43B;"></i>
