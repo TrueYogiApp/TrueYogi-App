@@ -2217,37 +2217,43 @@ body.lock-scroll {
   100% { background-position: 100% 50%; }
 }
 
-.live-tooltip-parent {
-  position: relative;
-}
-
+/* Hide tooltip by default, show on hover/click */
 .live-tooltip-text {
-  visibility: hidden;
-  opacity: 0;
+  display: none;
   position: absolute;
-  top: 120%;
+  background: #1a1b2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 12px;
+  min-width: 240px;
+  z-index: 1000;
+  pointer-events: auto;
+  margin-top: 10px;
   left: 50%;
   transform: translateX(-50%);
-  background: #232946ee;
-  color: #fde68a;
-  padding: 7px 20px;
-  border-radius: 11px;
-  font-size: 1.05em;
-  box-shadow: 0 2px 14px #0008;
-  white-space: nowrap;
-  z-index: 20;
-  font-weight: 500;
-  pointer-events: none;
-  user-select: none;
-  text-align: center;
-  transition: opacity 0.24s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
-.live-count-tooltip-trigger:hover + .live-tooltip-text,
-.live-count-tooltip-trigger:focus + .live-tooltip-text {
-  visibility: visible;
-  opacity: 1;
+/* Show tooltip when parent is hovered or has active class */
+.live-tooltip-parent:hover .live-tooltip-text,
+.live-tooltip-parent.active .live-tooltip-text {
+  display: block;
+}
+
+/* Position the parent for absolute positioning */
+.live-tooltip-parent {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Make sure list is scrollable */
+#live-meditators-list {
+  max-height: 140px;
+  overflow-y: auto;
   pointer-events: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #666 #222444;
 }
 
 /* Ensure time input works well on mobile */
@@ -2276,15 +2282,6 @@ input[type="date"] {
   }
 }
 
-
-#live-meditators-list {
-  max-height: 140px;
-  overflow-y: auto;
-  pointer-events: auto;
-  /* Optional: for even smoother appearance */
-  scrollbar-width: thin;
-  scrollbar-color: #666 #222444;
-}
 
 /* Apply similar effect to the SVG */
 .rainbow-svg {
