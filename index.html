@@ -2219,7 +2219,7 @@ body.lock-scroll {
 
 /* Hide tooltip by default, show on hover/click */
 .live-tooltip-text {
-  display: none;
+  display: none !important;
   position: absolute;
   background: #1a1b2e;
   border: 1px solid #333;
@@ -2227,11 +2227,13 @@ body.lock-scroll {
   padding: 12px;
   min-width: 240px;
   z-index: 1000;
-  pointer-events: auto;
-  margin-top: 10px;
+  /* Position it below the count number */
+  top: 100%; /* Start right below the trigger */
   left: 50%;
   transform: translateX(-50%);
+  margin-top: 5px; /* Small gap between count and tooltip */
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  pointer-events: auto;
 }
 
 /* Show tooltip when parent is hovered or has active class */
