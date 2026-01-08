@@ -2217,29 +2217,12 @@ body.lock-scroll {
   100% { background-position: 100% 50%; }
 }
 
-/* Hide tooltip by default, show on hover/click */
-.live-tooltip-text {
-  display: none !important;
-  position: absolute;
-  background: #1a1b2e;
-  border: 1px solid #333;
-  border-radius: 8px;
-  padding: 12px;
-  min-width: 240px;
-  z-index: 1000;
-  /* Position it below the count number */
-  top: 100%; /* Start right below the trigger */
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: 5px; /* Small gap between count and tooltip */
-  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  pointer-events: auto;
-}
-
 /* Show tooltip when parent is hovered or has active class */
 .live-tooltip-parent:hover .live-tooltip-text,
 .live-tooltip-parent.active .live-tooltip-text {
-  display: block;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 /* Position the parent for absolute positioning */
@@ -2247,6 +2230,28 @@ body.lock-scroll {
   position: relative;
   display: inline-flex;
   align-items: center;
+}
+
+.live-tooltip-text {
+  visibility: hidden;
+  opacity: 0;
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #232946ee;
+  color: #fde68a;
+  padding: 7px 20px;
+  border-radius: 11px;
+  font-size: 1.05em;
+  box-shadow: 0 2px 14px #0008;
+  white-space: nowrap;
+  z-index: 20;
+  font-weight: 500;
+  pointer-events: none;
+  user-select: none;
+  text-align: center;
+  transition: opacity 0.24s;
 }
 
 /* Make sure list is scrollable */
