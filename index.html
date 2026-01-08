@@ -8316,6 +8316,56 @@ async function updateLiveCount() {
   }
 }
 
+// Tooltip toggle for touch devices
+document.addEventListener('DOMContentLoaded', function() {
+  const trigger = document.querySelector('.live-count-tooltip-trigger');
+  const tooltip = document.getElementById('live-meditators-tooltip');
+  const parent = document.querySelector('.live-tooltip-parent');
+  
+  if (!trigger || !tooltip) return;
+  
+  // Toggle tooltip on click (for touch devices)
+  trigger.addEventListener('click', function(e) {
+    e.stopPropagation();
+    parent.classList.toggle('active');
+  });
+  
+  // Keep tooltip open when clicking inside it
+  tooltip.addEventListener('click', function(e) {
+    e.stopPropagation();
+  });
+  
+  // Close tooltip when clicking outside
+  document.addEventListener('click', function(e) {
+    if (!parent.contains(e.target)) {
+      parent.classList.remove('active');
+    }
+  });
+  
+  // For hover on desktop
+  parent.addEventListener('mouseenter', function() {
+    parent.classList.add('active');
+  });
+  
+  parent.addEventListener('mouseleave', function() {
+    // Small delay before hiding
+    setTimeout(() => {
+      if (!tooltip.matches(':hover')) {
+        parent.classList.remove('active');
+      }
+    }, 300);
+  });
+  
+  // Keep tooltip open if mouse moves into it
+  tooltip.addEventListener('mouseenter', function() {
+    parent.classList.add('active');
+  });
+  
+  tooltip.addEventListener('mouseleave', function() {
+    parent.classList.remove('active');
+  });
+});
+
 
 function updateLiveCountVisibility() {
   const liveCountSection = document.getElementById('live-count-section');
