@@ -6997,6 +6997,21 @@ function enforceClaimBeforeProceeding() {
   }
 }
 
+function refreshPageIfStale(thresholdHours = 24) {
+  // Use localStorage to remember last refresh
+  const key = 'lastPageRefresh';
+  const lastRefresh = parseInt(localStorage.getItem(key), 10) || 0;
+  const now = Date.now();
+  const thresholdMs = thresholdHours * 60 * 60 * 1000;
+
+  if (now - lastRefresh > thresholdMs) {
+    localStorage.setItem(key, now);
+    // You can either trigger a full page reload or a soft reload
+    window.location.reload();
+    // Or if you prefer: location.href = location.href;
+  }
+}
+
     function returnToModeSelection() {
         // Remove yogi-mode-active class when leaving
   document.body.classList.remove('yogi-mode-active');
@@ -7056,6 +7071,10 @@ function enforceClaimBeforeProceeding() {
   document.getElementById('duration-selector').classList.remove('hidden');
   document.getElementById('mode-selection').classList.remove('hidden');
 
+    if (currentMode === 'yogi') {
+    refreshPageIfStale(24); // Refresh if needed, after all updates
+  }
+  
 const bgMusicPlayer = document.getElementById('bg-music-player');
 if (bgMusicPlayer) {
   bgMusicPlayer.pause();
