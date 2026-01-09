@@ -8293,16 +8293,8 @@ async function updateLiveCount() {
       let color = '#777777';
 const currentDay = user.current_day || 0;
 
-console.log('=== USER DEBUG START ===');
-console.log('User ID:', user.omuserid);
-console.log('current_day:', currentDay);
-console.log('challenge_id:', user.challenge_id);
-console.log('start_date:', user.start_date);
-console.log('last_session_date:', user.last_session_date);
-
 if (currentDay > 0 && user.challenge_id) {
-  console.log('Has challenge and currentDay > 0');
-  
+  // Only give rainbow colors if user has a challenge
   let isInactive21DayUser = false;
   
   if (user.last_session_date && user.start_date) {
@@ -8310,58 +8302,26 @@ if (currentDay > 0 && user.challenge_id) {
     const last = new Date(user.last_session_date);
     const today = new Date();
     
-    console.log('Parsed start:', start);
-    console.log('Parsed last:', last);
-    console.log('Today:', today);
-    
     const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
     const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
     
-    console.log('daysBetween (last - start):', daysBetween);
-    console.log('daysSinceLastSession (today - last):', daysSinceLastSession);
-    console.log('Condition daysSinceLastSession > 2:', daysSinceLastSession > 2);
-    console.log('Condition daysBetween >= 21:', daysBetween >= 21);
-    console.log('Full condition (both true):', daysSinceLastSession > 2 && daysBetween >= 21);
-    
-    isInactive21DayUser = (daysSinceLastSession > 2 && daysBetween >= 21);
-    console.log('isInactive21DayUser:', isInactive21DayUser);
+    isInactive21DayUser = (daysSinceLastSession > 2 && daysBetween >= 21 && currentDay >= 21);
   }
   
   // Apply colors
   if (isInactive21DayUser) {
     color = '#22c55e'; // Green for inactive 21-day users
-    console.log('SET COLOR: GREEN (inactive 21-day user)');
   } else {
-    console.log('Using normal rainbow colors');
-    if (currentDay >= 1 && currentDay <= 6) {
-      color = '#ef4444';
-      console.log('SET COLOR: RED (day 1-6)');
-    } else if (currentDay >= 7 && currentDay <= 12) {
-      color = '#f59e42';
-      console.log('SET COLOR: ORANGE (day 7-12)');
-    } else if (currentDay >= 13 && currentDay <= 18) {
-      color = '#facc15';
-      console.log('SET COLOR: YELLOW (day 13-18)');
-    } else if (currentDay >= 19 && currentDay <= 24) {
-      color = '#22c55e';
-      console.log('SET COLOR: GREEN (day 19-24)');
-    } else if (currentDay >= 25 && currentDay <= 30) {
-      color = '#7dd3fc';
-      console.log('SET COLOR: BLUE (day 25-30)');
-    } else if (currentDay >= 31 && currentDay <= 36) {
-      color = '#6366f1';
-      console.log('SET COLOR: INDIGO (day 31-36)');
-    } else if (currentDay >= 37) {
-      color = '#a855f7';
-      console.log('SET COLOR: VIOLET (day 37+)');
-    }
+    if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';
+    else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42';
+    else if (currentDay >= 13 && currentDay <= 18) color = '#facc15';
+    else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e';
+    else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc';
+    else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1';
+    else if (currentDay >= 37) color = '#a855f7';
   }
-} else {
-  console.log('No challenge or currentDay = 0, color stays GRAY');
 }
-
-console.log('FINAL COLOR:', color);
-console.log('=== USER DEBUG END ===');
+// If no challenge_id OR currentDay = 0, color stays #777777 (gray)
 	  
   out += `
 <tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
