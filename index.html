@@ -6137,6 +6137,46 @@ async function syncSpaceshipChallengesToServer() {
 // Sync spaceship challenges on startup and when network comes online
 if (navigator.onLine) syncSpaceshipChallengesToServer();
 
+function archiveCurrentYogiChallenge(method) {
+  let archive = JSON.parse(localStorage.getItem('archivedYogiChallenges') || '[]');
+  let challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+  if (challenge && challenge.startDate) {
+    archive.push({ 
+      ...challenge,
+	  omUserId,
+      archivedAt: new Date().toISOString(),
+      archivedAtLocal: new Date().toLocaleString(),
+      uploaded: false,
+      archivedBy: method || 'unknown'         // <<< store reason (e.g. "reset" or "reconfigure")
+    });
+    localStorage.setItem('archivedYogiChallenges', JSON.stringify(archive));
+  }
+}
+
+async function syncArchivedYogiChallengesToServer() {
+  let archive = JSON.parse(localStorage.getItem('archivedYogiChallenges') || '[]');
+  let notUploaded = archive.filter(entry => !entry.uploaded);
+
+  if (!notUploaded.length) return;
+
+  for (const entry of notUploaded) {
+    try {
+      let response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/archive_challenge', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(entry)
+      });
+      if (response.ok) {
+        entry.uploaded = true; // Set the uploaded flag!
+      }
+    } catch (e) {
+      console.warn('Failed to sync archive entry:', e);
+    }
+  }
+  // Save updated status
+  localStorage.setItem('archivedYogiChallenges', JSON.stringify(archive));
+}
+
  async function reconfigureChallenge() {
   // --- Start: Also clear from Supabase if wallet is connected ---
   const walletKey = window.walletPublicKey;
@@ -6307,6 +6347,7 @@ try {
 }
 
   await deleteOfflineChallenge();
+  archiveCurrentYogiChallenge('reconfigure');
   
   // Reset all Yogi stats to 0 except resetCount
   const currentResetCount = challengeData.resetCount || 0; // Preserve reset count
@@ -6755,7 +6796,8 @@ async function confirmResetChallenge() {
   }
 
   await deleteOfflineChallenge();
-    
+  archiveCurrentYogiChallenge('reset');
+  
   // Proceed with local reset regardless (or, if you want, only if resetSuccess)
   localStorage.removeItem('yogiConfig');
   localStorage.removeItem('yogiChallenge');
