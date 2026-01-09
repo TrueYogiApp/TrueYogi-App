@@ -5801,7 +5801,6 @@ if (musicChoiceEl) {
 	  updateFAQVisibility();
 	  updateYogiIcon();
 	  updateLangSwitcherVisibility();
-	  syncArchivedYogiChallengesToServer();
 	  await validateOmPresence();
 	  updateCount();
     // Hide loader when app is ready
@@ -6349,6 +6348,7 @@ try {
 
   await deleteOfflineChallenge();
   archiveCurrentYogiChallenge('reconfigure');
+  syncArchivedYogiChallengesToServer();
   
   // Reset all Yogi stats to 0 except resetCount
   const currentResetCount = challengeData.resetCount || 0; // Preserve reset count
@@ -6798,8 +6798,9 @@ async function confirmResetChallenge() {
 
   await deleteOfflineChallenge();
   archiveCurrentYogiChallenge('reset');
+  syncArchivedYogiChallengesToServer();
   
-  // Proceed with local reset regardless (or, if you want, only if resetSuccess)
+  //. Proceed with local reset regardless (or, if you want, only if resetSuccess)
   localStorage.removeItem('yogiConfig');
   localStorage.removeItem('yogiChallenge');
   clearYogiSessions();
