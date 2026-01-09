@@ -8291,32 +8291,19 @@ async function updateLiveCount() {
       const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
 
       // Default gray for users without valid current_day
-let color = '#777777';
-const currentDay = user.current_day || 0;
+      let color = '#777777';
+      const currentDay = user.current_day || 0;
 
-if (currentDay) {
-  // If currentDay is more than 21, check if lastSessionDate is today or user has new activity; else lock at green (the 19-24 range)
-  if (currentDay > 21) {
-    let effectiveDay = 21; // Default to max for 21-day challenge (green)
-    if (user.lastSessionDate && user.startDate) {
-      const start = new Date(user.startDate);
-      const last = new Date(user.lastSessionDate);
-      const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
-      effectiveDay = Math.min(daysBetween, currentDay); // whichever is lower
-    }
-    if (effectiveDay >= 19 && effectiveDay <= 24) color = '#22c55e'; // Green, "frozen" at max for 21 days
-    
-    // If you want to show more advanced ranges see below, or always freeze at green.
-  } else {
-    if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';       // Red
-    else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42'; // Orange
-    else if (currentDay >= 13 && currentDay <= 18) color = '#facc15'; // Yellow
-    else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e'; // Green
-    else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc'; // Blue
-    else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1'; // Indigo
-    else if (currentDay >= 37) color = '#a855f7';                   // Violet
-  }
-}
+      // Determine rainbow color based on currentDay
+      if (currentDay) {
+        if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';       // Red
+        else if (currentDay >= 7 && currentDay <= 12) color = '#f97316'; // Orange
+        else if (currentDay >= 13 && currentDay <= 18) color = '#facc15'; // Yellow
+        else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e'; // Green
+        else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc'; // Blue
+        else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1'; // Indigo
+        else if (currentDay >= 37) color = '#a855f7';                   // Violet
+      }
 	  
   out += `
 <tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
