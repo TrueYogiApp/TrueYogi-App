@@ -8305,7 +8305,7 @@ if (currentDay > 0 && user.challenge_id) {
     const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
     const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
     
-    isInactive21DayUser = (daysSinceLastSession > 2 && daysBetween >= 21 && currentDay >= 21);
+    isInactive21DayUser = (daysSinceLastSession > 2 && daysBetween >= 21);
   }
   
   // Apply colors
