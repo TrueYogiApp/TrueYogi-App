@@ -8292,37 +8292,43 @@ async function updateLiveCount() {
 
       // Default gray for users without valid current_day
   let color = '#777777';
-  const currentDay = user.current_day || 0;
+const currentDay = user.current_day || 0;
 
-  // Only calculate colors if currentDay > 0
-  if (currentDay > 0) {
-    // Calculate actual progress if we have dates
-    let actualProgress = currentDay; // Default to currentDay
-
-    if (user.last_session_date && user.start_date) {
-      const start = new Date(user.start_date);
-      const last = new Date(user.last_session_date);
-      const today = new Date();
-      
-      const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
-      const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
-      
-      // If user completed 21+ days AND has been inactive >2 days
-      // Use their actual progress instead of inflated currentDay
-      if (daysSinceLastSession > 3 && daysBetween >= 21) {
-        actualProgress = Math.min(daysBetween, 24); // Cap at 24 for color purposes
-      }
+if (currentDay > 0) {
+  // FIRST: Check if this is an inactive 21-day user
+  if (user.last_session_date && user.start_date) {
+    const start = new Date(user.start_date);
+    const last = new Date(user.last_session_date);
+    const today = new Date();
+    
+    const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
+    const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+    
+    // If user completed 21+ days AND is inactive > 2 days
+    if (daysSinceLastSession > 2 && daysBetween >= 21) {
+      // Force green for ALL inactive 21-day users
+      color = '#22c55e';
+    } else {
+      // Active user or not a 21-day user - use normal colors
+      if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';
+      else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42';
+      else if (currentDay >= 13 && currentDay <= 18) color = '#facc15';
+      else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e';
+      else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc';
+      else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1';
+      else if (currentDay >= 37) color = '#a855f7';
     }
-
-    // Apply color based on ACTUAL progress (not inflated currentDay)
-    if (actualProgress >= 1 && actualProgress <= 6) color = '#ef4444';
-    else if (actualProgress >= 7 && actualProgress <= 12) color = '#f59e42';
-    else if (actualProgress >= 13 && actualProgress <= 18) color = '#facc15';
-    else if (actualProgress >= 19 && actualProgress <= 24) color = '#22c55e';
-    else if (actualProgress >= 25 && actualProgress <= 30) color = '#7dd3fc';
-    else if (actualProgress >= 31 && actualProgress <= 36) color = '#6366f1';
-    else if (actualProgress >= 37) color = '#a855f7';
+  } else {
+    // No session data - use normal colors
+    if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';
+    else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42';
+    else if (currentDay >= 13 && currentDay <= 18) color = '#facc15';
+    else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e';
+    else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc';
+    else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1';
+    else if (currentDay >= 37) color = '#a855f7';
   }
+}
 	  
   out += `
 <tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
