@@ -8309,10 +8309,10 @@ else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1';
 else if (currentDay >= 37) color = '#a855f7';
 
 // Second: Override for inactive 21-day users
-if (user.lastSessionDate && user.startDate) {
-    const start = new Date(user.startDate);
-    const last = new Date(user.lastSessionDate);
-    const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
+if (user.last_session_date && user.start_date) { // FIXED: Use correct property names!
+        const start = new Date(user.start_date);
+        const last = new Date(user.last_session_date);
+        const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
     const today = new Date();
     const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
     
