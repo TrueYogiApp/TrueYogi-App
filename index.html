@@ -8305,7 +8305,7 @@ if (currentDay > 0) {
     const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
     
     // If user completed 21+ days AND is inactive > 2 days
-    if (daysSinceLastSession > 2 && daysBetween >= 21) {
+    if (daysSinceLastSession > 2) {
       // Force green for ALL inactive 21-day users
       color = '#22c55e';
     } else {
@@ -8320,7 +8320,7 @@ if (currentDay > 0) {
     }
   } else {
     // No session data - use normal colors
-    if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';
+    if (currentDay >= 1 && currentDay <= 6) color = '#777777';
     else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42';
     else if (currentDay >= 13 && currentDay <= 18) color = '#facc15';
     else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e';
