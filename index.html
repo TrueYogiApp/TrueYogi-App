@@ -8310,12 +8310,12 @@ async function updateLiveCount() {
       const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
 
 // If no challenge_id OR currentDay = 0, color stays #777777 (gray)
-      let color = '#777777';
+	let color = '#777777';
 	const currentDay = user.current_day || 0;
 
 	if (currentDay > 0 && user.challenge_id) {
-	  // Only give rainbow colors if user has a challenge
 	  let isInactive21DayUser = false;
+	  let isInactive41DayUser = false;
 	  
 	  if (user.last_session_date && user.start_date) {
 		const start = new Date(user.start_date);
@@ -8326,12 +8326,16 @@ async function updateLiveCount() {
 		const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
 		
 		isInactive21DayUser = (daysSinceLastSession > 2 && daysBetween >= 21);
+		isInactive41DayUser = (daysSinceLastSession > 2 && daysBetween >= 41);
 	  }
 	  
 	  // Apply colors
-	  if (isInactive21DayUser) {
+	  if (isInactive41DayUser) {
+		color = '#a855f7'; // Violet for inactive 41+ day users
+	  } else if (isInactive21DayUser) {
 		color = '#22c55e'; // Green for inactive 21-day users
 	  } else {
+		// Rainbow logic
 		if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';
 		else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42';
 		else if (currentDay >= 13 && currentDay <= 18) color = '#facc15';
