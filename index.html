@@ -3885,7 +3885,24 @@ button[disabled] {
 <div id="meditation-guide-image" style="display: flex; justify-content: center; margin-bottom: 1.3em;">
   <!-- Image will be injected by JS -->
 </div>
-<div id="meditation-guide-animation" style="width:100%;height:180px;display:flex;align-items:center;justify-content:center;">
+<div id="meditation-guide-animation" style="width:100%;height:180px;display:flex;align-items:center;justify-content:center;position:relative;">
+  <!-- Add timer span, choose left or right -->
+  <span id="breath-timer"
+    style="
+      position:absolute;
+      top:11px;        /* distance from top */
+      right:55px;      /* use left:18px for left corner */
+      color:#ffe066;
+      background:rgba(30,25,0,0.16);
+      font-weight:bold;
+      font-size:1.09em;
+      padding:2px 10px;
+      border-radius:12px;
+      z-index:10;
+      letter-spacing:0.02em;
+      ">
+    1:00
+  </span>
   <canvas id="medGuideCanvas" width="320" height="180" style="border-radius:20px;box-shadow:0 0 20px #ffe06677;"></canvas>
 </div>
   <button onclick="toggleMeditationGuide()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 py-2 rounded-lg font-medium cursor-pointer">
@@ -18573,6 +18590,9 @@ const exhaleDuration = 6000;     // ms
 const minRadius = 38;
 const maxRadius = 78;
 
+let timerDuration = 60; // seconds in each loop
+let timerStart = null;
+
 function lerp(a, b, t) { return a + (b - a) * t; }
 
 function drawFrame(now) {
@@ -18669,6 +18689,16 @@ ctx.shadowBlur = 8;
 ctx.fillText(label, ctx.canvas.width/2, 40);
 ctx.restore();
 
+// Inside drawFrame:
+if (timerStart) {
+  let elapsedSecs = Math.floor((Date.now() - timerStart) / 1000);
+  let left = timerDuration - elapsedSecs;
+  if (left < 0) left = timerDuration; // loop
+  let m = Math.floor(left / 60);
+  let s = left % 60;
+  document.getElementById('breath-timer').textContent = m + ":" + (s<10?"0":"") + s;
+}
+
   animationFrameId = requestAnimationFrame(drawFrame);
 }
 
@@ -18681,6 +18711,7 @@ function startMeditationGuideAnimation() {
   state = "inhale";
   stateStart = 0;
   animationFrameId = requestAnimationFrame(drawFrame);
+  timerStart = Date.now();
 }
 
 function stopMeditationGuideAnimation() {
