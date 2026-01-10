@@ -3891,7 +3891,7 @@ button[disabled] {
     style="
       position:absolute;
       top:11px;        /* distance from top */
-      right:55px;      /* use left:18px for left corner */
+      right:45px;      /* use left:18px for left corner */
       color:#ffe066;
       background:rgba(30,25,0,0.16);
       font-weight:bold;
@@ -18582,10 +18582,10 @@ let stateStart = 0;
 let holdParticles = [];
 
 const NUM_PARTICLES = 32; // number of particles for shimmer
-const inhaleDuration = 8000;     // ms
-const holdAfterInhaleDuration = 5100; // ms
-const holdAfterExhaleDuration = 6300; // ms (or whatever you want)
-const exhaleDuration = 6000;     // ms
+const inhaleDuration = 6000;           // ms (6 sec)
+const holdAfterInhaleDuration = 3500;  // ms (3.5 sec)
+const exhaleDuration = 5000;           // ms (5 sec)
+const holdAfterExhaleDuration = 5500;  // ms (5.5 sec)
 
 const minRadius = 38;
 const maxRadius = 78;
@@ -18692,11 +18692,10 @@ ctx.restore();
 // Inside drawFrame:
 if (timerStart) {
   let elapsedSecs = Math.floor((Date.now() - timerStart) / 1000);
-  let left = timerDuration - elapsedSecs;
-  if (left < 0) left = timerDuration; // loop
+  let left = timerDuration - (elapsedSecs % timerDuration);
   let m = Math.floor(left / 60);
   let s = left % 60;
-  document.getElementById('breath-timer').textContent = m + ":" + (s<10?"0":"") + s;
+  document.getElementById('breath-timer').textContent = m + ":" + (s < 10 ? "0" : "") + s;
 }
 
   animationFrameId = requestAnimationFrame(drawFrame);
