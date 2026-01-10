@@ -7042,7 +7042,14 @@ function enforceClaimBeforeProceeding() {
 }
 
 function refreshPageIfStale(thresholdHours = 24) {
-  // Use localStorage to remember last refresh
+  // Check if omPresenceId exists - if yes, skip refresh
+  const omPresenceId = localStorage.getItem('omPresenceId');
+  if (omPresenceId) {
+    console.log('omPresenceId detected, skipping auto-refresh');
+    return; // Exit function, don't refresh
+  }
+  
+  // Original refresh logic continues only if no omPresenceId
   const key = 'lastPageRefresh';
   const lastRefresh = parseInt(localStorage.getItem(key), 10) || 0;
   const now = Date.now();
@@ -7050,9 +7057,7 @@ function refreshPageIfStale(thresholdHours = 24) {
 
   if (now - lastRefresh > thresholdMs) {
     localStorage.setItem(key, now);
-    // You can either trigger a full page reload or a soft reload
     window.location.reload();
-    // Or if you prefer: location.href = location.href;
   }
 }
 
