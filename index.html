@@ -18562,7 +18562,9 @@ let ctx = null;
 let running = false;
 let state = "inhale";
 let stateStart = 0;
+let holdParticles = [];
 
+const NUM_PARTICLES = 32; // number of particles for shimmer
 const inhaleDuration = 8000;     // ms
 const holdAfterInhaleDuration = 5100; // ms
 const holdAfterExhaleDuration = 6300; // ms (or whatever you want)
@@ -18578,6 +18580,31 @@ function drawFrame(now) {
   if (!stateStart) stateStart = now;
 
   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+if (state === "hold_inhale" || state === "hold_exhale") {
+    if (holdParticles.length === 0) {
+      initParticles(ctx.canvas); // create when entering hold
+    }
+    updateParticles(ctx.canvas, now);
+    // draw
+    for (let p of holdParticles) {
+      ctx.save();
+      ctx.globalAlpha = p.currentAlpha || p.alpha;
+      let grad = ctx.createRadialGradient(p.x, p.y, 0.1, p.x, p.y, p.r*2.2);
+      grad.addColorStop(0, "#fffbdb");
+      grad.addColorStop(0.3, "#ffe066");
+      grad.addColorStop(1, "transparent");
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, 2 * Math.PI);
+      ctx.fillStyle = grad;
+      ctx.shadowColor = "#fffbe0";
+      ctx.shadowBlur = 12;
+      ctx.fill();
+      ctx.restore();
+    }
+} else {
+    holdParticles = []; // clear particles on state exit
+}
 
   let radius, alpha;
   let elapsed = now - stateStart;
@@ -18664,6 +18691,38 @@ function stopMeditationGuideAnimation() {
   ctx = null;
   stateStart = 0;
 }
+
+function createParticle(canvas) {
+  return {
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    r: 0.9 + Math.random() * 1.2,
+    alpha: 0.5 + Math.random() * 0.5,
+    angle: Math.random() * 2 * Math.PI,
+    speed: 0.2 + Math.random() * 0.14,
+    twinkle: Math.random() * 2 * Math.PI, // phase offset for shimmer
+  };
+}
+
+function initParticles(canvas) {
+  holdParticles = [];
+  for (let i = 0; i < NUM_PARTICLES; i++) {
+    holdParticles.push(createParticle(canvas));
+  }
+}
+
+function updateParticles(canvas, now) {
+  for (let p of holdParticles) {
+    p.x += Math.cos(p.angle) * p.speed;
+    p.y += Math.sin(p.angle) * p.speed;
+    // bounce off edges
+    if (p.x < 0 || p.x > canvas.width) p.angle = Math.PI - p.angle;
+    if (p.y < 0 || p.y > canvas.height) p.angle = -p.angle;
+    // twinkle by time
+    p.currentAlpha = p.alpha * (0.7 + 0.5 * Math.sin(now * 0.002 + p.twinkle));
+  }
+}
+
 </script>
 
  <!-- Place this at the END of your index.html, after ALL other scripts -->
