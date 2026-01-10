@@ -404,5 +404,8 @@
 "countdownTimerSuffix": "segundos",
 "goBackButton": "Regresar",
 "config.confirm.seed.strong": "Planto esta semilla de práctica",
-"config.confirm.seed.body": "con la plena intención de cultivarla diariamente, recorriendo este camino con devoción consciente hacia mi verdadero ser."
+"config.confirm.seed.body": "con la plena intención de cultivarla diariamente, recorriendo este camino con devoción consciente hacia mi verdadero ser.",
+  "Inhale": "Inhala",
+  "Exhale": "Exhala",
+  "Hold2": "Mantén la respiración"
 }

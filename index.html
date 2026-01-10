@@ -3885,6 +3885,9 @@ button[disabled] {
 <div id="meditation-guide-image" style="display: flex; justify-content: center; margin-bottom: 1.3em;">
   <!-- Image will be injected by JS -->
 </div>
+<div id="meditation-guide-animation" style="width:100%;height:180px;display:flex;align-items:center;justify-content:center;">
+  <canvas id="medGuideCanvas" width="320" height="180" style="border-radius:20px;box-shadow:0 0 20px #ffe06677;"></canvas>
+</div>
   <button onclick="toggleMeditationGuide()" class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 py-2 rounded-lg font-medium cursor-pointer">
     <i class="fas fa-check mr-2"></i> Got It
   </button>
@@ -9704,17 +9707,14 @@ function toggleMeditationGuide() {
   const guide = document.getElementById('meditation-guide');
   if (!guide) return;
 
-  // was it hidden before toggling?
   const wasHidden = guide.classList.contains('hidden') || getComputedStyle(guide).display === 'none';
-
-  // toggle visibility
   guide.classList.toggle('hidden');
 
   if (wasHidden) {
-    // we just opened the guide — render the image for the current mode
     updateMeditationGuideImage(currentMode);
+    startMeditationGuideAnimation();
   } else {
-    // we just closed the guide — ensure music and glow stop
+    stopMeditationGuideAnimation();
     stopMeditationMusicOnClose();
   }
 }
@@ -18550,6 +18550,120 @@ for (let i = 0; i < 3; i++) {
     canvas.classList.add('hidden');
   };
 });
+</script>
+
+<script type="module">
+
+window.startMeditationGuideAnimation = startMeditationGuideAnimation;
+window.stopMeditationGuideAnimation = stopMeditationGuideAnimation;
+
+let animationFrameId = null;
+let ctx = null;
+let running = false;
+let state = "inhale";
+let stateStart = 0;
+
+const inhaleDuration = 8000;     // ms
+const holdAfterInhaleDuration = 5100; // ms
+const holdAfterExhaleDuration = 6300; // ms (or whatever you want)
+const exhaleDuration = 6000;     // ms
+
+const minRadius = 38;
+const maxRadius = 78;
+
+function lerp(a, b, t) { return a + (b - a) * t; }
+
+function drawFrame(now) {
+  if (!ctx) return;
+  if (!stateStart) stateStart = now;
+
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+  let radius, alpha;
+  let elapsed = now - stateStart;
+  if (state === "inhale") {
+    let p = Math.min(1, elapsed / inhaleDuration);
+    radius = lerp(minRadius, maxRadius, p);
+    alpha = lerp(0.61, 1.0, p);
+    if (elapsed >= inhaleDuration) {
+      state = "hold_inhale";
+      stateStart = now;
+    }
+  } else if (state === "hold_inhale") {
+    radius = maxRadius;
+    alpha = 1.0;
+    if (elapsed >= holdAfterInhaleDuration) {
+      state = "exhale";
+      stateStart = now;
+    }
+  } else if (state === "exhale") {
+    let p = Math.min(1, elapsed / exhaleDuration);
+    radius = lerp(maxRadius, minRadius, p);
+    alpha = lerp(1.0, 0.61, p);
+    if (elapsed >= exhaleDuration) {
+      state = "hold_exhale";
+      stateStart = now;
+    }
+  } else if (state === "hold_exhale") {
+    radius = minRadius;
+    alpha = 0.61;
+    if (elapsed >= holdAfterExhaleDuration) {
+      state = "inhale";
+      stateStart = now;
+    }
+  }
+
+  // ...drawing code stays the same...
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.beginPath();
+  ctx.arc(ctx.canvas.width / 2, ctx.canvas.height / 2, radius, 0, 2 * Math.PI);
+  ctx.fillStyle = '#ffed80';
+  ctx.shadowColor = '#ffe066';
+  ctx.shadowBlur = 30;
+  ctx.fill();
+  ctx.restore();
+
+ 
+ctx.save();
+ctx.font = "bold 20px sans-serif";
+ctx.fillStyle = '#ffe066';    // bright, readable color
+ctx.textAlign = "center";
+
+let labelKey = state === "inhale" ? "Inhale"
+             : state === "exhale" ? "Exhale"
+             : "Hold2"; // use "Hold2" as your key
+
+let label = t(labelKey); // fetches translation from your loaded tkeys
+
+ctx.globalAlpha = 1;
+ctx.shadowColor = "#222";
+ctx.shadowBlur = 8;
+ctx.fillText(label, ctx.canvas.width/2, 40);
+ctx.restore();
+
+  animationFrameId = requestAnimationFrame(drawFrame);
+}
+
+function startMeditationGuideAnimation() {
+  if (running) return;
+  const canvas = document.getElementById('medGuideCanvas');
+  if (!canvas) return;
+  ctx = canvas.getContext('2d');
+  running = true;
+  state = "inhale";
+  stateStart = 0;
+  animationFrameId = requestAnimationFrame(drawFrame);
+}
+
+function stopMeditationGuideAnimation() {
+  running = false;
+  if (animationFrameId) cancelAnimationFrame(animationFrameId);
+  animationFrameId = null;
+  if (ctx) ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+  ctx = null;
+  stateStart = 0;
+}
 </script>
 
  <!-- Place this at the END of your index.html, after ALL other scripts -->

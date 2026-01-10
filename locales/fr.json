@@ -409,7 +409,10 @@
 "countdownTimerSuffix": "s",
 "goBackButton": "Retour",
 "config.confirm.seed.strong": "Je plante cette graine de pratique",
-"config.confirm.seed.body": "avec l’intention entière de la cultiver chaque jour, marchant sur ce chemin avec une dévotion consciente envers mon vrai moi."
+"config.confirm.seed.body": "avec l’intention entière de la cultiver chaque jour, marchant sur ce chemin avec une dévotion consciente envers mon vrai moi.",
+  "Inhale": "Inspirez",
+  "Exhale": "Expirez",
+  "Hold2": "Retenez la respiration"
 
 
 }

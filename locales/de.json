@@ -404,5 +404,8 @@
 "countdownTimerSuffix": "sek.",
 "goBackButton": "Zurückgehen",
 "config.confirm.seed.strong": "Ich pflanze diesen Samen der Praxis",
-"config.confirm.seed.body": "mit voller Absicht, ihn täglich zu pflegen, und gehe diesen Weg mit bewusster Hingabe zu meinem wahren Selbst."
+"config.confirm.seed.body": "mit voller Absicht, ihn täglich zu pflegen, und gehe diesen Weg mit bewusster Hingabe zu meinem wahren Selbst.",
+  "Inhale": "Einatmen",
+  "Exhale": "Ausatmen",
+  "Hold2": "Atem anhalten"
 }

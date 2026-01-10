@@ -409,5 +409,8 @@
 "countdownTimerSuffix": "s",
 "goBackButton": "Go Back",
 "config.confirm.seed.strong": "I plant this seed of practice",
-"config.confirm.seed.body": "with full intention to cultivate it daily, walking this path with conscious devotion to my true self."
+"config.confirm.seed.body": "with full intention to cultivate it daily, walking this path with conscious devotion to my true self.",
+  "Inhale": "Inhale",
+  "Exhale": "Exhale",
+  "Hold2": "Hold Breath"
 }
