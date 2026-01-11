@@ -6948,13 +6948,19 @@ function restoreActiveSessionUI() {
   }
 }
 
-    function updateBackButtonVisibility() {
-      const backButtonContainer = document.getElementById('back-to-mode-container');
-      const completeSection = document.getElementById('complete-section');
-      const finalSection = document.getElementById('final-section');
-      const isCompleteOrFinalVisible = !completeSection.classList.contains('hidden') || !finalSection.classList.contains('hidden');
-      backButtonContainer.classList.toggle('hidden', sessionActive || isCompleteOrFinalVisible);
-    }
+function updateBackButtonVisibility() {
+  const backButtonContainer = document.getElementById('back-to-mode-container');
+  const completeSection = document.getElementById('complete-section');
+  const finalSection = document.getElementById('final-section');
+  const journeyCompleteSection = document.getElementById('journey-complete-section');
+
+  const isCompleteOrFinalOrJourneyVisible =
+    !completeSection.classList.contains('hidden') ||
+    !finalSection.classList.contains('hidden') ||
+    (journeyCompleteSection && !journeyCompleteSection.classList.contains('hidden'));
+
+  backButtonContainer.classList.toggle('hidden', sessionActive || isCompleteOrFinalOrJourneyVisible);
+}
 
 function enforceClaimBeforeProceeding() {
   let completedChallenges = [];
@@ -7039,22 +7045,22 @@ function enforceClaimBeforeProceeding() {
       challengeData.currentDay >= 41 &&
       challengeData.streakDays >= 41
     );
-if (challengeComplete) {
-    // Only show journey-complete-section if tokens not yet claimed!
-    let completedChallenges = [];
-    try {
-      completedChallenges = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
-    } catch {}
-    const hasUnclaimed = completedChallenges.some(c => !c.claimed && c.completionDate);
+	if (challengeComplete) {
+		// Only show journey-complete-section if tokens not yet claimed!
+		let completedChallenges = [];
+		try {
+		  completedChallenges = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+		} catch {}
+		const hasUnclaimed = completedChallenges.some(c => !c.claimed && c.completionDate);
 
-    if (hasUnclaimed) {
-      document.getElementById('app-interface').classList.add('hidden');
-      document.getElementById('journey-complete-section').classList.remove('hidden');
-      if (typeof updateJourneyCompleteButtons === 'function') updateJourneyCompleteButtons();
-      return;
-    }
-    // If all are claimed -- DO NOT hide app-interface, just let the UI show as normal!
-  }
+		if (hasUnclaimed) {
+		  document.getElementById('app-interface').classList.add('hidden');
+		  document.getElementById('journey-complete-section').classList.remove('hidden');
+		  if (typeof updateJourneyCompleteButtons === 'function') updateJourneyCompleteButtons();
+		  return;
+		}
+		// If all are claimed -- DO NOT hide app-interface, just let the UI show as normal!
+	  }
 
     try {
       loadYogiConfig();
