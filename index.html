@@ -8929,6 +8929,11 @@ const completionDateLocal = getLocalDateString(new Date(startTime || Date.now())
     window.syncSessionsToSupabase();
    }
   }
+    if (currentMode === 'flow') {
+  document.getElementById('app-interface').classList.remove('hidden');
+  document.getElementById('final-section').classList.remove('hidden');
+  document.getElementById('journey-complete-section').classList.add('hidden');
+}
 }
  
 function saveSession(minutes, sessionTime) {
