@@ -2409,6 +2409,29 @@ button[disabled] {
   pointer-events: none;
 }
 
+.violet-animate {
+  color: #8b5cf6; /* A nice violet */
+  animation: violetShine 1.5s linear infinite;
+  cursor: pointer;
+}
+
+@keyframes violetShine {
+  0%   { filter: brightness(1) hue-rotate(0deg); }
+  50%  { filter: brightness(1.3) hue-rotate(25deg); }
+  100% { filter: brightness(1) hue-rotate(0deg); }
+}
+
+.indigo-animate {
+  color: #4f46e5; /* Classic indigo */
+  animation: indigoShine 1.5s linear infinite;
+}
+
+@keyframes indigoShine {
+  0%   { filter: brightness(1.1) hue-rotate(0deg); }
+  50%  { filter: brightness(1.4) hue-rotate(18deg); }
+  100% { filter: brightness(1.1) hue-rotate(0deg); }
+}
+
 
 </style>
   
@@ -3938,7 +3961,7 @@ button[disabled] {
 <!-- Challenge streak stats -->
 <div class="flex flex-col items-center justify-center mt-4 w-full">
   <div id="challenge-streak-container" class="text-center">
-    <p class="text-2xl font-bold" id="challenge-streak" style="color:#6366f1;">0</p>
+    <p class="text-2xl font-bold indigo-animate" id="challenge-streak" style="color:#6366f1;">0</p>
     <p class="text-sm text-gray-400">Yogi Challenges</p>
     <p class="text-xs text-orange-500" id="challenge-duration-label"></p>
   </div>
@@ -3947,7 +3970,7 @@ button[disabled] {
 <!-- Yogi Spaceship Challenge stats -->
 <div class="flex flex-col items-center justify-center mt-2 w-full" id="spaceship-challenge-container">
   <div id="spaceship-challenge-streak-container" class="text-center">
-    <p class="text-2xl font-bold" id="spaceship-challenge-count" style="color:#a21caf;">0</p>
+    <p class="text-2xl font-bold violet-animate" id="spaceship-challenge-count" style="color:#a21caf;">0</p>
     <p class="text-sm text-gray-400">Yogi Spaceship Challenges</p>
   </div>
 </div>
