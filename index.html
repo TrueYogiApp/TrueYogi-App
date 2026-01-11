@@ -7314,7 +7314,7 @@ function showClaimTokens() {
   } catch {}
   let unclaimed = completedChallenges.find(c => !c.claimed && c.completionDate);
   if (!unclaimed) {
-    alert('No unclaimed challenge to claim tokens for!');
+    //alert('No unclaimed challenge to claim tokens for!');
     return;
   }
   document.getElementById('journey-complete-section').classList.add('hidden');
