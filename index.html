@@ -4943,6 +4943,14 @@ function syncOfflineChallengeToServer() {
   const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
   if (!challenge.startDate) return;
 
+  const lastPageRefresh = localStorage.getItem('lastPageRefresh') || null;
+  
+  // Get human-readable format
+	let lastPageRefreshHuman = null;
+	if (lastPageRefresh) {
+	  lastPageRefreshHuman = new Date(parseInt(lastPageRefresh)).toISOString(); // or toLocaleString() for local timezone
+	}
+	
   const payload = {
     om_user_id: localStorage.getItem('omUserId'),
     challenge_id: challenge.challengeId,
@@ -4956,7 +4964,9 @@ function syncOfflineChallengeToServer() {
     total_minutes: challenge.totalMinutes || 0,
     device_type: getDeviceType?.() || 'unknown',
     user_agent: navigator.userAgent,
-	reset_count: challenge.resetCount || 0
+	reset_count: challenge.resetCount || 0,
+	last_page_refresh: lastPageRefresh,
+	last_page_refresh_human: lastPageRefreshHuman
   };
 
   fetch('https://trueyogi-backend-knkq.onrender.com/api/offline_challenge', {
