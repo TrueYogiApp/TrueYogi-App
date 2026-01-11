@@ -15835,7 +15835,7 @@ function canSwipe() {
   
   // Don't swipe in post-session screens
   const completeSection = document.getElementById('complete-section');
-  const finalSection = document.getElementById('final-section');
+  const finalSection = document.getElementById('finall-section');
   if ((completeSection && !completeSection.classList.contains('hidden')) ||
       (finalSection && !finalSection.classList.contains('hidden'))) {
     return false;
@@ -15902,7 +15902,6 @@ document.addEventListener('touchstart', (e) => {
   }
 });
 
-// TOUCH MOVE
 // TOUCH MOVE
 document.addEventListener('touchmove', (e) => {
   if (!isSwipeActive || !canSwipe()) return;
