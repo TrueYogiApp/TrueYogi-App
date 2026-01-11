@@ -7039,13 +7039,22 @@ function enforceClaimBeforeProceeding() {
       challengeData.currentDay >= 41 &&
       challengeData.streakDays >= 41
     );
-    if (challengeComplete) {
+if (challengeComplete) {
+    // Only show journey-complete-section if tokens not yet claimed!
+    let completedChallenges = [];
+    try {
+      completedChallenges = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+    } catch {}
+    const hasUnclaimed = completedChallenges.some(c => !c.claimed && c.completionDate);
+
+    if (hasUnclaimed) {
       document.getElementById('app-interface').classList.add('hidden');
       document.getElementById('journey-complete-section').classList.remove('hidden');
-      // Show only claim if not claimed, only new journey if claimed
       if (typeof updateJourneyCompleteButtons === 'function') updateJourneyCompleteButtons();
       return;
     }
+    // If all are claimed -- DO NOT hide app-interface, just let the UI show as normal!
+  }
 
     try {
       loadYogiConfig();
