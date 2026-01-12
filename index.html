@@ -4839,9 +4839,21 @@ function hasMissedSession() {
     const dateStr = getLocalDateString(date);
     
     const completedCount = challengeData.sessionsCompleted.filter(s => s.date === dateStr).length;
-    if (completedCount < challengeData.requiredSessions) {
-      return true; // Missed a previous day's session
-    }
+if (completedCount < challengeData.requiredSessions) {
+  window.challengeMissedDebug = {
+    now: new Date().toString(),
+    today: today,
+    startDate: startDate.toString(),
+    challengeId: challengeData.challengeId,
+    currentMinutes,
+    userSessionTimes,
+    sessionsCompleted: challengeData.sessionsCompleted,
+    checkedDay: dateStr,
+    missingDay: true,
+    reason: 'missed previous day'
+  };
+  return true; // Missed a previous day's session
+}
   }
 
   // 2. Check today
@@ -4868,8 +4880,43 @@ function hasMissedSession() {
     }
   }
 
-  // 4. If you get here, some sessions for today are not completed and ALL their windows are over
-  return true;
+
+// Find last completed session for this challenge
+let lastSession = null;
+if (challengeData.sessionsCompleted && challengeData.sessionsCompleted.length > 0) {
+  // Sort by date and time, descending (handles multi-day and multi-session)
+  let sorted = challengeData.sessionsCompleted.slice().sort((a, b) => {
+    // Compare date first
+    if (a.date !== b.date) return b.date.localeCompare(a.date);
+    // If same date, compare time
+    return b.time.localeCompare(a.time);
+  });
+  lastSession = sorted[0]; // Most recent session
+}
+
+// 4. If you get here, some sessions for today are not completed and ALL their windows are over
+window.challengeMissedDebug = {
+  now: new Date().toString(),
+  calculationIso: new Date().toISOString(),
+  today: today,
+  startDate: startDate.toString(),
+  challengeId: challengeData.challengeId,
+  currentMinutes,
+  sessionActive,
+  currentMode,
+  requiredSessions: challengeData.requiredSessions,
+  todayCompletedCount: todayCompleted,
+  sessionsCompleted: challengeData.sessionsCompleted,
+  lastSessionDate: lastSession ? lastSession.date : null,
+  lastSessionTime: lastSession ? lastSession.time : null,  
+  allSessionsToday: userSessionTimes.map(session => ({
+    ...session,
+    status: (function() { /* same status logic as above */ })()
+  })),
+  userSessionTimes, // as-is
+  reason: 'missed detected by algorithm (today, all session windows passed)'
+};
+return true;
 }
 
 // FAQ Modal Functions
@@ -6047,9 +6094,31 @@ function showWelcomeModal() {
       document.getElementById('next-session-modal').classList.add('hidden');
     }
 
-    function showMissedSessionModal() {
-      document.getElementById('missed-session-modal').classList.remove('hidden');
-    }
+function showMissedSessionModal() {
+  const missedLogs = JSON.parse(localStorage.getItem('missedSessionLogs') || '[]');
+  const challengeId = window.challengeMissedDebug?.challengeId;
+  const today = window.challengeMissedDebug?.today;
+  const now = new Date();
+  const nowHourString = now.toISOString().slice(0, 13); // e.g., "2026-01-12T16"
+
+  // Find any log for same challengeId, same today, and same hour
+  const alreadyLogged = missedLogs.some(
+    log =>
+      log.challengeId === challengeId &&
+      log.today === today &&
+      log.modalShownAt &&
+      log.modalShownAt.slice(0, 13) === nowHourString
+  );
+
+  if (window.challengeMissedDebug && !alreadyLogged) {
+    missedLogs.push({
+      ...window.challengeMissedDebug,
+      modalShownAt: now.toISOString()
+    });
+    localStorage.setItem('missedSessionLogs', JSON.stringify(missedLogs));
+  }
+  document.getElementById('missed-session-modal').classList.remove('hidden');
+}
 
     function closeMissedSessionModal() {
       document.getElementById('missed-session-modal').classList.add('hidden');
@@ -6195,16 +6264,20 @@ if (navigator.onLine) syncSpaceshipChallengesToServer();
 function archiveCurrentYogiChallenge(method) {
   let archive = JSON.parse(localStorage.getItem('archivedYogiChallenges') || '[]');
   let challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+  let missedLogs = JSON.parse(localStorage.getItem('missedSessionLogs') || '[]');
+
   if (challenge && challenge.startDate) {
     archive.push({ 
       ...challenge,
-	  omUserId,
+      omUserId,
       archivedAt: new Date().toISOString(),
       archivedAtLocal: new Date().toLocaleString(),
       uploaded: false,
-      archivedBy: method || 'unknown'         // <<< store reason (e.g. "reset" or "reconfigure")
+      archivedBy: method || 'unknown',
+      missedSessionLogs: missedLogs
     });
     localStorage.setItem('archivedYogiChallenges', JSON.stringify(archive));
+    localStorage.removeItem('missedSessionLogs');
   }
 }
 
@@ -7742,7 +7815,7 @@ const endDatePlusOne = new Date(endDate.getTime());
 endDatePlusOne.setDate(endDatePlusOne.getDate() + 1);
 const isChallengeEnded = now >= endDatePlusOne;
 
-  let hasMissedSession = false;
+  let missedSessionFlag = false;
   let todayCompleted = challengeData.sessionsCompleted.filter(s => s.date === today).length;
 
   // Only evaluate sessions if today is on or after startDate
@@ -7788,7 +7861,7 @@ const isChallengeEnded = now >= endDatePlusOne;
     );
 
     if (isMissed) {
-      hasMissedSession = true;
+      missedSessionFlag = true;
     }
 
     const badge = document.createElement('span');
@@ -7817,7 +7890,7 @@ const isChallengeEnded = now >= endDatePlusOne;
   // FIX: Don't show missed modal if challenge has ended
   if (
     !isChallengeEnded &&
-    hasMissedSession &&
+    hasMissedSession() &&
     currentMode === 'yogi' &&
     todayCompleted < challengeData.requiredSessions
   ) {
