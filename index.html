@@ -4884,17 +4884,13 @@ if (completedCount < challengeData.requiredSessions) {
 // Find last completed session for this challenge
 let lastSession = null;
 if (challengeData.sessionsCompleted && challengeData.sessionsCompleted.length > 0) {
-  // Sort by date and time, descending (handles multi-day and multi-session)
   let sorted = challengeData.sessionsCompleted.slice().sort((a, b) => {
-    // Compare date first
     if (a.date !== b.date) return b.date.localeCompare(a.date);
-    // If same date, compare time
     return b.time.localeCompare(a.time);
   });
-  lastSession = sorted[0]; // Most recent session
+  lastSession = sorted[0];
 }
 
-// 4. If you get here, some sessions for today are not completed and ALL their windows are over
 window.challengeMissedDebug = {
   now: new Date().toString(),
   calculationIso: new Date().toISOString(),
@@ -4908,12 +4904,27 @@ window.challengeMissedDebug = {
   todayCompletedCount: todayCompleted,
   sessionsCompleted: challengeData.sessionsCompleted,
   lastSessionDate: lastSession ? lastSession.date : null,
-  lastSessionTime: lastSession ? lastSession.time : null,  
+  lastSessionTime: lastSession ? lastSession.time : null,
   allSessionsToday: userSessionTimes.map(session => ({
     ...session,
-    status: (function() { /* same status logic as above */ })()
+    status: (function() {
+      const [hours, minutes] = session.time.split(':').map(Number);
+      const sessionTime = hours * 60 + minutes;
+      const isCompleted = challengeData.sessionsCompleted.some(
+        s => s.date === today && s.time === session.time
+      );
+      const isActive = Math.abs(sessionTime - currentMinutes) <= 10;
+      if (isCompleted) return 'completed';
+      if (sessionTime < currentMinutes - 10) return 'missed';
+      if (isActive) return 'active';
+      return 'upcoming';
+    })()
   })),
-  userSessionTimes, // as-is
+  userSessionTimes,
+  clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+  browserOffsetMinutes: (new Date()).getTimezoneOffset(),
+  userAgent: navigator.userAgent,
+  platform: navigator.platform,
   reason: 'missed detected by algorithm (today, all session windows passed)'
 };
 return true;
@@ -6101,6 +6112,12 @@ function showMissedSessionModal() {
   const now = new Date();
   const nowHourString = now.toISOString().slice(0, 13); // e.g., "2026-01-12T16"
 
+  // GUARD: Only log if challenge is properly configured!
+  if (!challengeId || !window.challengeMissedDebug?.startDate || window.challengeMissedDebug.startDate === 'null') {
+    document.getElementById('missed-session-modal').classList.remove('hidden');
+    return; // Don't log "fake" sessions!
+  }
+
   // Find any log for same challengeId, same today, and same hour
   const alreadyLogged = missedLogs.some(
     log =>
@@ -6110,7 +6127,7 @@ function showMissedSessionModal() {
       log.modalShownAt.slice(0, 13) === nowHourString
   );
 
-  if (window.challengeMissedDebug && !alreadyLogged) {
+  if (!alreadyLogged) {
     missedLogs.push({
       ...window.challengeMissedDebug,
       modalShownAt: now.toISOString()
