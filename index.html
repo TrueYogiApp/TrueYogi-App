@@ -7793,6 +7793,60 @@ function completeExpiredSessionIfNeeded() {
   }
 }
 
+function setChallengeMissedDebug(reason, extra = {}) {
+  // Find last completed session for this challenge
+  let lastSession = null;
+  if (challengeData.sessionsCompleted && challengeData.sessionsCompleted.length > 0) {
+    let sorted = challengeData.sessionsCompleted.slice().sort((a, b) => {
+      if (a.date !== b.date) return b.date.localeCompare(a.date);
+      return b.time.localeCompare(a.time);
+    });
+    lastSession = sorted[0];
+  }
+  const now = new Date();
+  const today = getLocalDateString(now);
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  const todayCompleted = challengeData.sessionsCompleted.filter(s => s.date === today).length;
+
+  window.challengeMissedDebug = {
+    now: now.toString(),
+    calculationIso: now.toISOString(),
+    today: today,
+    startDate: challengeData.startDate ? (new Date(challengeData.startDate + "T00:00:00")).toString() : null,
+    challengeId: challengeData.challengeId,
+    currentMinutes,
+    sessionActive,
+    currentMode,
+    requiredSessions: challengeData.requiredSessions,
+    todayCompletedCount: todayCompleted,
+    sessionsCompleted: challengeData.sessionsCompleted,
+    lastSessionDate: lastSession ? lastSession.date : null,
+    lastSessionTime: lastSession ? lastSession.time : null,
+    allSessionsToday: userSessionTimes.map(session => ({
+      ...session,
+      status: (function() {
+        const [hours, minutes] = session.time.split(':').map(Number);
+        const sessionTime = hours * 60 + minutes;
+        const isCompleted = challengeData.sessionsCompleted.some(
+          s => s.date === today && s.time === session.time
+        );
+        const isActive = Math.abs(sessionTime - currentMinutes) <= 10;
+        if (isCompleted) return 'completed';
+        if (sessionTime < currentMinutes - 10) return 'missed';
+        if (isActive) return 'active';
+        return 'upcoming';
+      })()
+    })),
+    userSessionTimes,
+    clientTimezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    browserOffsetMinutes: (new Date()).getTimezoneOffset(),
+    userAgent: navigator.userAgent,
+    platform: navigator.platform,
+    reason: reason,
+    ...extra // for per-case fields
+  };
+}
+
 async function updateSessionTimesDisplay() {
   const completeSectionVisible = !document.getElementById('complete-section').classList.contains('hidden');
   const finalSectionVisible = !document.getElementById('final-section').classList.contains('hidden');
@@ -7913,8 +7967,11 @@ if (
     todayCompleted < challengeData.requiredSessions &&
     (missedSessionFlag || hasMissedSession())
 ) {
+    // Set lightweight debug if badge flag, robust debug if function
+    if (!hasMissedSession() && missedSessionFlag) {
+        setChallengeMissedDebug('missed badge triggered modal (session missed by UI badge logic)');
+    }
     showMissedSessionModal();
-    // If hasMissedSession() returns true, your debug log will be filled automatically as before.
 }
 }
 
