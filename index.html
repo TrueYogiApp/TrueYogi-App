@@ -7907,14 +7907,21 @@ const isChallengeEnded = now >= endDatePlusOne;
   });
 
   // FIX: Don't show missed modal if challenge has ended
-  if (
+// At the end of updateSessionTimesDisplay
+if (
     !isChallengeEnded &&
-    hasMissedSession() &&
     currentMode === 'yogi' &&
     todayCompleted < challengeData.requiredSessions
-  ) {
-    showMissedSessionModal();
-  }
+) {
+    // Prefer robust logging if hasMissedSession() is true
+    if (hasMissedSession()) {
+        showMissedSessionModal(); // will log/debug
+    } else if (missedSessionFlag) {
+        // If missedSessionFlag is set, but hasMissedSession() isn't (badge is red but function is not triggered), 
+        // show modal (but you may want to log a lighter debug, or set a simple fallback log)
+        showMissedSessionModal(); // consider passing info/red flag context here if needed!
+    }
+}
 }
 
 function isSessionMissedOnPreviousDays(sessionTime, today) {
