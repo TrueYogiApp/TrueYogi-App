@@ -6497,23 +6497,25 @@ try {
   archiveCurrentYogiChallenge('reconfigure');
   syncArchivedYogiChallengesToServer();
   
-  // Reset all Yogi stats to 0 except resetCount
-  const currentResetCount = challengeData.resetCount || 0; // Preserve reset count
-  const newResetCount = currentResetCount + 1; // increment by 1
-  
-  challengeData = {
-    startDate: null,
-    endDate: null,
-    currentDay: 1,
-    sessionsCompleted: [],
-    requiredSessions: 1,
-    lastSessionDate: null,
-    streakDays: 0,
-    totalSessions: 0,
-    totalMinutes: 0,
-    resetCount: newResetCount, // Keep the existing reset count
-    challengeStreak: 0
-  };
+	const yogiChallenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+	const currentResetCount = (yogiChallenge && yogiChallenge.resetCount) ? yogiChallenge.resetCount : 0;
+
+	// Only increment if challenge was actually configured/active
+	const newResetCount = yogiChallenge.startDate ? currentResetCount + 1 : currentResetCount;
+
+	challengeData = {
+		startDate: null,
+		endDate: null,
+		currentDay: 1,
+		sessionsCompleted: [],
+		requiredSessions: 1,
+		lastSessionDate: null,
+		streakDays: 0,
+		totalSessions: 0,
+		totalMinutes: 0,
+		resetCount: newResetCount,
+		challengeStreak: 0
+	};
   
   // Clear Yogi sessions from session history
   clearYogiSessions();
