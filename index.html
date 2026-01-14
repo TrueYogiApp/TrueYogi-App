@@ -4671,39 +4671,29 @@ function tryResumeAudio(e) {
   }
 
   // --- MOBILE LOOP FIX ---
-if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-  const bgMusicPlayer = document.getElementById('bg-music-player');
-  if (bgMusicPlayer) {
-    bgMusicPlayer.loop = true;
-    if (!bgMusicPlayer.hasLoopHandler) {
-      bgMusicPlayer.addEventListener('ended', function () {
-        // Workaround: remove and re-add to force mobile to start again
-        this.pause();
-        this.currentTime = 0;
-        let playPromise = this.play();
-        if (playPromise !== undefined) {
-          playPromise.catch(() => {
-            // Absolute workaround: replace node
-            let parent = this.parentNode;
-            parent.removeChild(this);
-            let newAudio = document.createElement('audio');
-            newAudio.id = 'bg-music-player';
-            newAudio.src = this.src;
-            newAudio.loop = true;
-            newAudio.volume = this.volume;
-            parent.appendChild(newAudio);
-            newAudio.play();
-          });
-        }
-      });
-      bgMusicPlayer.hasLoopHandler = true;
-    }
-    // Only call .play() if paused
-    if (bgMusicPlayer.paused) {
-      bgMusicPlayer.play().catch(() => {});
+  if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    const bgMusicPlayer = document.getElementById('bg-music-player');
+    if (bgMusicPlayer) {
+      bgMusicPlayer.loop = true;
+
+      // Attach ended handler once to ensure looping, never multiple times!
+      if (!bgMusicPlayer.hasLoopHandler) {
+        bgMusicPlayer.addEventListener('ended', function () {
+          // Only restart if NOT muted (optional)
+          // if (!this.muted) {
+            this.currentTime = 0;
+            this.play();
+          // }
+        });
+        bgMusicPlayer.hasLoopHandler = true;
+      }
+
+      // ---- The real fix: Only restart if paused (no reset on every tap) ----
+      if (bgMusicPlayer.paused) {
+        bgMusicPlayer.play().catch(() => {});
+      }
     }
   }
-}
   
   // --- PRIME THE BELL AUDIO, BUT KEEP IT SILENT DURING PRIMING ---
   const bell = document.getElementById('bell');
