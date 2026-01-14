@@ -6594,7 +6594,20 @@ function showEnhancedResetModal() {
   const challengeStreak = challenge.challengeStreak || 0;
   
   // What gets reset to 0
-  const daysProgressLost = Math.max(0, currentDay - 1);
+	const isOfflineUser = !window.walletPublicKey || !localStorage.getItem('jwtToken');
+	const isFullAccessUser = window.walletPublicKey && localStorage.getItem('jwtToken');
+
+	let maxAllowedDays = 41; // Default maximum
+	if (isOfflineUser) {
+	  maxAllowedDays = 21;
+	}
+
+	let cappedCurrentDay = currentDay;
+	if (cappedCurrentDay > maxAllowedDays) {
+	  cappedCurrentDay = maxAllowedDays;
+	}
+
+	const daysProgressLost = Math.max(0, cappedCurrentDay - 1); // Show as "days completed"
   const streakDaysLost = currentStreak;
   const totalSessionsLost = totalSessions;
   
