@@ -7037,6 +7037,15 @@ function restoreActiveSessionUI() {
     bgMusicPlayer.currentTime = 0;
     bgMusicPlayer.loop = true;
     bgMusicPlayer.volume = 0.5;
+    
+      // FIX: Add this to ensure looping works after background/restore
+  bgMusicPlayer.addEventListener('ended', function() {
+    if (sessionActive) {
+      this.currentTime = 0;
+      this.play().catch(e => console.log('Loop play error:', e));
+    }
+  });
+  
     backgroundAudio = bgMusicPlayer;
     if (backgroundAudio) {
       const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
