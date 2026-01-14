@@ -4670,31 +4670,6 @@ function tryResumeAudio(e) {
     });
   }
 
-  // --- MOBILE LOOP FIX ---
-  if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    const bgMusicPlayer = document.getElementById('bg-music-player');
-    if (bgMusicPlayer) {
-      bgMusicPlayer.loop = true;
-
-      // Attach ended handler once to ensure looping, never multiple times!
-      if (!bgMusicPlayer.hasLoopHandler) {
-        bgMusicPlayer.addEventListener('ended', function () {
-          // Only restart if NOT muted (optional)
-          // if (!this.muted) {
-            this.currentTime = 0;
-            this.play();
-          // }
-        });
-        bgMusicPlayer.hasLoopHandler = true;
-      }
-
-      // ---- The real fix: Only restart if paused (no reset on every tap) ----
-      if (bgMusicPlayer.paused) {
-        bgMusicPlayer.play().catch(() => {});
-      }
-    }
-  }
-  
   // --- PRIME THE BELL AUDIO, BUT KEEP IT SILENT DURING PRIMING ---
   const bell = document.getElementById('bell');
   if (bell) {
