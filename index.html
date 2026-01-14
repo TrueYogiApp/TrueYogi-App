@@ -4670,6 +4670,23 @@ function tryResumeAudio(e) {
     });
   }
 
+  // --- MOBILE LOOP FIX ---
+  if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+    const bgMusicPlayer = document.getElementById('bg-music-player');
+    if (bgMusicPlayer) {
+      bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
+      bgMusicPlayer.loop = true;
+      bgMusicPlayer.currentTime = 0;
+      bgMusicPlayer.volume = 0.5;
+      bgMusicPlayer.load();
+      bgMusicPlayer.play().catch(()=>{});
+      bgMusicPlayer.addEventListener('ended', function () {
+        this.currentTime = 0;
+        this.play();
+      });
+    }
+  }
+  
   // --- PRIME THE BELL AUDIO, BUT KEEP IT SILENT DURING PRIMING ---
   const bell = document.getElementById('bell');
   if (bell) {
@@ -7041,15 +7058,7 @@ function restoreActiveSessionUI() {
     bgMusicPlayer.currentTime = 0;
     bgMusicPlayer.loop = true;
     bgMusicPlayer.volume = 0.5;
- 
-  // Ensure looping on mobile/background:
-  bgMusicPlayer.addEventListener('ended', function() {
-    if (sessionActive && bgMusicPlayer.loop) {
-      bgMusicPlayer.currentTime = 0;
-      bgMusicPlayer.play().catch(e => {});
-    }
-  });
-  
+      
     backgroundAudio = bgMusicPlayer;
     if (backgroundAudio) {
       const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
