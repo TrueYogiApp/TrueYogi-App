@@ -7041,7 +7041,15 @@ function restoreActiveSessionUI() {
     bgMusicPlayer.currentTime = 0;
     bgMusicPlayer.loop = true;
     bgMusicPlayer.volume = 0.5;
-      
+ 
+  // Ensure looping on mobile/background:
+  bgMusicPlayer.addEventListener('ended', function() {
+    if (sessionActive && bgMusicPlayer.loop) {
+      bgMusicPlayer.currentTime = 0;
+      bgMusicPlayer.play().catch(e => {});
+    }
+  });
+  
     backgroundAudio = bgMusicPlayer;
     if (backgroundAudio) {
       const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
