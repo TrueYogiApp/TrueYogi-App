@@ -8867,12 +8867,6 @@ if (window.walletPublicKey && typeof window.syncSessionsToSupabase === "function
 
   document.getElementById('end-meditation-modal').classList.add('hidden');
   
-  if (currentMode === 'yogi') {
-    showMissedSessionModal();
-  } else {
-    document.getElementById('incomplete-section').classList.remove('hidden');
-  }
-  
   document.getElementById('session-stats').classList.remove('hidden');
   document.getElementById('yogi-progress').classList.toggle('hidden', currentMode !== 'yogi');
   document.getElementById('session-timing-display').classList.toggle('hidden', currentMode !== 'yogi');
