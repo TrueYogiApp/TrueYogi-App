@@ -4662,6 +4662,8 @@ function tryResumeAudio(e) {
       // Resume all audio elements if paused and not at beginning
       document.querySelectorAll('audio').forEach(audio => {
         if (audio.paused && audio.currentTime > 0) {
+          // ---- FIX: Make sure loop is re-enabled ----
+          audio.loop = true;
           audio.play().catch(() => {});
         }
       });
@@ -4674,6 +4676,7 @@ function tryResumeAudio(e) {
     const wasMuted = bell.muted;
     bell.muted = true;       // Mute for priming
     bell.currentTime = 0;
+    bell.loop = false;       // Ensure bell doesn't loop
     bell.play().then(() => {
       bell.pause();
       bell.currentTime = 0;
@@ -4682,12 +4685,13 @@ function tryResumeAudio(e) {
       bell.muted = wasMuted;
     });
   }
-  
-    // --- If session has finished while app was closed, play bell now ---
+
+  // --- If session has finished while app was closed, play bell now ---
   if (pendingBellSound) {
     if (bell) {
       bell.muted = false;
       bell.currentTime = 0;
+      bell.loop = false; // Bell should never loop!
       bell.play().catch(() => {});
     }
     pendingBellSound = false;
@@ -7037,15 +7041,7 @@ function restoreActiveSessionUI() {
     bgMusicPlayer.currentTime = 0;
     bgMusicPlayer.loop = true;
     bgMusicPlayer.volume = 0.5;
-    
-      // FIX: Add this to ensure looping works after background/restore
-  bgMusicPlayer.addEventListener('ended', function() {
-    if (sessionActive) {
-      this.currentTime = 0;
-      this.play().catch(e => console.log('Loop play error:', e));
-    }
-  });
-  
+      
     backgroundAudio = bgMusicPlayer;
     if (backgroundAudio) {
       const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
@@ -7059,6 +7055,7 @@ function restoreActiveSessionUI() {
           }
           // Only play if backgroundAudio exists and has play function
           if (backgroundAudio && typeof backgroundAudio.play === 'function') {
+		    backgroundAudio.loop = true;
             await backgroundAudio.play();
           }
         } catch (e) {
@@ -8767,6 +8764,16 @@ if (document.getElementById('music-toggle').checked) {
   bgMusicPlayer.currentTime = 0;
   bgMusicPlayer.loop = true;
   bgMusicPlayer.volume = 0.5;
+  
+    // ---- ADD THIS CHECK RIGHT HERE ----
+  const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  if (isMobile) {
+    bgMusicPlayer.addEventListener('ended', function () {
+      this.currentTime = 0;
+      this.play();
+    });
+  }
+  
   try {
     await bgMusicPlayer.play();
     startMeditationSelfHeal();             
