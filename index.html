@@ -4671,21 +4671,27 @@ function tryResumeAudio(e) {
   }
 
   // --- MOBILE LOOP FIX ---
-  if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-    const bgMusicPlayer = document.getElementById('bg-music-player');
-    if (bgMusicPlayer) {
-      bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
-      bgMusicPlayer.loop = true;
-      bgMusicPlayer.currentTime = 0;
-      bgMusicPlayer.volume = 0.5;
-      bgMusicPlayer.load();
-      bgMusicPlayer.play().catch(()=>{});
+if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
+  const bgMusicPlayer = document.getElementById('bg-music-player');
+  if (bgMusicPlayer) {
+    bgMusicPlayer.loop = true; // Always enforce looping
+
+    // Only reset/play if audio is paused or ended (not already playing)
+    if (bgMusicPlayer.paused) {
+      // Mobile fix: do NOT reset currentTime or override src/volume unless needed
+      bgMusicPlayer.play().catch(() => {});
+    }
+
+    // Extra: Only add the ended handler once!
+    if (!bgMusicPlayer.hasLoopHandler) {
       bgMusicPlayer.addEventListener('ended', function () {
         this.currentTime = 0;
         this.play();
       });
+      bgMusicPlayer.hasLoopHandler = true; // Custom property to avoid duplicate listeners
     }
   }
+}
   
   // --- PRIME THE BELL AUDIO, BUT KEEP IT SILENT DURING PRIMING ---
   const bell = document.getElementById('bell');
