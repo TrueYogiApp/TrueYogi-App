@@ -4674,21 +4674,33 @@ function tryResumeAudio(e) {
 if (/Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent)) {
   const bgMusicPlayer = document.getElementById('bg-music-player');
   if (bgMusicPlayer) {
-    bgMusicPlayer.loop = true; // Always enforce looping
-
-    // Only reset/play if audio is paused or ended (not already playing)
-    if (bgMusicPlayer.paused) {
-      // Mobile fix: do NOT reset currentTime or override src/volume unless needed
-      bgMusicPlayer.play().catch(() => {});
-    }
-
-    // Extra: Only add the ended handler once!
+    bgMusicPlayer.loop = true;
     if (!bgMusicPlayer.hasLoopHandler) {
       bgMusicPlayer.addEventListener('ended', function () {
+        // Workaround: remove and re-add to force mobile to start again
+        this.pause();
         this.currentTime = 0;
-        this.play();
+        let playPromise = this.play();
+        if (playPromise !== undefined) {
+          playPromise.catch(() => {
+            // Absolute workaround: replace node
+            let parent = this.parentNode;
+            parent.removeChild(this);
+            let newAudio = document.createElement('audio');
+            newAudio.id = 'bg-music-player';
+            newAudio.src = this.src;
+            newAudio.loop = true;
+            newAudio.volume = this.volume;
+            parent.appendChild(newAudio);
+            newAudio.play();
+          });
+        }
       });
-      bgMusicPlayer.hasLoopHandler = true; // Custom property to avoid duplicate listeners
+      bgMusicPlayer.hasLoopHandler = true;
+    }
+    // Only call .play() if paused
+    if (bgMusicPlayer.paused) {
+      bgMusicPlayer.play().catch(() => {});
     }
   }
 }
