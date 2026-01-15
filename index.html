@@ -5856,7 +5856,7 @@ if (musicChoiceEl) {
             if (currentMode === 'yogi') {
               const sessionDate = new Date(startTime).toDateString();
               const sessionTimeStr = currentSessionTime || new Date(startTime).toTimeString().split(' ')[0].slice(0, 5);
-              challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
+              challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)),completed: true });
               challengeData.totalSessions++;
               challengeData.totalMinutes += actualMinutes;
               challengeData.lastSessionDate = sessionDate;
@@ -7804,7 +7804,8 @@ function completeExpiredSessionIfNeeded() {
       challengeData.sessionsCompleted.push({
         time: sessionTime,
         duration: duration,
-        date: today
+        date: today,
+		completed: true
       });
 
       // Update other stats if needed
@@ -8970,7 +8971,8 @@ function updateTimer() {
         challengeData.sessionsCompleted.push({ 
           time: sessionTimeStr, 
           duration: targetDuration, 
-          date: sessionDay
+          date: sessionDay,
+		  completed: true
         });
         challengeData.totalSessions++;
         challengeData.totalMinutes += actualMinutes;
@@ -9436,7 +9438,8 @@ function checkDayReset() {
   }
 
   // ========== FIX #2: Check TODAY's sessions + CAP streak ==========
-  const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
+  const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr && s.completed).length;
+
   if (
     today >= startDate &&
     todaySessions === challengeData.requiredSessions &&
@@ -10757,7 +10760,7 @@ document.addEventListener('visibilitychange', async function() {
           if (currentMode === 'yogi') {
             const sessionDate = new Date(startTime).toDateString();
             const sessionTimeStr = currentSessionTime || new Date(startTime).toTimeString().split(' ')[0].slice(0, 5);
-            challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
+            challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)), completed: true });
             challengeData.totalSessions++;
             challengeData.totalMinutes += actualMinutes;
             challengeData.lastSessionDate = sessionDate;
