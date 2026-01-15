@@ -5029,18 +5029,24 @@ function syncOfflineChallengeToServer() {
   
   const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
   if (!challenge.startDate) return;
-
+  
+  // Generate challengeId if missing
+  if (!challenge.challengeId) {
+    challenge.challengeId = `${challenge.startDate}_${challenge.endDate}_${challenge.requiredSessions || 1}s_${challenge.totalMinutes || 30}md_${Date.now()}`;
+    localStorage.setItem('yogiChallenge', JSON.stringify(challenge));
+  }
+  
   const lastPageRefresh = localStorage.getItem('lastPageRefresh') || null;
   
   // Get human-readable format
-	let lastPageRefreshHuman = null;
-	if (lastPageRefresh) {
-	  lastPageRefreshHuman = new Date(parseInt(lastPageRefresh)).toISOString(); // or toLocaleString() for local timezone
-	}
-	
+  let lastPageRefreshHuman = null;
+  if (lastPageRefresh) {
+    lastPageRefreshHuman = new Date(parseInt(lastPageRefresh)).toISOString();
+  }
+  
   const payload = {
     om_user_id: localStorage.getItem('omUserId'),
-    challenge_id: challenge.challengeId,
+    challenge_id: challenge.challengeId, // Now it's guaranteed to exist
     start_date: challenge.startDate,
     end_date: challenge.endDate,
     current_day: challenge.currentDay || 1,
@@ -5051,9 +5057,9 @@ function syncOfflineChallengeToServer() {
     total_minutes: challenge.totalMinutes || 0,
     device_type: getDeviceType?.() || 'unknown',
     user_agent: navigator.userAgent,
-	reset_count: challenge.resetCount || 0,
-	last_page_refresh: lastPageRefresh,
-	last_page_refresh_human: lastPageRefreshHuman
+    reset_count: challenge.resetCount || 0,
+    last_page_refresh: lastPageRefresh,
+    last_page_refresh_human: lastPageRefreshHuman
   };
 
   fetch('https://trueyogi-backend-knkq.onrender.com/api/offline_challenge', {
