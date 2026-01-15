@@ -4655,7 +4655,19 @@ function enableMobileAudioResume() {
   });
 }
 
+function checkAndFixAudioVolume() {
+  const audios = document.querySelectorAll('audio');
+  audios.forEach(audio => {
+    if (audio.volume === 0 || audio.muted) {
+      console.log('Fixing muted/zero volume audio:', audio.id);
+      audio.volume = 1.0;
+      audio.muted = false;
+    }
+  });
+}
+
 function tryResumeAudio(e) {
+  checkAndFixAudioVolume();
   // Resume context if needed
   if (window.audioContext && window.audioContext.state === 'suspended') {
     window.audioContext.resume().then(() => {
