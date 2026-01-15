@@ -8409,18 +8409,7 @@ if (
   return;
 }
 
-    // Day-21 wallet check (only in Yogi mode)
-  if (
-    currentMode === 'yogi' &&
-    challengeData.currentDay >= 22 &&
-    (!window.walletPublicKey || !localStorage.getItem('jwtToken'))
-  ) {
-    // Show the modal and block session start
-    document.getElementById('wallet-required-modal').classList.remove('hidden');
-    return;
-  }
-  
-  // Day-21 device check (only in Yogi mode)
+// Day-21 device check (only in Yogi mode)
 if (
   currentMode === 'yogi' &&
   challengeData.currentDay >= 22 &&
@@ -8428,6 +8417,17 @@ if (
 ) {
   // Show modal and block session start
   showMobileRequiredModal();
+  return;
+}
+
+// Day-21 wallet check (only in Yogi mode, **ONLY on mobile**)
+if (
+  currentMode === 'yogi' &&
+  challengeData.currentDay >= 22 &&
+  isMobile() &&       // added (only mobile devices)
+  (!window.walletPublicKey || !localStorage.getItem('jwtToken'))
+) {
+  document.getElementById('wallet-required-modal').classList.remove('hidden');
   return;
 }
 
