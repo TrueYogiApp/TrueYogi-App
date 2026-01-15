@@ -11220,11 +11220,18 @@ document.querySelector('#spaceship-challenge-streak-container .text-gray-400').t
 
 document.getElementById('live-meditators-tooltip-text').textContent = t('liveMeditatorsTooltip');  
 
-const daysProgressLost = challengeData ? (challengeData.currentDay || 0) : 0;
+// Figure out if offline (cap at 21) or full access (cap at 41)
+const isOfflineUser = !window.walletPublicKey || !localStorage.getItem('jwtToken');
+const maxAllowedDays = isOfflineUser ? 21 : 41;
+
+const rawCurrentDay = challengeData ? (challengeData.currentDay || 0) : 0;
+const cappedCurrentDay = Math.min(rawCurrentDay, maxAllowedDays);
+const daysProgressLost = Math.max(0, cappedCurrentDay);
 const streakDaysLost = challengeData ? (challengeData.streakDays || 0) : 0;
 const totalSessionsLost = challengeData ? (challengeData.totalSessions || 0) : 0;
 document.getElementById('progress-loss-warning').querySelector('p').textContent = t('progressLossWarning');
-document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(1)').innerHTML = '• ' + t('progressLossDays', { n: daysProgressLost });
+document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(1)').innerHTML =
+  '• ' + t('progressLossDays', { n: daysProgressLost });
 document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(2)').innerHTML = '• ' + t('progressLossStreak', { n: streakDaysLost });
 document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(3)').innerHTML = '• ' + t('progressLossSessions', { n: totalSessionsLost });
 document.querySelector('#extra-confirmation p').textContent = t('typeResetConfirmation');
