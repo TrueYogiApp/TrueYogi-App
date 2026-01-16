@@ -8978,6 +8978,7 @@ function updateTimer() {
         challengeData.totalMinutes += actualMinutes;
         challengeData.lastSessionDate = sessionDate;
         saveChallengeData();
+        syncOfflineChallengeToServer();
         // Immediately update Yogi stats display
         document.getElementById('yogi-total-sessions').textContent = challengeData.totalSessions;
         document.getElementById('yogi-total-minutes').textContent = challengeData.totalMinutes;
@@ -9191,7 +9192,6 @@ function saveSession(minutes, sessionTime) {
   challengeData.challenge_source = window.location.origin; 
   localStorage.setItem('yogiChallenge', JSON.stringify(challengeData));
   updateProgressDisplay();
-  syncOfflineChallengeToServer();
   
   // Also update the stats display immediately
   if (currentMode === 'yogi') {
