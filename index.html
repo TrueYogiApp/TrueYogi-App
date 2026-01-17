@@ -5856,7 +5856,7 @@ if (musicChoiceEl) {
             if (currentMode === 'yogi') {
               const sessionDate = new Date(startTime).toDateString();
               const sessionTimeStr = currentSessionTime || new Date(startTime).toTimeString().split(' ')[0].slice(0, 5);
-              challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)),completed: true });
+              challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
               challengeData.totalSessions++;
               challengeData.totalMinutes += actualMinutes;
               challengeData.lastSessionDate = sessionDate;
@@ -7804,8 +7804,7 @@ function completeExpiredSessionIfNeeded() {
       challengeData.sessionsCompleted.push({
         time: sessionTime,
         duration: duration,
-        date: today,
-		completed: true
+        date: today
       });
 
       // Update other stats if needed
@@ -8971,8 +8970,7 @@ function updateTimer() {
         challengeData.sessionsCompleted.push({ 
           time: sessionTimeStr, 
           duration: targetDuration, 
-          date: sessionDay,
-		  completed: true
+          date: sessionDay
         });
         challengeData.totalSessions++;
         challengeData.totalMinutes += actualMinutes;
@@ -8983,6 +8981,7 @@ function updateTimer() {
         document.getElementById('yogi-total-sessions').textContent = challengeData.totalSessions;
         document.getElementById('yogi-total-minutes').textContent = challengeData.totalMinutes;
         document.getElementById('current-streak').textContent = challengeData.streakDays;
+		checkDayReset();
       }
     }
 
@@ -9038,7 +9037,6 @@ function isSyncAuthBannerVisible() {
   updateHideUiBtnVisibility();
   updateSessionTimesDisplay();
   updateStats();
-  checkDayReset();
 
   // Check for challenge completion (last session of last day)
   let showCongrats = false;
@@ -9437,35 +9435,36 @@ function checkDayReset() {
     }
   }
 
-// ========== FIX #2: Check TODAY's sessions + CAP streak ==========
-
-const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr && s.completed).length;
-
-if (
-  today >= startDate &&
-  todaySessions >= challengeData.requiredSessions && // All sessions must be completed
-  todaySessions === challengeData.requiredSessions && // Strict check for equality to prevent over-counting
-  challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
-) {
-  // ============ WALLET/JWT CHECK FOR INCREMENT ============
-  const currentMode = localStorage.getItem('currentMode') || 'yogi';
-  const isBlocked = currentMode === 'yogi' &&
-                    challengeData.currentDay >= 22 && 
-                    (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
-
-  const hasCompletedChallenge = currentMode === 'yogi' &&
-                                challengeData.currentDay >= 41 &&
-                                window.walletPublicKey &&
-                                localStorage.getItem('jwtToken');
-
-  if (!isBlocked || hasCompletedChallenge) {
-    // CAP streak at currentDay to prevent streak > currentDay
-    if (challengeData.streakDays < challengeData.currentDay) {
-      challengeData.streakDays++;
+  // ========== FIX #2: Check TODAY's sessions + CAP streak ==========
+  const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
+  if (
+    today >= startDate &&
+    todaySessions >= challengeData.requiredSessions &&
+    challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
+  ) {
+    // ============ WALLET/JWT CHECK FOR INCREMENT TOO ============
+    // Don't increment streak if user is blocked from continuing
+    const currentMode = localStorage.getItem('currentMode') || 'yogi';
+    const isBlocked = currentMode === 'yogi' && 
+                      challengeData.currentDay >= 22 && 
+                      (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
+    
+    if (!isBlocked) {
+      // CAP streak at currentDay to prevent streak > currentDay
+      if (challengeData.streakDays < challengeData.currentDay) {
+        challengeData.streakDays++;
+      }
+      challengeData.lastSessionDate = todayStr;
+      saveChallengeData();
+      updateProgressDisplay && updateProgressDisplay();
     }
-    challengeData.lastSessionDate = todayStr;
+  }
+
+  // ========== ADDITIONAL SAFEGUARD ==========
+  // Ensure streak never exceeds currentDay (in case of data corruption)
+  if (challengeData.streakDays > challengeData.currentDay) {
+    challengeData.streakDays = challengeData.currentDay;
     saveChallengeData();
-    updateProgressDisplay && updateProgressDisplay();
   }
 }
 
@@ -10761,7 +10760,7 @@ document.addEventListener('visibilitychange', async function() {
           if (currentMode === 'yogi') {
             const sessionDate = new Date(startTime).toDateString();
             const sessionTimeStr = currentSessionTime || new Date(startTime).toTimeString().split(' ')[0].slice(0, 5);
-            challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)), completed: true });
+            challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
             challengeData.totalSessions++;
             challengeData.totalMinutes += actualMinutes;
             challengeData.lastSessionDate = sessionDate;
