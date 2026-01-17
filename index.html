@@ -15526,101 +15526,119 @@ async function showZonePopup(zone, x, y) {
   const omPresenceId = localStorage.getItem('omPresenceId');
   const isUserActive = !!omPresenceId;
 
-  // Get user's country info
-  const userCountryInfo = await getUserCountryInfo();
-  const isUsersCountry = (zone.zone === userCountryInfo.country);
+  // --- Prefer live presence country (most accurate) ---
+  let myPresenceRow = livePresenceRows.find(row => row.id == omPresenceId);
+  let userCountry = myPresenceRow && myPresenceRow.country ? myPresenceRow.country : null;
 
-  // Set svgClass FIRST!
-  let svgClass = '';
-  if (isUserActive) {
-    svgClass = 'rainbow';
+  // Fallback to geo lookup only if not present in live presence
+  if (!userCountry) {
+    const userCountryInfo = await getUserCountryInfo();
+    userCountry = userCountryInfo.country;
   }
-
-  // NOW create svgImg using the class
-  const svgImg = `
-  <span style="min-width:33px;min-height:33px;display:inline-flex;align-items:center;justify-content:center;">
-    <img id="omusers-svg" class="${svgClass}" src="assets/omusers.svg"
-      style="width:33px;height:33px;vertical-align:middle;display:inline-block;">
-  </span>
-`;
 
   // Find all users in this zone
   let usersInZone = livePresenceRows.filter(row => row.country === zone.zone);
 
-  // Calculate total duration for all users in this zone
-let totalSeconds = usersInZone.reduce((sum, u) => {
-  if (u.joined_at) {
-    const start = new Date(u.joined_at);
-    const end = Date.now(); // current time in ms
-    if (!isNaN(start.getTime())) {
-      return sum + ((end - start.getTime()) / 1000);
-    }
+  // Prefer accurate display name:
+  // - If zone.zone is not "Unknown", use that
+  // - Else, use usersInZone[0].country if users exist
+  // - Else, fallback to "Unknown"
+  let displayCountry;
+  if (zone.zone && zone.zone !== 'Unknown') {
+    displayCountry = getDisplayCountryName(zone.zone);
+  } else if (usersInZone.length > 0 && usersInZone[0].country && usersInZone[0].country !== 'Unknown') {
+    displayCountry = getDisplayCountryName(usersInZone[0].country);
+  } else if (userCountry && userCountry !== 'Unknown') {
+    displayCountry = getDisplayCountryName(userCountry);
+  } else {
+    displayCountry = "Unknown";
   }
-  return sum;
-}, 0);
+
+  // Set svgClass if user is active
+  let svgClass = isUserActive ? 'rainbow' : '';
+
+  // SVG image
+  const svgImg = `
+    <span style="min-width:33px;min-height:33px;display:inline-flex;align-items:center;justify-content:center;">
+      <img id="omusers-svg" class="${svgClass}" src="assets/omusers.svg"
+        style="width:33px;height:33px;vertical-align:middle;display:inline-block;">
+    </span>
+  `;
+
+  // Calculate total duration for all users in this zone
+  let totalSeconds = usersInZone.reduce((sum, u) => {
+    if (u.joined_at) {
+      const start = new Date(u.joined_at);
+      const end = Date.now();
+      if (!isNaN(start.getTime())) {
+        return sum + ((end - start.getTime()) / 1000);
+      }
+    }
+    return sum;
+  }, 0);
   const totalDurationText = formatTotalDuration(totalSeconds);
 
-  // Always show total count
+  // Always show total count if present
+  let showCount = zone.count !== null && zone.count !== undefined && zone.count > 0;
   let countText = `${zone.count}`;
 
   // Popup HTML
-const popup = document.createElement('div');
-popup.classList.add('earthzone-popup'); 
-let showCount = zone.count !== null && zone.count !== undefined && zone.count > 0;
-popup.innerHTML = `
-<div style="
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-  max-width: 98vw;
-  overflow: auto;
-  font-size: 0.91em;
-">
-  ${showCount ? `<span>${countText}</span>` : ''}
-  <span style="min-width:33px;min-height:33px;display:inline-flex;align-items:center;justify-content:center;">
-    ${svgImg}
-  </span>
-  <span>${getDisplayCountryName(zone.zone)}</span>
-  ${
-    showCount && totalDurationText
-      ? `<span style="font-weight:600;color:#ffe066;display: flex; align-items: center;max-width:80vw;overflow:hidden;text-overflow:ellipsis;">
-            <img src="/assets/clockchakra.svg" class="chakra-rotate" style="width:18px; height:18px; margin-right:5px;">
-            ${totalDurationText.replace(/[()]/g, '')}
-         </span>`
-      : ''
-  }
-</div>
-`;
-  popup.style.cssText = `
-    position: fixed;
-    left: ${x}px; top: ${y}px;
-    transform: translate(-50%, -120%);
-    background: rgba(0,0,0,0.75);
-    color: #fde68a;
-    font-size: 0.85rem;
-    padding: 6px 10px;
-    border-radius: 6px;
-    box-shadow: 0 0 8px #fde68a66;
-    pointer-events: auto;
-    opacity: 0;
-    transition: opacity 0.4s ease;
-    z-index: 10000;
-    white-space: nowrap;
+  const popup = document.createElement('div');
+  popup.classList.add('earthzone-popup');
+  popup.innerHTML = `
+  <div style="
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-wrap: wrap;
+    max-width: 98vw;
+    overflow: auto;
+    font-size: 0.91em;
+  ">
+    ${showCount ? `<span>${countText}</span>` : ''}
+    <span style="min-width:33px;min-height:33px;display:inline-flex;align-items:center;justify-content:center;">
+      ${svgImg}
+    </span>
+    <span>${displayCountry}</span>
+    ${
+      showCount && totalDurationText
+        ? `<span style="font-weight:600;color:#ffe066;display: flex; align-items: center;max-width:80vw;overflow:hidden;text-overflow:ellipsis;">
+              <img src="/assets/clockchakra.svg" class="chakra-rotate" style="width:18px; height:18px; margin-right:5px;">
+              ${totalDurationText.replace(/[()]/g, '')}
+           </span>`
+        : ''
+    }
+  </div>
   `;
+  popup.style.cssText = `
+      position: fixed;
+      left: ${x}px; top: ${y}px;
+      transform: translate(-50%, -120%);
+      background: rgba(0,0,0,0.75);
+      color: #fde68a;
+      font-size: 0.85rem;
+      padding: 6px 10px;
+      border-radius: 6px;
+      box-shadow: 0 0 8px #fde68a66;
+      pointer-events: auto;
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      z-index: 10000;
+      white-space: nowrap;
+    `;
   document.body.appendChild(popup);
-  
+
   // Attach event to SVG icon in popup
-const svgIcon = popup.querySelector('#omusers-svg');
-if (svgIcon) {
-  svgIcon.style.cursor = "pointer";
-  svgIcon.onpointerenter = function(e) {
-    showUserListPopup(usersInZone, popup, x, y);
-  };
-  svgIcon.onclick = function(e) {
-    showUserListPopup(usersInZone, popup, x, y);
-  };
-}
+  const svgIcon = popup.querySelector('#omusers-svg');
+  if (svgIcon) {
+    svgIcon.style.cursor = "pointer";
+    svgIcon.onpointerenter = function (e) {
+      showUserListPopup(usersInZone, popup, x, y);
+    };
+    svgIcon.onclick = function (e) {
+      showUserListPopup(usersInZone, popup, x, y);
+    };
+  }
 
   setTimeout(() => popup.style.opacity = 1, 10);
   setTimeout(() => {
