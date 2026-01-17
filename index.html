@@ -9443,7 +9443,6 @@ const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === tod
 
 if (
   today >= startDate &&
-  todaySessions >= challengeData.requiredSessions && // All sessions must be completed
   todaySessions === challengeData.requiredSessions && // Strict check for equality to prevent over-counting
   challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
 ) {
