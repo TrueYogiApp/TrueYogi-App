@@ -15128,6 +15128,17 @@ setAuraColor();
   // --- OPTIMIZED: Use cached starfield ---
   renderStarfield(canvas);
 
+// --- NORMALIZE ALL COUNTRY FIELDS ---
+livePresenceRows.forEach(row => {
+    if (row.country && typeof row.country === "string") {
+        row.country = row.country.trim();
+        // Fix title case: "canada" => "Canada" - optional
+        if (row.country.length > 1)
+            row.country = row.country.charAt(0).toUpperCase() + row.country.slice(1);
+        if (row.country.toLowerCase() === "unknown") row.country = "";
+    }
+});
+
 // ---- LIVE ZONE/COUNTRY CALCULATION ----
 const countryCounts = {};
 let omPresenceId = localStorage.getItem('omPresenceId');
