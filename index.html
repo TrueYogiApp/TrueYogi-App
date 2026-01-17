@@ -9375,6 +9375,7 @@ function checkDayReset() {
       
       // ============ WALLET/JWT CHECK FOR BLOCKED USERS ============
       // Only reset streak if user is NOT blocked from continuing
+      // Get current mode - adjust based on how you store it
       const currentMode = localStorage.getItem('currentMode') || 'yogi'; 
       
       // Check if user is blocked (day >= 22, no wallet/JWT)
@@ -9382,18 +9383,11 @@ function checkDayReset() {
                         challengeData.currentDay >= 22 && 
                         (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
       
-      // ============ NEW CHECK FOR CHALLENGE COMPLETERS ============
-      // Check if user has completed 41-day challenge (has wallet & JWT)
-      const hasCompletedChallenge = currentMode === 'yogi' && 
-                                    challengeData.currentDay >= 41 &&
-                                    window.walletPublicKey && 
-                                    localStorage.getItem('jwtToken');
-      
-      // Only reset streak if: NOT blocked AND NOT a challenge completer
-      if (!isBlocked && !hasCompletedChallenge) {
+      // Only reset streak if NOT blocked
+      if (!isBlocked) {
         challengeData.streakDays = 0;
       }
-      // If blocked OR challenge completer, streak stays as is
+      // If blocked, streak stays as is (user can't continue anyway)
     }
 
     challengeData.currentDay = Math.min(diffDays, 41);
@@ -9403,6 +9397,7 @@ function checkDayReset() {
   updateSessionTimesDisplay();
 
   // ========== FIX #1: Check YESTERDAY's completed sessions first ==========
+  // This handles the case where user completed yesterday but closed app
   const yesterday = new Date(today);
   yesterday.setDate(today.getDate() - 1);
   const yesterdayStr = getLocalDateString(yesterday);
@@ -9414,20 +9409,14 @@ function checkDayReset() {
     challengeData.lastSessionDate !== yesterdayStr && // Not already counted
     challengeData.lastSessionDate !== todayStr // Not counted today already
   ) {
-    // ============ WALLET/JWT CHECK FOR INCREMENT ============
+    // ============ WALLET/JWT CHECK FOR INCREMENT TOO ============
+    // Don't increment streak if user is blocked from continuing
     const currentMode = localStorage.getItem('currentMode') || 'yogi';
     const isBlocked = currentMode === 'yogi' && 
                       challengeData.currentDay >= 22 && 
                       (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
     
-    // ============ NEW: ALLOW INCREMENT FOR CHALLENGE COMPLETERS ============
-    const hasCompletedChallenge = currentMode === 'yogi' && 
-                                  challengeData.currentDay >= 41 &&
-                                  window.walletPublicKey && 
-                                  localStorage.getItem('jwtToken');
-    
-    // Increment if: NOT blocked OR is a challenge completer
-    if (!isBlocked || hasCompletedChallenge) {
+    if (!isBlocked) {
       challengeData.streakDays++;
       challengeData.lastSessionDate = yesterdayStr;
       saveChallengeData();
@@ -9459,14 +9448,6 @@ function checkDayReset() {
       updateProgressDisplay && updateProgressDisplay();
     }
   }
-
-  // ========== ADDITIONAL SAFEGUARD ==========
-  // Ensure streak never exceeds currentDay (in case of data corruption)
-  if (challengeData.streakDays > challengeData.currentDay) {
-    challengeData.streakDays = challengeData.currentDay;
-    saveChallengeData();
-  }
-}
 
   // ========== ADDITIONAL SAFEGUARD ==========
   // Ensure streak never exceeds currentDay (in case of data corruption)
