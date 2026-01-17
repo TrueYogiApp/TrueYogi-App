@@ -9428,7 +9428,7 @@ function checkDayReset() {
   const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
   if (
     today >= startDate &&
-    todaySessions >= challengeData.requiredSessions &&
+    todaySessions === challengeData.requiredSessions &&
     challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
   ) {
     // ============ WALLET/JWT CHECK FOR INCREMENT TOO ============
