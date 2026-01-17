@@ -9800,23 +9800,6 @@ streakCountElem.addEventListener('click', (e) => {
     totalMinutes += h.totalMinutes || 0;
   });
 
-function modeIcon(h) {
-  // Spaceship mode
-  if (h.mode === "spaceship") {
-    return '<span title="Spaceship" style="font-size:1.3em;">🛸</span>';
-  }
-  // Offline mode (no wallet/jwt or explicit property)
-  if ((!h.walletPublicKey && !h.jwtToken) || h.mode === "offline") {
-    return '<span title="Offline" style="font-size:1.3em;">📶</span>';
-  }
-  // Online mode (has wallet/jwt, not spaceship)
-  if (h.walletPublicKey && h.jwtToken) {
-    return '<span title="Online" style="font-size:1.3em;">💳</span>';
-  }
-  // Default: yogi mode (fallback)
-  return '<span title="Yogi" style="font-size:1.3em;">🧘</span>';
-}
-
 function shortDate(d) {
   if (!d) return "-";
   // If ISO string (has "T"), just take the date portion before "T"
@@ -9828,12 +9811,11 @@ function shortDate(d) {
 }	
 let rows = history.map((h, i) =>
   `<tr>
-    <td class="pr-2 w-[8%] whitespace-nowrap">${i + 1}.</td>
-    <td class="w-[22%] whitespace-nowrap">${h.startDate ? shortDate(h.startDate) : '-'}</td>
-    <td class="w-[22%] whitespace-nowrap">${h.endDate ? shortDate(h.endDate) : '-'}</td>
-    <td class="text-right w-[12%] whitespace-nowrap">${h.totalSessions || 0}</td>
-    <td class="text-right w-[12%] whitespace-nowrap">${h.totalMinutes || 0}</td>
-    <td class="text-center w-[12%] whitespace-nowrap">${modeIcon(h)}</td>
+    <td class="pr-2 w-[10%] whitespace-nowrap">${i + 1}.</td>
+    <td class="w-[35%] whitespace-nowrap">${h.startDate ? shortDate(h.startDate) : '-'}</td>
+    <td class="w-[35%] whitespace-nowrap">${h.endDate ? shortDate(h.endDate) : '-'}</td>
+    <td class="text-right w-[10%] whitespace-nowrap">${h.totalSessions || 0}</td>
+    <td class="text-right w-[10%] whitespace-nowrap">${h.totalMinutes || 0}</td>
   </tr>`
 ).join('');
 
@@ -9852,7 +9834,6 @@ modal.innerHTML = `
           <th class="whitespace-nowrap" style="color:yellow">${t('challenge_history_end')}</th>
           <th class="whitespace-nowrap" style="color:green">${t('challenge_history_sessions')}</th>
           <th class="whitespace-nowrap" style="color:blue">${t('challenge_history_minutes')}</th>
-		  <th class="whitespace-nowrap" style="color:purple"></th>
         </tr>
       </thead>
       <tbody>${rows}</tbody>
