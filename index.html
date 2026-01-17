@@ -13521,7 +13521,6 @@ function formatDurationGrid(seconds) {
   return `${secs}s`;
 }
 
-
 async function showCountryStatsOnEarthGrid() {
   const stats = await fetchCountryStats();
   const statsLabel = document.getElementById('gridStatsLabel');
@@ -13857,8 +13856,11 @@ async function showCountryUserListPopup(country, x, y) {
     max-height: 320px;
     overflow-y: auto;
     text-align: left;
+	  /* Scrollbar styling */
+  scrollbar-width: thin;
+  scrollbar-color: #fde68a #000000;
   `;
-
+  
 const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
 const currentUserId = localStorage.getItem('omUserId');
 
@@ -14540,7 +14542,7 @@ if (userIds.length === 0) {
     const row = userRows[id];
     const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
 
-    // Only top duration keeper sees call icon for other live users, currentUserId === longestDurationUserId &&
+    // Only top duration keeper sees call icon for other live users
     let callIcon = '';
     if (
       canStartCall &&
@@ -14907,7 +14909,7 @@ userIdDisplay.onclick = async function(e) {
     // -- Countdown until next heartbeat
     const timeLeftMs = nextHeartbeatDate - now;
     if (timeLeftMs < 0) {
-      nextCountdownText = "OM now!";
+      nextCountdownText = "Due now!";
     } else {
       const minsLeft = Math.floor(timeLeftMs / 60000);
       const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
@@ -14922,14 +14924,14 @@ userIdDisplay.onclick = async function(e) {
 
   // Remove any existing popup
   const oldPopup = document.getElementById('current-user-mins-popup');
-if (oldPopup) oldPopup.remove();
+  if (oldPopup) oldPopup.remove();
 
 // Check broadcast permission BEFORE creating popup
 const canBroadcast = await canUserBroadcast();
 
-// Build your popup with heartbeat warning color and countdown
-const popup = document.createElement('div');
-popup.id = 'current-user-mins-popup';
+  // Build your popup with heartbeat warning color and countdown
+  const popup = document.createElement('div');
+  popup.id = 'current-user-mins-popup';
 popup.innerHTML = `
   <div style="font-size:1.2em;font-weight:800;color:#ffd700;margin-bottom:5px;letter-spacing:1px;text-align:center;">
     ${duration} <span style="font-size:0.7em;font-weight:normal;opacity:0.9;">connected</span>
@@ -14958,24 +14960,24 @@ popup.innerHTML = `
   </div>
   <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
   <div style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;">
-    <span style="font-size:1em;color:#ffe066;line-height:1.4;text-align:center;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">
-        <span style="font-weight:600;opacity:0.9;color:#ffeb99;">Next pulse:</span>
-        <b style="color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.4);">${nextHeartbeatStr || 'Unknown'}</b>
-      </div>
-      <div id="hb-countdown" style="font-size:0.95em;color:#ffd700;font-weight:700;letter-spacing:0.5px;
-                    background:rgba(255,215,0,0.1);padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.2);">
-        ${nextCountdownText}
-      </div>
-    </span>
+<span style="font-size:1em;color:#ffe066;line-height:1.4;text-align:center;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">
+    <span style="font-weight:600;opacity:0.9;color:#ffeb99;">Next pulse:</span>
+    <b style="color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.4);">${nextHeartbeatStr || 'Unknown'}</b>
   </div>
-  ${missedHeartbeat 
-    ? `<div style="margin-top:14px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:6px;font-size:1.02em;color:#ff6b6b;font-weight:bold;text-align:center;border:1px solid rgba(255,68,68,0.3);">
-          Pulse missed! 
-          <span style="color:#ffd700;font-weight:bold;text-shadow:0 0 8px #ffd700;animation:om-glow 2s infinite alternate;">OM</span> again.
-       </div>`
-    : ''
-  }
+  <div id="hb-countdown" style="font-size:0.95em;color:#ffd700;font-weight:700;letter-spacing:0.5px;
+                background:rgba(255,215,0,0.1);padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.2);">
+    ${nextCountdownText}
+  </div>
+</span>
+  </div>
+${missedHeartbeat 
+  ? `<div style="margin-top:14px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:6px;font-size:1.02em;color:#ff6b6b;font-weight:bold;text-align:center;border:1px solid rgba(255,68,68,0.3);">
+        Pulse missed! 
+        <span style="color:#ffd700;font-weight:bold;text-shadow:0 0 8px #ffd700;animation:om-glow 2s infinite alternate;">OM</span> again.
+     </div>`
+  : ''
+}
 `;
   popup.style.cssText = `
     position: fixed;
@@ -15112,7 +15114,7 @@ setAuraColor();
   setTimeout(() => container.style.opacity = 1, 10);
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-   // --- OPTIMIZED: Use cached starfield ---
+  // --- OPTIMIZED: Use cached starfield ---
   renderStarfield(canvas);
 
 // ---- LIVE ZONE/COUNTRY CALCULATION ----
@@ -15735,7 +15737,7 @@ function startCallPolling() {
       }
 
       lastCallId = call.id;
-
+	  
 	  stopAllAudio();
       showWherebyParticipantDialog(call.whereby_participant_url, call.id);
 
