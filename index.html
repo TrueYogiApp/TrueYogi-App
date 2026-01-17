@@ -9811,11 +9811,12 @@ function shortDate(d) {
 }	
 let rows = history.map((h, i) =>
   `<tr>
-    <td class="pr-2 w-[10%] whitespace-nowrap">${i + 1}.</td>
-    <td class="w-[35%] whitespace-nowrap">${h.startDate ? shortDate(h.startDate) : '-'}</td>
-    <td class="w-[35%] whitespace-nowrap">${h.endDate ? shortDate(h.endDate) : '-'}</td>
-    <td class="text-right w-[10%] whitespace-nowrap">${h.totalSessions || 0}</td>
-    <td class="text-right w-[10%] whitespace-nowrap">${h.totalMinutes || 0}</td>
+    <td class="pr-2 w-[8%] whitespace-nowrap">${i + 1}.</td>
+    <td class="w-[22%] whitespace-nowrap">${h.startDate ? shortDate(h.startDate) : '-'}</td>
+    <td class="w-[8%] text-center whitespace-nowrap">${h.mode === "spaceship" ? "🛸" : ""}</td>
+    <td class="w-[22%] whitespace-nowrap">${h.endDate ? shortDate(h.endDate) : '-'}</td>
+    <td class="text-right w-[12%] whitespace-nowrap">${h.totalSessions || 0}</td>
+    <td class="text-right w-[12%] whitespace-nowrap">${h.totalMinutes || 0}</td>
   </tr>`
 ).join('');
 
@@ -9827,15 +9828,16 @@ modal.innerHTML = `
   <hr style="height:3px; background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); border:none; margin-bottom:10px;" />
   <div class="overflow-x-auto">
     <table style="min-width:420px; width:100%;">
-      <thead>
-        <tr>
-          <th class="whitespace-nowrap" style="color:red"></th>
-          <th class="whitespace-nowrap" style="color:orange">${t('challenge_history_start')}</th>
-          <th class="whitespace-nowrap" style="color:yellow">${t('challenge_history_end')}</th>
-          <th class="whitespace-nowrap" style="color:green">${t('challenge_history_sessions')}</th>
-          <th class="whitespace-nowrap" style="color:blue">${t('challenge_history_minutes')}</th>
-        </tr>
-      </thead>
+	<thead>
+	  <tr>
+		<th class="pr-2 w-[8%] whitespace-nowrap"></th>
+		<th class="w-[22%] whitespace-nowrap">${t('challenge_history_start')}</th>
+		<th class="w-[8%] text-center whitespace-nowrap"></th>
+		<th class="w-[22%] whitespace-nowrap">${t('challenge_history_end')}</th>
+		<th class="text-right w-[12%] whitespace-nowrap">${t('challenge_history_sessions')}</th>
+		<th class="text-right w-[12%] whitespace-nowrap">${t('challenge_history_minutes')}</th>
+	  </tr>
+	</thead>
       <tbody>${rows}</tbody>
     </table>
   </div>
