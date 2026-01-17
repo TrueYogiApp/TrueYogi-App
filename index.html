@@ -13638,8 +13638,28 @@ async function fetchUserCountryStats() {
 }
 
 async function getUserCountryInfo() {
+  // 1. First try to get from the user's om_presence row (uses localStorage for id)
+  const omPresenceId = localStorage.getItem('omPresenceId');
+  if (omPresenceId && typeof supabase !== 'undefined') {
+    try {
+      let { data, error } = await supabase
+        .from('om_presence')
+        .select('country')
+        .eq('id', omPresenceId)
+        .single();
+      if (data && data.country && data.country.toLowerCase() !== 'unknown') {
+        return {
+          country: data.country,
+          countryCode: data.country.slice(0, 2).toLowerCase() // this works for many countries, or enhance as needed!
+        };
+      }
+    } catch (e) {
+      // Ignore and fallback to API
+    }
+  }
+
+  // 2. If not in DB (or error), use fallback IP API
   try {
-    // Fast, free, no API key needed
     const res = await fetch('https://ipapi.co/json/');
     const data = await res.json();
     return {
