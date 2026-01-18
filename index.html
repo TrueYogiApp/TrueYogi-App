@@ -13637,8 +13637,12 @@ async function fetchUserCountryStats() {
     .sort((a, b) => b.total_seconds - a.total_seconds);
 }
 
+let ipCountryCache = null;
+let cacheTimestamp = 0;
+const CACHE_TTL = 60 * 60 * 1000; // 1 hour cache for IP lookups
+
 async function getUserCountryInfo() {
-  // 1. DB check (same as before)
+  // 1. ALWAYS check DB first (freshest for OM users)
   const omPresenceId = localStorage.getItem('omPresenceId');
   if (omPresenceId && typeof supabase !== 'undefined') {
     try {
@@ -13648,6 +13652,10 @@ async function getUserCountryInfo() {
         .eq('id', omPresenceId)
         .single();
       if (data?.country && data.country.toLowerCase() !== 'unknown') {
+        // Clear IP cache when DB has different country
+        if (ipCountryCache && ipCountryCache.country !== data.country) {
+          ipCountryCache = null;
+        }
         return {
           country: data.country,
           countryCode: data.country.slice(0, 2).toLowerCase()
@@ -13656,7 +13664,13 @@ async function getUserCountryInfo() {
     } catch (e) {}
   }
 
-  // 2. Try FIRST IP API with timeout
+  // 2. For non-OM users: Check if cache is fresh (1 hour)
+  const now = Date.now();
+  if (ipCountryCache && (now - cacheTimestamp) < CACHE_TTL) {
+    return ipCountryCache;
+  }
+
+  // 3. Fresh IP lookup (cache expired or first time)
   try {
     const controller = new AbortController();
     setTimeout(() => controller.abort(), 3000);
@@ -13665,30 +13679,40 @@ async function getUserCountryInfo() {
       signal: controller.signal 
     });
     const data = await res.json();
-    return {
+    
+    ipCountryCache = {
       country: data.country_name,
       countryCode: data.country_code
     };
+    cacheTimestamp = now;
+    return ipCountryCache;
   } catch {
-    // 3. Try SECOND IP API (different service)
     try {
       const res = await fetch('https://ipwho.is/');
       const data = await res.json();
-      return {
+      
+      ipCountryCache = {
         country: data.country,
         countryCode: data.country_code
       };
+      cacheTimestamp = now;
+      return ipCountryCache;
     } catch {
-      // 4. Simple browser fallback
+      // 4. Browser fallback (no cache)
       const lang = navigator.language || 'en-US';
-      if (lang.includes('en-US') || lang.includes('en-CA')) {
-        return { country: "United States", countryCode: "us" };
-      }
-      if (lang.includes('en-GB')) {
-        return { country: "United Kingdom", countryCode: "gb" };
-      }
-      if (lang.includes('en-IN')) {
-        return { country: "India", countryCode: "in" };
+      const countryMap = {
+        'en-US': ['United States', 'us'],
+        'en-CA': ['Canada', 'ca'],
+        'en-GB': ['United Kingdom', 'gb'],
+        'en-IN': ['India', 'in'],
+        'en-AU': ['Australia', 'au'],
+        'fr-CA': ['Canada', 'ca']
+      };
+      
+      for (const [key, [country, code]] of Object.entries(countryMap)) {
+        if (lang.includes(key.slice(0, 2))) {
+          return { country, countryCode: code };
+        }
       }
       
       return { country: "Unknown", countryCode: "un" };
