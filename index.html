@@ -5859,7 +5859,7 @@ if (musicChoiceEl) {
               challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
               challengeData.totalSessions++;
               challengeData.totalMinutes += actualMinutes;
-              challengeData.lastSessionDate = sessionDay;
+              challengeData.lastSessionDate = sessionDate;
               saveChallengeData();
             }
 
@@ -10751,7 +10751,7 @@ document.addEventListener('visibilitychange', async function() {
             challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
             challengeData.totalSessions++;
             challengeData.totalMinutes += actualMinutes;
-            challengeData.lastSessionDate = sessionDay;
+            challengeData.lastSessionDate = sessionDate;
             saveChallengeData();
           }
 
