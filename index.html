@@ -5859,7 +5859,7 @@ if (musicChoiceEl) {
               challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
               challengeData.totalSessions++;
               challengeData.totalMinutes += actualMinutes;
-              challengeData.lastSessionDate = sessionDate;
+              challengeData.lastSessionDate = sessionDay;
               saveChallengeData();
             }
 
@@ -8974,7 +8974,7 @@ function updateTimer() {
         });
         challengeData.totalSessions++;
         challengeData.totalMinutes += actualMinutes;
-        challengeData.lastSessionDate = sessionDate;
+        challengeData.lastSessionDate = sessionDay;
         saveChallengeData();
         syncOfflineChallengeToServer();
         // Immediately update Yogi stats display
@@ -10751,7 +10751,7 @@ document.addEventListener('visibilitychange', async function() {
             challengeData.sessionsCompleted.push({ time: sessionTimeStr, duration: targetDuration, date: getLocalDateString(new Date(startTime)) });
             challengeData.totalSessions++;
             challengeData.totalMinutes += actualMinutes;
-            challengeData.lastSessionDate = sessionDate;
+            challengeData.lastSessionDate = sessionDay;
             saveChallengeData();
           }
 
