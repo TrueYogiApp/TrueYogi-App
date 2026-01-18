@@ -9144,7 +9144,7 @@ const completionDateLocal = getLocalDateString(new Date(startTime || Date.now())
 }
  
 function saveSession(minutes, sessionTime) {
- // PREVENT SESSION POLLUTION: Only save if journey wallet matches
+ // PREVENT SESSION POLLUTION: Only save if journey wallet matches.
   const journeyWallet = localStorage.getItem('currentJourneyWallet');
   const walletIsConnected = !!window.walletPublicKey;
 
