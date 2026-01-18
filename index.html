@@ -9835,12 +9835,12 @@ modal.innerHTML = `
     <table style="min-width:420px; width:100%;">
 	<thead>
 	  <tr>
-		<th class="pr-2 w-[8%] whitespace-nowrap"></th>
-		<th class="w-[22%] whitespace-nowrap">${t('challenge_history_start')}</th>
+		<th class="pr-2 w-[8%] whitespace-nowrap" style="color:red"></th>
+		<th class="w-[22%] whitespace-nowrap" style="color:orange">${t('challenge_history_start')}</th>
 		<th class="w-[8%] text-center whitespace-nowrap"></th>
-		<th class="w-[22%] whitespace-nowrap">${t('challenge_history_end')}</th>
-		<th class="text-right w-[12%] whitespace-nowrap">${t('challenge_history_sessions')}</th>
-		<th class="text-right w-[12%] whitespace-nowrap">${t('challenge_history_minutes')}</th>
+		<th class="w-[22%] whitespace-nowrap"  style="color:yellow">${t('challenge_history_end')}</th>
+		<th class="text-right w-[12%] whitespace-nowrap" style="color:green">${t('challenge_history_sessions')}</th>
+		<th class="text-right w-[12%] whitespace-nowrap" style="color:blue">${t('challenge_history_minutes')}</th>
 	  </tr>
 	</thead>
       <tbody>${rows}</tbody>
