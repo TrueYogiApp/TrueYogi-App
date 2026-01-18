@@ -9424,13 +9424,22 @@ function checkDayReset() {
     }
   }
 
-  // ========== FIX #2: Check TODAY's sessions + CAP streak ==========
-  const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
-  if (
-    today >= startDate &&
-    todaySessions === challengeData.requiredSessions &&
-    challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
-  ) {
+ // ========== FIX #2: Check TODAY's sessions + CAP streak ==========
+const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
+const todaySessionTimes = challengeData.sessionsCompleted
+  .filter(s => s.date === todayStr)
+  .map(s => s.time);
+
+// Check if ALL required session times are completed today
+const allRequiredSessionsCompleted = userSessionTimes.every(sessionTime => 
+  todaySessionTimes.includes(sessionTime.time)
+);
+
+if (
+  today >= startDate &&
+  allRequiredSessionsCompleted &&  // ✅ This will be FALSE if not all sessions are done
+  challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
+) {
     // ============ WALLET/JWT CHECK FOR INCREMENT TOO ============
     // Don't increment streak if user is blocked from continuing
     const currentMode = localStorage.getItem('currentMode') || 'yogi';
