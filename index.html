@@ -7747,6 +7747,7 @@ if (!navigator.onLine || !isActuallyOnline()) {
   }));
   saveChallengeData(); 
   updateYogiIcon(); 
+  syncOfflineChallengeToServer();
   document.getElementById('yogi-config-modal').classList.add('hidden');
   document.getElementById('app-interface').classList.remove('hidden');
   updateBackButtonVisibility();
