@@ -9429,33 +9429,35 @@ function checkDayReset() {
 
   // ========== FIX #2: Check TODAY's sessions + CAP streak ==========
   const todaySessions = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
-  if (
-    today >= startDate &&
-    todaySessions >= challengeData.requiredSessions &&
-    challengeData.lastSessionDate !== todayStr // Only increment ONCE per day
-  ) {
-    // ============ WALLET/JWT CHECK FOR INCREMENT ============
-    const currentMode = localStorage.getItem('currentMode') || 'yogi';
-    const isBlocked = currentMode === 'yogi' && 
-                      challengeData.currentDay >= 22 && 
-                      (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
-    
-    // ============ NEW: ALLOW INCREMENT FOR CHALLENGE COMPLETERS ============
-    const hasCompletedChallenge = currentMode === 'yogi' && 
-                                  challengeData.currentDay >= 41 &&
-                                  window.walletPublicKey && 
-                                  localStorage.getItem('jwtToken');
-    
-    if (!isBlocked || hasCompletedChallenge) {
-      // CAP streak at currentDay to prevent streak > currentDay
-      if (challengeData.streakDays < challengeData.currentDay) {
-        challengeData.streakDays++;
-      }
-      challengeData.lastSessionDate = todayStr;
-      saveChallengeData();
-      updateProgressDisplay && updateProgressDisplay();
-    }
+console.log('[DEBUG] --- Checking today\'s streak increment ---');
+console.log('[DEBUG] today:', today, '| startDate:', startDate);
+console.log('[DEBUG] todayStr:', todayStr);
+console.log('[DEBUG] todaySessions:', todaySessions, '| requiredSessions:', challengeData.requiredSessions);
+console.log('[DEBUG] challengeData.streakDays:', challengeData.streakDays, '| currentDay:', challengeData.currentDay);
+
+if (
+  today >= startDate &&
+  todaySessions === challengeData.requiredSessions &&
+  challengeData.streakDays < challengeData.currentDay
+){
+  const currentMode = localStorage.getItem('currentMode') || 'yogi';
+  const isBlocked = currentMode === 'yogi' && challengeData.currentDay >= 22 &&
+                    (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
+  const hasCompletedChallenge = currentMode === 'yogi' &&
+                               challengeData.currentDay >= 41 &&
+                               window.walletPublicKey &&
+                               localStorage.getItem('jwtToken');
+  if ((!isBlocked || hasCompletedChallenge) &&
+      challengeData.streakDays < challengeData.currentDay) {
+    console.log('[DEBUG] Incrementing streak for today. Now streakDays:', challengeData.streakDays + 1);
+    challengeData.streakDays++;
+    challengeData.lastSessionDate = todayStr;
+    saveChallengeData();
+    updateProgressDisplay && updateProgressDisplay();
+  } else {
+    console.log('[DEBUG] No streak increment: conditions not met (blocked or already incremented).');
   }
+}
 
   // ========== ADDITIONAL SAFEGUARD ==========
   // Ensure streak never exceeds currentDay (in case of data corruption)
