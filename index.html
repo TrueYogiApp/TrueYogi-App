@@ -2563,10 +2563,10 @@ button[disabled] {
       <span class="text-yellow-300" id="info-section-line4">During the session, remember: meditation continues even if life interrupts. As long as you gently return to your breath and awareness, your presence is the practice.</span>
     </div>
     <div class="flex justify-center gap-4">
-      <button onclick="confirmStartMeditation()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button onclick="confirmStartMeditation()" class="mode-btn bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
         Begin Stillness
       </button>
-      <button onclick="cancelStartMeditation()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button onclick="cancelStartMeditation()" class="mode-btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         Not Yet
       </button>
     </div>
@@ -2582,10 +2582,10 @@ button[disabled] {
       <h2 class="text-xl font-semibold text-red-300 mb-2">End Meditation?</h2>
       <p id="end-meditation-description" class="text-gray-200 mb-4">Are you sure you wish to end this session early? This time of Stillness won’t be recorded in your TrueYogi journey.</p>
       <div class="flex justify-center gap-4">
-        <button onclick="confirmEndMeditation()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+        <button onclick="confirmEndMeditation()" class="mode-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
           End Session
         </button>
-        <button onclick="cancelEndMeditation()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+        <button onclick="cancelEndMeditation()" class="mode-btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
           Continue Meditation
         </button>
       </div>
@@ -2600,7 +2600,7 @@ button[disabled] {
       </div>
       <h2 class="text-xl font-semibold text-green-300 mb-2">Daily Sessions Complete</h2>
       <p class="text-gray-200 mb-4" id="completed-sessions-text"></p>
-      <button id="completed-sessions-modal-btn" onclick="closeCompletedSessionsModal()" class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button id="completed-sessions-modal-btn" onclick="closeCompletedSessionsModal()" class="mode-btn bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         Continue Journey
       </button>
     </div>
@@ -2806,7 +2806,7 @@ button[disabled] {
 	  </label>
 	</div>
 	  
-	<button id="begin-journey" onclick="saveYogiConfig()" class="w-full bg-gray-700 hover:bg-yellow-500 text-gray-400 hover:text-gray-900 px-4 py-3 rounded-lg font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+	<button id="begin-journey" onclick="saveYogiConfig()" class="mode-btn w-full bg-gray-700 hover:bg-yellow-500 text-gray-400 hover:text-gray-900 px-4 py-3 rounded-lg font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
 	  <i class="fas fa-check-circle mr-2"></i> Begin Journey
 	</button>
     </div>
