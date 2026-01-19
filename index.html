@@ -30,14 +30,39 @@
 	  padding-bottom: env(safe-area-inset-bottom, 0px);
 	  box-sizing: border-box;
 	}
-    .mode-btn {
-      transition: all 0.3s ease;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    .mode-btn.active {
-      transform: scale(1.05);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-    }
+	/* Base Styles for all Buttons */
+	.mode-btn {
+	  transition: all 0.2s ease; /* Smooth transition for hover/active effects */
+	  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+	  transform: translateY(0); /* Default position */
+	}
+
+	.mode-btn:hover:not(.disabled) {
+	  filter: brightness(1.1); /* Slightly brighter on hover */
+	}
+
+	.mode-btn:active {
+	  transform: scale(0.95); /* Press in effect */
+	  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15); /* Reduced shadow on press */
+	}
+
+	/* Active/Toggled State */
+	.mode-btn.active {
+	  transform: scale(1.05); /* Enlarged slightly */
+	  box-shadow: 0 0 15px rgba(255, 255, 255, 0.3); /* Glow effect for toggle */
+	}
+	/* Icon-specific interaction */
+	.mode-btn i {
+	  transition: transform 0.2s ease;
+	}
+
+	.mode-btn:hover i:not(.disabled) {
+	  transform: scale(1.1); /* Slightly enlarge icons on hover */
+	}
+
+	.mode-btn:active i {
+	  transform: scale(0.95); /* Shrink icons slightly on press */
+	}
     #progress-ring {
       transition: stroke-dashoffset 1s linear;
     }
