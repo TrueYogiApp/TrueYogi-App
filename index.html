@@ -5737,7 +5737,8 @@ async function confirmFullReset() {
     if (window.solana && window.solana.isPhantom && window.walletPublicKey) {
       await window.solana.disconnect();
     }
-
+	
+   await deleteOfflineChallenge();
     // --- Clear ALL app data ---
     localStorage.clear();
 	      // Set a flag to block auto-reconnect on reload
