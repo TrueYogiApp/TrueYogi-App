@@ -5056,13 +5056,7 @@ function syncOfflineChallengeToServer() {
   
   const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
   if (!challenge.startDate) return;
-  
-  // Generate challengeId if missing
-  if (!challenge.challengeId) {
-    challenge.challengeId = `${challenge.startDate}_${challenge.endDate}_${challenge.requiredSessions || 1}s_${challenge.totalMinutes || 30}md_${Date.now()}`;
-    localStorage.setItem('yogiChallenge', JSON.stringify(challenge));
-  }
-  
+    
   const lastPageRefresh = localStorage.getItem('lastPageRefresh') || null;
   
   // Get human-readable format
