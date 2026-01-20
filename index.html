@@ -4121,14 +4121,14 @@ button[disabled] {
         </div>
         <p class="text-yellow-300 text-xl mb-2">Congratulations, TrueYogi!</p>
         <p class="text-gray-300 mb-6">You have completed your 41-day journey of Stillness.</p>
-        <button onclick="resetYogiJourney()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer">
+        <button onclick="resetYogiJourney()" class="mode-btn w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer">
           <i class="fas fa-om mr-2"></i>Start a New Journey
         </button>
-		<button id="claim-tokens-btn" onclick="showClaimTokens()" class="w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold mb-3 cursor-pointer">
+		<button id="claim-tokens-btn" onclick="showClaimTokens()" class="mode-btn w-full bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-xl font-semibold mb-3 cursor-pointer">
 		<i class="fas fa-coins mr-2"></i>Claim YOGI Tokens
 		</button>
 		
-		<button id="view-certificate-btn" onclick="showCertificatePage()" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold mb-3 cursor-pointer">
+		<button id="view-certificate-btn" onclick="showCertificatePage()" class="mode-btn w-full bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-xl font-semibold mb-3 cursor-pointer">
 		<i class="fas fa-certificate mr-2"></i>View Certificate
 		</button>
       </div>
@@ -4140,11 +4140,11 @@ button[disabled] {
   </div>
   <p class="text-green-300 text-xl mb-2">Claim Your YOGI Tokens</p>
   <p class="text-gray-300 mb-6">Presence honored. You’ve completed the Sacred 41-day path. Breathe, Connect and Authenticate your wallet to receive your YOGI tokens.</p>
-  <button id="start-claim-btn" onclick="startClaimProcess()" class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold mb-3 cursor-pointer">
+  <button id="start-claim-btn" onclick="startClaimProcess()" class="mode-btn w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold mb-3 cursor-pointer">
     <i class="fas fa-wallet mr-2"></i>Claim Now
   </button>
   <div id="claim-status" class="mt-4 text-sm text-gray-300" aria-live="polite"></div>
-  <button onclick="closeClaimTokens()" class="w-full mt-4 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl font-semibold">
+  <button onclick="closeClaimTokens()" class="mode-btn w-full mt-4 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-xl font-semibold">
     Close
   </button>
   <div id="claim-loader" style="display:none; margin:0 auto 1em auto; text-align:center;">
