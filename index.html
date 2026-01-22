@@ -16893,14 +16893,21 @@ async function clearOfflineData() {
     localStorage.removeItem('trueyogi_install_started');
     localStorage.removeItem('trueyogi_install_notified');
     localStorage.removeItem('trueyogi_success_shown');
+	localStorage.removeItem('storage_used_mb');
+    localStorage.removeItem('storage_last_checked');
     
-    // 4. Send message to SW to clear caches (if still active)
+    // 5. Send message to SW to clear caches (if still active)
     if (navigator.serviceWorker.controller) {
       navigator.serviceWorker.controller.postMessage({
         type: 'CLEAR_APP_CACHE'
       });
     }
     
+	    // 4. Reload the page after a brief delay to ensure Chrome fully releases cache space
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 9000);
+	
     return true;
   } catch (error) {
     console.error('Error clearing offline data:', error);
