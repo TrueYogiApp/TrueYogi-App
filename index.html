@@ -10995,6 +10995,7 @@ async function setLanguage(lang) {
   updateFaqButton();
   updateUILanguage();
   updateWalletUI();
+  loadSacredLines();
   await loadQuotes();  
 }
 
@@ -11024,6 +11025,7 @@ function updateUILanguage() {
 updateFAQTokenAddress();
 updateFaqButton();
 updateStorageInfo();
+loadSacredLines();
   const howToMeditateEl = document.getElementById('how-to-meditate-link');
   if (howToMeditateEl) howToMeditateEl.textContent = t('howToMeditate');
   const endMeditationBtn = document.getElementById('end-meditation-btn-label');
