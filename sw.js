@@ -92,7 +92,16 @@ const APP_FILES = [
   '/assets/wisdom.de.json',
   '/assets/wisdom.zh.json',
   '/assets/wisdom.ru.json',
-  '/assets/wisdom.it.json'   
+  '/assets/wisdom.it.json',
+  '/assets/sacred.lines.en.json',
+  '/assets/sacred.lines.te.json', 
+  '/assets/sacred.lines.fr.json', 
+  '/assets/sacred.lines.hi.json', 
+  '/assets/sacred.lines.es.json', 
+  '/assets/sacred.lines.de.json', 
+  '/assets/sacred.lines.ru.json', 
+  '/assets/sacred.lines.zh.json', 
+  '/assets/sacred.lines.it.json'   
 ];
 
 // Helper: sequentially cache audio files

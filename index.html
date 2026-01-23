@@ -2460,7 +2460,7 @@ button[disabled] {
 
 #sacred-line-container {
   width: 100%;
-  height: 56px; /* slightly taller for 2 lines */
+  height: 68px; /* slightly taller for 2 lines */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -3096,17 +3096,27 @@ button[disabled] {
 <span id="emr-anim"
   style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
          width: 180px; height: 32px; display: none; pointer-events: none;">
-  <svg viewBox="0 0 180 32" width="180" height="32">
-    <polyline 
-      class="emr-zig"
-      points="0,16 20,16 30,4 40,28 60,20 70,32 80,8 100,24 120,12 140,28 150,16 180,16"
-      fill="none"
-      stroke="#b782ff"
-      stroke-width="3.4"
-      stroke-linecap="round"
-      stroke-linejoin="round"
-    />
-  </svg>
+<svg viewBox="0 0 180 32" width="180" height="32">
+  <defs>
+    <filter id="emr-shine" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="2.5" result="blur" />
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <polyline 
+    class="emr-zig"
+    filter="url(#emr-shine)"
+    points="0,16 20,16 30,4 40,28 60,20 70,32 80,8 100,24 120,12 140,28 150,16 180,16"
+    fill="none"
+    stroke="#b782ff"
+    stroke-width="3.4"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
 </span>
 </div>
 
@@ -4687,6 +4697,15 @@ async function loadSacredLines() {
 
 const emrAnim = document.getElementById('emr-anim');
 
+const emrShapes = [
+  // Classic EMR zigzag
+  "0,16 20,16 30,4 40,28 60,20 70,32 80,8 100,24 120,12 140,28 150,16 180,16",
+  // Gentle realistic pulse (sinus rhythm, with one clear spike)
+  "0,16 18,16 30,14 34,4 38,28 52,16 70,16 80,16 100,18 110,8 114,24 130,16 180,16",
+  // Double beat, realistic medical style
+  "0,16 14,16 18,6 22,28 28,12 34,24 40,16 62,16 70,12 75,24 80,16 100,16 120,16 130,10 132,20 140,16 180,16"
+];
+
 function showLine() {
   if (lines.length === 0) return;
   el.textContent = lines[index];
@@ -4695,7 +4714,15 @@ function showLine() {
 
   setTimeout(() => {
     el.style.opacity = 0;
-    if (emrAnim) emrAnim.style.display = "block";
+    if (emrAnim) {
+      // --- Randomize the shape ---
+      const poly = emrAnim.querySelector('.emr-zig');
+      if (poly) {
+        const shape = emrShapes[Math.floor(Math.random() * emrShapes.length)];
+        poly.setAttribute('points', shape);
+      }
+      emrAnim.style.display = "block";
+    }
   }, 16500);
 
   index = (index + 1) % lines.length;
