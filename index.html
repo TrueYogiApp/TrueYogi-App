@@ -4666,12 +4666,33 @@ function shuffleArray(array) {
   }
 }
 
+// --- Persistent Deck Shuffle Logic ---
+function saveDeck(lang, shuffledDeck, deckIndex) {
+  try {
+    localStorage.setItem(`sacredDeck_${lang}`, JSON.stringify({ deck: shuffledDeck, index: deckIndex }));
+  } catch (e) { /* ignore quota exceptions safely */ }
+}
+
+function loadDeck(lang) {
+  try {
+    const val = localStorage.getItem(`sacredDeck_${lang}`);
+    if (!val) return null;
+    return JSON.parse(val);
+  } catch (e) {
+    return null;
+  }
+}
+
+function clearOldDeck(lang) {
+  // (Call if language is switched etc.)
+  localStorage.removeItem(`sacredDeck_${lang}`);
+}
+
 async function loadSacredLines() {
-  // Detect language
   const lang = localStorage.getItem('lang') || 'en';
   const linesUrl = `/assets/sacred.lines.${lang}.json`;
+  const fallbackUrl = `/assets/sacred.lines.en.json`;
 
-  // --- CLEAR timeout if exists ---
   if (sacredLinesTimeout) {
     clearTimeout(sacredLinesTimeout);
     sacredLinesTimeout = null;
@@ -4681,17 +4702,42 @@ async function loadSacredLines() {
     const resp = await fetch(linesUrl);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     lines = await resp.json();
+
     if (lines.length > 0) {
-      // Always shuffle order on each lang change/load
-      shuffleArray(lines);
-      index = 0;
+      // Try deck restore
+      const deckState = loadDeck(lang);
+      if (deckState && Array.isArray(deckState.deck) && deckState.deck.length === lines.length) {
+        lines = deckState.deck;
+        index = deckState.index || 0;
+      } else {
+        shuffleArray(lines);
+        index = 0;
+        saveDeck(lang, lines, index);
+      }
       showLine();
     } else {
-      el.textContent = "No sacred lines found.";
+      throw new Error('Language file is empty');
     }
   } catch (err) {
-    el.textContent = "Failed to load sacred lines.";
-    console.error(`Error fetching sacred lines [${linesUrl}]:`, err);
+    console.warn(`Failed to load sacred lines [${linesUrl}], trying English fallback:`, err);
+    
+    // Try loading English fallback
+    try {
+      const fallbackResp = await fetch(fallbackUrl);
+      if (!fallbackResp.ok) throw new Error(`Fallback HTTP ${fallbackResp.status}`);
+      lines = await fallbackResp.json();
+      
+      if (lines.length > 0) {
+        shuffleArray(lines);
+        index = 0;
+        showLine();
+      } else {
+        el.textContent = "No sacred lines found in English fallback.";
+      }
+    } catch (fallbackErr) {
+      el.textContent = "Failed to load sacred lines.";
+      console.error(`Error fetching English fallback sacred lines [${fallbackUrl}]:`, fallbackErr);
+    }
   }
 }
 
@@ -4703,7 +4749,13 @@ const emrShapes = [
   // Gentle realistic pulse (sinus rhythm, with one clear spike)
   "0,16 18,16 30,14 34,4 38,28 52,16 70,16 80,16 100,18 110,8 114,24 130,16 180,16",
   // Double beat, realistic medical style
-  "0,16 14,16 18,6 22,28 28,12 34,24 40,16 62,16 70,12 75,24 80,16 100,16 120,16 130,10 132,20 140,16 180,16"
+  "0,16 14,16 18,6 22,28 28,12 34,24 40,16 62,16 70,12 75,24 80,16 100,16 120,16 130,10 132,20 140,16 180,16",
+    // Smooth sinus rhythm with rounded PQRST complex
+  "0,16 15,16 20,12 25,4 30,28 38,16 45,8 52,24 60,16 75,16 85,14 90,10 94,6 100,28 108,22 115,12 120,18 130,16 145,16 155,14 160,8 165,24 170,16 180,16",
+  // Irregular heartbeat (atrial fibrillation inspired)
+  "0,16 10,14 18,18 25,10 32,22 40,12 48,20 55,14 62,16 70,16 78,12 85,22 92,14 100,16 108,10 115,20 122,14 130,16 138,18 145,8 152,24 160,14 168,16 175,12 180,16",
+  // Flatter baseline with occasional prominent spikes
+  "0,16 12,16 20,14 25,6 30,26 40,14 50,16 60,16 70,14 75,18 80,16 90,16 100,14 105,8 110,22 120,16 130,14 135,20 140,16 150,16 160,14 165,5 170,28 175,16 180,16"
 ];
 
 function showLine() {
@@ -4715,7 +4767,6 @@ function showLine() {
   setTimeout(() => {
     el.style.opacity = 0;
     if (emrAnim) {
-      // --- Randomize the shape ---
       const poly = emrAnim.querySelector('.emr-zig');
       if (poly) {
         const shape = emrShapes[Math.floor(Math.random() * emrShapes.length)];
@@ -4725,7 +4776,17 @@ function showLine() {
     }
   }, 16500);
 
+  // --- Save progress in deck ---
   index = (index + 1) % lines.length;
+  const lang = localStorage.getItem('lang') || 'en';
+  saveDeck(lang, lines, index);
+
+  // When the deck is finished, reshuffle for a new "round"
+  if (index === 0) {
+    shuffleArray(lines);
+    saveDeck(lang, lines, index);
+  }
+
   if (sacredLinesTimeout) clearTimeout(sacredLinesTimeout);
   sacredLinesTimeout = setTimeout(showLine, 29500);
 }
@@ -11013,9 +11074,16 @@ document.addEventListener('DOMContentLoaded', async function() {
 });
 
 async function setLanguage(lang) {
+  // 1. Get previous language before switching
+  const previousLang = localStorage.getItem('lang') || 'en';
+
+  // 2. Clear old deck for previous language
+  clearOldDeck(previousLang);
+
+  // 3. Set new language and continue as before
   localStorage.setItem('lang', lang);
   await loadLanguage(lang);
-    if (localStorage.getItem('showCacheClearedTooltip') === '1') {
+  if (localStorage.getItem('showCacheClearedTooltip') === '1') {
     showTooltip(t('cacheReloaded'));
     localStorage.removeItem('showCacheClearedTooltip');
   }
@@ -11023,7 +11091,7 @@ async function setLanguage(lang) {
   updateUILanguage();
   updateWalletUI();
   loadSacredLines();
-  await loadQuotes();  
+  await loadQuotes();
 }
 
 function updateFAQTokenAddress() {
