@@ -4658,6 +4658,12 @@ const el = document.getElementById("sacred-line");
 const heartbeat = document.getElementById("heartbeat-anim");
 let sacredLinesTimeout = null;
 
+// Store current state in localStorage
+const SACRED_STORAGE_KEY = 'sacred_lines_state';
+const RECENT_HISTORY_SIZE = 5; // Keep last 5 shown quotes in memory
+const RECENT_HISTORY_KEY = 'sacred_recent_history';
+const OLD_QUOTE_CHANCE = 0.25; // 25% chance to show an old quote
+
 // Fisher-Yates shuffle for true randomness
 function shuffleArray(array) {
   for (let i = array.length - 1; i > 0; i--) {
@@ -4681,10 +4687,59 @@ async function loadSacredLines() {
     const resp = await fetch(linesUrl);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     lines = await resp.json();
+    
     if (lines.length > 0) {
-      // Always shuffle order on each lang change/load
-      shuffleArray(lines);
-      index = 0;
+      // Load saved state
+      const savedState = localStorage.getItem(SACRED_STORAGE_KEY);
+      const savedHistory = localStorage.getItem(RECENT_HISTORY_KEY);
+      
+      if (savedState) {
+        const state = JSON.parse(savedState);
+        
+        // Check if it's the same language and we have the same number of lines
+        if (state.lang === lang && state.linesCount === lines.length) {
+          // Use saved shuffled order and index
+          if (state.shuffledIndices && state.shuffledIndices.length === lines.length) {
+            // Recreate the shuffled order using indices
+            const shuffledLines = [];
+            for (const idx of state.shuffledIndices) {
+              shuffledLines.push(lines[idx]);
+            }
+            lines = shuffledLines;
+            index = state.index % lines.length;
+          }
+        } else {
+          // Different language or line count, create new shuffled order
+          shuffleArray(lines);
+          index = 0;
+          saveState(lang);
+          // Clear history for new language
+          localStorage.setItem(RECENT_HISTORY_KEY, JSON.stringify([]));
+        }
+      } else {
+        // No saved state, shuffle and start from beginning
+        shuffleArray(lines);
+        index = 0;
+        saveState(lang);
+        localStorage.setItem(RECENT_HISTORY_KEY, JSON.stringify([]));
+      }
+      
+      // Load recent history if exists
+      let recentHistory = [];
+      if (savedHistory) {
+        try {
+          recentHistory = JSON.parse(savedHistory);
+          // Ensure we only keep valid indices
+          recentHistory = recentHistory.filter(idx => idx >= 0 && idx < lines.length);
+        } catch (e) {
+          console.error("Error parsing recent history:", e);
+          recentHistory = [];
+        }
+      }
+      
+      // Store history in a way that showLine can access it
+      window.sacredRecentHistory = recentHistory;
+      
       showLine();
     } else {
       el.textContent = "No sacred lines found.";
@@ -4692,6 +4747,23 @@ async function loadSacredLines() {
   } catch (err) {
     el.textContent = "Failed to load sacred lines.";
     console.error(`Error fetching sacred lines [${linesUrl}]:`, err);
+  }
+}
+
+function saveState(currentLang) {
+  // Save the current state to localStorage
+  const state = {
+    lang: currentLang,
+    linesCount: lines.length,
+    index: index,
+    // Store indices to recreate shuffled order
+    shuffledIndices: lines.map((line, i) => i)
+  };
+  localStorage.setItem(SACRED_STORAGE_KEY, JSON.stringify(state));
+  
+  // Save recent history
+  if (window.sacredRecentHistory) {
+    localStorage.setItem(RECENT_HISTORY_KEY, JSON.stringify(window.sacredRecentHistory));
   }
 }
 
@@ -4708,7 +4780,50 @@ const emrShapes = [
 
 function showLine() {
   if (lines.length === 0) return;
-  el.textContent = lines[index];
+  
+  let displayIndex = index;
+  const currentLang = localStorage.getItem('lang') || 'en';
+  
+  // Initialize recent history if not exists
+  if (!window.sacredRecentHistory) {
+    window.sacredRecentHistory = [];
+  }
+  
+  // Decide whether to show an old quote (25% chance)
+  const showOldQuote = Math.random() < OLD_QUOTE_CHANCE;
+  
+  if (showOldQuote && window.sacredRecentHistory.length > 0) {
+    // Pick a random quote from recent history (excluding current index if it's in history)
+    const availableOldQuotes = window.sacredRecentHistory.filter(idx => idx !== index);
+    
+    if (availableOldQuotes.length > 0) {
+      // Pick a random old quote from history
+      const randomOldIndex = availableOldQuotes[Math.floor(Math.random() * availableOldQuotes.length)];
+      displayIndex = randomOldIndex;
+      
+      // Move forward in main sequence anyway to ensure progress
+      index = (index + 1) % lines.length;
+    } else {
+      // No old quotes available, use current and move forward
+      displayIndex = index;
+      index = (index + 1) % lines.length;
+    }
+  } else {
+    // Show normal sequential quote
+    displayIndex = index;
+    index = (index + 1) % lines.length;
+  }
+  
+  // Update recent history
+  window.sacredRecentHistory.unshift(displayIndex);
+  
+  // Keep only the most recent quotes in history
+  if (window.sacredRecentHistory.length > RECENT_HISTORY_SIZE) {
+    window.sacredRecentHistory = window.sacredRecentHistory.slice(0, RECENT_HISTORY_SIZE);
+  }
+  
+  // Display the quote
+  el.textContent = lines[displayIndex];
   el.style.opacity = 1;
   if (emrAnim) emrAnim.style.display = "none";
 
@@ -4725,10 +4840,21 @@ function showLine() {
     }
   }, 16500);
 
-  index = (index + 1) % lines.length;
+  // Save state after showing each line
+  saveState(currentLang);
+  
   if (sacredLinesTimeout) clearTimeout(sacredLinesTimeout);
   sacredLinesTimeout = setTimeout(showLine, 29500);
 }
+
+// Also save state when language changes
+window.addEventListener('languageChanged', () => {
+  const currentLang = localStorage.getItem('lang') || 'en';
+  saveState(currentLang);
+  // Clear history for new language
+  localStorage.setItem(RECENT_HISTORY_KEY, JSON.stringify([]));
+  window.sacredRecentHistory = [];
+});
 
 function setEmrLineColor() {
   const auraClass = auraColors[getAuraIndex()];
