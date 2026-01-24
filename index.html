@@ -20,6 +20,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Dancing+Script:700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&display=swap" rel="stylesheet">
+
   <style>
 	body {
 	  min-height: 100dvh; /* preferred for modern devices */
@@ -4837,14 +4839,14 @@ modal.innerHTML = `
       
       <div class="space-y-4">
         <button id="challenge-complete-new-journey-btn" onclick="resetYogiJourney()" 
-          class="w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 hover:scale-[1.02]">
+          class="mode-btn w-full bg-yellow-400 hover:bg-yellow-500 text-gray-900 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 hover:scale-[1.02]">
           <i class="fas fa-om mr-2"></i>${t('challengeCompleteButtonNewJourney')}
         </button>
         
         <div class="h-2"></div> <!-- Simple spacing div -->
         
         <button id="challenge-complete-close-btn" onclick="closeChallengeCompletedModal()" 
-          class="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 border border-gray-700">
+          class="mode-btn w-full bg-gray-800 hover:bg-gray-700 text-gray-300 px-6 py-3 rounded-xl font-semibold cursor-pointer transition-all duration-200 border border-gray-700">
           <i class="fas fa-times mr-2"></i>${t('close')}
         </button>
       </div>
