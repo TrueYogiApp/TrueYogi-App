@@ -13375,13 +13375,27 @@ setInterval(setAuraColor, 1000);
 // Enhanced offline detection
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
-  
-  // Check both browser online status AND actual network connectivity
+  const acked = localStorage.getItem('spaceshipPopupAck') === '1';
+  const offlineInstalled = localStorage.getItem('trueyogi_offline_installed') === 'true';
+
   if (!navigator.onLine || !isActuallyOnline()) {
     status.style.display = 'block';
-    console.log('Offline mode activated');
+    // ADD THIS: only show popup if offline mode is installed
+    if (!spaceshipPopupShown && !spaceshipPopupTimer && !acked && offlineInstalled) {
+      spaceshipPopupTimer = setTimeout(() => {
+        spaceshipPopup.style.display = 'flex';
+        lockBackground(true);
+        spaceshipPopupShown = true;
+      }, 9000);
+    }
   } else {
     status.style.display = 'none';
+    clearTimeout(spaceshipPopupTimer);
+    spaceshipPopupTimer = null;
+    spaceshipPopupShown = false;
+    lockBackground(false);
+    spaceshipPopup.style.display = 'none';
+    localStorage.removeItem('spaceshipPopupAck');
   }
 }
 
