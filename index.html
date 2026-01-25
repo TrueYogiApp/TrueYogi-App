@@ -18260,6 +18260,7 @@ function showScreensaver() {
 }
 
 function hideScreensaver() {
+ if (modalPopupActive) return;
   canvasEl.classList.add("hidden");
   screensaverActive = false;
 }
