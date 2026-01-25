@@ -407,5 +407,16 @@
 "config.confirm.seed.body": "con la plena intención de cultivarla diariamente, recorriendo este camino con devoción consciente hacia mi verdadero ser.",
   "Inhale": "Inhala",
   "Exhale": "Exhala",
-  "Hold2": "Mantén la respiración"
+  "Hold2": "Mantén la respiración",
+"spaceship.popup.title": "Modo Nave Espacial Iniciado",
+"spaceship.popup.subtitle1": "Has activado el modo avión o apagado el WiFi.",
+"spaceship.popup.subtitle2": "El modo Nave Espacial ahora está activo.",
+"spaceship.popup.text1": "Todas las señales están desconectadas. El mundo exterior está en pausa.",
+"spaceship.popup.mantra": "Respira. Permanece. Observa.",
+"spaceship.popup.button": "Continuar",
+"spaceship.info.title": "Cómo iniciar un desafío de Nave Espacial",
+"spaceship.info.createChallenge": "Crea un desafío en modo Nave Espacial.",
+"spaceship.info.details": "Completa tu desafío durante 21 días sin conectarte a internet, sin desactivar el modo avión, ni activar WiFi.",
+"spaceship.info.note": "Si te conectas a internet durante el desafío, se convertirá en un desafío normal.<br>¡Permanece offline para mantener activo el desafío de Nave Espacial!",
+"spaceship.info.button": "Entendido"
 }

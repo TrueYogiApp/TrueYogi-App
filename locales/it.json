@@ -408,5 +408,16 @@
 "config.confirm.seed.body": "con la piena intenzione di coltivarla ogni giorno, percorrendo questo percorso con devozione consapevole al mio vero sé.",
   "Inhale": "Inspira profondamente",
   "Exhale": "Espira lentamente",
-  "Hold2": "Trattieni il respiro"
+  "Hold2": "Trattieni il respiro",
+"spaceship.popup.title": "Modalità Astronave Attivata",
+"spaceship.popup.subtitle1": "Hai attivato la modalità aereo o disattivato il WiFi.",
+"spaceship.popup.subtitle2": "La modalità Astronave è ora attiva.",
+"spaceship.popup.text1": "Tutti i segnali sono disattivati. Il mondo esterno è in pausa.",
+"spaceship.popup.mantra": "Respira. Rimani. Osserva.",
+"spaceship.popup.button": "Continua",
+"spaceship.info.title": "Come iniziare una Sfida Astronave",
+"spaceship.info.createChallenge": "Crea una sfida in modalità Astronave.",
+"spaceship.info.details": "Completa la tua sfida per 21 giorni senza andare online, senza disattivare la modalità aereo o attivare il WiFi.",
+"spaceship.info.note": "Se vai online durante la sfida, verrà trasformata in una sfida normale.<br>Rimani offline per mantenere attiva la Sfida Astronave!",
+"spaceship.info.button": "Capito"
 }

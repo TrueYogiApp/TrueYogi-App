@@ -408,5 +408,16 @@
 "config.confirm.seed.body": "每天都怀着完全的意愿去培养它，带着对真实自我的觉知和虔诚走在这条修炼之路上。",
   "Inhale": "吸气",
   "Exhale": "呼气",
-  "Hold2": "屏住呼吸"
+  "Hold2": "屏住呼吸",
+"spaceship.popup.title": "飞船模式已启动",
+"spaceship.popup.subtitle1": "你已切换到飞行模式或关闭了WiFi。",
+"spaceship.popup.subtitle2": "飞船模式现已激活。",
+"spaceship.popup.text1": "所有信号已断开。外部世界已暂停。",
+"spaceship.popup.mantra": "呼吸。保持。观察。",
+"spaceship.popup.button": "继续",
+"spaceship.info.title": "如何开始飞船挑战",
+"spaceship.info.createChallenge": "在飞船模式中创建一个挑战。",
+"spaceship.info.details": "连续21天完成挑战，不要上网，不要关闭飞行模式或打开WiFi。",
+"spaceship.info.note": "如果在挑战期间上网，挑战将切换为普通挑战。<br>保持离线，飞船挑战才能继续激活！",
+"spaceship.info.button": "知道了"
 }

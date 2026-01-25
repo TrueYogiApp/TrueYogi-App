@@ -407,5 +407,16 @@
 "config.confirm.seed.body": "mit voller Absicht, ihn täglich zu pflegen, und gehe diesen Weg mit bewusster Hingabe zu meinem wahren Selbst.",
   "Inhale": "Einatmen",
   "Exhale": "Ausatmen",
-  "Hold2": "Atem anhalten"
+  "Hold2": "Atem anhalten",
+"spaceship.popup.title": "Raumschiff-Modus aktiviert",
+"spaceship.popup.subtitle1": "Du hast den Flugmodus aktiviert oder WLAN ausgeschaltet.",
+"spaceship.popup.subtitle2": "Raumschiff-Modus ist jetzt aktiv.",
+"spaceship.popup.text1": "Alle Signale sind deaktiviert. Die Außenwelt ist pausiert.",
+"spaceship.popup.mantra": "Atme. Bleibe. Beobachte.",
+"spaceship.popup.button": "Fortfahren",
+"spaceship.info.title": "Wie startet man eine Raumschiff-Herausforderung",
+"spaceship.info.createChallenge": "Erstelle eine Herausforderung im Raumschiff-Modus.",
+"spaceship.info.details": "Absolviere deine Herausforderung 21 Tage lang ohne online zu gehen, ohne den Flugmodus auszuschalten oder WLAN zu aktivieren.",
+"spaceship.info.note": "Wenn du während der Herausforderung online gehst, wird sie zu einer regulären Herausforderung.<br>Bleibe offline, um die Raumschiff-Herausforderung aktiv zu halten!",
+"spaceship.info.button": "Verstanden"
 }

@@ -2504,6 +2504,93 @@ button[disabled] {
 }
 
 
+/* Spaceship popup */
+#spaceship-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(1.5px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.spaceship-popup-inner {
+  background: rgba(10, 10, 20, 0.85);
+  border-radius: 14px;
+  padding: 24px 26px;
+  text-align: center;
+  color: #f5f0e6;
+  box-shadow: 0 0 40px rgba(255, 220, 160, 0.15);
+  box-sizing: border-box;
+  width: 94vw;
+  max-width: 360px;
+  min-width: 0;
+  margin: 0 auto;
+  animation: spaceshipBreath 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (max-width: 600px) {
+  .spaceship-popup-inner {
+    width: 96vw;    /* nearly full width for mobile */
+    max-width: 96vw;
+    border-radius: 10px;
+    padding: 18px 5vw;
+  }
+}
+
+@media (min-width: 1200px) {
+  .spaceship-popup-inner {
+    max-width: 400px;   /* optional: look good on ultra-wide/huge screens */
+  }
+}
+
+@keyframes spaceshipBreath {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.015);
+  }
+}
+
+#spaceship-info-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  /* F L E X Centering! */
+  display: flex;
+}
+
+.spaceship-title {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  letter-spacing: 0.08em;
+}
+
+.spaceship-text {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+#spaceship-ack {
+  margin-top: 18px;
+  padding: 8px 18px;
+  background: transparent;
+  border: 1px solid rgba(255, 220, 160, 0.5);
+  color: #f5e8c8;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -4635,7 +4722,8 @@ button[disabled] {
 	let omUserId = localStorage.getItem('omUserId');
 	let pendingBellSound = false; // <-- Add this near your globals
 	let broadcastMode = false;	
-
+  let spaceshipPopupTimer = null;
+  let spaceshipPopupShown = false;
 	
     // Challenge Data
     let challengeData = {
@@ -4802,6 +4890,124 @@ function setEmrLineColor() {
 }
 
 loadSacredLines();
+
+
+// Spaceship popup
+let modalPopupActive = false; // globally
+
+function lockBackground(lock) {
+  document.body.style.overflow = lock ? 'hidden' : '';
+  if (lock) {
+    document.body.classList.add('spaceship-popup-active');
+	modalPopupActive = true;
+  } else {
+    document.body.classList.remove('spaceship-popup-active');
+	modalPopupActive = false;
+  }
+}
+
+const spaceshipPopup = document.createElement('div');
+spaceshipPopup.id = 'spaceship-popup';
+document.body.appendChild(spaceshipPopup);
+
+// --- Function to render the popup, always uses the latest language
+function renderSpaceshipPopup() {
+  spaceshipPopup.innerHTML = `
+    <div class="spaceship-popup-inner">
+      <div class="spaceship-title">
+        🚀 ${t('spaceship.popup.title')}
+      </div>
+      <div class="spaceship-subtitle" style="font-size:0.97rem; margin-bottom:10px; color:#ffeeb0;">
+        ${t('spaceship.popup.subtitle1')}<br>
+        <span style="opacity:0.85;">${t('spaceship.popup.subtitle2')}</span>
+      </div>
+      <div class="spaceship-text">
+        <span style="opacity:0.82;">${t('spaceship.popup.text1')}</span>
+        <br><br>
+        <em style="color:#fff2cf;font-weight:600;">${t('spaceship.popup.mantra')}</em>
+      </div>
+      <button id="spaceship-ack">${t('spaceship.popup.button')}</button>
+    </div>
+  `;
+  // Always re-attach event listener for new button element
+  const ackBtn = document.getElementById('spaceship-ack');
+  if (ackBtn) {
+    ackBtn.onclick = () => {
+      spaceshipPopup.style.display = 'none';
+      lockBackground(false);
+      localStorage.setItem('spaceshipPopupAck', '1');
+
+      // Check for yogiConfig and yogiChallenge in localStorage
+      let yogiConfig = null, yogiChallenge = null;
+      if (localStorage.getItem('yogiConfig')) {
+        try { yogiConfig = JSON.parse(localStorage.getItem('yogiConfig')); } catch (e) {}
+      }
+      if (localStorage.getItem('yogiChallenge')) {
+        try { yogiChallenge = JSON.parse(localStorage.getItem('yogiChallenge')); } catch (e) {}
+      }
+      const hasActiveChallenge =
+        (yogiConfig && yogiConfig.startDate) ||
+        (yogiChallenge && yogiChallenge.startDate);
+      if (!hasActiveChallenge) {
+        spaceshipInfoPopup.style.display = 'flex';
+        lockBackground(true);
+      }
+    };
+  }
+}
+
+const spaceshipInfoPopup = document.createElement('div');
+spaceshipInfoPopup.id = 'spaceship-info-popup';
+spaceshipInfoPopup.style.display = 'none';
+document.body.appendChild(spaceshipInfoPopup);
+
+function renderSpaceshipInfoPopup() {
+  spaceshipInfoPopup.innerHTML = `
+    <div class="spaceship-popup-inner">
+      <div class="spaceship-title">
+        🛰️ ${t('spaceship.info.title')}
+      </div>
+      <div class="spaceship-text" style="margin-bottom:16px;">
+        <strong>${t('spaceship.info.createChallenge')}</strong><br><br>
+        ${t('spaceship.info.details')}<br><br>
+        <em>${t('spaceship.info.note')}</em>
+      </div>
+      <button id="spaceship-info-ack"
+        style="margin-top:18px;padding:8px 22px;background:linear-gradient(90deg,#ffe777 0%,#ffce3d 100%);
+        border:none;color:#3f2c00;border-radius:20px;font-weight:bold;font-size:1.07rem;cursor:pointer;
+        box-shadow:0 1px 7px 0 rgba(255,215,60,0.28);
+        transition:filter .16s;">
+        ${t('spaceship.info.button')}
+      </button>
+    </div>
+  `;
+  // Re-attach event listener for new button
+  const infoAckBtn = document.getElementById('spaceship-info-ack');
+  if (infoAckBtn) {
+    infoAckBtn.onclick = () => {
+      spaceshipInfoPopup.style.display = 'none';
+      lockBackground(false);
+    };
+  }
+}
+
+// Check if canSwipe function exists in global scope
+if (typeof window.canSwipe === 'function') {
+  // Save the original function
+  const originalCanSwipe = window.canSwipe;
+  
+  // Create a new version that also checks for spaceship popup
+  window.canSwipe = function() {
+    // First check if spaceship popup is active
+    const spaceshipPopup = document.getElementById('spaceship-popup');
+    if (spaceshipPopup && spaceshipPopup.style.display === 'flex') {
+      return false;
+    }
+    
+    // Then run the original check
+    return originalCanSwipe();
+  };
+}
 
 
     // COnfiguration Form checkbox
@@ -11123,6 +11329,8 @@ updateFAQTokenAddress();
 updateFaqButton();
 updateStorageInfo();
 loadSacredLines();
+renderSpaceshipPopup();
+renderSpaceshipInfoPopup();
   const howToMeditateEl = document.getElementById('how-to-meditate-link');
   if (howToMeditateEl) howToMeditateEl.textContent = t('howToMeditate');
   const endMeditationBtn = document.getElementById('end-meditation-btn-label');

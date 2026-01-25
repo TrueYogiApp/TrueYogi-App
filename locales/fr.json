@@ -412,7 +412,17 @@
 "config.confirm.seed.body": "avec l’intention entière de la cultiver chaque jour, marchant sur ce chemin avec une dévotion consciente envers mon vrai moi.",
   "Inhale": "Inspirez",
   "Exhale": "Expirez",
-  "Hold2": "Retenez la respiration"
-
+  "Hold2": "Retenez la respiration",
+"spaceship.popup.title": "Mode Vaisseau Spatial Activé",
+"spaceship.popup.subtitle1": "Vous avez activé le mode avion ou désactivé le WiFi.",
+"spaceship.popup.subtitle2": "Le Mode Vaisseau Spatial est maintenant actif.",
+"spaceship.popup.text1": "Tous les signaux sont coupés. Le monde extérieur est en pause.",
+"spaceship.popup.mantra": "Respirez. Restez. Observez.",
+"spaceship.popup.button": "Continuer",
+"spaceship.info.title": "Comment lancer un défi Vaisseau Spatial",
+"spaceship.info.createChallenge": "Créez un défi en mode Vaisseau Spatial.",
+"spaceship.info.details": "Réalisez votre défi pendant 21 jours sans aller en ligne, sans désactiver le mode avion ou activer le WiFi.",
+"spaceship.info.note": "Si vous vous connectez durant le défi, il deviendra un défi classique.<br>Restez hors ligne pour garder le Défi Vaisseau Spatial actif !",
+"spaceship.info.button": "Compris"
 
 }
