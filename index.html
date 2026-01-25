@@ -19752,7 +19752,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 };
 
 
-  // 3️⃣ Optional: Sync and fetch on wallet connect
+  // 3️⃣ Optional: Sync and fetch on wallet connect.
   window.addEventListener('wallet-connected', async function() {
 	 fixUnknownSessionIds();
 	  await window.fetchSessionsFromSupabase();
