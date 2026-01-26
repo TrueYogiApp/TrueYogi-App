@@ -9443,12 +9443,12 @@ function updateTimer() {
         challengeData.totalMinutes += actualMinutes;
         challengeData.lastSessionDate = sessionDate;
         saveChallengeData();
+        checkDayReset();
         syncOfflineChallengeToServer();
         // Immediately update Yogi stats display
         document.getElementById('yogi-total-sessions').textContent = challengeData.totalSessions;
         document.getElementById('yogi-total-minutes').textContent = challengeData.totalMinutes;
         document.getElementById('current-streak').textContent = challengeData.streakDays;
-		checkDayReset();
       }
     }
 
@@ -9590,8 +9590,8 @@ const completionDateLocal = getLocalDateString(new Date(startTime || Date.now())
     updateBackButtonVisibility();
     checkJourneyCompletion();
 	showCompletionStats();
-	syncOfflineChallengeToServer();
   checkDayReset();
+	syncOfflineChallengeToServer();
 	if (window.walletPublicKey) {
 	fixUnknownSessionIds();
 	const journeyWallet = localStorage.getItem('currentJourneyWallet');
