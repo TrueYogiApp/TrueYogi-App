@@ -13449,18 +13449,6 @@ setAuraColor();
 setInterval(setAuraColor, 1000);
 
 
-// Unlock spaceship sound on first user gesture (for mobile browsers):
-window.addEventListener('click', function unlockSpaceAudio() {
-  var audio = document.getElementById('spaceship-sound');
-  if (audio && audio.paused) {
-    audio.play().then(function() {
-      audio.pause();
-      audio.currentTime = 0;
-    }).catch(function(){});
-  }
-  window.removeEventListener('click', unlockSpaceAudio);
-});
-
 // Enhanced offline detection
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
