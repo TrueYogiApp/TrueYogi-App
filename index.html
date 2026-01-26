@@ -13487,7 +13487,6 @@ function updateOnlineStatus() {
     spaceshipPopup.style.display = 'none';
     localStorage.removeItem('spaceshipPopupAck');
     
-    updateSpaceshipIndicator();
     // NEW: Hide spaceship indicator when online
     const indicator = document.getElementById('spaceship-indicator');
     if (indicator) {
