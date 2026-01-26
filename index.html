@@ -5511,6 +5511,7 @@ function syncOfflineChallengeToServer() {
     required_sessions: challenge.requiredSessions || 1,
     sessions_completed: challenge.sessionsCompleted || [],
     last_session_date: challenge.lastSessionDate,
+    streak_days: challenge.streakDays || 0,
     total_sessions: challenge.totalSessions || 0,
     total_minutes: challenge.totalMinutes || 0,
     device_type: getDeviceType?.() || 'unknown',
