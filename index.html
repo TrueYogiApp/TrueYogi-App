@@ -2602,6 +2602,15 @@ button[disabled] {
   z-index: 10001;
 }
 
+/* Spaceship Challenge Mode */
+@keyframes wobble {
+  0%, 100% { transform: rotate(-4deg);}
+  50% { transform: rotate(4deg);}
+}
+.wobble-slow {
+  animation: wobble 1.1s ease-in-out infinite;
+  display: inline-block;
+}
 
 </style>
   
@@ -4008,6 +4017,9 @@ button[disabled] {
       <div id="yogi-progress" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
         <div class="flex justify-between items-center mb-2">
           <p id="sacred" class="text-yellow-300">Sacred 41</p>
+		  <span id="spaceship-indicator" class="ml-1 hidden">
+  <img src="/assets/spaceship.mode.svg" width="33" height="33" class="wobble-slow" alt="Spaceship Mode" title="Spaceship Challenge Active">
+</span>
           <span class="text-xs bg-yellow-900 text-yellow-200 px-2 py-1 rounded"><span id="day-label">Day</span> <span id="current-day-display">1</span>/41</span>
         </div>
         <div class="w-full bg-gray-700 rounded-full h-2.5 mb-2" id="progress-bar-bg"></div>
@@ -8114,6 +8126,19 @@ function getLocalTimeString() {
 	  updateTokenPreview();
     }
 
+// Function to update spaceship indicator
+function updateSpaceshipIndicator() {
+  const indicator = document.getElementById('spaceship-indicator');
+  const challengeData = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+  
+  // Show spaceship icon if it's a spaceship challenge (has spaceshipKeyAtStart)
+  if (challengeData.spaceshipKeyAtStart) {
+    indicator.classList.remove('hidden');
+  } else {
+    indicator.classList.add('hidden');
+  }
+}
+
    async function saveYogiConfig() {
 	const journeyWallet = localStorage.getItem('currentJourneyWallet');
 const walletIsConnected = !!window.walletPublicKey;
@@ -8267,6 +8292,7 @@ if (!navigator.onLine || !isActuallyOnline()) {
   updateBackButtonVisibility();
   updateSessionTimesDisplay();
   checkSessionNotifications();
+  updateSpaceshipIndicator();
 	if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiConfigToSupabase === "function") {
 	  try {
 		await window.syncYogiConfigToSupabase();
@@ -13472,6 +13498,12 @@ function updateOnlineStatus() {
     spaceshipPopup.style.display = 'none';
     localStorage.removeItem('spaceshipPopupAck');
 
+    // NEW: Hide spaceship indicator when online
+    const indicator = document.getElementById('spaceship-indicator');
+    if (indicator) {
+      indicator.classList.add('hidden');
+    }
+	
     // NEW: Check if user is in a spaceship challenge and show popup
     const challengeData = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
     const onlineNoticeAcked = localStorage.getItem('onlineNoticeAck') === '1';
