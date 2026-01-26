@@ -13423,6 +13423,18 @@ setAuraColor();
 setInterval(setAuraColor, 1000);
 
 
+// Unlock spaceship sound on first user gesture (for mobile browsers):
+window.addEventListener('click', function unlockSpaceAudio() {
+  var audio = document.getElementById('spaceship-sound');
+  if (audio && audio.paused) {
+    audio.play().then(function() {
+      audio.pause();
+      audio.currentTime = 0;
+    }).catch(function(){});
+  }
+  window.removeEventListener('click', unlockSpaceAudio);
+});
+
 // Enhanced offline detection
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
@@ -13437,7 +13449,18 @@ function updateOnlineStatus() {
         spaceshipPopup.style.display = 'flex';
         lockBackground(true);
         spaceshipPopupShown = true;
-		document.getElementById('spaceship-sound').play().catch(()=>{});
+
+        // Robust spaceship sound playback:
+        var audio = document.getElementById('spaceship-sound');
+        if (audio) {
+          audio.pause();              // Stop if already playing
+          audio.currentTime = 0;      // Rewind to start
+          // Try to play (user gesture unlock needed ONCE at top)
+          audio.play().catch(function(err){
+            // OPTIONAL: you can log error if you want
+            // console.log("Spaceship sound play error:", err);
+          });
+        }
       }, 9000);
     }
   } else {
@@ -13448,16 +13471,16 @@ function updateOnlineStatus() {
     lockBackground(false);
     spaceshipPopup.style.display = 'none';
     localStorage.removeItem('spaceshipPopupAck');
-	
-	    // NEW: Check if user is in a spaceship challenge and show popup
+
+    // NEW: Check if user is in a spaceship challenge and show popup
     const challengeData = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
-	const onlineNoticeAcked = localStorage.getItem('onlineNoticeAck') === '1';
-	
+    const onlineNoticeAcked = localStorage.getItem('onlineNoticeAck') === '1';
+
     // Check if challenge has spaceshipKeyAtStart AND currentDay exists and is less than 21 days
-    if (challengeData.spaceshipKeyAtStart && 
-        challengeData.currentDay && 
+    if (challengeData.spaceshipKeyAtStart &&
+        challengeData.currentDay &&
         challengeData.currentDay < 21 &&
-		!onlineNoticeAcked) {
+        !onlineNoticeAcked) {
       onlineNoticePopup.style.display = 'flex';
       lockBackground(true);
     }
