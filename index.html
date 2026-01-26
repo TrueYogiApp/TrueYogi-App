@@ -5063,6 +5063,7 @@ function renderOnlineNoticePopup() {
       onlineNoticePopup.style.display = 'none';
       lockBackground(false);
       localStorage.setItem('onlineNoticeAck', '1');
+      updateSpaceshipIndicator();
     }
   }
 }
@@ -8131,9 +8132,15 @@ function getLocalTimeString() {
 function updateSpaceshipIndicator() {
   const indicator = document.getElementById('spaceship-indicator');
   const challengeData = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+  const onlineNoticeAcked = localStorage.getItem('onlineNoticeAck') === '1';
   
-  // Show spaceship icon if it's a spaceship challenge (has spaceshipKeyAtStart)
-  if (challengeData.spaceshipKeyAtStart) {
+  // Show spaceship icon ONLY if:
+  // 1. It's a spaceship challenge (has spaceshipKeyAtStart)
+  // 2. User hasn't acknowledged the online notice
+  // 3. AND we're currently offline
+  const isOffline = !navigator.onLine || !isActuallyOnline();
+  
+  if (challengeData.spaceshipKeyAtStart && !onlineNoticeAcked && isOffline) {
     indicator.classList.remove('hidden');
   } else {
     indicator.classList.add('hidden');
