@@ -9590,6 +9590,7 @@ const completionDateLocal = getLocalDateString(new Date(startTime || Date.now())
     checkJourneyCompletion();
 	showCompletionStats();
 	syncOfflineChallengeToServer();
+  checkDayReset();
 	if (window.walletPublicKey) {
 	fixUnknownSessionIds();
 	const journeyWallet = localStorage.getItem('currentJourneyWallet');
