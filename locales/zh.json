@@ -419,5 +419,10 @@
 "spaceship.info.createChallenge": "在飞船模式中创建一个挑战。",
 "spaceship.info.details": "连续21天完成挑战，不要上网，不要关闭飞行模式或打开WiFi。",
 "spaceship.info.note": "如果在挑战期间上网，挑战将切换为普通挑战。<br>保持离线，飞船挑战才能继续激活！",
-"spaceship.info.button": "知道了"
+"spaceship.info.button": "知道了",
+"online.notice.title": "外部世界已检测到",
+"online.notice.text1": "你与外部世界重新连接。",
+"online.notice.text2": "你的飞船挑战已温和地暂停。",
+"online.notice.text3": "你可以继续作为常规挑战前进，或重置以开启新的飞船冒险。",
+"online.notice.button": "带着觉知返回"
 }

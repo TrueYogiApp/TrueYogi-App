@@ -423,6 +423,11 @@
 "spaceship.info.createChallenge": "Créez un défi en mode Vaisseau Spatial.",
 "spaceship.info.details": "Réalisez votre défi pendant 21 jours sans aller en ligne, sans désactiver le mode avion ou activer le WiFi.",
 "spaceship.info.note": "Si vous vous connectez durant le défi, il deviendra un défi classique.<br>Restez hors ligne pour garder le Défi Vaisseau Spatial actif !",
-"spaceship.info.button": "Compris"
+"spaceship.info.button": "Compris",
+"online.notice.title": "Monde extérieur détecté",
+"online.notice.text1": "Vous vous êtes reconnecté au monde extérieur.",
+"online.notice.text2": "Votre Défi Vaisseau Spatial est mis en pause en douceur.",
+"online.notice.text3": "Vous pouvez poursuivre votre parcours comme un défi classique ou réinitialiser pour commencer une nouvelle aventure Vaisseau Spatial.",
+"online.notice.button": "Revenir en pleine conscience"
 
 }

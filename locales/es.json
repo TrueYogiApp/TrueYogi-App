@@ -418,5 +418,10 @@
 "spaceship.info.createChallenge": "Crea un desafío en modo Nave Espacial.",
 "spaceship.info.details": "Completa tu desafío durante 21 días sin conectarte a internet, sin desactivar el modo avión, ni activar WiFi.",
 "spaceship.info.note": "Si te conectas a internet durante el desafío, se convertirá en un desafío normal.<br>¡Permanece offline para mantener activo el desafío de Nave Espacial!",
-"spaceship.info.button": "Entendido"
+"spaceship.info.button": "Entendido",
+"online.notice.title": "Mundo exterior detectado",
+"online.notice.text1": "Te has reconectado con el mundo exterior.",
+"online.notice.text2": "Tu desafío Nave Espacial se ha pausado suavemente.",
+"online.notice.text3": "Puedes continuar tu viaje como un desafío regular o reiniciar para comenzar una nueva aventura Nave Espacial.",
+"online.notice.button": "Regresa con conciencia"
 }

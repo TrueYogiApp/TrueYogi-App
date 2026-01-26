@@ -418,5 +418,10 @@
 "spaceship.info.createChallenge": "Erstelle eine Herausforderung im Raumschiff-Modus.",
 "spaceship.info.details": "Absolviere deine Herausforderung 21 Tage lang ohne online zu gehen, ohne den Flugmodus auszuschalten oder WLAN zu aktivieren.",
 "spaceship.info.note": "Wenn du während der Herausforderung online gehst, wird sie zu einer regulären Herausforderung.<br>Bleibe offline, um die Raumschiff-Herausforderung aktiv zu halten!",
-"spaceship.info.button": "Verstanden"
+"spaceship.info.button": "Verstanden",
+"online.notice.title": "Außenwelt erkannt",
+"online.notice.text1": "Du hast dich wieder mit der Außenwelt verbunden.",
+"online.notice.text2": "Deine Raumschiff-Challenge wurde sanft pausiert.",
+"online.notice.text3": "Du kannst deine Reise als reguläre Challenge fortsetzen oder zurücksetzen, um ein neues Raumschiff-Abenteuer zu starten.",
+"online.notice.button": "Mit Bewusstheit zurückkehren"
 }

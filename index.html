@@ -2591,6 +2591,18 @@ button[disabled] {
   cursor: pointer;
 }
 
+#online-notice-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -5009,6 +5021,39 @@ if (typeof window.canSwipe === 'function') {
   };
 }
 
+// Create online notice popup
+const onlineNoticePopup = document.createElement('div');
+onlineNoticePopup.id = 'online-notice-popup';
+document.body.appendChild(onlineNoticePopup);
+
+function renderOnlineNoticePopup() {
+  onlineNoticePopup.innerHTML = `
+    <div class="spaceship-popup-inner">
+      <div class="spaceship-title">🌐  ${t('online.notice.title')}</div>
+      <div class="spaceship-text">
+        ${t('online.notice.text1')}<br><br>
+        ${t('online.notice.text2')}<br>
+        ${t('online.notice.text3')}
+      </div>
+      <button id="online-notice-ok"
+      style="margin-top:18px;padding:8px 22px;background:linear-gradient(90deg,#8ab4f8 0%,#8ab4f8 100%);
+          border:none;color:#3f2c00;border-radius:20px;font-weight:bold;font-size:1.07rem;cursor:pointer;
+          box-shadow:0 1px 7px 0 rgba(255,215,60,0.28);
+          transition:filter .16s;">
+        ${t('online.notice.button')}
+      </button>
+    </div>
+  `;
+  const onlineNoticeOkBtn = document.getElementById('online-notice-ok');
+  if (onlineNoticeOkBtn) {
+    onlineNoticeOkBtn.onclick = () => {
+      onlineNoticePopup.style.display = 'none';
+      lockBackground(false);
+      localStorage.setItem('onlineNoticeAck', '1');
+    }
+  }
+}
+
 
     // COnfiguration Form checkbox
 document.getElementById('config-confirm').addEventListener('change', function() {
@@ -6989,6 +7034,7 @@ try {
   
   // Clear Yogi sessions from session history
   clearYogiSessions();
+  localStorage.removeItem('onlineNoticeAck');
   
   // Save the reset data
   saveChallengeData();
@@ -7436,6 +7482,7 @@ async function confirmResetChallenge() {
   localStorage.removeItem('yogiConfig');
   localStorage.removeItem('yogiChallenge');
   clearYogiSessions();
+  localStorage.removeItem('onlineNoticeAck');
 
   challengeData = {
     startDate: null,
@@ -9590,7 +9637,7 @@ const completionDateLocal = getLocalDateString(new Date(startTime || Date.now())
     updateBackButtonVisibility();
     checkJourneyCompletion();
 	showCompletionStats();
-  checkDayReset();
+    checkDayReset();
 	syncOfflineChallengeToServer();
 	if (window.walletPublicKey) {
 	fixUnknownSessionIds();
@@ -11333,6 +11380,7 @@ updateStorageInfo();
 loadSacredLines();
 renderSpaceshipPopup();
 renderSpaceshipInfoPopup();
+renderOnlineNoticePopup();
   const howToMeditateEl = document.getElementById('how-to-meditate-link');
   if (howToMeditateEl) howToMeditateEl.textContent = t('howToMeditate');
   const endMeditationBtn = document.getElementById('end-meditation-btn-label');
@@ -13398,6 +13446,19 @@ function updateOnlineStatus() {
     lockBackground(false);
     spaceshipPopup.style.display = 'none';
     localStorage.removeItem('spaceshipPopupAck');
+	
+	    // NEW: Check if user is in a spaceship challenge and show popup
+    const challengeData = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+	const onlineNoticeAcked = localStorage.getItem('onlineNoticeAck') === '1';
+	
+    // Check if challenge has spaceshipKeyAtStart AND currentDay exists and is less than 21 days
+    if (challengeData.spaceshipKeyAtStart && 
+        challengeData.currentDay && 
+        challengeData.currentDay < 21 &&
+		!onlineNoticeAcked) {
+      onlineNoticePopup.style.display = 'flex';
+      lockBackground(true);
+    }
   }
 }
 

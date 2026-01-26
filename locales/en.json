@@ -423,6 +423,11 @@
 "spaceship.info.createChallenge": "Create a challenge in Spaceship mode.",
 "spaceship.info.details": "Complete your challenge for 21 days without going online, without turning off Airplane Mode, or without turning on WiFi.",
 "spaceship.info.note": "If you go online during the challenge, it will switch to a regular challenge.<br>Stay offline to keep the Spaceship Challenge active!",
-"spaceship.info.button": "Got it"
+"spaceship.info.button": "Got it",
+"online.notice.title": "External World Detected",
+"online.notice.text1": "You’ve reconnected with the outside world.",
+"online.notice.text2": "Your Spaceship Challenge has gently paused.",
+"online.notice.text3": "You can continue your journey as a regular challenge or reset to start new Spaceship adventure.",
+"online.notice.button": "Return with Awareness"
   
 }
