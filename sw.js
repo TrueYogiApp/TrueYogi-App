@@ -31,6 +31,7 @@ const AUDIO_ASSETS = [
   'https://assets.trueyogi.app/assets/music/music-it.mp3',
   'https://assets.trueyogi.app/assets/music/music-ru.mp3',
   'https://assets.trueyogi.app/assets/Spaceship.ultraraygun.mp3',  
+  'https://assets.trueyogi.app/assets/Spaceship-takeoff.wav',    
   '/assets/crown_aum_963hz.mp3',
   '/assets/thirdeye_om_852hz.mp3',
   '/assets/throat_ham_741hz.mp3',

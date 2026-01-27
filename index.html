@@ -4455,6 +4455,7 @@ button[disabled] {
 <audio id="sound-gong" src="https://assets.trueyogi.app/assets/tao-chi-gong.m4a" preload="auto"></audio>
 <audio id="sound-bowl" src="https://assets.trueyogi.app/assets/harmony-bell.m4a" preload="auto"></audio>
 <audio id="spaceship-sound" src="https://assets.trueyogi.app/assets/Spaceship.ultraraygun.mp3" preload="auto"></audio>
+<audio id="spaceship-notice-sound" src="https://assets.trueyogi.app/assets/spaceship-takeoff.wav" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -13511,6 +13512,13 @@ function updateOnlineStatus() {
         !onlineNoticeAcked) {
       onlineNoticePopup.style.display = 'flex';
       lockBackground(true);
+	  		  // Play notice sound
+	var noticeSound = document.getElementById('spaceship-notice-sound');
+	if (noticeSound) {
+	  noticeSound.pause();          // stop if playing
+	  noticeSound.currentTime = 0;  // rewind
+	  noticeSound.play().catch(()=>{});
+	}
     }
   }
 }
@@ -13540,7 +13548,6 @@ statusElement.style.cssText = `
   border-radius: 50%;
   z-index: 10000;
   display: none;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
   cursor: help;
   width: 24px;
   height: 30px;
