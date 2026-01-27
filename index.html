@@ -4017,8 +4017,29 @@ button[disabled] {
       <div id="yogi-progress" class="hidden bg-gray-800 p-4 rounded-lg mb-4">
         <div class="flex justify-between items-center mb-2">
           <p id="sacred" class="text-yellow-300">Sacred 41</p>
-		  <span id="spaceship-indicator" class="ml-1 hidden">
-  <img src="/assets/spaceship.mode.svg" width="33" height="33" class="wobble-slow" alt="Spaceship Mode" title="Spaceship Challenge Active">
+		  <span id="spaceship-indicator" class="ml-1 hidden" style="position:relative;">
+  <img src="/assets/spaceship.mode.svg" width="33" height="33"
+       class="wobble-slow cursor-pointer"
+       alt="Spaceship Mode"
+       title="Spaceship Challenge Active">
+  <span id="spaceship-tooltip" style="
+      display:none;
+      position: absolute;
+      top: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(50,40,80,0.98);
+      color: #f5f0e6;
+      padding: 7px 18px;
+      border-radius: 14px;
+      font-size: 0.96rem;
+      font-weight: 500;
+      white-space: nowrap;
+      z-index: 1000;
+      box-shadow:0 3px 14px 0 rgba(0,0,0,0.12);
+      ">
+     Spaceship Challenge
+  </span>
 </span>
           <span class="text-xs bg-yellow-900 text-yellow-200 px-2 py-1 rounded"><span id="day-label">Day</span> <span id="current-day-display">1</span>/41</span>
         </div>
@@ -4455,7 +4476,7 @@ button[disabled] {
 <audio id="sound-gong" src="https://assets.trueyogi.app/assets/tao-chi-gong.m4a" preload="auto"></audio>
 <audio id="sound-bowl" src="https://assets.trueyogi.app/assets/harmony-bell.m4a" preload="auto"></audio>
 <audio id="spaceship-sound" src="https://assets.trueyogi.app/assets/Spaceship.ultraraygun.mp3" preload="auto"></audio>
-<audio id="spaceship-notice-sound" src="https://assets.trueyogi.app/assets/spaceship-takeoff.wav" preload="auto"></audio>
+<audio id="spaceship-notice-sound" src="https://assets.trueyogi.app/assets/Spaceship-takeoff.wav" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -5068,6 +5089,23 @@ function renderOnlineNoticePopup() {
     }
   }
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+  const indicator = document.getElementById('spaceship-indicator');
+  const tooltip = document.getElementById('spaceship-tooltip');
+  if (indicator && tooltip) {
+    const icon = indicator.querySelector('img');
+    icon.addEventListener('click', function() {
+      tooltip.style.display = 'block';
+      // Hide tooltip after 1.5 seconds
+      setTimeout(() => { tooltip.style.display = 'none'; }, 3000);
+    });
+    // Optional: hide if clicked again immediately
+    icon.addEventListener('blur', function() {
+      tooltip.style.display = 'none';
+    });
+  }
+});
 
 
     // COnfiguration Form checkbox
