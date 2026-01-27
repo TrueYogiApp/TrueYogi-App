@@ -420,7 +420,7 @@
   "spaceship.popup.mantra": "Breathe. Stay. Observe.",
   "spaceship.popup.button": "Continue",
   "spaceship.info.title": "How to Start a Spaceship Challenge",
-"spaceship.info.createChallenge": "Create a challenge in Spaceship mode.",
+"spaceship.info.createChallenge": "Configure TrueYogi Challenge.",
 "spaceship.info.details": "Complete your challenge for 21 days without going online, without turning off Airplane Mode, or without turning on WiFi.",
 "spaceship.info.note": "If you go online during the challenge, it will switch to a regular challenge.<br>Stay offline to keep the Spaceship Challenge active!",
 "spaceship.info.button": "Got it",
