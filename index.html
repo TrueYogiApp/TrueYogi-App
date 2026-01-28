@@ -2612,6 +2612,25 @@ button[disabled] {
   display: inline-block;
 }
 
+
+  /* Add this to your CSS */
+  #config-confirm {
+    width: 1.1rem;
+    height: 1.1rem;
+    min-width: 1.1rem;
+    min-height: 1.1rem;
+  }
+  
+  /* Optional: Better mobile experience */
+  @media (max-width: 640px) {
+    #config-confirm {
+      width: 1.1rem;
+      height: 1.1rem;
+      min-width: 1.1rem;
+      min-height: 1.1rem;
+    }
+  }
+  
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -2955,16 +2974,16 @@ button[disabled] {
       <p id="config-error" class="text-red-400 text-sm mb-3 hidden"></p>
 	  
 	<div class="mb-4 p-3 bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg text-sm text-left border-l-4 border-yellow-500">
-  <label class="flex items-start cursor-pointer">
-    <input type="checkbox" id="config-confirm" 
-           class="mt-1 mr-3 cursor-pointer w-5 h-5 sm:w-6 sm:h-6" 
-           required>
-    <span class="text-gray-300" id="config-confirm-label">
-      <i class="fas fa-seedling text-green-400"></i>
-      <strong class="text-yellow-300"> I plant this seed of practice</strong> with full intention to cultivate it daily, walking this path with conscious devotion to my true self.
-    </span>
-  </label>
-</div>
+	  <label class="flex items-start cursor-pointer">
+		<input type="checkbox" id="config-confirm" 
+			   class="mt-1 mr-3 cursor-pointer" 
+			   required>
+		<span class="text-gray-300" id="config-confirm-label">
+		  <i class="fas fa-seedling text-green-400"></i>
+		  <strong class="text-yellow-300"> I plant this seed of practice</strong> with full intention to cultivate it daily, walking this path with conscious devotion to my true self.
+		</span>
+	  </label>
+	</div>
 	  
 	<button id="begin-journey" onclick="saveYogiConfig()" class="mode-btn w-full bg-gray-700 hover:bg-yellow-500 text-gray-400 hover:text-gray-900 px-4 py-3 rounded-lg font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
 	  <i class="fas fa-check-circle mr-2"></i> Begin Journey
