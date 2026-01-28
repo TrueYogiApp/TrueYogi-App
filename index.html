@@ -13517,6 +13517,34 @@ setAuraColor();
 setInterval(setAuraColor, 1000);
 
 
+function unlockSpaceshipAudio() {
+  const audio = document.getElementById('spaceship-sound');
+  if (audio) {
+    audio.muted = true;
+    audio.play()
+      .then(() => {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.muted = false; // unmute for next time
+      })
+      .catch(()=>{ audio.muted = false; });
+  }
+  // Repeat for your notice sound if needed
+  const noticeSound = document.getElementById('spaceship-notice-sound');
+  if (noticeSound) {
+    noticeSound.muted = true;
+    noticeSound.play()
+      .then(() => {
+        noticeSound.pause();
+        noticeSound.currentTime = 0;
+        noticeSound.muted = false;
+      })
+      .catch(()=>{ noticeSound.muted = false; });
+  }
+}
+window.addEventListener('touchend', unlockSpaceshipAudio, {once:true});
+window.addEventListener('click', unlockSpaceshipAudio, {once:true});
+
 // Enhanced offline detection
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
