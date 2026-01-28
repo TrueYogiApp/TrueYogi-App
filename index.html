@@ -13518,32 +13518,12 @@ setInterval(setAuraColor, 1000);
 
 
 function unlockSpaceshipAudio() {
-  const audio = document.getElementById('spaceship-sound');
-  if (audio) {
-    audio.muted = true;
-    audio.play()
-      .then(() => {
-        audio.pause();
-        audio.currentTime = 0;
-        audio.muted = false; // unmute for next time
-      })
-      .catch(()=>{ audio.muted = false; });
-  }
-  // Repeat for your notice sound if needed
-  const noticeSound = document.getElementById('spaceship-notice-sound');
-  if (noticeSound) {
-    noticeSound.muted = true;
-    noticeSound.play()
-      .then(() => {
-        noticeSound.pause();
-        noticeSound.currentTime = 0;
-        noticeSound.muted = false;
-      })
-      .catch(()=>{ noticeSound.muted = false; });
-  }
+  // Just set a flag, don't play any sounds here
+  window.audioUnlocked = true;
 }
-window.addEventListener('touchend', unlockSpaceshipAudio, {once:true});
-window.addEventListener('click', unlockSpaceshipAudio, {once:true});
+
+window.addEventListener('touchend', unlockSpaceshipAudio, {once: true});
+window.addEventListener('click', unlockSpaceshipAudio, {once: true});
 
 // Enhanced offline detection
 function updateOnlineStatus() {
@@ -13561,15 +13541,14 @@ function updateOnlineStatus() {
         spaceshipPopupShown = true;
 
         // Robust spaceship sound playback:
-        var audio = document.getElementById('spaceship-sound');
-        if (audio) {
-          audio.pause();              // Stop if already playing
-          audio.currentTime = 0;      // Rewind to start
-          // Try to play (user gesture unlock needed ONCE at top)
-          audio.play().catch(function(err){
-            // OPTIONAL: you can log error if you want
-            // console.log("Spaceship sound play error:", err);
-          });
+        // Only play if user has interacted with the page
+        if (window.audioUnlocked) {
+          var audio = document.getElementById('spaceship-sound');
+          if (audio) {
+            audio.pause();              // Stop if already playing
+            audio.currentTime = 0;      // Rewind to start
+            audio.play().catch(function(err){});
+          }
         }
       }, 9000);
     }
@@ -13599,13 +13578,16 @@ function updateOnlineStatus() {
         !onlineNoticeAcked) {
       onlineNoticePopup.style.display = 'flex';
       lockBackground(true);
-	  		  // Play notice sound
-	var noticeSound = document.getElementById('spaceship-notice-sound');
-	if (noticeSound) {
-	  noticeSound.pause();          // stop if playing
-	  noticeSound.currentTime = 0;  // rewind
-	  noticeSound.play().catch(()=>{});
-	}
+      
+      // Play notice sound only if user has interacted with the page
+      if (window.audioUnlocked) {
+        var noticeSound = document.getElementById('spaceship-notice-sound');
+        if (noticeSound) {
+          noticeSound.pause();          // stop if playing
+          noticeSound.currentTime = 0;  // rewind
+          noticeSound.play().catch(()=>{});
+        }
+      }
     }
   }
 }
