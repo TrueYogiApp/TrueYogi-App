@@ -13518,35 +13518,34 @@ setInterval(setAuraColor, 1000);
 
 
 function unlockSpaceshipAudio() {
-  // Just set a flag, don't play any sounds here
-  window.audioUnlocked = true;
+  // Use localStorage which persists across page loads
+  localStorage.setItem('audioUnlocked', 'true');
 }
 
 window.addEventListener('touchend', unlockSpaceshipAudio, {once: true});
 window.addEventListener('click', unlockSpaceshipAudio, {once: true});
 
-// Enhanced offline detection
+// Then in updateOnlineStatus, check localStorage:
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
   const acked = localStorage.getItem('spaceshipPopupAck') === '1';
   const offlineInstalled = localStorage.getItem('trueyogi_offline_installed') === 'true';
+  const audioUnlocked = localStorage.getItem('audioUnlocked') === 'true'; // ← CHECK HERE
 
   if (!navigator.onLine || !isActuallyOnline()) {
     status.style.display = 'block';
-    // ADD THIS: only show popup if offline mode is installed
     if (!spaceshipPopupShown && !spaceshipPopupTimer && !acked && offlineInstalled) {
       spaceshipPopupTimer = setTimeout(() => {
         spaceshipPopup.style.display = 'flex';
         lockBackground(true);
         spaceshipPopupShown = true;
 
-        // Robust spaceship sound playback:
-        // Only play if user has interacted with the page
-        if (window.audioUnlocked) {
+        // Only play if audio is unlocked
+        if (audioUnlocked) { // ← USE THE VARIABLE
           var audio = document.getElementById('spaceship-sound');
           if (audio) {
-            audio.pause();              // Stop if already playing
-            audio.currentTime = 0;      // Rewind to start
+            audio.pause();
+            audio.currentTime = 0;
             audio.play().catch(function(err){});
           }
         }
@@ -13561,17 +13560,14 @@ function updateOnlineStatus() {
     spaceshipPopup.style.display = 'none';
     localStorage.removeItem('spaceshipPopupAck');
     
-    // NEW: Hide spaceship indicator when online
     const indicator = document.getElementById('spaceship-indicator');
     if (indicator) {
       indicator.classList.add('hidden');
     }
 	
-    // NEW: Check if user is in a spaceship challenge and show popup
     const challengeData = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
     const onlineNoticeAcked = localStorage.getItem('onlineNoticeAck') === '1';
 
-    // Check if challenge has spaceshipKeyAtStart AND currentDay exists and is less than 21 days
     if (challengeData.spaceshipKeyAtStart &&
         challengeData.currentDay &&
         challengeData.currentDay < 21 &&
@@ -13579,12 +13575,12 @@ function updateOnlineStatus() {
       onlineNoticePopup.style.display = 'flex';
       lockBackground(true);
       
-      // Play notice sound only if user has interacted with the page
-      if (window.audioUnlocked) {
+      // Only play if audio is unlocked
+      if (audioUnlocked) { // ← USE THE SAME VARIABLE
         var noticeSound = document.getElementById('spaceship-notice-sound');
         if (noticeSound) {
-          noticeSound.pause();          // stop if playing
-          noticeSound.currentTime = 0;  // rewind
+          noticeSound.pause();
+          noticeSound.currentTime = 0;
           noticeSound.play().catch(()=>{});
         }
       }
