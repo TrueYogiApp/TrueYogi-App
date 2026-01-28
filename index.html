@@ -20163,7 +20163,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
 	  //await window.fetchYogiConfigFromSupabase();
-      await window.fetchYogiChallengeFromSupabase();
+      //await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
       // Sync the Yogi Config (new logic includes skip for already synced)
