@@ -13517,6 +13517,49 @@ setAuraColor();
 setInterval(setAuraColor, 1000);
 
 
+let pageLoadedTime = Date.now();
+
+function unlockSpaceshipAudio() {
+  // Don't unlock if page just loaded (within 3 seconds)
+  // Prevents auto-clicks/touches that happen immediately on page load
+  if (Date.now() - pageLoadedTime < 3000) {
+    return;
+  }
+  
+  const audio = document.getElementById('spaceship-sound');
+  if (audio) {
+    audio.muted = true;     // Mute it
+    audio.volume = 0;       // Set volume to 0
+    audio.play()           // Try to play (silently)
+      .then(() => {
+        setTimeout(() => {
+          audio.pause();              // Stop playback
+          audio.currentTime = 0;      // Rewind
+          audio.muted = false;        // Unmute for future
+          audio.volume = 1;           // Restore volume
+        }, 50); // Wait 50ms then cleanup
+      })
+      .catch(() => { 
+        // If play fails, just restore settings
+        audio.muted = false;
+        audio.volume = 1;
+      });
+  }
+  
+  // Same for notice sound...
+}
+
+// Set page load time when DOM loads
+document.addEventListener('DOMContentLoaded', function() {
+  pageLoadedTime = Date.now();
+});
+
+// Wait 3 seconds BEFORE even listening for clicks/touches
+setTimeout(() => {
+  window.addEventListener('touchend', unlockSpaceshipAudio, {once:true});
+  window.addEventListener('click', unlockSpaceshipAudio, {once:true});
+}, 3000); // Wait 3 seconds before listening
+
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
   const acked = localStorage.getItem('spaceshipPopupAck') === '1';
