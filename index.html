@@ -4496,14 +4496,7 @@ button[disabled] {
 <audio id="sound-chimes" src="https://assets.trueyogi.app/assets/tamtam-gong.m4a" preload="auto"></audio>
 <audio id="sound-gong" src="https://assets.trueyogi.app/assets/tao-chi-gong.m4a" preload="auto"></audio>
 <audio id="sound-bowl" src="https://assets.trueyogi.app/assets/harmony-bell.m4a" preload="auto"></audio>
-<audio 
-  id="spaceship-sound" 
-  src="https://assets.trueyogi.app/assets/Spaceship.ultraraygun.mp3" 
-  preload="auto"
-  playsinline
-  webkit-playsinline
-  muted="false">
-</audio>
+<audio id="spaceship-sound" src="https://assets.trueyogi.app/assets/Spaceship.ultraraygun.mp3" preload="auto"></audio>
 <audio id="spaceship-notice-sound" src="https://assets.trueyogi.app/assets/Spaceship-takeoff.wav" preload="auto"></audio>
 
  <!-- Certificate Page HTML  --> 
@@ -13524,37 +13517,30 @@ setAuraColor();
 setInterval(setAuraColor, 1000);
 
 
-function unlockSpaceshipAudio() {
-  // Use localStorage which persists across page loads
-  localStorage.setItem('audioUnlocked', 'true');
-}
-
-window.addEventListener('touchend', unlockSpaceshipAudio, {once: true});
-window.addEventListener('click', unlockSpaceshipAudio, {once: true});
-
-// Then in updateOnlineStatus, check localStorage:
 function updateOnlineStatus() {
   const status = document.getElementById('online-status');
   const acked = localStorage.getItem('spaceshipPopupAck') === '1';
   const offlineInstalled = localStorage.getItem('trueyogi_offline_installed') === 'true';
-  const audioUnlocked = localStorage.getItem('audioUnlocked') === 'true'; // ← CHECK HERE
 
   if (!navigator.onLine || !isActuallyOnline()) {
     status.style.display = 'block';
+    // ADD THIS: only show popup if offline mode is installed
     if (!spaceshipPopupShown && !spaceshipPopupTimer && !acked && offlineInstalled) {
       spaceshipPopupTimer = setTimeout(() => {
         spaceshipPopup.style.display = 'flex';
         lockBackground(true);
         spaceshipPopupShown = true;
 
-        // Only play if audio is unlocked
-        if (audioUnlocked) { // ← USE THE VARIABLE
-          var audio = document.getElementById('spaceship-sound');
-          if (audio) {
-            audio.pause();
-            audio.currentTime = 0;
-            audio.play().catch(function(err){});
-          }
+        // Robust spaceship sound playback:
+        var audio = document.getElementById('spaceship-sound');
+        if (audio) {
+          audio.pause();              // Stop if already playing
+          audio.currentTime = 0;      // Rewind to start
+          // Try to play (user gesture unlock needed ONCE at top)
+          audio.play().catch(function(err){
+            // OPTIONAL: you can log error if you want
+            // console.log("Spaceship sound play error:", err);
+          });
         }
       }, 9000);
     }
@@ -13567,30 +13553,30 @@ function updateOnlineStatus() {
     spaceshipPopup.style.display = 'none';
     localStorage.removeItem('spaceshipPopupAck');
     
+    // NEW: Hide spaceship indicator when online
     const indicator = document.getElementById('spaceship-indicator');
     if (indicator) {
       indicator.classList.add('hidden');
     }
 	
+    // NEW: Check if user is in a spaceship challenge and show popup
     const challengeData = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
     const onlineNoticeAcked = localStorage.getItem('onlineNoticeAck') === '1';
 
+    // Check if challenge has spaceshipKeyAtStart AND currentDay exists and is less than 21 days
     if (challengeData.spaceshipKeyAtStart &&
         challengeData.currentDay &&
         challengeData.currentDay < 21 &&
         !onlineNoticeAcked) {
       onlineNoticePopup.style.display = 'flex';
       lockBackground(true);
-      
-      // Only play if audio is unlocked
-      if (audioUnlocked) { // ← USE THE SAME VARIABLE
-        var noticeSound = document.getElementById('spaceship-notice-sound');
-        if (noticeSound) {
-          noticeSound.pause();
-          noticeSound.currentTime = 0;
-          noticeSound.play().catch(()=>{});
-        }
-      }
+	  		  // Play notice sound
+	var noticeSound = document.getElementById('spaceship-notice-sound');
+	if (noticeSound) {
+	  noticeSound.pause();          // stop if playing
+	  noticeSound.currentTime = 0;  // rewind
+	  noticeSound.play().catch(()=>{});
+	}
     }
   }
 }
