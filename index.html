@@ -13546,7 +13546,25 @@ function unlockSpaceshipAudio() {
       });
   }
   
-  // Same for notice sound...
+  // Add notice sound unlock
+  const noticeSound = document.getElementById('spaceship-notice-sound');
+  if (noticeSound) {
+    noticeSound.muted = true;
+    noticeSound.volume = 0;
+    noticeSound.play()
+      .then(() => {
+        setTimeout(() => {
+          noticeSound.pause();
+          noticeSound.currentTime = 0;
+          noticeSound.muted = false;
+          noticeSound.volume = 1;
+        }, 50);
+      })
+      .catch(() => { 
+        noticeSound.muted = false;
+        noticeSound.volume = 1;
+      });
+  }
 }
 
 // Set page load time when DOM loads
