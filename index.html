@@ -10077,6 +10077,16 @@ if (
     challengeData.streakDays = challengeData.currentDay;
     saveChallengeData();
   }
+  
+    // ========== SIMPLE FIX ==========
+  // If today is completed, make sure streak equals currentDay
+  const completedToday = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length >= challengeData.requiredSessions;
+  
+  if (completedToday && challengeData.streakDays < challengeData.currentDay) {
+    challengeData.streakDays = challengeData.currentDay;
+    saveChallengeData();
+    updateProgressDisplay && updateProgressDisplay();
+  }
 }
 
 
