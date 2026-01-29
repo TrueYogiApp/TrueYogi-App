@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <meta name="theme-color" content="#1e293b">
   <title>TrueYogi</title>
   <meta name="description" content="True Yogi (YOGI) draws from Bhagavad Gita wisdom: 'A Yogi excels the monk, scholar, and ritualist. Strive to be a Yogi.' Anchoring a cosmic grid of awakened souls devoted to meditation and truth. Earn YOGI tokens through stillness practice and wisdom engagement.">
@@ -4965,23 +4965,21 @@ let modalPopupActive = false; // globally
 
 function lockBackground(lock) {
   if (lock) {
-    // Lock everything
     document.body.style.overflow = 'hidden';
     document.body.style.position = 'fixed';
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
-    document.body.style.touchAction = 'none'; // Block touch gestures
+    document.body.style.top = `-${window.scrollY}px`; // Save scroll position
     document.body.classList.add('spaceship-popup-active');
     modalPopupActive = true;
   } else {
-    // Unlock everything
+    const scrollY = document.body.style.top;
     document.body.style.overflow = '';
     document.body.style.position = '';
-    document.body.style.width = '';
-    document.body.style.height = '';
-    document.body.style.touchAction = '';
+    document.body.style.top = '';
     document.body.classList.remove('spaceship-popup-active');
     modalPopupActive = false;
+    
+    // Restore scroll position
+    window.scrollTo(0, parseInt(scrollY || '0') * -1);
   }
 }
 
