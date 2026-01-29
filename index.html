@@ -4964,13 +4964,24 @@ loadSacredLines();
 let modalPopupActive = false; // globally
 
 function lockBackground(lock) {
-  document.body.style.overflow = lock ? 'hidden' : '';
   if (lock) {
+    // Lock everything
+    document.body.style.overflow = 'hidden';
+    document.body.style.position = 'fixed';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+    document.body.style.touchAction = 'none'; // Block touch gestures
     document.body.classList.add('spaceship-popup-active');
-	modalPopupActive = true;
+    modalPopupActive = true;
   } else {
+    // Unlock everything
+    document.body.style.overflow = '';
+    document.body.style.position = '';
+    document.body.style.width = '';
+    document.body.style.height = '';
+    document.body.style.touchAction = '';
     document.body.classList.remove('spaceship-popup-active');
-	modalPopupActive = false;
+    modalPopupActive = false;
   }
 }
 
