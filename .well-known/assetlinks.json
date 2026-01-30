@@ -1,8 +1,0 @@
-[{
-      "relation": ["delegate_permission/common.handle_all_urls"],
-      "target": {
-        "namespace": "android_app",
-        "package_name": "app.trueyogi.android",
-        "sha256_cert_fingerprints": ["E6:AC:B4:A6:08:3E:2C:41:36:1C:FB:41:D5:C5:95:8B:9D:FC:9B:A5:65:62:A9:0B:63:04:BE:A5:BB:8B:D1:BC"]
-      }
-    }]
