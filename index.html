@@ -3048,6 +3048,13 @@ button[disabled] {
 <!-- Wallet Required Modal (Day 21+) -->
 <div id="wallet-required-modal" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true">
   <div class="confirmation-modal max-w-md mx-4 p-6 rounded-xl text-center">
+    <!-- NEW: Celebration / Congratulations! -->
+    <div id="wallet-congrats-emoji" class="text-green-400 text-4xl mb-2">🎉</div>
+    <h2 id="wallet-congrats-heading" class="font-semibold text-green-300 mb-1" style="font-size:1.2em;">Congratulations!</h2>
+    <p id="wallet-congrats-description" class="mb-4 text-gray-100" style="font-size:1em;">
+      You completed your 21-day spiritual challenge. Your dedication is truly inspiring.
+    </p>
+    <!-- Existing Wallet Icon and Title -->
     <div class="text-yellow-400 text-5xl mb-4">
       <i class="fas fa-wallet"></i>
     </div>
@@ -3055,18 +3062,18 @@ button[disabled] {
     <p class="text-gray-200 mb-4">
       To continue your sacred journey beyond 21 days, please connect and verify your wallet.<br>
       This ensures your progress and rewards are secure.<br>
-	  Or you can reset the challenge and start again from day 1.
+      Or you can reset the challenge and start again from day 1.
     </p>
-<div class="flex flex-col gap-4">
-  <button onclick="connectWalletForDay21()" 
-    class="mode-btn w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-3 rounded-lg font-semibold cursor-pointer">
-    <i class="fas fa-wallet mr-2"></i> Connect Wallet
-  </button>
-  <button onclick="resetChallengeForDay21()" 
-    class="mode-btn w-full bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-lg font-semibold cursor-pointer">
-    <i class="fas fa-redo mr-2"></i> Reset Challenge
-  </button>
-</div>
+    <div class="flex flex-col gap-4">
+      <button onclick="connectWalletForDay21()" 
+        class="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-3 rounded-lg font-semibold cursor-pointer">
+        <i class="fas fa-wallet mr-2"></i> Connect Wallet
+      </button>
+      <button onclick="resetChallengeForDay21()" 
+        class="w-full bg-gray-700 hover:bg-gray-600 text-white px-4 py-3 rounded-lg font-semibold cursor-pointer">
+        <i class="fas fa-redo mr-2"></i> Save & Reset Challenge
+      </button>
+    </div>
   </div>
 </div>
 
@@ -11768,14 +11775,18 @@ renderOnlineNoticePopup();
   ${t('syncAuthRequiredLine2')}<br>
   <span class="block mt-2 text-yellow-400">${t('syncAuthRequiredVerify')}</span>
 `;
-  document.querySelector('#wallet-required-modal h2').textContent = t('walletRequiredHeading');
-  document.querySelector('#wallet-required-modal .text-gray-200').innerHTML = `
+document.querySelector('#wallet-congrats-emoji').textContent = t('walletRequiredCongratsEmoji');
+document.querySelector('#wallet-congrats-heading').textContent = t('walletRequiredCongratsHeading');
+document.querySelector('#wallet-congrats-description').textContent = t('walletRequiredCongratsDescription');
+
+document.querySelector('#wallet-required-modal h2.text-xl').textContent = t('walletRequiredHeading');
+document.querySelector('#wallet-required-modal .text-gray-200').innerHTML = `
   ${t('walletRequiredDescriptionLine1')}<br>
   ${t('walletRequiredDescriptionLine2')}<br>
   ${t('walletRequiredDescriptionLine3')}
 `;
-  document.querySelector('#wallet-required-modal .bg-yellow-500').innerHTML = `<i class="fas fa-wallet mr-2"></i> ${t('walletRequiredButtonConnect')}`;
-  document.querySelector('#wallet-required-modal .bg-gray-700').innerHTML = `<i class="fas fa-redo mr-2"></i> ${t('walletRequiredButtonReset')}`;
+document.querySelector('#wallet-required-modal .bg-yellow-500').innerHTML = `<i class="fas fa-wallet mr-2"></i> ${t('walletRequiredButtonConnect')}`;
+document.querySelector('#wallet-required-modal .bg-gray-700').innerHTML = `<i class="fas fa-redo mr-2"></i> ${t('walletRequiredButtonReset')}`;
   document.querySelector('#claim-required-modal h2').textContent = t('claimRequiredHeading');
   document.querySelector('#claim-required-modal .text-gray-200').innerHTML = t('claimRequiredDescription');
   document.querySelector('#journey-complete-section .text-yellow-300').textContent = t('journeyCompleteHeading');
@@ -20411,8 +20422,8 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	 fixUnknownSessionIds();
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
-	  await window.fetchYogiConfigFromSupabase();
-      await window.fetchYogiChallengeFromSupabase();
+	  //await window.fetchYogiConfigFromSupabase();
+      //await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
       // Sync the Yogi Config (new logic includes skip for already synced)
