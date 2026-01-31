@@ -7352,74 +7352,65 @@ function showEnhancedResetModal() {
   const currentDay = challenge.currentDay || 1;
   const currentStreak = challenge.streakDays || 0;
   const totalSessions = challenge.totalSessions || 0;
-  const challengeStreak = challenge.challengeStreak || 0;
   
-  // FIXED: Better user status detection
-  const hasWalletKey = window.walletPublicKey && typeof window.walletPublicKey === 'string' && window.walletPublicKey.trim() !== '';
-  const hasJwtToken = localStorage.getItem('jwtToken') && localStorage.getItem('jwtToken').trim() !== '';
+  // SIMPLE CHECK: Is user full access?
+  const isFullAccess = window.walletPublicKey && localStorage.getItem('jwtToken');
   
-  let maxAllowedDays = 41; // Default maximum
+  // Calculate days to show - full access users see actual, others see capped at 21
+  const daysToShow = isFullAccess ? currentDay : Math.min(currentDay, 21);
+  const daysProgressLost = Math.max(0, daysToShow - 1);
   
-  // FIXED: Clearer logic for determining user type
-  if (!hasWalletKey && !hasJwtToken) {
-    // Truly offline user - no wallet key AND no JWT token
-    maxAllowedDays = 21;
-  } else if (hasWalletKey && hasJwtToken) {
-    // Full access user - both wallet key AND JWT token
-    maxAllowedDays = 41;
-  } else {
-    // Partial access user (one or the other)
-    maxAllowedDays = 41; // Or whatever you want for partial users
-  }
-
-  // DEBUG: Log user status for troubleshooting
-  console.log('User status:', {
-    hasWalletKey,
-    hasJwtToken,
+  // DEBUG
+  console.log('Reset Modal Debug:', {
+    isFullAccess,
     walletPublicKey: window.walletPublicKey,
-    maxAllowedDays,
-    currentDay
+    jwtToken: localStorage.getItem('jwtToken') ? 'exists' : 'null',
+    currentDay,
+    daysToShow,
+    daysProgressLost
   });
-
-  let cappedCurrentDay = currentDay;
-  if (cappedCurrentDay > maxAllowedDays) {
-    cappedCurrentDay = maxAllowedDays;
-  }
-
-  const daysProgressLost = Math.max(0, cappedCurrentDay - 1); // Show as "days completed"
-  const streakDaysLost = currentStreak;
-  const totalSessionsLost = totalSessions;
   
-  // Update the display
-  document.getElementById('days-progress-lost').textContent = daysProgressLost;
-  document.getElementById('streak-days-lost').textContent = streakDaysLost;
-  document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
+  // SAFELY update display if elements exist
+  const daysElement = document.getElementById('days-progress-lost');
+  const streakElement = document.getElementById('streak-days-lost');
+  const sessionsElement = document.getElementById('total-sessions-lost');
+  
+  if (daysElement) daysElement.textContent = daysProgressLost;
+  if (streakElement) streakElement.textContent = currentStreak;
+  if (sessionsElement) sessionsElement.textContent = totalSessions;
   
   // Show warning if anything will be lost
   const warningDiv = document.getElementById('progress-loss-warning');
-  const willLoseProgress = daysProgressLost > 0 || streakDaysLost > 0 || totalSessionsLost > 0;
+  const willLoseProgress = daysProgressLost > 0 || currentStreak > 0 || totalSessions > 0;
   
-  if (willLoseProgress) {
-    warningDiv.classList.remove('hidden');
-    
-    // Add visual warning for significant loss
-    if (daysProgressLost > 10 || streakDaysLost > 10) {
-      warningDiv.classList.add('pulse-warning');
+  if (warningDiv) {
+    if (willLoseProgress) {
+      warningDiv.classList.remove('hidden');
+      
+      // Add visual warning for significant loss
+      if (daysProgressLost > 10 || currentStreak > 10) {
+        warningDiv.classList.add('pulse-warning');
+      }
+    } else {
+      warningDiv.classList.add('hidden');
     }
-  } else {
-    warningDiv.classList.add('hidden');
   }
   
   // Show modal
-  document.getElementById('reset-confirmation-modal').classList.remove('hidden');
+  const modal = document.getElementById('reset-confirmation-modal');
+  if (modal) {
+    modal.classList.remove('hidden');
+  }
   
   // Add shake effect if significant progress
-  if (daysProgressLost > 5 || streakDaysLost > 5) {
+  if (daysProgressLost > 5 || currentStreak > 5) {
     const proceedBtn = document.getElementById('proceed-to-reset-btn');
-    proceedBtn.classList.add('shake-warning');
-    setTimeout(() => {
-      proceedBtn.classList.remove('shake-warning');
-    }, 500);
+    if (proceedBtn) {
+      proceedBtn.classList.add('shake-warning');
+      setTimeout(() => {
+        proceedBtn.classList.remove('shake-warning');
+      }, 500);
+    }
   }
 }
 
