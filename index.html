@@ -4747,14 +4747,6 @@ button[disabled] {
 
 <div id="challenge-completed-modal" class="hidden"></div>
 
-<div id="swipe-indicator" class="swipe-indicator">
-  <i class="fas fa-arrow-right"></i> <!-- Changed from fa-arrow-left to fa-arrow-right -->
-</div>
-
-<!-- Right swipe indicator for FAQ -->
-<div id="swipe-indicator-right" class="swipe-indicator-right">
-  <i class="fas fa-arrow-right"></i>
-</div>
 
 <!-- Modal Overlay and Window -->
 <div id="challenge-history-modal-overlay" class="hidden fixed inset-0 bg-black bg-opacity-40 z-40"></div>
@@ -4765,6 +4757,181 @@ button[disabled] {
   <!-- Additional styles added for responsiveness -->
   <!-- Content filled by JS -->
 </div>
+
+
+<!-- Place these at the very END of your <body> -->
+<div id="swipe-indicator" class="swipe-indicator" style="position:fixed;z-index:10001;">
+  <i class="fas fa-arrow-right"></i>
+</div>
+<div id="swipe-indicator-right" class="swipe-indicator-right" style="position:fixed;z-index:10001;">
+  <i class="fas fa-arrow-right"></i>
+</div>
+
+<div id="dashboard-panel" style="
+  display: none;
+  position: fixed; left: 0; top: 0;
+  width: 100vw; height: 100vh;
+  background: #181825;
+  color: #fff;
+  z-index: 10000;
+  flex-direction: column;
+  overflow: hidden;
+">
+  <!-- Simple Header -->
+  <div style="
+    padding: 40px 20px 20px 20px; /* Added top padding for phone notch */
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+  ">
+    <h2 style="margin: 0 0 8px 0;">📚 Reading Materials</h2>
+    <div style="color: #94a3b8; font-size: 14px;">
+       Swipe left from right edge to close 👈
+    </div>
+  </div>
+
+  <!-- PDF List -->
+<div id="pdf-list" style="padding: 20px; overflow-y: auto; flex: 1;"></div>
+
+  <!-- PDF Viewer Overlay - SIMPLIFIED -->
+  <div id="pdf-viewer-overlay" style="
+    display: none;
+    position: absolute; left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(24,24,37,0.98);
+    z-index: 10001;
+    flex-direction: column;
+    padding-top: 40px; /* Added for phone notch */
+  ">
+    <!-- SIMPLE HEADER - NO DOWNLOAD BUTTON -->
+    <div style="
+      padding: 15px 20px;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    ">
+      <div id="pdf-title" style="font-size: 16px; font-weight: bold;">Loading PDF...</div>
+      <button onclick="closePDFinline()" style="
+        background: rgba(239,68,68,0.3);
+        border: 1px solid rgba(239,68,68,0.5);
+        color: #fca5a5;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+      ">Close</button>
+    </div>
+
+    <!-- SIMPLE PDF VIEWER -->
+    <div style="
+      flex: 1;
+      overflow: auto;
+    ">
+      <iframe id="pdf-iframe" style="
+        width: 100%;
+        height: 100%;
+        border: none;
+        background: white;
+      "></iframe>
+    </div>
+  </div>
+
+  <!-- Simple Footer -->
+  <div style="
+    padding: 15px;
+    text-align: center;
+    color: #64748b;
+    font-size: 13px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+  ">
+    Tap any PDF to open it
+  </div>
+</div>
+
+<script>
+// SIMPLE PDF FUNCTIONS
+let currentPDF = null;
+let currentPDFName = '';
+let pdfs = [];
+
+// --- Color palette to rotate through for cards (add or edit as you like) ---
+const cardColors = [
+  {bg:'rgba(59,130,246,0.14)', border:'rgba(59,130,246,0.22)', icon:'#60a5fa'},   // blue
+  {bg:'rgba(16,185,129,0.14)', border:'rgba(16,185,129,0.22)', icon:'#34d399'},   // emerald
+  {bg:'rgba(168,85,247,0.13)', border:'rgba(168,85,247,0.22)', icon:'#a78bfa'},   // purple
+  {bg:'rgba(250,204,21,0.15)', border:'rgba(250,204,21,0.20)', icon:'#facc15'},   // gold
+  {bg:'rgba(96,165,250,0.14)', border:'rgba(96,165,250,0.22)', icon:'#60a5fa'},   // sky
+  {bg:'rgba(251,113,133,0.12)', border:'rgba(251,113,133,0.18)', icon:'#fb7185'}, // rose
+  {bg:'rgba(100,116,139,0.12)', border:'rgba(100,116,139,0.18)', icon:'#64748b'}, // slate
+  {bg:'rgba(22,163,74,0.13)', border:'rgba(22,163,74,0.20)', icon:'#16a34a'},     // dark green
+];
+
+// --- Dynamically render PDF cards in dashboard ---
+function renderPDFList() {
+  const list = document.getElementById('pdf-list');
+  list.innerHTML = ""; // Clear existing
+
+  pdfs.forEach((pdf, i) => {
+    const color = cardColors[i % cardColors.length];
+    const html =
+      `<div class="pdf-item" onclick="viewPDFinline('${pdf.url.replace(/'/g,"\\'")}', '${pdf.title.replace(/'/g,"\\'") }')" 
+        style="background:${color.bg};border:1px solid ${color.border};border-radius:12px;padding:20px;margin-bottom:15px;cursor:pointer;transition:transform 0.2s;"
+        onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
+        <div style="display:flex;align-items:center;gap:15px;">
+          <div style="width:50px;height:50px;background:${color.bg};border-radius:10px;display:flex;align-items:center;justify-content:center;">
+            <i class="fas fa-book" style="font-size:28px;color:${color.icon};"></i>
+          </div>
+          <div style="flex:1;">
+            <h3 style="margin:0 0 5px 0;">${pdf.title}</h3>
+            <p style="margin:0;color:#94a3b8;font-size:14px;">${pdf.author}</p>
+          </div>
+          <div style="color:${color.icon};font-size:20px;">→</div>
+        </div>
+      </div>`;
+    list.insertAdjacentHTML('beforeend', html);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('https://assets.trueyogi.app/assets/Material/material.json')
+    .then(r => r.json())
+    .then(data => {
+      pdfs = data;
+      renderPDFList();
+    })
+    .catch(e => {
+      document.getElementById('pdf-list').innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">Failed to load books list.</div>';
+    });
+});
+
+document.addEventListener('DOMContentLoaded', renderPDFList);
+
+// Your viewer func stays the same!
+function viewPDFinline(pdfPath, pdfName) {
+  const overlay = document.getElementById('pdf-viewer-overlay');
+  const iframe = document.getElementById('pdf-iframe');
+
+  overlay.style.display = 'flex';
+  document.getElementById('pdf-title').textContent = pdfName;
+
+  currentPDF = pdfPath;
+  currentPDFName = pdfName;
+
+  // Always use Google Docs Viewer (works on both mobile & desktop)
+  const encodedUrl = encodeURIComponent(pdfPath);
+  iframe.src = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
+}
+
+function closePDFinline() {
+  const overlay = document.getElementById('pdf-viewer-overlay');
+  const container = document.querySelector('#pdf-viewer-overlay > div:last-child');
+  container.innerHTML = '<iframe id="pdf-iframe" style="width:100%;height:100%;border:none;background:white;"></iframe>';
+  overlay.style.display = 'none';
+  currentPDF = null;
+  currentPDFName = '';
+}
+</script>
 
   <script>
     // State Management
@@ -16872,202 +17039,214 @@ function stopMeditationMusicOnClose() {
 
 
 // Simpler, more reliable swipe detection
-let touchStartX = 0;
-let touchStartY = 0;
-let isSwipeActive = false;
-let swipeType = null;
+let dashboardActive = false;
+let touchStartX = 0, touchStartY = 0, isSwipeActive = false, swipeType = null;
 const SWIPE_THRESHOLD = 120;
-const SWIPE_AREA = 30;
-const RIGHT_SWIPE_AREA = 30;
-const SHOW_INDICATOR_THRESHOLD = SWIPE_THRESHOLD * 0.3;
+const SWIPE_AREA = 30; // px from left
+const RIGHT_SWIPE_AREA = 30; // px from right
 
-// Simple function to check if we can swipe
 function canSwipe() {
-  // Don't swipe during active session
-  if (typeof sessionActive !== 'undefined' && sessionActive) {
-    return false;
-  }
-  
-  // Don't swipe in post-session screens
+  if (typeof sessionActive !== 'undefined' && sessionActive) return false;
   const completeSection = document.getElementById('complete-section');
   const finalSection = document.getElementById('final-section');
   if ((completeSection && !completeSection.classList.contains('hidden')) ||
-      (finalSection && !finalSection.classList.contains('hidden'))) {
+      (finalSection && !finalSection.classList.contains('hidden')))
     return false;
+  // Block if any overlay/modal
+  const modalBlocks = ['missed-session-modal','mobile-required-modal'];
+  for (let id of modalBlocks) {
+    const m = document.getElementById(id);
+    if (m && !m.classList.contains('hidden')) return false;
   }
-  
-  // Check if in any blocking modal
-  const missedModal = document.getElementById('missed-session-modal');
-  const mobileModal = document.getElementById('mobile-required-modal');
-  if ((missedModal && !missedModal.classList.contains('hidden')) ||
-      (mobileModal && !mobileModal.classList.contains('hidden'))) {
-    return false;
-  }
-  
   return true;
 }
 
-// Check which mode button was touched
 function getModeFromTouch(touchY) {
   const flowBtn = document.getElementById('flow-mode-btn-select');
   const yogiBtn = document.getElementById('yogi-mode-btn-select');
-  
   if (flowBtn && yogiBtn) {
     const flowRect = flowBtn.getBoundingClientRect();
     const yogiRect = yogiBtn.getBoundingClientRect();
-    
-    if (touchY >= flowRect.top && touchY <= flowRect.bottom) {
-      return 'flow';
-    }
-    if (touchY >= yogiRect.top && touchY <= yogiRect.bottom) {
-      return 'yogi';
-    }
+    if (touchY >= flowRect.top && touchY <= flowRect.bottom) return 'flow';
+    if (touchY >= yogiRect.top && touchY <= yogiRect.bottom) return 'yogi';
   }
-  
   return null;
 }
 
 // TOUCH START
 document.addEventListener('touchstart', (e) => {
   if (!canSwipe()) return;
-  
   const touchX = e.touches[0].clientX;
   const touchY = e.touches[0].clientY;
   const windowWidth = window.innerWidth;
-  
-  // Left edge (for back OR entering modes)
-  if (touchX < SWIPE_AREA) {
-    touchStartX = touchX;
-    touchStartY = touchY;
-    isSwipeActive = true;
-    swipeType = 'left';
-  }
-  
-  // Right edge (for FAQ)
-  else if (touchX > windowWidth - RIGHT_SWIPE_AREA) {
-    // Check if FAQ is already open
-    const faqModal = document.getElementById('faq-modal');
-    if (faqModal && !faqModal.classList.contains('hidden')) {
-      return; // FAQ is already open
-    }
-    
-    touchStartX = touchX;
-    isSwipeActive = true;
-    swipeType = 'right';
+
+  if (!dashboardActive && touchX < SWIPE_AREA) {
+    touchStartX = touchX; touchStartY = touchY; isSwipeActive = true; swipeType = 'left';
+  } else if (touchX > windowWidth - RIGHT_SWIPE_AREA) {
+    // Always treat as possible dashboard close if dashboard is shown
+    touchStartX = touchX; touchStartY = touchY; isSwipeActive = true; swipeType = 'right';
   }
 });
 
 // TOUCH MOVE
 document.addEventListener('touchmove', (e) => {
   if (!isSwipeActive || !canSwipe()) return;
-  
   const currentX = e.touches[0].clientX;
   const swipeDistance = currentX - touchStartX;
-  
-  // Left edge swipe (moving right)
-  if (swipeType === 'left' && swipeDistance > 0) {
-    const indicator = document.getElementById('swipe-indicator'); // FIX: Add this
-    if (!indicator) return; // FIX: Add this
-    
-    const translateX = Math.min(swipeDistance / 2, 40);
-    indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
-    indicator.classList.toggle('show', swipeDistance > SHOW_INDICATOR_THRESHOLD);
-    
-    // Color change based on start position
-    const mode = getModeFromTouch(touchStartY);
-    if (mode === 'flow') {
-      indicator.style.background = 'rgba(59, 130, 246, 0.2)';
-      const icon = indicator.querySelector('i');
-      if (icon) icon.style.color = '#3b82f6';
-    } else if (mode === 'yogi') {
-      indicator.style.background = 'rgba(234, 179, 8, 0.2)';
-      const icon = indicator.querySelector('i');
-      if (icon) icon.style.color = '#eab308';
-    } else {
-      // Reset to default
-      indicator.style.background = '';
-      const icon = indicator.querySelector('i');
-      if (icon) icon.style.color = '';
-    }
+  let indicator, color = '', icon = null;
+
+  // --- DASHBOARD CLOSE (RED ARROW, ALREADY WORKS) ---
+  if (dashboardActive && swipeType === 'right' && swipeDistance < 0) {
+    indicator = document.getElementById('swipe-indicator-right');
+    indicator.style.transform = `translateY(-50%) translateX(${Math.max(swipeDistance / 2, -40)}px)`;
+    indicator.classList.toggle('show', Math.abs(swipeDistance) > SWIPE_THRESHOLD * 0.3);
+    indicator.style.background = 'rgba(220,20,60,0.22)';
+    icon = indicator.querySelector('i'); if (icon) icon.style.color = '#ff5555';
+    return;
   }
-  
-  // Right edge swipe (moving left)
-  else if (swipeType === 'right' && swipeDistance < 0) {
-    const indicator = document.getElementById('swipe-indicator-right');
-    if (indicator) {
-      const translateX = Math.max(swipeDistance / 2, -40);
-      indicator.style.transform = `translateY(-50%) translateX(${translateX}px)`;
-      indicator.classList.toggle('show', Math.abs(swipeDistance) > SHOW_INDICATOR_THRESHOLD);
-    }
+
+// --- SWIPE RIGHT: All app/mode/dashboard logic ---
+if (!dashboardActive && swipeType === 'left' && swipeDistance > 0) {
+  const mode = getModeFromTouch(touchStartY);
+  // Figure out if we're on main app or inside a mode
+  const appInterface = document.getElementById('app-interface');
+  const backBtn = document.getElementById('back-to-mode');
+  const isBackBtnVisible = backBtn && backBtn.offsetParent !== null && !backBtn.classList.contains('hidden');
+  const isOnMainScreen = !isBackBtnVisible;
+
+  indicator = document.getElementById('swipe-indicator');
+  indicator.style.transform = `translateY(-50%) translateX(${Math.min(swipeDistance/2, 40)}px)`;
+  indicator.classList.toggle('show', swipeDistance > SWIPE_THRESHOLD * 0.3);
+
+	// Check if FAQ is open
+	const faqModal = document.getElementById('faq-modal');
+	const isFAQOpen = faqModal && !faqModal.classList.contains('hidden');
+
+	if (isFAQOpen) {
+	  // Always white when closing FAQ
+	  color = 'rgba(255,255,255,0.22)';
+	  icon = indicator.querySelector('i');
+	  if (icon) icon.style.color = '#fff';
+	} else if (isOnMainScreen) {
+	  // Main Screen: mode button = blue/yellow, non-button = green
+	  if (mode==='flow') {
+		color='rgba(59,130,246,.2)'; icon=indicator.querySelector('i'); if(icon) icon.style.color='#3b82f6';
+	  }
+	  else if (mode==='yogi') {
+		color='rgba(234,179,8,.2)'; icon=indicator.querySelector('i'); if(icon) icon.style.color='#eab308';
+	  }
+	  else { // green for dashboard
+		color='rgba(16,185,129,0.2)'; icon=indicator.querySelector('i'); if(icon) icon.style.color='#10b981';
+	  }
+	} else {
+	  // Inside mode: WHITE for back navigation
+	  color='rgba(255,255,255,0.19)';
+	  icon=indicator.querySelector('i');
+	  if(icon) icon.style.color='#fff';
+	}
+	indicator.style.background = color;
+	return;
+}
+
+  // --- ALL FAQ ARROWS (WHITE) ---
+  if (swipeType === 'right' && swipeDistance < 0) { // left move from right
+    indicator = document.getElementById('swipe-indicator-right');
+    indicator.style.transform = `translateY(-50%) translateX(${Math.max(swipeDistance/2, -40)}px)`;
+    indicator.classList.toggle('show', Math.abs(swipeDistance) > SWIPE_THRESHOLD * 0.3);
+    indicator.style.background = 'rgba(255,255,255,0.19)';
+    icon = indicator.querySelector('i'); if (icon) icon.style.color = '#fff';
+    return;
   }
 });
-
 
 // TOUCH END
 document.addEventListener('touchend', (e) => {
   if (!isSwipeActive) return;
-  
   const touchEndX = e.changedTouches[0].clientX;
   const swipeDistance = touchEndX - touchStartX;
-  
-  // Reset indicators
+
+  // Reset indicators, always
   const leftIndicator = document.getElementById('swipe-indicator');
   const rightIndicator = document.getElementById('swipe-indicator-right');
-  
   if (leftIndicator) {
-    leftIndicator.style.transform = 'translateY(-50%)';
-    leftIndicator.classList.remove('show');
-    
-    // Reset colors to default
-    leftIndicator.style.background = '';
-    const leftIcon = leftIndicator.querySelector('i');
-    if (leftIcon) leftIcon.style.color = '';
+    leftIndicator.style.transform = 'translateY(-50%)'; leftIndicator.classList.remove('show');
+    leftIndicator.style.background = ''; const leftIcon = leftIndicator.querySelector('i'); if (leftIcon) leftIcon.style.color = '';
   }
-  
   if (rightIndicator) {
-    rightIndicator.style.transform = 'translateY(-50%)';
-    rightIndicator.classList.remove('show');
+    rightIndicator.style.transform = 'translateY(-50%)'; rightIndicator.classList.remove('show');
+    rightIndicator.style.background = ''; const rightIcon = rightIndicator.querySelector('i'); if (rightIcon) rightIcon.style.color = '';
   }
-  
-  // LEFT EDGE SWIPE (right movement)
-  if (swipeType === 'left' && swipeDistance > SWIPE_THRESHOLD) {
-    const faqModal = document.getElementById('faq-modal');
-    const isFAQOpen = faqModal && !faqModal.classList.contains('hidden');
-    
+
+  // --- DASHBOARD CLOSE (SWIPE LEFT FROM RIGHT EDGE IN DASHBOARD, RED ARROW) ---
+if (dashboardActive && swipeType === 'right' && swipeDistance < -SWIPE_THRESHOLD) {
+  closeDashboardPanel();
+  isSwipeActive = false;
+  swipeType = null;
+  touchStartX = 0;
+  touchStartY = 0;
+  return;
+}
+
+  // --- SWIPE LEFT FROM RIGHT CORNER: OPEN FAQ ANYWHERE ---
+  if (swipeType === 'right' && Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
+    openFAQModal();               // Regardless of dashboard/mode state
+    isSwipeActive = false; swipeType = null; touchStartX = 0; touchStartY = 0; return;
+  }
+
+  // --- MAIN APP INTERFACE OR MODE: SWIPE RIGHT ---
+if (!dashboardActive && swipeType === 'left' && swipeDistance > SWIPE_THRESHOLD) {
+const faqModal = document.getElementById('faq-modal');
+const isFAQOpen = faqModal && !faqModal.classList.contains('hidden');
+const mode = getModeFromTouch(touchStartY);
+const appInterface = document.getElementById('app-interface');
+const backBtn = document.getElementById('back-to-mode');
+const isBackBtnVisible = backBtn && backBtn.offsetParent !== null && !backBtn.classList.contains('hidden');
+const isOnMainScreen = !isBackBtnVisible;
+console.log('FAQ open:', isFAQOpen, 'mode:', mode, 'isOnMainScreen:', isOnMainScreen);
+
+  // If FAQ is open, close it
+  if (isFAQOpen) {
+    closeFAQModal();
+  }
+  else if (!isOnMainScreen) { // in mode, go back to main mode select
+  returnToModeSelection();
+}
+  // If user swiped on a mode button (and on main screen), enter that mode
+  else if (isOnMainScreen && mode) {
+    selectMode(mode);
+  }
+  // If user swiped on non-button space (and on main), open dashboard
+  else if (isOnMainScreen && !mode) {
+    openDashboardPanel();
+  }
+  // In mode: swipe right from left edge closes FAQ if open, otherwise returns to mode selection
+  else if (appInterface && !appInterface.classList.contains('hidden') && backBtn && !backBtn.classList.contains('hidden')) {
     if (isFAQOpen) {
-      // Close FAQ
       closeFAQModal();
     } else {
-      // Check if we're touching a mode button
-      const mode = getModeFromTouch(touchStartY);
-      if (mode) {
-        // Enter the mode
-        selectMode(mode);
-      } else {
-        // Go back (only works inside modes, not in main interface)
-        const appInterface = document.getElementById('app-interface');
-        if (appInterface && !appInterface.classList.contains('hidden')) {
-          // Check if we're inside a mode (has back button)
-          const backBtn = document.getElementById('back-to-mode');
-          if (backBtn && !backBtn.classList.contains('hidden')) {
-            returnToModeSelection();
-          }
-        }
-      }
+      returnToModeSelection();
     }
   }
-  
-  // RIGHT EDGE SWIPE (left movement)
-  else if (swipeType === 'right' && Math.abs(swipeDistance) > SWIPE_THRESHOLD) {
-    openFAQModal();
-  }
-  
-  // Reset
+}
+
+  // Reset (always)
   isSwipeActive = false;
   swipeType = null;
   touchStartX = 0;
   touchStartY = 0;
 });
+
+// --- DASHBOARD SHOW/HIDE HELPERS ---
+function openDashboardPanel() {
+  document.getElementById('app-interface').style.display = 'none';
+  document.getElementById('dashboard-panel').style.display = 'flex';
+  dashboardActive = true;
+}
+function closeDashboardPanel() {
+  document.getElementById('app-interface').style.display = '';
+  document.getElementById('dashboard-panel').style.display = 'none';
+  dashboardActive = false;
+}
 
   </script>
 	
@@ -20233,7 +20412,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
 	  //await window.fetchYogiConfigFromSupabase();
-      //await window.fetchYogiChallengeFromSupabase();
+      await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
       // Sync the Yogi Config (new logic includes skip for already synced)
