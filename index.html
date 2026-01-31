@@ -7354,7 +7354,7 @@ function showEnhancedResetModal() {
   const totalSessions = challenge.totalSessions || 0;
   
   // SIMPLE CHECK: Is user full access?
-  const isFullAccess = window.walletPublicKey && localStorage.getItem('jwtToken');
+  const isFullAccess = localStorage.getItem('jwtToken');
   
   // Calculate days to show - full access users see actual, others see capped at 21
   const daysToShow = isFullAccess ? currentDay : Math.min(currentDay, 21);
