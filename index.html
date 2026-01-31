@@ -20411,7 +20411,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	 fixUnknownSessionIds();
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
-	  //await window.fetchYogiConfigFromSupabase();
+	  await window.fetchYogiConfigFromSupabase();
       await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
