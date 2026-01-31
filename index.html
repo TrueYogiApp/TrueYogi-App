@@ -7354,28 +7354,46 @@ function showEnhancedResetModal() {
   const totalSessions = challenge.totalSessions || 0;
   const challengeStreak = challenge.challengeStreak || 0;
   
-  // What gets reset to 0
-	const isOfflineUser = !window.walletPublicKey || !localStorage.getItem('jwtToken');
-	const isFullAccessUser = window.walletPublicKey && localStorage.getItem('jwtToken');
+  // FIXED: Better user status detection
+  const hasWalletKey = window.walletPublicKey && typeof window.walletPublicKey === 'string' && window.walletPublicKey.trim() !== '';
+  const hasJwtToken = localStorage.getItem('jwtToken') && localStorage.getItem('jwtToken').trim() !== '';
+  
+  let maxAllowedDays = 41; // Default maximum
+  
+  // FIXED: Clearer logic for determining user type
+  if (!hasWalletKey && !hasJwtToken) {
+    // Truly offline user - no wallet key AND no JWT token
+    maxAllowedDays = 21;
+  } else if (hasWalletKey && hasJwtToken) {
+    // Full access user - both wallet key AND JWT token
+    maxAllowedDays = 41;
+  } else {
+    // Partial access user (one or the other)
+    maxAllowedDays = 41; // Or whatever you want for partial users
+  }
 
-	let maxAllowedDays = 41; // Default maximum
-	if (isOfflineUser) {
-	  maxAllowedDays = 21;
-	}
+  // DEBUG: Log user status for troubleshooting
+  console.log('User status:', {
+    hasWalletKey,
+    hasJwtToken,
+    walletPublicKey: window.walletPublicKey,
+    maxAllowedDays,
+    currentDay
+  });
 
-	let cappedCurrentDay = currentDay;
-	if (cappedCurrentDay > maxAllowedDays) {
-	  cappedCurrentDay = maxAllowedDays;
-	}
+  let cappedCurrentDay = currentDay;
+  if (cappedCurrentDay > maxAllowedDays) {
+    cappedCurrentDay = maxAllowedDays;
+  }
 
-	const daysProgressLost = Math.max(0, cappedCurrentDay - 1); // Show as "days completed"
+  const daysProgressLost = Math.max(0, cappedCurrentDay - 1); // Show as "days completed"
   const streakDaysLost = currentStreak;
   const totalSessionsLost = totalSessions;
   
   // Update the display
-  //document.getElementById('days-progress-lost').textContent = daysProgressLost;
-  //document.getElementById('streak-days-lost').textContent = streakDaysLost;
-  //document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
+  document.getElementById('days-progress-lost').textContent = daysProgressLost;
+  document.getElementById('streak-days-lost').textContent = streakDaysLost;
+  document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
   
   // Show warning if anything will be lost
   const warningDiv = document.getElementById('progress-loss-warning');
