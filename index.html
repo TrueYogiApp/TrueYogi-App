@@ -7352,65 +7352,63 @@ function showEnhancedResetModal() {
   const currentDay = challenge.currentDay || 1;
   const currentStreak = challenge.streakDays || 0;
   const totalSessions = challenge.totalSessions || 0;
+  const challengeStreak = challenge.challengeStreak || 0;
   
-  // SIMPLE CHECK: Is user full access?
-  const isFullAccess = localStorage.getItem('jwtToken');
+  // Determine user type and max allowed days
+  const hasWalletKey = localStorage.getItem('currentJourneyWallet');
+  const hasJwtToken = localStorage.getItem('jwtToken');
   
-  // Calculate days to show - full access users see actual, others see capped at 21
-  const daysToShow = isFullAccess ? currentDay : Math.min(currentDay, 21);
-  const daysProgressLost = Math.max(0, daysToShow - 1);
+  let maxAllowedDays = 41; // Default maximum for full access users
+  if (!hasWalletKey && !hasJwtToken) {
+    maxAllowedDays = 21; // Offline users
+  }
   
-  // DEBUG
-  console.log('Reset Modal Debug:', {
-    isFullAccess,
-    walletPublicKey: window.walletPublicKey,
-    jwtToken: localStorage.getItem('jwtToken') ? 'exists' : 'null',
-    currentDay,
-    daysToShow,
-    daysProgressLost
-  });
+  // For display purposes, we want to show actual days progress lost
+  let displayDaysLost;
   
-  // SAFELY update display if elements exist
-  const daysElement = document.getElementById('days-progress-lost');
-  const streakElement = document.getElementById('streak-days-lost');
-  const sessionsElement = document.getElementById('total-sessions-lost');
+  if (hasWalletKey && hasJwtToken) {
+    // Full access user - show actual days completed (currentDay - 1)
+    displayDaysLost = Math.max(0, currentDay - 1);
+  } else {
+    // Offline user - cap at 21 days maximum
+    const cappedDay = Math.min(currentDay, 21);
+    displayDaysLost = Math.max(0, cappedDay - 1);
+  }
   
-  if (daysElement) daysElement.textContent = daysProgressLost;
-  if (streakElement) streakElement.textContent = currentStreak;
-  if (sessionsElement) sessionsElement.textContent = totalSessions;
+  const streakDaysLost = currentStreak;
+  const totalSessionsLost = totalSessions;
+  
+  // Update the display with correct values
+  // For your specific case, you should update:
+  // document.getElementById('days-progress-lost').textContent = displayDaysLost;
+  // document.getElementById('streak-days-lost').textContent = streakDaysLost;
+  // document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
   
   // Show warning if anything will be lost
   const warningDiv = document.getElementById('progress-loss-warning');
-  const willLoseProgress = daysProgressLost > 0 || currentStreak > 0 || totalSessions > 0;
+  const willLoseProgress = displayDaysLost > 0 || streakDaysLost > 0 || totalSessionsLost > 0;
   
-  if (warningDiv) {
-    if (willLoseProgress) {
-      warningDiv.classList.remove('hidden');
-      
-      // Add visual warning for significant loss
-      if (daysProgressLost > 10 || currentStreak > 10) {
-        warningDiv.classList.add('pulse-warning');
-      }
-    } else {
-      warningDiv.classList.add('hidden');
+  if (willLoseProgress) {
+    warningDiv.classList.remove('hidden');
+    
+    // Add visual warning for significant loss
+    if (displayDaysLost > 10 || streakDaysLost > 10) {
+      warningDiv.classList.add('pulse-warning');
     }
+  } else {
+    warningDiv.classList.add('hidden');
   }
   
   // Show modal
-  const modal = document.getElementById('reset-confirmation-modal');
-  if (modal) {
-    modal.classList.remove('hidden');
-  }
+  document.getElementById('reset-confirmation-modal').classList.remove('hidden');
   
   // Add shake effect if significant progress
-  if (daysProgressLost > 5 || currentStreak > 5) {
+  if (displayDaysLost > 5 || streakDaysLost > 5) {
     const proceedBtn = document.getElementById('proceed-to-reset-btn');
-    if (proceedBtn) {
-      proceedBtn.classList.add('shake-warning');
-      setTimeout(() => {
-        proceedBtn.classList.remove('shake-warning');
-      }, 500);
-    }
+    proceedBtn.classList.add('shake-warning');
+    setTimeout(() => {
+      proceedBtn.classList.remove('shake-warning');
+    }, 500);
   }
 }
 
