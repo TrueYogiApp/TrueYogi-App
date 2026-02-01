@@ -7353,12 +7353,6 @@ function showEnhancedResetModal() {
   const currentStreak = challenge.streakDays || 0;
   const totalSessions = challenge.totalSessions || 0;
   
-  // DEBUG: Log all authentication states
-  console.log('=== AUTH DEBUG ===');
-  console.log('window.walletPublicKey:', window.walletPublicKey);
-  console.log('localStorage jwtToken:', localStorage.getItem('jwtToken'));
-  console.log('localStorage currentJourneyWallet:', localStorage.getItem('currentJourneyWallet'));
-  
   // Check multiple ways user might be authenticated
   const hasWalletKey = window.walletPublicKey;
   const hasJwtToken = localStorage.getItem('jwtToken');
@@ -7367,33 +7361,22 @@ function showEnhancedResetModal() {
   // Determine if user is full access (online/on-chain)
   // User is considered full access if they have BOTH authentication AND a wallet connection
   const isFullAccessUser = (hasWalletKey || hasCurrentJourneyWallet) && hasJwtToken;
-  
-  console.log('isFullAccessUser determined as:', isFullAccessUser);
-  console.log('currentDay:', currentDay);
-  
+    
   // Calculate days progress lost based on user type
   let daysProgressLost;
   
   if (isFullAccessUser) {
     // Full access user: can have up to 41 days
     daysProgressLost = Math.max(0, currentDay - 1);
-    console.log('Full access user - days lost:', daysProgressLost, '(uncapped)');
   } else {
     // Offline or partial access user: capped at 21 days
     const cappedDay = Math.min(currentDay, 21);
     daysProgressLost = Math.max(0, cappedDay - 1);
-    console.log('Offline user - days lost:', daysProgressLost, '(capped at 21)');
   }
   
   const streakDaysLost = currentStreak;
   const totalSessionsLost = totalSessions;
-  
-  console.log('Final calculation:', {
-    daysProgressLost,
-    streakDaysLost,
-    totalSessionsLost
-  });
-  
+    
   // Show warning if anything will be lost
   const warningDiv = document.getElementById('progress-loss-warning');
   const willLoseProgress = daysProgressLost > 0 || streakDaysLost > 0 || totalSessionsLost > 0;
@@ -7415,7 +7398,6 @@ function showEnhancedResetModal() {
   const modal = document.getElementById('reset-confirmation-modal');
   if (modal) {
     modal.classList.remove('hidden');
-    console.log('Modal shown successfully');
   } else {
     console.error('Reset modal element not found!');
     return;
