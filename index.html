@@ -7373,24 +7373,32 @@ function showEnhancedResetModal() {
   const streakDaysLost = currentStreak;
   const totalSessionsLost = totalSessions;
   
-  // Update the display - make sure these IDs exist in your HTML
-  document.getElementById('days-progress-lost').textContent = daysProgressLost;
-  document.getElementById('streak-days-lost').textContent = streakDaysLost;
-  document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
+  // Log for debugging
+  console.log('Reset Modal Debug:', {
+    hasWalletKey,
+    hasJwtToken,
+    isFullAccessUser,
+    currentDay,
+    daysProgressLost,
+    streakDaysLost,
+    totalSessionsLost
+  });
   
   // Show warning if anything will be lost
   const warningDiv = document.getElementById('progress-loss-warning');
   const willLoseProgress = daysProgressLost > 0 || streakDaysLost > 0 || totalSessionsLost > 0;
   
-  if (willLoseProgress) {
-    warningDiv.classList.remove('hidden');
-    
-    // Add visual warning for significant loss
-    if (daysProgressLost > 10 || streakDaysLost > 10) {
-      warningDiv.classList.add('pulse-warning');
+  if (warningDiv) {
+    if (willLoseProgress) {
+      warningDiv.classList.remove('hidden');
+      
+      // Add visual warning for significant loss
+      if (daysProgressLost > 10 || streakDaysLost > 10) {
+        warningDiv.classList.add('pulse-warning');
+      }
+    } else {
+      warningDiv.classList.add('hidden');
     }
-  } else {
-    warningDiv.classList.add('hidden');
   }
   
   // Show modal
@@ -7399,10 +7407,12 @@ function showEnhancedResetModal() {
   // Add shake effect if significant progress
   if (daysProgressLost > 5 || streakDaysLost > 5) {
     const proceedBtn = document.getElementById('proceed-to-reset-btn');
-    proceedBtn.classList.add('shake-warning');
-    setTimeout(() => {
-      proceedBtn.classList.remove('shake-warning');
-    }, 500);
+    if (proceedBtn) {
+      proceedBtn.classList.add('shake-warning');
+      setTimeout(() => {
+        proceedBtn.classList.remove('shake-warning');
+      }, 500);
+    }
   }
 }
 
