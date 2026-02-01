@@ -7352,47 +7352,41 @@ function showEnhancedResetModal() {
   const currentDay = challenge.currentDay || 1;
   const currentStreak = challenge.streakDays || 0;
   const totalSessions = challenge.totalSessions || 0;
-  const challengeStreak = challenge.challengeStreak || 0;
   
-  // Determine user type and max allowed days
-  const hasWalletKey = localStorage.getItem('currentJourneyWallet');
+  // Determine user type based on wallet and JWT
+  const hasWalletKey = window.walletPublicKey;
   const hasJwtToken = localStorage.getItem('jwtToken');
+  const isFullAccessUser = hasWalletKey && hasJwtToken;
   
-  let maxAllowedDays = 41; // Default maximum for full access users
-  if (!hasWalletKey && !hasJwtToken) {
-    maxAllowedDays = 21; // Offline users
-  }
+  // Calculate days progress lost based on user type
+  let daysProgressLost;
   
-  // For display purposes, we want to show actual days progress lost
-  let displayDaysLost;
-  
-  if (hasWalletKey && hasJwtToken) {
-    // Full access user - show actual days completed (currentDay - 1)
-    displayDaysLost = Math.max(0, currentDay - 1);
+  if (isFullAccessUser) {
+    // Full access user: can have up to 41 days
+    daysProgressLost = Math.max(0, currentDay - 1);
   } else {
-    // Offline user - cap at 21 days maximum
+    // Offline or partial access user: capped at 21 days
     const cappedDay = Math.min(currentDay, 21);
-    displayDaysLost = Math.max(0, cappedDay - 1);
+    daysProgressLost = Math.max(0, cappedDay - 1);
   }
   
   const streakDaysLost = currentStreak;
   const totalSessionsLost = totalSessions;
   
-  // Update the display with correct values
-  // For your specific case, you should update:
-  // document.getElementById('days-progress-lost').textContent = displayDaysLost;
-  // document.getElementById('streak-days-lost').textContent = streakDaysLost;
-  // document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
+  // Update the display - make sure these IDs exist in your HTML
+  document.getElementById('days-progress-lost').textContent = daysProgressLost;
+  document.getElementById('streak-days-lost').textContent = streakDaysLost;
+  document.getElementById('total-sessions-lost').textContent = totalSessionsLost;
   
   // Show warning if anything will be lost
   const warningDiv = document.getElementById('progress-loss-warning');
-  const willLoseProgress = displayDaysLost > 0 || streakDaysLost > 0 || totalSessionsLost > 0;
+  const willLoseProgress = daysProgressLost > 0 || streakDaysLost > 0 || totalSessionsLost > 0;
   
   if (willLoseProgress) {
     warningDiv.classList.remove('hidden');
     
     // Add visual warning for significant loss
-    if (displayDaysLost > 10 || streakDaysLost > 10) {
+    if (daysProgressLost > 10 || streakDaysLost > 10) {
       warningDiv.classList.add('pulse-warning');
     }
   } else {
@@ -7403,7 +7397,7 @@ function showEnhancedResetModal() {
   document.getElementById('reset-confirmation-modal').classList.remove('hidden');
   
   // Add shake effect if significant progress
-  if (displayDaysLost > 5 || streakDaysLost > 5) {
+  if (daysProgressLost > 5 || streakDaysLost > 5) {
     const proceedBtn = document.getElementById('proceed-to-reset-btn');
     proceedBtn.classList.add('shake-warning');
     setTimeout(() => {
