@@ -1114,6 +1114,36 @@
       font-size: 1.2rem;
       cursor: pointer;
     }
+
+#add-to-homescreen .checkbox-container {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+#add-to-homescreen #dont-show-again {
+  margin-right: 8px;
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+}
+
+#add-to-homescreen .checkbox-container label {
+  color: #d1d5db;
+  font-size: 0.9rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+#add-to-homescreen #got-it-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+#add-to-homescreen #got-it-btn:disabled:hover {
+  background: #eab308;
+}
+
 	
 #yogi-mint {
   background: linear-gradient(90deg, #ffd700, #fff, #ffd700);
@@ -4477,10 +4507,17 @@ button[disabled] {
     </div>
   </div>
   
-  <div class="buttons">
-    <button class="btn-secondary" onclick="dismissHomescreenPrompt()">Maybe Later</button>
-    <button class="btn-primary" onclick="dismissHomescreenPrompt(true)">Got It!</button>
-  </div>
+<div class="checkbox-container" style="display: flex; align-items: center; margin: 10px 0;">
+  <input type="checkbox" id="dont-show-again" style="margin-right: 8px;">
+  <label for="dont-show-again" style="color: #d1d5db; font-size: 0.9rem;">
+    ✓ I understand the installation steps
+  </label>
+</div>
+
+<div class="buttons">
+  <button class="btn-secondary" onclick="dismissHomescreenPrompt()">Maybe Later</button>
+  <button class="btn-primary" id="got-it-btn" onclick="dismissHomescreenPrompt(false)" disabled>Got It!</button>
+</div>
 </div>
   
 <button id="hide-ui-btn"
@@ -12069,6 +12106,7 @@ document.addEventListener('visibilitychange', handleVisibilityChange);
 // ADD THIS ONE LINE FOR PWA SUPPORT
 document.addEventListener('visibilitychange', requestWakeLock);
 
+
 // Add to Homescreen functionality
 
 // NEW: Detect platform and show correct instructions
@@ -12106,6 +12144,12 @@ function showHomescreenPrompt() {
     
     const prompt = document.getElementById('add-to-homescreen');
     prompt.style.display = 'block';
+    
+    // Reset checkbox and disable Got It! button
+    const checkbox = document.getElementById('dont-show-again');
+    const gotItBtn = document.getElementById('got-it-btn');
+    if (checkbox) checkbox.checked = false;
+    if (gotItBtn) gotItBtn.disabled = true;
   }
 }
 
@@ -12113,8 +12157,22 @@ function dismissHomescreenPrompt(permanent = false) {
   const prompt = document.getElementById('add-to-homescreen');
   prompt.style.display = 'none';
   
-  if (permanent) {
+  // Check if checkbox is checked for permanent dismissal
+  const dontShowAgain = document.getElementById('dont-show-again');
+  if (dontShowAgain && dontShowAgain.checked) {
     localStorage.setItem('homescreenPromptDismissed', 'true');
+  }
+}
+
+function setupCheckboxListener() {
+  const checkbox = document.getElementById('dont-show-again');
+  const gotItBtn = document.getElementById('got-it-btn');
+  
+  if (checkbox && gotItBtn) {
+    checkbox.addEventListener('change', function() {
+      // Enable Got It! button only when checkbox is checked
+      gotItBtn.disabled = !this.checked;
+    });
   }
 }
 
@@ -12133,6 +12191,7 @@ window.addEventListener('load', function() {
   if (document.getElementById('add-to-homescreen').style.display === 'block') {
     detectPlatformAndShowInstructions();
   }
+  setupCheckboxListener();
 });
 	
 	
@@ -20433,7 +20492,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
 	  //await window.fetchYogiConfigFromSupabase();
-      //await window.fetchYogiChallengeFromSupabase();
+      await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
       // Sync the Yogi Config (new logic includes skip for already synced)
