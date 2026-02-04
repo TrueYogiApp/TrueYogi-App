@@ -17786,6 +17786,10 @@ if (spaceshipReadyNote) spaceshipReadyNote.textContent = t('spaceship_ready_note
       style.remove();
     }
   }, 12000);
+    	    // Reload the page after a brief delay to ensure Chrome fully releases cache space
+    setTimeout(() => {
+      window.location.reload(true);
+    }, 15000);
 }
 
 // Function to show update notification
