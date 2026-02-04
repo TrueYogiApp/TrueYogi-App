@@ -431,6 +431,10 @@
 "online.notice.text1": "You’ve reconnected with the outside world.",
 "online.notice.text2": "Your Spaceship Challenge has gently paused.",
 "online.notice.text3": "You can continue your journey as a regular challenge or reset to start new Spaceship adventure.",
-"online.notice.button": "Return with Awareness"
+"online.notice.button": "Return with Awareness",
+  "spaceship.offlineInfo.title": "Offline Mode Limited",
+  "spaceship.offlineInfo.text": "You are offline and Spaceship Mode is not yet enabled.",
+  "spaceship.offlineInfo.cta": "Enable Spaceship Mode from Settings to access all features offline.",
+  "spaceship.offlineInfo.gotit": "Got it!"
   
 }

@@ -427,5 +427,9 @@
 "online.notice.text1": "Ti sei riconnesso al mondo esterno.",
 "online.notice.text2": "La tua Sfida Astronave è stata dolcemente messa in pausa.",
 "online.notice.text3": "Puoi continuare il tuo viaggio come sfida regolare o resettare per iniziare una nuova avventura Astronave.",
-"online.notice.button": "Torna con consapevolezza"
+"online.notice.button": "Torna con consapevolezza",
+  "spaceship.offlineInfo.title": "Modalità offline limitata",
+  "spaceship.offlineInfo.text": "Sei offline e la modalità Spaceship non è ancora abilitata.",
+  "spaceship.offlineInfo.cta": "Abilita la modalità Spaceship dalle Impostazioni per accedere a tutte le funzionalità offline.",
+  "spaceship.offlineInfo.gotit": "Ho capito!"
 }

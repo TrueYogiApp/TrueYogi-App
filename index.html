@@ -2632,6 +2632,19 @@ button[disabled] {
   z-index: 10001;
 }
 
+#spaceship-offline-info-popup {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.08);
+  backdrop-filter: blur(2px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+  display: flex; /* This ensures centering! */
+}
+
+
 /* Spaceship Challenge Mode */
 @keyframes wobble {
   0%, 100% { transform: rotate(-4deg);}
@@ -5163,6 +5176,39 @@ function lockBackground(lock) {
   } else {
     document.body.classList.remove('spaceship-popup-active');
 	modalPopupActive = false;
+  }
+}
+
+const spaceshipOfflineInfoPopup = document.createElement('div');
+spaceshipOfflineInfoPopup.id = 'spaceship-offline-info-popup';
+spaceshipOfflineInfoPopup.style.display = 'none';
+document.body.appendChild(spaceshipOfflineInfoPopup);
+
+function renderSpaceshipOfflineInfoPopup() {
+  spaceshipOfflineInfoPopup.innerHTML = `
+    <div class="spaceship-popup-inner">
+      <div class="spaceship-title">
+        🚧 ${t('spaceship.offlineInfo.title')}
+      </div>
+      <div class="spaceship-text" style="margin-bottom:18px;">
+        ${t('spaceship.offlineInfo.text')}<br><br>
+        <strong>${t('spaceship.offlineInfo.cta')}</strong>
+      </div>
+      <button id="spaceship-offline-info-ack"
+        style="margin-top:12px;padding:8px 22px;background:#8be9c4;border:none;color:#1d3843;
+        border-radius:20px;font-weight:bold;font-size:1.07rem;cursor:pointer;">
+        ${t('spaceship.offlineInfo.gotit')}
+      </button>
+    </div>
+  `;
+  // Attach event handler
+  const ackBtn = document.getElementById('spaceship-offline-info-ack');
+  if (ackBtn) {
+    ackBtn.onclick = () => {
+      spaceshipOfflineInfoPopup.style.display = 'none';
+      lockBackground(false);
+	  localStorage.setItem('spaceshipOfflineInfoAck', '1');
+    };
   }
 }
 
@@ -11686,6 +11732,7 @@ loadSacredLines();
 renderSpaceshipPopup();
 renderSpaceshipInfoPopup();
 renderOnlineNoticePopup();
+renderSpaceshipOfflineInfoPopup();
   const howToMeditateEl = document.getElementById('how-to-meditate-link');
   if (howToMeditateEl) howToMeditateEl.textContent = t('howToMeditate');
   const endMeditationBtn = document.getElementById('end-meditation-btn-label');
@@ -13818,9 +13865,21 @@ function updateOnlineStatus() {
   const status = document.getElementById('online-status');
   const acked = localStorage.getItem('spaceshipPopupAck') === '1';
   const offlineInstalled = localStorage.getItem('trueyogi_offline_installed') === 'true';
+  const offlineInfoAcked = localStorage.getItem('spaceshipOfflineInfoAck') === '1';
+  let offlineInfoPopupTimer = null;
 
   if (!navigator.onLine || !isActuallyOnline()) {
     status.style.display = 'block';
+	  if (!offlineInstalled && !offlineInfoAcked) {
+		if (!offlineInfoPopupTimer) {
+		  offlineInfoPopupTimer = setTimeout(() => {
+			renderSpaceshipOfflineInfoPopup();
+			spaceshipOfflineInfoPopup.style.display = 'flex';
+			lockBackground(true);
+		  }, 9000);
+		}
+		return;
+	  }
     // ADD THIS: only show popup if offline mode is installed
     if (!spaceshipPopupShown && !spaceshipPopupTimer && !acked && offlineInstalled) {
       spaceshipPopupTimer = setTimeout(() => {
@@ -13847,9 +13906,11 @@ function updateOnlineStatus() {
     spaceshipPopupTimer = null;
     spaceshipPopupShown = false;
     lockBackground(false);
+	spaceshipOfflineInfoPopup.style.display = 'none';
     spaceshipPopup.style.display = 'none';
     localStorage.removeItem('spaceshipPopupAck');
-    
+	localStorage.removeItem('spaceshipOfflineInfoAck');
+
     // NEW: Hide spaceship indicator when online
     const indicator = document.getElementById('spaceship-indicator');
     if (indicator) {
@@ -13867,14 +13928,15 @@ function updateOnlineStatus() {
         !onlineNoticeAcked) {
       onlineNoticePopup.style.display = 'flex';
       lockBackground(true);
-	  		  // Play notice sound
+	  
+		  // Play notice sound
 	var noticeSound = document.getElementById('spaceship-notice-sound');
 	if (noticeSound) {
 	  noticeSound.pause();          // stop if playing
 	  noticeSound.currentTime = 0;  // rewind
 	  noticeSound.play().catch(()=>{});
 	}
-    }
+   }
   }
 }
 

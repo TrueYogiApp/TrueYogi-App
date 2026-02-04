@@ -427,5 +427,9 @@
 "online.notice.text1": "你与外部世界重新连接。",
 "online.notice.text2": "你的飞船挑战已温和地暂停。",
 "online.notice.text3": "你可以继续作为常规挑战前进，或重置以开启新的飞船冒险。",
-"online.notice.button": "带着觉知返回"
+"online.notice.button": "带着觉知返回",
+  "spaceship.offlineInfo.title": "离线模式受限",
+  "spaceship.offlineInfo.text": "您当前处于离线状态，尚未启用飞船模式。",
+  "spaceship.offlineInfo.cta": "请在设置中启用飞船模式，以访问所有离线功能。",
+  "spaceship.offlineInfo.gotit": "知道了！"
 }

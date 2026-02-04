@@ -426,5 +426,9 @@
 "online.notice.text1": "Te has reconectado con el mundo exterior.",
 "online.notice.text2": "Tu desafío Nave Espacial se ha pausado suavemente.",
 "online.notice.text3": "Puedes continuar tu viaje como un desafío regular o reiniciar para comenzar una nueva aventura Nave Espacial.",
-"online.notice.button": "Regresa con conciencia"
+"online.notice.button": "Regresa con conciencia",
+ "spaceship.offlineInfo.title": "Modo offline limitado",
+  "spaceship.offlineInfo.text": "Estás sin conexión y el Modo Spaceship aún no está habilitado.",
+  "spaceship.offlineInfo.cta": "Habilita el Modo Spaceship desde Configuración para acceder a todas las funciones offline.",
+  "spaceship.offlineInfo.gotit": "¡Entendido!"
 }

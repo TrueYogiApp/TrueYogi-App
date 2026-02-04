@@ -426,5 +426,9 @@
 "online.notice.text1": "Du hast dich wieder mit der Außenwelt verbunden.",
 "online.notice.text2": "Deine Raumschiff-Challenge wurde sanft pausiert.",
 "online.notice.text3": "Du kannst deine Reise als reguläre Challenge fortsetzen oder zurücksetzen, um ein neues Raumschiff-Abenteuer zu starten.",
-"online.notice.button": "Mit Bewusstheit zurückkehren"
+"online.notice.button": "Mit Bewusstheit zurückkehren",
+  "spaceship.offlineInfo.title": "Offline-Modus eingeschränkt",
+  "spaceship.offlineInfo.text": "Du bist offline und der Spaceship-Modus ist noch nicht aktiviert.",
+  "spaceship.offlineInfo.cta": "Aktiviere den Spaceship-Modus in den Einstellungen, um alle Offline-Funktionen zu nutzen.",
+  "spaceship.offlineInfo.gotit": "Verstanden!"
 }

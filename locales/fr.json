@@ -431,6 +431,10 @@
 "online.notice.text1": "Vous vous êtes reconnecté au monde extérieur.",
 "online.notice.text2": "Votre Défi Vaisseau Spatial est mis en pause en douceur.",
 "online.notice.text3": "Vous pouvez poursuivre votre parcours comme un défi classique ou réinitialiser pour commencer une nouvelle aventure Vaisseau Spatial.",
-"online.notice.button": "Revenir en pleine conscience"
+"online.notice.button": "Revenir en pleine conscience",
+  "spaceship.offlineInfo.title": "Mode hors ligne limité",
+  "spaceship.offlineInfo.text": "Vous êtes hors ligne et le mode Spaceship n'est pas encore activé.",
+  "spaceship.offlineInfo.cta": "Activez le Mode Spaceship dans les paramètres pour accéder à toutes les fonctionnalités hors ligne.",
+  "spaceship.offlineInfo.gotit": "Compris !"
 
 }

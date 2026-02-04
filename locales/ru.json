@@ -427,6 +427,10 @@
 "online.notice.text1": "Вы вновь присоединились к внешнему миру.",
 "online.notice.text2": "Ваш космический челлендж мягко приостановлен.",
 "online.notice.text3": "Вы можете продолжить путь как обычный челлендж или начать новое космическое приключение.",
-"online.notice.button": "Вернуться с осознанностью"
+"online.notice.button": "Вернуться с осознанностью",
+  "spaceship.offlineInfo.title": "Ограниченный офлайн-режим",
+  "spaceship.offlineInfo.text": "Вы офлайн, и режим Spaceship ещё не включён.",
+  "spaceship.offlineInfo.cta": "Включите режим Spaceship в настройках, чтобы получить доступ ко всем офлайн-функциям.",
+  "spaceship.offlineInfo.gotit": "Понятно!"
   
 }
