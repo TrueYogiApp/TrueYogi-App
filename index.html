@@ -5078,18 +5078,50 @@ document.getElementById('tab-video').onclick = function() {
 
 // Video overlay logic:
 function openVideoPlayer(youtubeId, title) {
+  console.log("openVideoPlayer called with:", youtubeId, title);
+
   const overlay = document.getElementById('video-player-overlay');
   const iframe = document.getElementById('youtube-player');
+
+  if (!overlay) {
+    console.error("video-player-overlay element not found!");
+    return;
+  }
+  if (!iframe) {
+    console.error("youtube-player iframe element not found!");
+    return;
+  }
+
   overlay.style.display = 'flex';
   document.getElementById('video-player-title').textContent = title;
-  iframe.src = 'https://www.youtube.com/embed/' + youtubeId + '?autoplay=1';
 
-  // Listen for error on the iframe
-  iframe.onerror = function() {
-    // Hide the overlay and open in YouTube app/browser
+  // Remove previous error handler if any
+  iframe.onerror = null;
+
+  // Listen for iframe error (embedding fails)
+  iframe.onerror = function(event) {
+    console.error("YouTube iframe error occurred (likely embed forbidden):", event);
     overlay.style.display = 'none';
     window.open('https://www.youtube.com/watch?v=' + youtubeId, '_blank');
   };
+
+  // Useful for debugging current iframe src
+  console.log("Setting iframe src to:", 'https://www.youtube.com/embed/' + youtubeId + '?autoplay=1');
+  iframe.src = 'https://www.youtube.com/embed/' + youtubeId + '?autoplay=1';
+
+  // Extra: Observe iframe 'load' event for debugging
+  iframe.onload = function() {
+    console.log("YouTube iframe loaded successfully for:", youtubeId);
+  };
+
+  // Debug details about environment
+  console.log("User agent:", navigator.userAgent);
+  console.log("Current window.location:", window.location.href);
+  if (window.matchMedia('(display-mode: standalone)').matches) {
+      console.log("PWA/standalone mode detected");
+  } else {
+      console.log("Browser/tab mode detected");
+  }
 }
 
 function closeVideoPlayer() {
