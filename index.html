@@ -4836,28 +4836,20 @@ button[disabled] {
 ">
   <!-- Simple Header -->
   <div style="
-    padding: 40px 20px 0 20px; /* Added top padding for phone notch */
+    padding: 40px 20px 20px 20px; /* Added top padding for phone notch */
     border-bottom: 1px solid rgba(255,255,255,0.1);
     text-align: center;
   ">
-    <h2 style="margin: 0 0 8px 0;">🌼 Wisdom Library</h2>
+    <h2 style="margin: 0 0 8px 0;">📚 Reading Materials</h2>
     <div style="color: #94a3b8; font-size: 14px;">
        Swipe left from right edge to close 👈
     </div>
   </div>
 
-  <!-- Tab bar -->
-  <div style="display:flex;gap:10px;justify-content:center;padding:12px 0 0 0;">
-    <button id="tab-pdf" class="dashboard-tab dashboard-tab-active">📚 PDFs</button>
-    <button id="tab-video" class="dashboard-tab">🎬 Videos</button>
-  </div>
-
   <!-- PDF List -->
-  <div id="pdf-list" style="padding: 20px; overflow-y: auto; flex: 1;"></div>
-  <!-- Video List (initially hidden) -->
-  <div id="video-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;"></div>
+<div id="pdf-list" style="padding: 20px; overflow-y: auto; flex: 1;"></div>
 
-  <!-- PDF Viewer Overlay (same as before) -->
+  <!-- PDF Viewer Overlay - SIMPLIFIED -->
   <div id="pdf-viewer-overlay" style="
     display: none;
     position: absolute; left: 0; top: 0;
@@ -4867,6 +4859,7 @@ button[disabled] {
     flex-direction: column;
     padding-top: 40px; /* Added for phone notch */
   ">
+    <!-- SIMPLE HEADER - NO DOWNLOAD BUTTON -->
     <div style="
       padding: 15px 20px;
       background: rgba(0,0,0,0.5);
@@ -4886,6 +4879,8 @@ button[disabled] {
         font-size: 14px;
       ">Close</button>
     </div>
+
+    <!-- SIMPLE PDF VIEWER -->
     <div style="
       flex: 1;
       overflow: auto;
@@ -4899,22 +4894,6 @@ button[disabled] {
     </div>
   </div>
 
-  <!-- YouTube Video Player Overlay -->
-  <div id="video-player-overlay" style="
-    display: none;
-    position: fixed; left: 0; top: 0; width: 100vw; height: 100vh;
-    z-index: 11000; align-items: center; justify-content: center;
-    background: rgba(12,10,30,0.88);
-  ">
-    <div style="max-width:96vw;background:#171732;padding:20px 20px 10px 20px;border-radius:16px;box-shadow:0 0 60px 0 #ffe49e33;text-align:center;">
-      <div id="video-player-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;"></div>
-      <iframe id="youtube-player" width="350" height="210" src="" frameborder="0" allowfullscreen style="border-radius:10px;box-shadow:0 0 10px #92823344;"></iframe>
-      <div>
-        <button onclick="closeVideoPlayer()" style="margin:17px 0 7px 0;padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Simple Footer -->
   <div style="
     padding: 15px;
@@ -4923,7 +4902,7 @@ button[disabled] {
     font-size: 13px;
     border-top: 1px solid rgba(255,255,255,0.1);
   ">
-    Tap any PDF to open it, or watch a video from the Videos tab.
+    Tap any PDF to open
   </div>
 </div>
 
@@ -5008,83 +4987,6 @@ function closePDFinline() {
   overlay.style.display = 'none';
   currentPDF = null;
   currentPDFName = '';
-}
-
-let videos = [];
-
-// Fetch and render videos
-function renderVideoList() {
-  const list = document.getElementById('video-list');
-  list.innerHTML = "";
-  videos.forEach((vid, i) => {
-    const html = `
-      <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:12px 18px 18px 18px;margin-bottom:18px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(50,50,80,0.11);">
-        <img src="${vid.thumb || 'https://img.youtube.com/vi/' + vid.youtubeId + '/hqdefault.jpg'}"
-           alt="video thumbnail"
-           style="width:75px;height:52px;border-radius:8px;object-fit:cover;box-shadow:0 1px 6px 0 #241c0022;">
-        <div style="flex:1;">
-          <div style="font-weight:bold;font-size:1.08rem;">${vid.title}</div>
-          <div style="color:#adbbef;font-size:0.95rem;">${vid.author || ''}</div>
-          <button onclick="openVideoPlayer('${vid.youtubeId}','${vid.title.replace(/'/g,'\\\'')}')" style="margin-top:7px;padding:5px 14px;background:#ffe85a;color:#2c1d00;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">Watch</button>
-        </div>
-      </div>`;
-    list.insertAdjacentHTML('beforeend', html);
-  });
-}
-
-// Simple overlay or inline player
-function openVideoPlayer(youtubeId, title) {
-  // e.g. show an overlay div with embedded YouTube player
-  const overlay = document.createElement('div');
-  overlay.style = `
-    position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:11000;display:flex;align-items:center;justify-content:center;background:rgba(12,10,30,0.88);`;
-  overlay.innerHTML = `
-    <div style="max-width:96vw;background:#171732;padding:20px 20px 10px 20px;border-radius:16px;box-shadow:0 0 60px 0 #ffe49e33;text-align:center;">
-      <div style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
-      <iframe width="350" height="210" src="https://www.youtube.com/embed/${youtubeId}?autoplay=1" frameborder="0" allowfullscreen style="border-radius:10px;box-shadow:0 0 10px #92823344;"></iframe>
-      <div>
-        <button onclick="this.closest('div').parentNode.remove()" style="margin:17px 0 7px 0;padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
-      </div>
-    </div>`;
-  document.body.appendChild(overlay);
-}
-
-// Load videos
-document.addEventListener('DOMContentLoaded', function() {
-  fetch('https://assets.trueyogi.app/assets/Material/videos.json')
-    .then(r => r.json())
-    .then(data => {
-      videos = data;
-      renderVideoList();
-    })
-    .catch(e => {
-      document.getElementById('video-list').innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">Failed to load videos list.</div>';
-    });
-});
-
-// Tab switching logic:
-document.getElementById('tab-pdf').onclick = function() {
-  document.getElementById('pdf-list').style.display = '';
-  document.getElementById('video-list').style.display = 'none';
-  this.classList.add('dashboard-tab-active');
-  document.getElementById('tab-video').classList.remove('dashboard-tab-active');
-};
-document.getElementById('tab-video').onclick = function() {
-  document.getElementById('video-list').style.display = '';
-  document.getElementById('pdf-list').style.display = 'none';
-  this.classList.add('dashboard-tab-active');
-  document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
-};
-
-// Video overlay logic:
-function openVideoPlayer(youtubeId, title) {
-  document.getElementById('video-player-overlay').style.display = 'flex';
-  document.getElementById('video-player-title').textContent = title;
-  document.getElementById('youtube-player').src = 'https://www.youtube.com/embed/' + youtubeId + '?autoplay=1';
-}
-function closeVideoPlayer() {
-  document.getElementById('video-player-overlay').style.display = 'none';
-  document.getElementById('youtube-player').src = '';
 }
 </script>
 
