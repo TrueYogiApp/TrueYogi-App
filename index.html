@@ -5080,7 +5080,7 @@ document.getElementById('tab-video').onclick = function() {
 function openVideoPlayer(youtubeId, title) {
   document.getElementById('video-player-overlay').style.display = 'flex';
   document.getElementById('video-player-title').textContent = title;
-  document.getElementById('youtube-player').src = 'https://www.youtube.com/embed/' + youtubeId + '?autoplay=1';
+  document.getElementById('youtube-player').src = 'https://www.youtube.com/embed/' + youtubeId;
 }
 function closeVideoPlayer() {
   document.getElementById('video-player-overlay').style.display = 'none';
