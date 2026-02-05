@@ -5083,7 +5083,13 @@ function openVideoPlayer(youtubeId, title) {
   overlay.style.display = 'flex';
   document.getElementById('video-player-title').textContent = title;
   iframe.src = 'https://www.youtube.com/embed/' + youtubeId + '?autoplay=1';
-  // optionally set currentVideo variables if you track state
+
+  // Listen for error on the iframe
+  iframe.onerror = function() {
+    // Hide the overlay and open in YouTube app/browser
+    overlay.style.display = 'none';
+    window.open('https://www.youtube.com/watch?v=' + youtubeId, '_blank');
+  };
 }
 
 function closeVideoPlayer() {
