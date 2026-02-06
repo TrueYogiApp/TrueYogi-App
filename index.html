@@ -4914,6 +4914,23 @@ button[disabled] {
       </div>
     </div>
   </div>
+  
+  <div id="lang-floater" style="
+  position: fixed;
+  bottom: 100px; /* adjust as needed */
+  left: 25px; /* or 'right', or center! */
+  z-index: 11001;
+  font-size: 14px;
+  color: #a6adc8;
+  background: rgba(30,30,50,.78);
+  border-radius: 10px;
+  padding: 2px 13px 3px 13px;
+  box-shadow: 0 1px 6px 0 #0002;
+  pointer-events: none;
+  transition: background .2s,border .2s;
+  font-weight: bold;
+  opacity: .92;
+" class="hide-lang-floater">EN</div>
 
   <!-- Simple Footer -->
   <div style="
@@ -4923,8 +4940,10 @@ button[disabled] {
     font-size: 13px;
     border-top: 1px solid rgba(255,255,255,0.1);
   ">
-    Tap any PDF to open it, or watch a video from the Videos tab.
+    Tap any teaching to open, or watch a video from the Videos tab.
   </div>
+  
+
 </div>
 
 <script>
@@ -4945,6 +4964,36 @@ const cardColors = [
   {bg:'rgba(22,163,74,0.13)', border:'rgba(22,163,74,0.20)', icon:'#16a34a'},     // dark green
 ];
 
+function updateLangFloaterOnScroll() {
+  const floater = document.getElementById('lang-floater');
+  const pdfList = document.getElementById('pdf-list');
+  const items = Array.from(pdfList.querySelectorAll('.pdf-item'));
+
+  let currentLang = floater.textContent.toLowerCase();
+  let newLangTriggered = false;
+
+  for (let i = 0; i < items.length; i++) {
+    const rect = items[i].getBoundingClientRect();
+    const thisLang = (items[i].getAttribute('data-lang') || 'en').toLowerCase();
+
+    // Detect first item with a different language coming up from bottom
+    if (thisLang !== currentLang && rect.top >= window.innerHeight - 80 && rect.top < window.innerHeight) {
+      floater.textContent = thisLang.toUpperCase();
+      newLangTriggered = true;
+      break;
+    }
+    // Optionally: fallback to regular logic, so floater stays correct as you scroll
+    if (!newLangTriggered && rect.top >= 0 && rect.top < window.innerHeight - 80) {
+      floater.textContent = thisLang.toUpperCase();
+    }
+  }
+}
+
+document.getElementById('pdf-list').addEventListener('scroll', updateLangFloaterOnScroll);
+window.addEventListener('resize', updateLangFloaterOnScroll);
+// Optionally for safety after rendering:
+setTimeout(updateLangFloaterOnScroll, 200);
+
 // --- Dynamically render PDF cards in dashboard ---
 function renderPDFList() {
   const list = document.getElementById('pdf-list');
@@ -4953,7 +5002,7 @@ function renderPDFList() {
   pdfs.forEach((pdf, i) => {
     const color = cardColors[i % cardColors.length];
     const html =
-      `<div class="pdf-item" onclick="viewPDFinline('${pdf.url.replace(/'/g,"\\'")}', '${pdf.title.replace(/'/g,"\\'") }')" 
+      `<div class="pdf-item" data-lang="${pdf.lang}" onclick="viewPDFinline('${pdf.url.replace(/'/g,"\\'")}', '${pdf.title.replace(/'/g,"\\'") }')" 
         style="background:${color.bg};border:1px solid ${color.border};border-radius:12px;padding:20px;margin-bottom:15px;cursor:pointer;transition:transform 0.2s;"
         onmouseover="this.style.transform='translateX(5px)'" onmouseout="this.style.transform='translateX(0)'">
         <div style="display:flex;align-items:center;gap:15px;">
@@ -4997,6 +5046,9 @@ function viewPDFinline(pdfPath, pdfName) {
   // Always use Google Docs Viewer (works on both mobile & desktop)
   const encodedUrl = encodeURIComponent(pdfPath);
   iframe.src = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
+  
+  // HIDE language floater
+  document.getElementById('lang-floater').style.display = 'none';
 }
 
 function closePDFinline() {
@@ -5006,6 +5058,12 @@ function closePDFinline() {
   overlay.style.display = 'none';
   currentPDF = null;
   currentPDFName = '';
+  
+   // SHOW language floater only if PDF tab is active!
+  if (document.getElementById('pdf-list').style.display !== 'none') {
+    document.getElementById('lang-floater').style.display = '';
+    updateLangFloaterOnScroll();
+  }
 }
 
 let videos = [];
@@ -5049,12 +5107,15 @@ document.getElementById('tab-pdf').onclick = function() {
   document.getElementById('video-list').style.display = 'none';
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-video').classList.remove('dashboard-tab-active');
+  document.getElementById('lang-floater').style.display = ''; // SHOW floater
+  updateLangFloaterOnScroll();
 };
 document.getElementById('tab-video').onclick = function() {
   document.getElementById('video-list').style.display = '';
   document.getElementById('pdf-list').style.display = 'none';
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
+  document.getElementById('lang-floater').style.display = 'none'; // HIDE floater
 };
 
 // SINGLE Video overlay function - dynamic approach for proper cleanup
