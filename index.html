@@ -5063,6 +5063,9 @@ function openVideoPlayer(youtubeId, title) {
   const existing = document.querySelector('.video-overlay-container');
   if (existing) existing.remove();
   
+  // Generate ONCE and store
+  const playerId = `player-container-${Date.now()}`;
+  
   const overlay = document.createElement('div');
   overlay.className = 'video-overlay-container';
   overlay.style.cssText = `
@@ -5074,7 +5077,7 @@ function openVideoPlayer(youtubeId, title) {
   overlay.innerHTML = `
     <div style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;">
       <div style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
-      <div id="player-container-${Date.now()}" style="width:350px;height:210px;border-radius:10px;overflow:hidden;"></div>
+      <div id="${playerId}" style="width:350px;height:210px;border-radius:10px;overflow:hidden;"></div>
       <div style="margin-top:15px;">
         <button onclick="closeVideoPlayer()" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
         <a href="https://www.youtube.com/watch?v=${youtubeId}" 
@@ -5097,7 +5100,7 @@ function openVideoPlayer(youtubeId, title) {
   
   // Create player when API is ready
   function createPlayer() {
-    new YT.Player(`player-container-${Date.now()}`, {
+    new YT.Player(playerId, {  // ← Use the SAME playerId variable
       height: '210',
       width: '350',
       videoId: youtubeId,
@@ -5120,7 +5123,14 @@ function openVideoPlayer(youtubeId, title) {
   
   function onPlayerError(event) {
     console.log('YouTube Player Error:', event.data);
-    // Show fallback link
+    // Optional: Show error message to user
+    const container = document.getElementById(playerId);
+    if (container) {
+      container.innerHTML = `
+        <div style="color:#f87171;padding:20px;text-align:center;">
+          Video cannot be played here. Use "Open in YouTube" button.
+        </div>`;
+    }
   }
   
   // Wait for API to load
@@ -5150,6 +5160,7 @@ document.addEventListener('keydown', function(e) {
     closeVideoPlayer();
   }
 });
+
 </script>
 
   <script>
