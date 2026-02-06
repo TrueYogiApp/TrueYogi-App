@@ -4923,7 +4923,7 @@ button[disabled] {
     font-size: 13px;
     border-top: 1px solid rgba(255,255,255,0.1);
   ">
-    Tap any PDF to open it, or watch a video from the Videos tab.
+    Tap any teaching to open, or watch a video from the Videos tab.
   </div>
 </div>
 
@@ -12310,7 +12310,6 @@ const cappedCurrentDay = Math.min(rawCurrentDay, maxAllowedDays);
 const daysProgressLost = Math.max(0, cappedCurrentDay);
 const streakDaysLost = challengeData ? (challengeData.streakDays || 0) : 0;
 const totalSessionsLost = challengeData ? (challengeData.totalSessions || 0) : 0;
-
 document.getElementById('progress-loss-warning').querySelector('p').textContent = t('progressLossWarning');
 document.getElementById('progress-loss-warning').querySelector('ul li:nth-child(1)').innerHTML =
   '• ' + t('progressLossDays', { n: daysProgressLost });
