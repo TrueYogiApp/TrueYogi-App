@@ -4923,7 +4923,7 @@ button[disabled] {
     font-size: 13px;
     border-top: 1px solid rgba(255,255,255,0.1);
   ">
-    Tap any teaching to open, or watch a video from the Videos tab.
+    Tap any PDF to open it, or watch a video from the Videos tab.
   </div>
 </div>
 
@@ -5058,12 +5058,16 @@ document.getElementById('tab-video').onclick = function() {
 };
 
 // SINGLE Video overlay function - dynamic approach for proper cleanup
+// Global wake lock variables
+let videoWakeLock = null;
+let isVideoFullscreen = false;
+
 function openVideoPlayer(youtubeId, title) {
   // Remove existing
   const existing = document.querySelector('.video-overlay-container');
   if (existing) existing.remove();
   
-  // Generate ONCE and store
+  // Generate player ID
   const playerId = `player-container-${Date.now()}`;
   
   const overlay = document.createElement('div');
@@ -5100,7 +5104,7 @@ function openVideoPlayer(youtubeId, title) {
   
   // Create player when API is ready
   function createPlayer() {
-    new YT.Player(playerId, {  // ← Use the SAME playerId variable
+    const player = new YT.Player(playerId, {
       height: '210',
       width: '350',
       videoId: youtubeId,
@@ -5112,25 +5116,37 @@ function openVideoPlayer(youtubeId, title) {
       },
       events: {
         'onReady': onPlayerReady,
+        'onStateChange': onPlayerStateChange,
         'onError': onPlayerError
       }
     });
+    
+    // Store player reference
+    overlay._player = player;
   }
   
   function onPlayerReady(event) {
     event.target.playVideo();
+    // Request wake lock when video starts
+    requestVideoWakeLock();
+  }
+  
+  function onPlayerStateChange(event) {
+    // YouTube player state codes:
+    // -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
+    
+    if (event.data === YT.PlayerState.PLAYING) {
+      // Video is playing - keep screen on
+      requestVideoWakeLock();
+    } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+      // Video paused or ended - release wake lock
+      releaseVideoWakeLock();
+    }
   }
   
   function onPlayerError(event) {
     console.log('YouTube Player Error:', event.data);
-    // Optional: Show error message to user
-    const container = document.getElementById(playerId);
-    if (container) {
-      container.innerHTML = `
-        <div style="color:#f87171;padding:20px;text-align:center;">
-          Video cannot be played here. Use "Open in YouTube" button.
-        </div>`;
-    }
+    releaseVideoWakeLock(); // Release on error too
   }
   
   // Wait for API to load
@@ -5139,27 +5155,139 @@ function openVideoPlayer(youtubeId, title) {
   } else {
     window.onYouTubeIframeAPIReady = createPlayer;
   }
+  
+  // Store overlay reference
+  window.currentVideoOverlay = overlay;
+  
+  // Add visibility change listener
+  document.addEventListener('visibilitychange', handleVisibilityChange);
 }
 
-// Global close function
+// Video-specific wake lock functions
+async function requestVideoWakeLock() {
+  try {
+    if ('wakeLock' in navigator && document.visibilityState === 'visible') {
+      videoWakeLock = await navigator.wakeLock.request('screen');
+      console.log('Video Wake Lock acquired');
+      
+      videoWakeLock.addEventListener('release', () => {
+        console.log('Video Wake Lock was released');
+        // If video is still playing and tab is visible, reacquire
+        if (window.currentVideoOverlay && 
+            window.currentVideoOverlay._player && 
+            window.currentVideoOverlay._player.getPlayerState() === YT.PlayerState.PLAYING &&
+            document.visibilityState === 'visible') {
+          setTimeout(requestVideoWakeLock, 100);
+        }
+      });
+    }
+  } catch (err) {
+    console.error(`Error acquiring video wake lock: ${err.message}`);
+  }
+}
+
+function releaseVideoWakeLock() {
+  if (videoWakeLock !== null) {
+    videoWakeLock.release();
+    videoWakeLock = null;
+    console.log('Video Wake Lock released');
+  }
+}
+
+function handleVisibilityChange() {
+  if (document.visibilityState === 'hidden') {
+    // Tab hidden - release wake lock to save battery
+    releaseVideoWakeLock();
+  } else if (document.visibilityState === 'visible') {
+    // Tab visible again - if video is playing, reacquire wake lock
+    if (window.currentVideoOverlay && 
+        window.currentVideoOverlay._player && 
+        window.currentVideoOverlay._player.getPlayerState() === YT.PlayerState.PLAYING) {
+      requestVideoWakeLock();
+    }
+  }
+}
+
+// Add to your existing code:
+function toggleFullScreen(player) {
+  if (!isVideoFullscreen) {
+    const iframe = player.getIframe();
+    if (iframe.requestFullscreen) {
+      iframe.requestFullscreen();
+    } else if (iframe.webkitRequestFullscreen) {
+      iframe.webkitRequestFullscreen();
+    } else if (iframe.mozRequestFullScreen) {
+      iframe.mozRequestFullScreen();
+    } else if (iframe.msRequestFullscreen) {
+      iframe.msRequestFullscreen();
+    }
+    isVideoFullscreen = true;
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.mozCancelFullScreen) {
+      document.mozCancelFullScreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+    isVideoFullscreen = false;
+  }
+}
+
+// Listen for fullscreen changes
+document.addEventListener('fullscreenchange', handleFullscreenChange);
+document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+
+function handleFullscreenChange() {
+  isVideoFullscreen = !!(
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement ||
+    document.msFullscreenElement
+  );
+  
+  // Keep wake lock in fullscreen too
+  if (isVideoFullscreen) {
+    requestVideoWakeLock();
+  }
+}
+
 function closeVideoPlayer() {
+  // Release wake lock
+  releaseVideoWakeLock();
+  
+  // Remove visibility listener
+  document.removeEventListener('visibilitychange', handleVisibilityChange);
+  
+  // Stop and remove player
+  if (window.currentVideoOverlay && window.currentVideoOverlay._player) {
+    try {
+      window.currentVideoOverlay._player.stopVideo();
+      window.currentVideoOverlay._player.destroy();
+    } catch (e) {
+      // Ignore errors if player already destroyed
+    }
+  }
+  
+  // Remove overlay
   const overlay = document.querySelector('.video-overlay-container');
-  if (overlay && overlay._cleanup) {
-    overlay._cleanup();
-  } else if (overlay) {
-    overlay.remove();
-  }
-  if (window.currentVideoOverlay) {
-    window.currentVideoOverlay = null;
-  }
+  if (overlay) overlay.remove();
+  
+  // Clear reference
+  window.currentVideoOverlay = null;
 }
 
-// Also add ESC key to close
+// Also add ESC key support
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'Escape') {
+  if (e.key === 'Escape' && document.querySelector('.video-overlay-container')) {
     closeVideoPlayer();
   }
 });
+
 
 </script>
 
