@@ -5068,37 +5068,37 @@ function openVideoPlayer(youtubeId, title) {
   // Create new overlay
   const overlay = document.createElement('div');
   overlay.className = 'video-overlay-container';
+  
+  // Generate unique IDs for this instance
+  const playerId = `yt-player-${Date.now()}`;
+  const loadingId = `loading-${Date.now()}`;
+  
   overlay.style.cssText = `
     position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:11000;
     display:flex;align-items:center;justify-content:center;
     background:rgba(12,10,30,0.88);
   `;
   
-  // Try different embed approaches
-  // Option 1: Standard embed (most compatible)
-  const embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
-  
-  // Option 2: With autoplay but no other params (simpler)
-  // const embedUrl = `https://www.youtube.com/embed/${youtubeId}`;
+  // Use embed URL WITH autoplay from the start
+  const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&playsinline=1`;
   
   overlay.innerHTML = `
     <div style="max-width:96vw;background:#171732;padding:20px 20px 10px 20px;border-radius:16px;box-shadow:0 0 60px 0 #ffe49e33;text-align:center;">
       <div style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
       
-      <!-- TRY SIMPLER APPROACH FIRST -->
       <iframe 
-        id="yt-player-${youtubeId}"
+        id="${playerId}"
         width="350" 
         height="210" 
         src="${embedUrl}"
         frameborder="0" 
-        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         allowfullscreen 
         style="border-radius:10px;box-shadow:0 0 10px #92823344;">
       </iframe>
       
       <!-- Add loading indicator -->
-      <div id="loading-${youtubeId}" style="margin:10px;color:#94a3b8;">
+      <div id="${loadingId}" style="margin:10px;color:#94a3b8;">
         Loading video...
       </div>
       
@@ -5112,42 +5112,75 @@ function openVideoPlayer(youtubeId, title) {
       </div>
       
       <div>
-        <button onclick="closeVideoPlayer()" style="margin:17px 0 7px 0;padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
+        <button id="close-btn-${Date.now()}" style="margin:17px 0 7px 0;padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
       </div>
     </div>`;
   
   document.body.appendChild(overlay);
   
   // Add error detection
-  const iframe = document.getElementById(`yt-player-${youtubeId}`);
-  const loading = document.getElementById(`loading-${youtubeId}`);
+  const iframe = document.getElementById(playerId);
+  const loading = document.getElementById(loadingId);
+  const closeBtn = overlay.querySelector(`[id^="close-btn-"]`);
+  
+  // Store reference to THIS overlay for cleanup
+  overlay._cleanup = function() {
+    // Stop the iframe
+    if (iframe) {
+      iframe.src = '';
+      iframe.remove();
+    }
+    // Remove the overlay
+    if (overlay && overlay.parentNode) {
+      overlay.parentNode.removeChild(overlay);
+    }
+  };
+  
+  // Set up close button
+  closeBtn.onclick = function() {
+    overlay._cleanup();
+  };
   
   iframe.onload = function() {
-    loading.style.display = 'none';
+    if (loading) loading.style.display = 'none';
   };
   
   iframe.onerror = function() {
-    loading.innerHTML = '<span style="color:#f87171;">Video cannot be embedded. Use "Watch on YouTube" link above.</span>';
+    if (loading) {
+      loading.innerHTML = '<span style="color:#f87171;">Video cannot be embedded. Use "Watch on YouTube" link above.</span>';
+    }
   };
   
-  // Try to play after a short delay
-  setTimeout(() => {
-    try {
-      // Try to reload with autoplay
-      iframe.src = `https://www.youtube.com/embed/${youtubeId}?autoplay=1`;
-    } catch (e) {
-      console.log('Autoplay failed, manual play required');
+  // Also allow clicking outside the modal to close
+  overlay.onclick = function(e) {
+    if (e.target === overlay) {
+      overlay._cleanup();
     }
-  }, 1000);
+  };
+  
+  // Store reference for global close function
+  window.currentVideoOverlay = overlay;
 }
 
-// Close function that properly cleans up
+// Global close function
 function closeVideoPlayer() {
   const overlay = document.querySelector('.video-overlay-container');
-  if (overlay) {
+  if (overlay && overlay._cleanup) {
+    overlay._cleanup();
+  } else if (overlay) {
     overlay.remove();
   }
+  if (window.currentVideoOverlay) {
+    window.currentVideoOverlay = null;
+  }
 }
+
+// Also add ESC key to close
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeVideoPlayer();
+  }
+});
 </script>
 
   <script>
