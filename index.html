@@ -5059,107 +5059,76 @@ document.getElementById('tab-video').onclick = function() {
 
 // SINGLE Video overlay function - dynamic approach for proper cleanup
 function openVideoPlayer(youtubeId, title) {
-  // Remove any existing overlay first
-  const existingOverlay = document.querySelector('.video-overlay-container');
-  if (existingOverlay) {
-    existingOverlay.remove();
-  }
+  // Remove existing
+  const existing = document.querySelector('.video-overlay-container');
+  if (existing) existing.remove();
   
-  // Create new overlay
   const overlay = document.createElement('div');
   overlay.className = 'video-overlay-container';
-  
-  // Generate unique IDs for this instance
-  const playerId = `yt-player-${Date.now()}`;
-  const loadingId = `loading-${Date.now()}`;
-  
   overlay.style.cssText = `
     position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:11000;
     display:flex;align-items:center;justify-content:center;
     background:rgba(12,10,30,0.88);
   `;
   
-  // Use embed URL WITH autoplay from the start
-  const embedUrl = `https://www.youtube.com/embed/${youtubeId}?autoplay=1&playsinline=1`;
-  
   overlay.innerHTML = `
-    <div style="max-width:96vw;background:#171732;padding:20px 20px 10px 20px;border-radius:16px;box-shadow:0 0 60px 0 #ffe49e33;text-align:center;">
+    <div style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;">
       <div style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
-      
-      <iframe 
-        id="${playerId}"
-        width="350" 
-        height="210" 
-        src="${embedUrl}"
-        frameborder="0" 
-        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-        allowfullscreen 
-        style="border-radius:10px;box-shadow:0 0 10px #92823344;">
-      </iframe>
-      
-      <!-- Add loading indicator -->
-      <div id="${loadingId}" style="margin:10px;color:#94a3b8;">
-        Loading video...
-      </div>
-      
-      <!-- Alternative link as fallback -->
+      <div id="player-container-${Date.now()}" style="width:350px;height:210px;border-radius:10px;overflow:hidden;"></div>
       <div style="margin-top:15px;">
+        <button onclick="closeVideoPlayer()" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
         <a href="https://www.youtube.com/watch?v=${youtubeId}" 
            target="_blank"
-           style="display:inline-block;padding:8px 20px;background:#3b82f6;color:white;border-radius:8px;text-decoration:none;font-size:14px;">
-          Watch on YouTube
+           style="display:inline-block;margin-left:10px;padding:7px 20px;background:#3b82f6;color:white;border-radius:8px;text-decoration:none;font-size:14px;">
+          Open in YouTube
         </a>
-      </div>
-      
-      <div>
-        <button id="close-btn-${Date.now()}" style="margin:17px 0 7px 0;padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
       </div>
     </div>`;
   
   document.body.appendChild(overlay);
   
-  // Add error detection
-  const iframe = document.getElementById(playerId);
-  const loading = document.getElementById(loadingId);
-  const closeBtn = overlay.querySelector(`[id^="close-btn-"]`);
+  // Load YouTube IFrame API if not already loaded
+  if (!window.YT) {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    const firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  }
   
-  // Store reference to THIS overlay for cleanup
-  overlay._cleanup = function() {
-    // Stop the iframe
-    if (iframe) {
-      iframe.src = '';
-      iframe.remove();
-    }
-    // Remove the overlay
-    if (overlay && overlay.parentNode) {
-      overlay.parentNode.removeChild(overlay);
-    }
-  };
+  // Create player when API is ready
+  function createPlayer() {
+    new YT.Player(`player-container-${Date.now()}`, {
+      height: '210',
+      width: '350',
+      videoId: youtubeId,
+      playerVars: {
+        'playsinline': 1,
+        'rel': 0,
+        'modestbranding': 1,
+        'showinfo': 0
+      },
+      events: {
+        'onReady': onPlayerReady,
+        'onError': onPlayerError
+      }
+    });
+  }
   
-  // Set up close button
-  closeBtn.onclick = function() {
-    overlay._cleanup();
-  };
+  function onPlayerReady(event) {
+    event.target.playVideo();
+  }
   
-  iframe.onload = function() {
-    if (loading) loading.style.display = 'none';
-  };
+  function onPlayerError(event) {
+    console.log('YouTube Player Error:', event.data);
+    // Show fallback link
+  }
   
-  iframe.onerror = function() {
-    if (loading) {
-      loading.innerHTML = '<span style="color:#f87171;">Video cannot be embedded. Use "Watch on YouTube" link above.</span>';
-    }
-  };
-  
-  // Also allow clicking outside the modal to close
-  overlay.onclick = function(e) {
-    if (e.target === overlay) {
-      overlay._cleanup();
-    }
-  };
-  
-  // Store reference for global close function
-  window.currentVideoOverlay = overlay;
+  // Wait for API to load
+  if (window.YT && YT.loaded) {
+    createPlayer();
+  } else {
+    window.onYouTubeIframeAPIReady = createPlayer;
+  }
 }
 
 // Global close function
