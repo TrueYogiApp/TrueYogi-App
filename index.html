@@ -5139,22 +5139,84 @@ function openVideoPlayer(youtubeId, title) {
     background:rgba(12,10,30,0.88);
   `;
   
-  overlay.innerHTML = `
-    <div style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;">
-      <div style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
-      <div id="${playerId}" style="width:350px;height:210px;border-radius:10px;overflow:hidden;"></div>
-      <div style="margin-top:15px;">
-        <button onclick="closeVideoPlayer()" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
-        <a href="https://www.youtube.com/watch?v=${youtubeId}" 
-           target="_blank"
-           style="display:inline-block;margin-left:10px;padding:7px 20px;background:#3b82f6;color:white;border-radius:8px;text-decoration:none;font-size:14px;">
-          Open in YouTube
-        </a>
-      </div>
-    </div>`;
+overlay.innerHTML = `
+  <div style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;position:relative;">
+    <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
+    <div id="${playerId}" style="width:350px;height:210px;border-radius:10px;overflow:hidden;margin:0 auto 24px auto;"></div>
+    <div class="video-controls" style="transition:opacity .4s;opacity:1;pointer-events:auto;">
+      <button onclick="closeVideoPlayer()" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
+      <a href="https://www.youtube.com/watch?v=${youtubeId}" 
+         target="_blank"
+         style="display:inline-block;margin-left:10px;padding:7px 20px;background:#3b82f6;color:white;border-radius:8px;text-decoration:none;font-size:14px;">
+        Open in YouTube
+      </a>
+    </div>
+  </div>
+`;
   
   document.body.appendChild(overlay);
   
+// Show/hide global screensaver canvas (already animating!)
+// Use z-index so it's behind overlay content but above the overlay background
+let videoScreensaverTimer = null;
+
+function showOverlayScreensaver() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  canvas.style.display = 'block';
+  canvas.style.position = 'fixed';
+  canvas.style.left = '0';
+  canvas.style.top = '0';
+  canvas.style.width = '100vw';
+  canvas.style.height = '100vh';
+  canvas.style.pointerEvents = 'none';
+  canvas.style.zIndex = '10999'; // above overlay bg, behind video box
+}
+
+function hideOverlayScreensaver() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  canvas.style.display = 'none';
+}
+
+// Reset timer every user action in overlay
+function resetOverlayIdleTimer() {
+  hideOverlayScreensaver();
+  clearTimeout(videoScreensaverTimer);
+  videoScreensaverTimer = setTimeout(() => {
+    showOverlayScreensaver();
+  }, 30000); // 30 seconds
+}
+
+['mousemove','mousedown','keydown','touchstart'].forEach(evt => {
+  overlay.addEventListener(evt, resetOverlayIdleTimer, true);
+});
+
+resetOverlayIdleTimer();
+  
+let controls = overlay.querySelector('.video-controls');
+let titleEl = overlay.querySelector('.video-title');
+let hideControlsTimer = null;
+
+function hideControls() {
+  controls.style.opacity = '0';
+  controls.style.pointerEvents = 'none';
+  titleEl.style.opacity = '0';
+}
+function showControls(autoHide) {
+  controls.style.opacity = '1';
+  controls.style.pointerEvents = 'auto';
+  titleEl.style.opacity = '1';
+  clearTimeout(hideControlsTimer);
+  if (autoHide) {
+    hideControlsTimer = setTimeout(hideControls, 2500); // only hide if autoHide true
+  }
+}
+
+overlay.addEventListener('click', function(e) {
+  if (!controls.contains(e.target) && !titleEl.contains(e.target)) showControls(true);
+});
+
   // Load YouTube IFrame API if not already loaded
   if (!window.YT) {
     const tag = document.createElement('script');
@@ -5192,18 +5254,15 @@ function openVideoPlayer(youtubeId, title) {
     requestVideoWakeLock();
   }
   
-  function onPlayerStateChange(event) {
-    // YouTube player state codes:
-    // -1 (unstarted), 0 (ended), 1 (playing), 2 (paused), 3 (buffering), 5 (video cued)
-    
-    if (event.data === YT.PlayerState.PLAYING) {
-      // Video is playing - keep screen on
-      requestVideoWakeLock();
-    } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
-      // Video paused or ended - release wake lock
-      releaseVideoWakeLock();
-    }
+function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.PLAYING) {
+    requestVideoWakeLock();
+    showControls(true); // playing: auto-hide
+  } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
+    releaseVideoWakeLock();
+    showControls(false); // paused/ended: stay visible
   }
+}
   
   function onPlayerError(event) {
     console.log('YouTube Player Error:', event.data);
@@ -5340,6 +5399,9 @@ function closeVideoPlayer() {
   
   // Clear reference
   window.currentVideoOverlay = null;
+  
+  hideOverlayScreensaver();
+clearTimeout(videoScreensaverTimer);
 }
 
 // Also add ESC key support
