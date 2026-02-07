@@ -5157,11 +5157,6 @@ overlay.innerHTML = `
     <div id="${playerId}" style="width:350px;height:210px;border-radius:10px;overflow:hidden;margin:0 auto 24px auto;"></div>
     <div class="video-controls" style="transition:opacity .4s;opacity:1;pointer-events:auto;">
       <button onclick="closeVideoPlayer()" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
-      <a href="https://www.youtube.com/watch?v=${youtubeId}" 
-         target="_blank"
-         style="display:inline-block;margin-left:10px;padding:7px 20px;background:#3b82f6;color:white;border-radius:8px;text-decoration:none;font-size:14px;">
-        Open in YouTube
-      </a>
     </div>
   </div>
 `;
@@ -21005,7 +21000,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
 	  //await window.fetchYogiConfigFromSupabase();
-      //await window.fetchYogiChallengeFromSupabase();
+      await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
       // Sync the Yogi Config (new logic includes skip for already synced)
