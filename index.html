@@ -5072,7 +5072,19 @@ let videos = [];
 function renderVideoList() {
   const list = document.getElementById('video-list');
   list.innerHTML = "";
-  videos.forEach((vid, i) => {
+
+  // Get current language (from localStorage or global)
+  const currentLang = localStorage.getItem('lang') || 'en';
+
+  // Filter videos
+  const filteredVideos = videos.filter(v => (v.lang || 'en') === currentLang);
+
+  if (filteredVideos.length === 0) {
+    list.innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">No videos for this language.</div>';
+    return;
+  }
+
+  filteredVideos.forEach((vid, i) => {
     const html = `
       <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:12px 18px 18px 18px;margin-bottom:18px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(50,50,80,0.11);">
         <img src="${vid.thumb || 'https://img.youtube.com/vi/' + vid.youtubeId + '/hqdefault.jpg'}"
@@ -12146,6 +12158,7 @@ async function setLanguage(lang) {
   updateUILanguage();
   updateWalletUI();
   loadSacredLines();
+  renderVideoList();
   await loadQuotes();
 }
 
