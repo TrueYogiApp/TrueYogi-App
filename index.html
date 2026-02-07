@@ -5155,45 +5155,7 @@ overlay.innerHTML = `
 `;
   
   document.body.appendChild(overlay);
-  
-// Show/hide global screensaver canvas (already animating!)
-// Use z-index so it's behind overlay content but above the overlay background
-let videoScreensaverTimer = null;
-
-function showOverlayScreensaver() {
-  const canvas = document.getElementById('particles-canvas');
-  if (!canvas) return;
-  canvas.style.display = 'block';
-  canvas.style.position = 'fixed';
-  canvas.style.left = '0';
-  canvas.style.top = '0';
-  canvas.style.width = '100vw';
-  canvas.style.height = '100vh';
-  canvas.style.pointerEvents = 'none';
-  canvas.style.zIndex = '10999'; // above overlay bg, behind video box
-}
-
-function hideOverlayScreensaver() {
-  const canvas = document.getElementById('particles-canvas');
-  if (!canvas) return;
-  canvas.style.display = 'none';
-}
-
-// Reset timer every user action in overlay
-function resetOverlayIdleTimer() {
-  hideOverlayScreensaver();
-  clearTimeout(videoScreensaverTimer);
-  videoScreensaverTimer = setTimeout(() => {
-    showOverlayScreensaver();
-  }, 30000); // 30 seconds
-}
-
-['mousemove','mousedown','keydown','touchstart'].forEach(evt => {
-  overlay.addEventListener(evt, resetOverlayIdleTimer, true);
-});
-
-resetOverlayIdleTimer();
-  
+    
 let controls = overlay.querySelector('.video-controls');
 let titleEl = overlay.querySelector('.video-title');
 let hideControlsTimer = null;
@@ -5201,15 +5163,19 @@ let hideControlsTimer = null;
 function hideControls() {
   controls.style.opacity = '0';
   controls.style.pointerEvents = 'none';
+  controls.style.visibility = 'hidden';   // <-- add this
   titleEl.style.opacity = '0';
+  titleEl.style.visibility = 'hidden';    // <-- add this
 }
 function showControls(autoHide) {
   controls.style.opacity = '1';
   controls.style.pointerEvents = 'auto';
+  controls.style.visibility = 'visible';  // <-- add this
   titleEl.style.opacity = '1';
+  titleEl.style.visibility = 'visible';   // <-- add this
   clearTimeout(hideControlsTimer);
   if (autoHide) {
-    hideControlsTimer = setTimeout(hideControls, 2500); // only hide if autoHide true
+    hideControlsTimer = setTimeout(hideControls, 2500);
   }
 }
 
@@ -5282,6 +5248,44 @@ function onPlayerStateChange(event) {
   // Add visibility change listener
   document.addEventListener('visibilitychange', handleVisibilityChange);
 }
+
+// Show/hide global screensaver canvas (already animating!)
+// Use z-index so it's behind overlay content but above the overlay background
+let videoScreensaverTimer = null;
+
+function showOverlayScreensaver() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  canvas.style.display = 'block';
+  canvas.style.position = 'fixed';
+  canvas.style.left = '0';
+  canvas.style.top = '0';
+  canvas.style.width = '100vw';
+  canvas.style.height = '100vh';
+  canvas.style.pointerEvents = 'none';
+  canvas.style.zIndex = '10999'; // above overlay bg, behind video box
+}
+
+function hideOverlayScreensaver() {
+  const canvas = document.getElementById('particles-canvas');
+  if (!canvas) return;
+  canvas.style.display = 'none';
+}
+
+// Reset timer every user action in overlay
+function resetOverlayIdleTimer() {
+  hideOverlayScreensaver();
+  clearTimeout(videoScreensaverTimer);
+  videoScreensaverTimer = setTimeout(() => {
+    showOverlayScreensaver();
+  }, 30000); // 30 seconds
+}
+
+['mousemove','mousedown','keydown','touchstart'].forEach(evt => {
+  overlay.addEventListener(evt, resetOverlayIdleTimer, true);
+});
+
+resetOverlayIdleTimer();
 
 // Video-specific wake lock functions
 async function requestVideoWakeLock() {
