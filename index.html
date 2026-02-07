@@ -5012,8 +5012,6 @@ function viewPDFinline(pdfPath, pdfName) {
   const encodedUrl = encodeURIComponent(pdfPath);
   iframe.src = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
   
-  // HIDE language floater
-  document.getElementById('lang-floater').style.display = 'none';
 }
 
 function closePDFinline() {
@@ -5024,11 +5022,6 @@ function closePDFinline() {
   currentPDF = null;
   currentPDFName = '';
   
-   // SHOW language floater only if PDF tab is active!
-  if (document.getElementById('pdf-list').style.display !== 'none') {
-    document.getElementById('lang-floater').style.display = '';
-    updateLangFloaterOnScroll();
-  }
 }
 
 let videos = [];
@@ -5084,7 +5077,6 @@ document.getElementById('tab-pdf').onclick = function() {
   document.getElementById('video-list').style.display = 'none';
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-video').classList.remove('dashboard-tab-active');
-  document.getElementById('lang-floater').style.display = ''; // SHOW floater
   updateLangFloaterOnScroll();
 };
 document.getElementById('tab-video').onclick = function() {
@@ -5092,7 +5084,6 @@ document.getElementById('tab-video').onclick = function() {
   document.getElementById('pdf-list').style.display = 'none';
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
-  document.getElementById('lang-floater').style.display = 'none'; // HIDE floater
 };
 
 // SINGLE Video overlay function - dynamic approach for proper cleanup
