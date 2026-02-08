@@ -5534,6 +5534,7 @@ let yogiInterval = null;
 // === for music cycling ===
 let yogiAudioLoops = 0;
 let musicPauseTimeout = null;
+let startMessageTimeout = null; // <-- NEW: track start message timeout
 
 function toggleYogiMeditation() {
   const minutesText = document.getElementById("yogi-total-minutes").innerText;
@@ -5548,10 +5549,11 @@ function toggleYogiMeditation() {
     timerDisplay.style.opacity = "1";
     timerDisplay.style.transition = "opacity 1s";
     timerDisplay.style.fontSize = "2.1rem";
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       timerDisplay.innerText = "";
       if (typeof next === "function") next();
     }, duration);
+    return timeoutId; // <-- return timeout ID so we can clear it
   }
 
   // Clear pause timer if user closes early
@@ -5594,7 +5596,8 @@ function toggleYogiMeditation() {
     dim.style.pointerEvents = "auto";
 
     // 1. Show start message, then proceed
-    showYogiMessage(t('presence.begins'), 6000, () => {
+    startMessageTimeout = showYogiMessage(t('presence.begins'), 6000, () => {
+      startMessageTimeout = null; // Clear reference after callback runs
       // Start music loop logic
       playCycleMusic();
 
@@ -5629,7 +5632,15 @@ function toggleYogiMeditation() {
   } else {
     // End early
     yogiPlaying = false;
+
+    // <-- NEW: Clear start message timeout if it's still pending
+    if (startMessageTimeout) {
+      clearTimeout(startMessageTimeout);
+      startMessageTimeout = null;
+    }
+
     audio.pause();
+    audio.currentTime = 0; // <-- Reset audio to start
     stopMusicPause();
     audio.onended = null;
     clearTimeout(yogiTimer);
