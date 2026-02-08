@@ -5177,9 +5177,11 @@ function openVideoPlayer(youtubeId, title) {
   `;
   
 overlay.innerHTML = `
-  <div style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;position:relative;">
+  <div class="video-outer-container" style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;position:relative;">
     <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
-    <div id="${playerId}" style="width:350px;height:210px;border-radius:10px;overflow:hidden;margin:0 auto 24px auto;"></div>
+    <div class="video-frame" style="border-radius:10px;overflow:hidden;margin:0 auto 24px auto;background:#211f3c;transition:background 0.6s;">
+      <div id="${playerId}" style="width:350px;height:210px;"></div>
+    </div>
     <div class="video-controls" style="transition:opacity .4s;opacity:1;pointer-events:auto;">
       <button onclick="closeVideoPlayer()" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
     </div>
@@ -5187,6 +5189,23 @@ overlay.innerHTML = `
 `;
   
   document.body.appendChild(overlay);
+
+function hideVideoFrame() {
+  const outer = overlay.querySelector('.video-outer-container');
+  if (outer) {
+    outer.style.background = 'none';
+    outer.style.boxShadow = 'none';
+    outer.style.transition = 'background 0.6s';
+  }
+}
+
+function showVideoFrame() {
+  const outer = overlay.querySelector('.video-outer-container');
+  if (outer) {
+    outer.style.background = '#171732';
+    outer.style.boxShadow = ''; // or set a specific shadow if you want
+  }
+}
   
 // Show/hide global screensaver canvas (already animating!)
 // Use z-index so it's behind overlay content but above the overlay background
@@ -5294,9 +5313,11 @@ function onPlayerStateChange(event) {
   if (event.data === YT.PlayerState.PLAYING) {
     requestVideoWakeLock();
     showControls(true); // playing: auto-hide
+	hideVideoFrame();
   } else if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.ENDED) {
     releaseVideoWakeLock();
     showControls(false); // paused/ended: stay visible
+	showVideoFrame();
   }
 }
   
