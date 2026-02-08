@@ -2490,15 +2490,26 @@ button[disabled] {
 }
 
 .green-animate {
-  color: #29D884; /* Classic indigo */
-  animation: greenShine 1.5s linear infinite;
-  cursor: pointer;
+  color: #29D884;
+  animation: greenShine 1.5s linear infinite, breathePulse 3s ease-in-out infinite;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.green-animate:hover {
+  transform: scale(1.2);
+  filter: brightness(1.7) drop-shadow(0 0 14px rgba(41, 216, 132, 0.7));
+  animation: greenShine 1.5s linear infinite; /* pause breathe on hover, just glow */
 }
 
 @keyframes greenShine {
   0%   { filter: brightness(1.1) hue-rotate(0deg); }
   50%  { filter: brightness(1.4) hue-rotate(18deg); }
   100% { filter: brightness(1.1) hue-rotate(0deg); }
+}
+
+@keyframes breathePulse {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
 }
 
 #sacred-line-container {
@@ -4324,7 +4335,7 @@ button[disabled] {
     <p class="text-xs text-gray-400">Yogi Sessions</p>
   </div>
     <div>
-  <p class="text-xl font-bold text-green-400 green-animate cursor-pointer"
+  <p class="text-xl font-bold text-green-400 green-animate"
      id="yogi-total-minutes"
      onclick="toggleYogiMeditation()">
     0
