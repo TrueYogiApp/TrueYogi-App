@@ -432,5 +432,7 @@
   "spaceship.offlineInfo.text": "您当前处于离线状态，尚未启用飞船模式。",
   "spaceship.offlineInfo.cta": "请在设置中启用飞船模式，以访问所有离线功能。",
   "spaceship.offlineInfo.gotit": "知道了！",
-  "presence.deepened": "存在感加深了"   
+  "presence.begins": "觉察开始了",
+  "presence.deepened": "觉察加深了",
+  "presence.be": "与自己的觉察同在"  
 }

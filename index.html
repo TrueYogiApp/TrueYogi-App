@@ -5510,6 +5510,18 @@ function toggleYogiMeditation() {
   const dim = document.getElementById("deep-dim-layer");
   const timerDisplay = document.getElementById("deep-timer");
 
+  // Helper: show temporary messages
+  function showYogiMessage(msg, duration, next) {
+    timerDisplay.innerText = msg;
+    timerDisplay.style.opacity = "1";
+    timerDisplay.style.transition = "opacity 1s";
+    timerDisplay.style.fontSize = "2.1rem";
+    setTimeout(() => {
+      timerDisplay.innerText = "";
+      if (typeof next === "function") next();
+    }, duration);
+  }
+
   // Clear pause timer if user closes early
   function stopMusicPause() {
     if (musicPauseTimeout) {
@@ -5548,41 +5560,39 @@ function toggleYogiMeditation() {
     let remaining = minutes * 60;
     dim.style.opacity = "0.5";
     dim.style.pointerEvents = "auto";
-    timerDisplay.innerText = "";
 
-    // Start music playing/looping logic
-    playCycleMusic();
+    // 1. Show start message, then proceed
+    showYogiMessage(t('presence.begins'), 2000, () => {
+      // Start music loop logic
+      playCycleMusic();
 
-    // update timer every second
-    yogiInterval = setInterval(() => {
-      let m = Math.floor(remaining / 60);
-      let s = remaining % 60;
-      timerDisplay.innerText =
-        String(m).padStart(2,"0") + ":" +
-        String(s).padStart(2,"0");
-      remaining--;
-      if (remaining < 0) clearInterval(yogiInterval);
-    }, 1000);
+      // update timer every second
+      timerDisplay.style.fontSize = ""; // reset for timer view
+      yogiInterval = setInterval(() => {
+        let m = Math.floor(remaining / 60);
+        let s = remaining % 60;
+        timerDisplay.innerText =
+          String(m).padStart(2,"0") + ":" +
+          String(s).padStart(2,"0");
+        remaining--;
+        if (remaining < 0) clearInterval(yogiInterval);
+      }, 1000);
 
-    yogiTimer = setTimeout(() => {
-      audio.pause();
-      stopMusicPause();
-      clearInterval(yogiInterval);
+      yogiTimer = setTimeout(() => {
+        audio.pause();
+        stopMusicPause();
+        clearInterval(yogiInterval);
 
-      // 1. Show completion message
-      timerDisplay.innerText = t('presence.deepened');
-      timerDisplay.style.opacity = "1";
-      timerDisplay.style.transition = "opacity 1s";
-      timerDisplay.style.fontSize = "2.1rem";
-
-      setTimeout(() => {
-        dim.style.opacity = "0";
-        dim.style.pointerEvents = "none";
-        timerDisplay.innerText = "";
-        yogiPlaying = false;
-        audio.onended = null;
-      }, 4000);
-    }, minutes * 60000);
+        // On natural finish
+        showYogiMessage(t('presence.deepened'), 4000, () => {
+          dim.style.opacity = "0";
+          dim.style.pointerEvents = "none";
+          timerDisplay.innerText = "";
+          yogiPlaying = false;
+          audio.onended = null;
+        });
+      }, minutes * 60000);
+    });
 
   } else {
     // End early
@@ -5590,11 +5600,15 @@ function toggleYogiMeditation() {
     audio.pause();
     stopMusicPause();
     audio.onended = null;
-    dim.style.opacity = "0";
-    dim.style.pointerEvents = "none";
-    timerDisplay.innerText = "";
     clearTimeout(yogiTimer);
     clearInterval(yogiInterval);
+
+    // Show early stop message, then hide
+    showYogiMessage(t('presence.be'), 2000, () => {
+      dim.style.opacity = "0";
+      dim.style.pointerEvents = "none";
+      timerDisplay.innerText = "";
+    });
   }
 }
 

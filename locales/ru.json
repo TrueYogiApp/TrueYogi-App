@@ -432,6 +432,8 @@
   "spaceship.offlineInfo.text": "Вы офлайн, и режим Spaceship ещё не включён.",
   "spaceship.offlineInfo.cta": "Включите режим Spaceship в настройках, чтобы получить доступ ко всем офлайн-функциям.",
   "spaceship.offlineInfo.gotit": "Понятно!",
-  "presence.deepened": "Присутствие углубилось"   
+  "presence.begins": "Присутствие начинается",
+  "presence.deepened": "Присутствие углубилось",
+  "presence.be": "Будьте со своим присутствием"  
   
 }

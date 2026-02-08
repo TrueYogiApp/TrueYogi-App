@@ -431,5 +431,7 @@
   "spaceship.offlineInfo.text": "Du bist offline und der Spaceship-Modus ist noch nicht aktiviert.",
   "spaceship.offlineInfo.cta": "Aktiviere den Spaceship-Modus in den Einstellungen, um alle Offline-Funktionen zu nutzen.",
   "spaceship.offlineInfo.gotit": "Verstanden!",
-  "presence.deepened": "Die Präsenz hat sich vertieft"   
+  "presence.begins": "Die Präsenz beginnt",
+  "presence.deepened": "Die Präsenz hat sich vertieft",
+  "presence.be": "Sei mit deiner Präsenz" 
 }
