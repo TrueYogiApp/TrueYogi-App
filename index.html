@@ -5658,7 +5658,7 @@ function toggleYogiMeditation() {
     clearInterval(yogiInterval);
 
     // Show early stop message, then hide
-    showYogiMessage(t('presence.be'), 4500, () => {
+    showYogiMessage(t('presence.be'), 3000, () => {
       dim.style.opacity = "0";
       dim.style.pointerEvents = "none";
       timerDisplay.innerText = "";
