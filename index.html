@@ -5623,7 +5623,7 @@ function toggleYogiMeditation() {
           yogiPlaying = false;
           audio.onended = null;
         });
-      }, minutes * 60000);
+      }, minutes * 6000);
     });
 
   } else {
@@ -5636,7 +5636,7 @@ function toggleYogiMeditation() {
     clearInterval(yogiInterval);
 
     // Show early stop message, then hide
-    showYogiMessage(t('presence.be'), 45000, () => {
+    showYogiMessage(t('presence.be'), 4500, () => {
       dim.style.opacity = "0";
       dim.style.pointerEvents = "none";
       timerDisplay.innerText = "";
