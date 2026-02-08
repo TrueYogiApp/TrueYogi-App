@@ -434,6 +434,7 @@
   "spaceship.offlineInfo.title": "ఆఫ్లైన్ మోడ్ పరిమితంగా ఉంది",
   "spaceship.offlineInfo.text": "మీరు ఆఫ్లైన్‌లో ఉన్నారు మరియు స్పేస్‌షిప్ మోడ్ ఇంకా సామర్థ్యం చేయలేదు.",
   "spaceship.offlineInfo.cta": "ప్రతి ఫీచర్‌ను ఆఫ్లైన్‌లో యాక్సెస్ చేయడానికి సెట్టింగ్స్‌లో నుండి స్పేస్‌షిప్ మోడ్‌ను ప్రారంభించండి.",
-  "spaceship.offlineInfo.gotit": "సరే!"
+  "spaceship.offlineInfo.gotit": "సరే!",
+  "presence.deepened": "స్థిరత్వం లోనికి తెచ్చుకుంది"  
 
 }

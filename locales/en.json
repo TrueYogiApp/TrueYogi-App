@@ -435,6 +435,7 @@
   "spaceship.offlineInfo.title": "Offline Mode Limited",
   "spaceship.offlineInfo.text": "You are offline and Spaceship Mode is not yet enabled.",
   "spaceship.offlineInfo.cta": "Enable Spaceship Mode from Settings to access all features offline.",
-  "spaceship.offlineInfo.gotit": "Got it!"
+  "spaceship.offlineInfo.gotit": "Got it!",
+  "presence.deepened": "Presence deepened"
   
 }

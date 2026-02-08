@@ -430,5 +430,6 @@
   "spaceship.offlineInfo.title": "Offline-Modus eingeschränkt",
   "spaceship.offlineInfo.text": "Du bist offline und der Spaceship-Modus ist noch nicht aktiviert.",
   "spaceship.offlineInfo.cta": "Aktiviere den Spaceship-Modus in den Einstellungen, um alle Offline-Funktionen zu nutzen.",
-  "spaceship.offlineInfo.gotit": "Verstanden!"
+  "spaceship.offlineInfo.gotit": "Verstanden!",
+  "presence.deepened": "Die Präsenz hat sich vertieft"   
 }

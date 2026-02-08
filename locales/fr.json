@@ -435,6 +435,7 @@
   "spaceship.offlineInfo.title": "Mode hors ligne limité",
   "spaceship.offlineInfo.text": "Vous êtes hors ligne et le mode Spaceship n'est pas encore activé.",
   "spaceship.offlineInfo.cta": "Activez le Mode Spaceship dans les paramètres pour accéder à toutes les fonctionnalités hors ligne.",
-  "spaceship.offlineInfo.gotit": "Compris !"
+  "spaceship.offlineInfo.gotit": "Compris !",
+  "presence.deepened": "స్థిరత్వం లోనికి తెచ్చుకుంది"   
 
 }

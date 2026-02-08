@@ -430,6 +430,7 @@
   "spaceship.offlineInfo.title": "ऑफ़लाइन मोड सीमित है",
   "spaceship.offlineInfo.text": "आप ऑफ़लाइन हैं और स्पेसशिप मोड अभी सक्षम नहीं है।",
   "spaceship.offlineInfo.cta": "सभी सुविधाओं को ऑफ़लाइन प्राप्त करने के लिए सेटिंग्स से स्पेसशिप मोड सक्षम करें।",
-  "spaceship.offlineInfo.gotit": "ठीक है!"
+  "spaceship.offlineInfo.gotit": "ठीक है!",
+  "presence.deepened": "साक्षात्कार गहरा हुआ"   
 
 }

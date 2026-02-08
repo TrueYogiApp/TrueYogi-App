@@ -2693,6 +2693,52 @@ button[disabled] {
 }
 
   
+#yogi-total-minutes:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+#deep-dim-layer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: black;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.8s ease;
+  z-index: 20000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.deep-breathing {
+  animation: cosmicBreath 12s ease-in-out infinite;
+}
+
+@keyframes cosmicBreath {
+  0% { opacity: 0.45; }
+  50% { opacity: 0.65; }
+  100% { opacity: 0.45; }
+}
+
+#deep-timer {
+  font-size: 3rem;
+  color: rgba(255,255,255,0.85);
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  pointer-events: none;
+}
+
+#deep-timer {
+  animation: breatheTimer 6s ease-in-out infinite;
+}
+
+@keyframes breatheTimer {
+  0%,100% { opacity:0.6; transform:scale(1); }
+  50% { opacity:1; transform:scale(1.05); }
+}
+  
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -4254,10 +4300,14 @@ button[disabled] {
     <p class="text-xl font-bold text-yellow-400" id="yogi-total-sessions">0</p>
     <p class="text-xs text-gray-400">Yogi Sessions</p>
   </div>
-  <div>
-    <p class="text-xl font-bold text-green-400" id="yogi-total-minutes">0</p>
-    <p class="text-xs text-gray-400">Yogi Minutes</p>
-  </div>
+    <div>
+  <p class="text-xl font-bold text-green-400 green-animate cursor-pointer"
+     id="yogi-total-minutes"
+     onclick="toggleYogiMeditation()">
+    0
+  </p>
+  <p class="text-xs text-gray-400">Yogi Minutes </p>
+</div>
   <div>
     <p class="text-xl font-bold text-yellow-400" id="yogi-day-streak">0</p>
     <p class="text-xs text-gray-400">Yogi Streak</p>
@@ -4538,6 +4588,11 @@ button[disabled] {
   🌞
 </button>
 
+<div id="deep-dim-layer">
+  <div id="deep-timer">00:00</div>
+</div>
+
+
   <!-- Sound elements -->
   <audio id="bell" src="https://trueyogi.app/assets/meditation-end.mp3" preload="auto" muted></audio>
   <audio id="om-sound" src="https://assets.trueyogi.app/assets/aum.m4a" preload="auto"></audio>
@@ -4555,6 +4610,10 @@ button[disabled] {
 <audio id="spaceship-sound" src="https://assets.trueyogi.app/assets/Spaceship.ultraraygun.mp3" preload="auto"></audio>
 <audio id="spaceship-notice-sound" src="https://assets.trueyogi.app/assets/Spaceship-takeoff.wav" preload="auto"></audio>
 <audio id="spaceship-heal-sound" src="https://assets.trueyogi.app/assets/Spaceship-heal.wav" preload="auto"></audio>
+
+<audio id="yogiMeditationAudio">
+  <source src="https://assets.trueyogi.app/assets/deep-space.mp3" type="audio/mpeg">
+</audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -5405,8 +5464,8 @@ document.addEventListener('keydown', function(e) {
 	let omUserId = localStorage.getItem('omUserId');
 	let pendingBellSound = false; // <-- Add this near your globals
 	let broadcastMode = false;	
-  let spaceshipPopupTimer = null;
-  let spaceshipPopupShown = false;
+    let spaceshipPopupTimer = null;
+    let spaceshipPopupShown = false;
 	
     // Challenge Data
     let challengeData = {
@@ -5423,6 +5482,116 @@ document.addEventListener('keydown', function(e) {
       challengeStreak: 0 // Add this line
     };
 
+
+// Yogi minutes Meditation
+let yogiPlaying = false;
+let yogiTimer = null;
+let yogiInterval = null;
+
+// === for music cycling ===
+let yogiAudioLoops = 0;
+let musicPauseTimeout = null;
+
+function toggleYogiMeditation() {
+  const minutesText = document.getElementById("yogi-total-minutes").innerText;
+  const minutes = parseInt(minutesText) || 0;
+  const audio = document.getElementById("yogiMeditationAudio");
+  const dim = document.getElementById("deep-dim-layer");
+  const timerDisplay = document.getElementById("deep-timer");
+
+  // Clear pause timer if user closes early
+  function stopMusicPause() {
+    if (musicPauseTimeout) {
+      clearTimeout(musicPauseTimeout);
+      musicPauseTimeout = null;
+    }
+  }
+
+  function playCycleMusic() {
+    yogiAudioLoops = 0;
+    // Start playing music and set up 'ended' event
+    audio.currentTime = 0;
+    audio.play();
+
+    audio.onended = function() {
+      if (!yogiPlaying) return; // User may have quit
+      yogiAudioLoops += 1;
+      if (yogiAudioLoops < 3) {
+        // play again
+        audio.currentTime = 0;
+        audio.play();
+      } else {
+        // 3 loops have finished, start pause
+        musicPauseTimeout = setTimeout(() => {
+          if (!yogiPlaying) return; // User may have quit
+          yogiAudioLoops = 0;
+          audio.currentTime = 0;
+          audio.play();
+        }, 3 * 60 * 1000); // 3 minutes pause
+      }
+    };
+  }
+
+  if (!yogiPlaying) {
+    yogiPlaying = true;
+    let remaining = minutes * 60;
+    dim.style.opacity = "0.5";
+    dim.style.pointerEvents = "auto";
+    timerDisplay.innerText = "";
+
+    // Start music playing/looping logic
+    playCycleMusic();
+
+    // update timer every second
+    yogiInterval = setInterval(() => {
+      let m = Math.floor(remaining / 60);
+      let s = remaining % 60;
+      timerDisplay.innerText =
+        String(m).padStart(2,"0") + ":" +
+        String(s).padStart(2,"0");
+      remaining--;
+      if (remaining < 0) clearInterval(yogiInterval);
+    }, 1000);
+
+    yogiTimer = setTimeout(() => {
+      audio.pause();
+      stopMusicPause();
+      clearInterval(yogiInterval);
+
+      // 1. Show completion message
+      timerDisplay.innerText = t('presence.deepened');
+      timerDisplay.style.opacity = "1";
+      timerDisplay.style.transition = "opacity 1s";
+      timerDisplay.style.fontSize = "2.1rem";
+
+      setTimeout(() => {
+        dim.style.opacity = "0";
+        dim.style.pointerEvents = "none";
+        timerDisplay.innerText = "";
+        yogiPlaying = false;
+        audio.onended = null;
+      }, 4000);
+    }, minutes * 60000);
+
+  } else {
+    // End early
+    yogiPlaying = false;
+    audio.pause();
+    stopMusicPause();
+    audio.onended = null;
+    dim.style.opacity = "0";
+    dim.style.pointerEvents = "none";
+    timerDisplay.innerText = "";
+    clearTimeout(yogiTimer);
+    clearInterval(yogiInterval);
+  }
+}
+
+document.getElementById("deep-dim-layer").addEventListener("click", () => {
+  if (yogiPlaying) {
+    toggleYogiMeditation();
+  }
+});
 
 // Sacred Lines
 let lines = [];

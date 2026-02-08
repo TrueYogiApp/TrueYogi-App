@@ -431,5 +431,6 @@
   "spaceship.offlineInfo.title": "Modalità offline limitata",
   "spaceship.offlineInfo.text": "Sei offline e la modalità Spaceship non è ancora abilitata.",
   "spaceship.offlineInfo.cta": "Abilita la modalità Spaceship dalle Impostazioni per accedere a tutte le funzionalità offline.",
-  "spaceship.offlineInfo.gotit": "Ho capito!"
+  "spaceship.offlineInfo.gotit": "Ho capito!",
+  "presence.deepened": "La presenza si è approfondita"   
 }
