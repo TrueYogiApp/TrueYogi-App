@@ -2489,6 +2489,17 @@ button[disabled] {
   100% { filter: brightness(1.1) hue-rotate(0deg); }
 }
 
+.green-animate {
+  color: #29D884; /* Classic indigo */
+  animation: greenShine 1.5s linear infinite;
+  cursor: pointer;
+}
+
+@keyframes greenShine {
+  0%   { filter: brightness(1.1) hue-rotate(0deg); }
+  50%  { filter: brightness(1.4) hue-rotate(18deg); }
+  100% { filter: brightness(1.1) hue-rotate(0deg); }
+}
 
 #sacred-line-container {
   width: 100%;
