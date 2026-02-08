@@ -436,8 +436,9 @@
   "spaceship.offlineInfo.text": "You are offline and Spaceship Mode is not yet enabled.",
   "spaceship.offlineInfo.cta": "Enable Spaceship Mode from Settings to access all features offline.",
   "spaceship.offlineInfo.gotit": "Got it!",
-  "presence.begins": "Presence begins",
-  "presence.deepened": "Presence deepened",
-  "presence.be": "Be with your Presence"
+  "presence.begins": "Entering deeper Stillness",
+  "presence.be": "Be with your Presence",
+  "presence.deepened": "Stillness Deepened"
+
   
 }

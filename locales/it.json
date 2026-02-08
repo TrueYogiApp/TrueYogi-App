@@ -432,7 +432,8 @@
   "spaceship.offlineInfo.text": "Sei offline e la modalità Spaceship non è ancora abilitata.",
   "spaceship.offlineInfo.cta": "Abilita la modalità Spaceship dalle Impostazioni per accedere a tutte le funzionalità offline.",
   "spaceship.offlineInfo.gotit": "Ho capito!",
-  "presence.begins": "La presenza ha inizio",
-  "presence.deepened": "La presenza si è approfondita",
-  "presence.be": "Sii con la tua presenza" 
+  "presence.begins": "Entrando in una quiete più profonda",
+  "presence.be": "Sii con la tua presenza",
+  "presence.deepened": "Quiete approfondita"
+  
 }

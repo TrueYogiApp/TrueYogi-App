@@ -2734,11 +2734,23 @@ button[disabled] {
 }
 
 #deep-timer {
-  font-size: 3rem;
+  font-size: clamp(1.4rem, 7vw, 3rem);
   color: rgba(255,255,255,0.85);
   font-weight: bold;
   letter-spacing: 0.1em;
   pointer-events: none;
+
+  /* New centering styles: */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  word-break: break-word;       /* breaks long text nicely */
+  white-space: normal;          /* ensures line breaks */
+  padding-left: 10px;
+  padding-right: 10px;
+  box-sizing: border-box;
 }
 
 #deep-timer {
@@ -5582,7 +5594,7 @@ function toggleYogiMeditation() {
     dim.style.pointerEvents = "auto";
 
     // 1. Show start message, then proceed
-    showYogiMessage(t('presence.begins'), 2000, () => {
+    showYogiMessage(t('presence.begins'), 6000, () => {
       // Start music loop logic
       playCycleMusic();
 
@@ -5604,7 +5616,7 @@ function toggleYogiMeditation() {
         clearInterval(yogiInterval);
 
         // On natural finish
-        showYogiMessage(t('presence.deepened'), 4000, () => {
+        showYogiMessage(t('presence.deepened'), 6000, () => {
           dim.style.opacity = "0";
           dim.style.pointerEvents = "none";
           timerDisplay.innerText = "";
@@ -5624,7 +5636,7 @@ function toggleYogiMeditation() {
     clearInterval(yogiInterval);
 
     // Show early stop message, then hide
-    showYogiMessage(t('presence.be'), 2000, () => {
+    showYogiMessage(t('presence.be'), 45000, () => {
       dim.style.opacity = "0";
       dim.style.pointerEvents = "none";
       timerDisplay.innerText = "";
