@@ -5537,6 +5537,37 @@ document.addEventListener('keydown', function(e) {
     };
 
 
+// === Deep Presence Tracking ===
+async function updateDeepPresence(isDeep) {
+  const presenceId = localStorage.getItem('omPresenceId');
+  
+  // Only update if user is in OM presence
+  if (!presenceId) {
+    console.log('No OM presence, skipping deep presence update');
+    return false;
+  }
+  
+  try {
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/update-deep-presence', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        presence_id: presenceId,
+        deep_presence: isDeep
+      })
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Failed to update deep presence:', err);
+    return false;
+  }
+}
+
 // Yogi minutes Meditation
 let yogiPlaying = false;
 let yogiTimer = null;
@@ -5548,6 +5579,8 @@ let musicPauseTimeout = null;
 let startMessageTimeout = null; // <-- NEW: track start message timeout
 
 function toggleYogiMeditation() {
+  const presenceId = localStorage.getItem('omPresenceId');
+  
   const minutesText = document.getElementById("yogi-total-minutes").innerText;
   const minutes = parseInt(minutesText) || 0;
   const audio = document.getElementById("yogiMeditationAudio");
@@ -5564,10 +5597,9 @@ function toggleYogiMeditation() {
       timerDisplay.innerText = "";
       if (typeof next === "function") next();
     }, duration);
-    return timeoutId; // <-- return timeout ID so we can clear it
+    return timeoutId;
   }
 
-  // Clear pause timer if user closes early
   function stopMusicPause() {
     if (musicPauseTimeout) {
       clearTimeout(musicPauseTimeout);
@@ -5577,25 +5609,22 @@ function toggleYogiMeditation() {
 
   function playCycleMusic() {
     yogiAudioLoops = 0;
-    // Start playing music and set up 'ended' event
     audio.currentTime = 0;
     audio.play();
 
     audio.onended = function() {
-      if (!yogiPlaying) return; // User may have quit
+      if (!yogiPlaying) return;
       yogiAudioLoops += 1;
       if (yogiAudioLoops < 3) {
-        // play again
         audio.currentTime = 0;
         audio.play();
       } else {
-        // 3 loops have finished, start pause
         musicPauseTimeout = setTimeout(() => {
-          if (!yogiPlaying) return; // User may have quit
+          if (!yogiPlaying) return;
           yogiAudioLoops = 0;
           audio.currentTime = 0;
           audio.play();
-        }, 3 * 60 * 1000); // 3 minutes pause
+        }, 3 * 60 * 1000);
       }
     };
   }
@@ -5606,14 +5635,19 @@ function toggleYogiMeditation() {
     dim.style.opacity = "0.5";
     dim.style.pointerEvents = "auto";
 
+    // Update backend that deep presence has started
+    updateDeepPresence(true).then(success => {
+      if (!success) {
+        console.warn('Could not update deep presence status, but continuing meditation');
+      }
+    });
+
     // 1. Show start message, then proceed
     startMessageTimeout = showYogiMessage(t('presence.begins'), 6000, () => {
-      startMessageTimeout = null; // Clear reference after callback runs
-      // Start music loop logic
+      startMessageTimeout = null;
       playCycleMusic();
 
-      // update timer every second
-      timerDisplay.style.fontSize = ""; // reset for timer view
+      timerDisplay.style.fontSize = "";
       yogiInterval = setInterval(() => {
         let m = Math.floor(remaining / 60);
         let s = remaining % 60;
@@ -5629,13 +5663,15 @@ function toggleYogiMeditation() {
         stopMusicPause();
         clearInterval(yogiInterval);
 
-        // On natural finish
-        showYogiMessage(t('presence.deepened'), 6000, () => {
-          dim.style.opacity = "0";
-          dim.style.pointerEvents = "none";
-          timerDisplay.innerText = "";
-          yogiPlaying = false;
-          audio.onended = null;
+        // On natural finish - update deep presence to false
+        updateDeepPresence(false).then(() => {
+          showYogiMessage(t('presence.deepened'), 6000, () => {
+            dim.style.opacity = "0";
+            dim.style.pointerEvents = "none";
+            timerDisplay.innerText = "";
+            yogiPlaying = false;
+            audio.onended = null;
+          });
         });
       }, minutes * 60000);
     });
@@ -5644,20 +5680,23 @@ function toggleYogiMeditation() {
     // End early
     yogiPlaying = false;
 
-    // <-- NEW: Clear start message timeout if it's still pending
+    // Update backend that deep presence has ended
+    updateDeepPresence(false).then(() => {
+      // Continue with UI cleanup
+    });
+
     if (startMessageTimeout) {
       clearTimeout(startMessageTimeout);
       startMessageTimeout = null;
     }
 
     audio.pause();
-    audio.currentTime = 0; // <-- Reset audio to start
+    audio.currentTime = 0;
     stopMusicPause();
     audio.onended = null;
     clearTimeout(yogiTimer);
     clearInterval(yogiInterval);
 
-    // Show early stop message, then hide
     showYogiMessage(t('presence.be'), 3000, () => {
       dim.style.opacity = "0";
       dim.style.pointerEvents = "none";
@@ -5665,6 +5704,12 @@ function toggleYogiMeditation() {
     });
   }
 }
+
+document.getElementById("deep-dim-layer").addEventListener("click", () => {
+  if (yogiPlaying) {
+    toggleYogiMeditation();
+  }
+});
 
 document.getElementById("deep-dim-layer").addEventListener("click", () => {
   if (yogiPlaying) {
