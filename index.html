@@ -16273,7 +16273,7 @@ await fetchCallPermission();
   // Fetch sessions during this flame period 
   let { data, error } = await supabase
     .from('om_sessions')
-    .select('user_id, country, countryCode, duration_seconds, started_at, ended_at')
+    .select('user_id, country, countryCode, duration_seconds, started_at, ended_at, deep_presence')
     .gte('started_at', lastFlameStarted.toISOString());
 
   if (error || !data) {
@@ -16285,26 +16285,29 @@ await fetchCallPermission();
   // Group and sum durations by user
   const userDurations = {}; // user_id => total seconds
   const userRows = {};      // user_id => store country/countryCode from any row
+  const userDeepPresence = {}; // <-- NEW: user_id => true if ANY session has deep_presence
+  
+	data.forEach(row => {
+	  if (!row.user_id) return;
+	  let duration = 0;
 
-  data.forEach(row => {
-    if (!row.user_id) return;
-    let duration = 0;
+	  if (row.ended_at) {
+		duration = row.duration_seconds || (
+		  Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000)
+		);
+	  } else {
+		duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
+	  }
 
-    if (row.ended_at) {
-      // Session ended, use provided duration or calculate
-      duration = row.duration_seconds || (
-        Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000)
-      );
-    } else {
-      // Live session, use elapsed time from started_at to now
-      duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
-    }
+	  userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
 
-    userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
+	  if (!userRows[row.user_id]) userRows[row.user_id] = row;
 
-    // Store row for country/countryCode
-    if (!userRows[row.user_id]) userRows[row.user_id] = row;
-  });
+	  // Track deep presence: if ANY session is deep, mark the user as deep
+	  if (row.deep_presence) {
+		userDeepPresence[row.user_id] = true;
+	  }
+	});
 
   // Display list of users with flag, shortUserId, SUMMED duration
   const listPopup = document.createElement('div');
@@ -16356,6 +16359,8 @@ const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
 
 // const longestDurationUserId = userIds[0]; // top flame keeper
 //const longestDurationUserId = await fetchUserWithHighestDuration();
+const deepPresenceSvg = `<img src="assets/deep.presence.svg" style="width:24px; height:24px; vertical-align:middle; margin-left:4px; transform:translateY(-2px);" title="In Deep Presence">`;
+
 
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
@@ -16364,40 +16369,41 @@ if (userIds.length === 0) {
   <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
     <strong>Flame Keepers</strong>
   </div>
-  ${userIds.map((id, index) => {
-    const isCurrentUser = id === currentUserId;
-    const isLive = liveIds.has(id);
-    const row = userRows[id];
-    const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
+	${userIds.map((id, index) => {
+	  const isCurrentUser = id === currentUserId;
+	  const isLive = liveIds.has(id);
+	  const isDeepPresence = userDeepPresence[id]; // <-- CHECK THIS
+	  const row = userRows[id];
+	  const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
 
-    // Only top duration keeper sees call icon for other live users
-    let callIcon = '';
-    if (
-      canStartCall &&
-      !isCurrentUser &&
-      isLive
-    ) {
-      callIcon = `<span class="call-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Start call">☎️</span>`;
-    }
+	  let callIcon = '';
+	  if (
+		canStartCall &&
+		!isCurrentUser &&
+		isLive
+	  ) {
+		callIcon = `<span class="call-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Start call">☎️</span>`;
+	  }
 
-    return `
-      <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-        <span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
-        <span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
-          ${isLive ? liveSvg : blankSvg}
-        </span>
-        <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
-        <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-          ${getShortUserId(id)}
-        </span>
-        <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
-        <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-          ${formatDurationGrid(userDurations[id])}
-        </span>
-        ${callIcon}
-      </div>
-    `;
-  }).join('')}
+		return `
+		  <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+			<span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
+			<span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
+			  ${isLive ? liveSvg : blankSvg}
+			</span>
+			<img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+			<span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
+			  ${getShortUserId(id)}
+			</span>
+			<img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
+			<span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
+			  ${formatDurationGrid(userDurations[id])}
+			</span>
+			${isDeepPresence ? deepPresenceSvg : ''}
+			${callIcon}
+		  </div>
+		`;
+	}).join('')}
   `;
 }
 
