@@ -2772,7 +2772,19 @@ button[disabled] {
   0%,100% { opacity:0.6; transform:scale(1); }
   50% { opacity:1; transform:scale(1.05); }
 }
-  
+ 
+
+  /* Deep.presence.svg */
+@keyframes lotusGlow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 215, 0, 0.6)); }
+  50%      { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 1)); }
+}
+
+.lotus-glow {
+  animation: lotusGlow 2.5s ease-in-out infinite;
+}  
+
+ 
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -16359,7 +16371,7 @@ const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
 
 // const longestDurationUserId = userIds[0]; // top flame keeper
 //const longestDurationUserId = await fetchUserWithHighestDuration();
-const deepPresenceSvg = `<img src="assets/deep.presence.svg" style="width:27px; height:27px; vertical-align:middle; margin-left:4px; transform:translateY(-2px); filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.8));" title="In Deep Presence">`;
+const deepPresenceSvg = `<img src="assets/deep.presence.svg" class="lotus-glow" style="width:27px; height:27px; vertical-align:middle; margin-left:4px; transform:translateY(-2px);" title="In Deep Presence">`;
 
 
 if (userIds.length === 0) {
