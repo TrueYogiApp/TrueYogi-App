@@ -5543,7 +5543,7 @@ async function updateDeepPresence(isDeep) {
   
   // Only update if user is in OM presence
   if (!presenceId) {
-    console.log('No OM presence, skipping deep presence update');
+    //console.log('No OM presence, skipping deep presence update');
     return false;
   }
   
@@ -5638,7 +5638,7 @@ function toggleYogiMeditation() {
     // Update backend that deep presence has started
     updateDeepPresence(true).then(success => {
       if (!success) {
-        console.warn('Could not update deep presence status, but continuing meditation');
+        //console.warn('Could not update deep presence status, but continuing meditation');
       }
     });
 
