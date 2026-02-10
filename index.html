@@ -16384,7 +16384,7 @@ const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
 
 // const longestDurationUserId = userIds[0]; // top flame keeper
 //const longestDurationUserId = await fetchUserWithHighestDuration();
-const deepPresenceSvg = `<img src="assets/deep.presence.svg" class="lotus-glow" style="width:27px; height:27px; vertical-align:middle; margin-left:4px; transform:translateY(-2px);" title="In Deep Presence">`;
+const deepPresenceSvg = `<img src="assets/deep.presence.svg" class="lotus-glow deep-presence-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:4px; transform:translateY(-2px); cursor:pointer;">`;
 
 
 if (userIds.length === 0) {
@@ -16485,8 +16485,66 @@ Array.from(listPopup.querySelectorAll('.call-icon')).forEach(el => {
   };
 });
 
+
+// Add tooltip event handlers for deep presence icons
+Array.from(listPopup.querySelectorAll('.deep-presence-icon')).forEach(el => {
+  // For touch devices (mobile)
+  el.addEventListener('touchstart', function(e) {
+    e.stopPropagation();
+    showDeepPresenceTooltip(this, 'In Deep Presence');
+  });
+  
+  // For desktop hover
+  el.addEventListener('mouseenter', function(e) {
+    showDeepPresenceTooltip(this, 'In Deep Presence');
+  });
+  
+  el.addEventListener('mouseleave', function(e) {
+    removeDeepPresenceTooltip();
+  });
+});
+
   document.body.appendChild(listPopup);
   setTimeout(() => listPopup.remove(), 12000);
+}
+
+// Helper functions for deep presence tooltip
+function showDeepPresenceTooltip(element, text) {
+  // Remove any existing tooltip
+  removeDeepPresenceTooltip();
+  
+  const tooltip = document.createElement('div');
+  tooltip.id = 'deep-presence-tooltip';
+  tooltip.textContent = text;
+  tooltip.style.cssText = `
+    position: fixed;
+    background: rgba(0,0,0,0.95);
+    color: #ffd700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    z-index: 10060;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(255,215,0,0.3);
+    border: 1px solid rgba(255,215,0,0.5);
+  `;
+  
+  document.body.appendChild(tooltip);
+  
+  // Position the tooltip above the icon
+  const rect = element.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
+  tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
+  
+  // Auto-remove after 3 seconds (for touch)
+  setTimeout(() => removeDeepPresenceTooltip(), 3000);
+}
+
+function removeDeepPresenceTooltip() {
+  const tooltip = document.getElementById('deep-presence-tooltip');
+  if (tooltip) tooltip.remove();
 }
 
 async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starterUserId, x, y) {
@@ -21281,7 +21339,7 @@ window.fetchYogiChallengeFromSupabase = async function() {
 	  await window.fetchSessionsFromSupabase();
 	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
 	  //await window.fetchYogiConfigFromSupabase();
-      await window.fetchYogiChallengeFromSupabase();
+      //await window.fetchYogiChallengeFromSupabase();
       await window.syncYogiChallengeToSupabase();
   }
       // Sync the Yogi Config (new logic includes skip for already synced)
