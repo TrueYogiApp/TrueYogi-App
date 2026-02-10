@@ -5660,6 +5660,13 @@ function toggleYogiMeditation() {
     dim.style.opacity = "0.5";
     dim.style.pointerEvents = "auto";
 
+    // Update backend that deep presence has started
+    updateDeepPresence(true).then(success => {
+      if (!success) {
+        console.warn('Could not update deep presence status, but continuing meditation');
+      }
+    });
+	
     // Start music immediately when meditation begins
     playCycleMusic();
     
@@ -5685,6 +5692,7 @@ function toggleYogiMeditation() {
         clearInterval(yogiInterval);
 
         // On natural finish
+        updateDeepPresence(false).then(() => {		
         showYogiMessage(t('presence.deepened'), 6000, () => {
           dim.style.opacity = "0";
           dim.style.pointerEvents = "none";
@@ -5692,13 +5700,19 @@ function toggleYogiMeditation() {
           yogiPlaying = false;
           audio.onended = null;
         });
+	   });
       }, minutes * 60000);
     });
-
+	
   } else {
     // End early
     yogiPlaying = false;
 
+    // Update backend that deep presence has ended
+    updateDeepPresence(false).then(() => {
+      // Continue with UI cleanup
+    });
+	
     // Clear start message timeout if it's still pending
     if (startMessageTimeout) {
       clearTimeout(startMessageTimeout);
