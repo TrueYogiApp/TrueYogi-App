@@ -5742,6 +5742,172 @@ document.getElementById("deep-dim-layer").addEventListener("click", () => {
 });
 
 
+// === Ultimate Stillness Tracking (for challenge history meditation) ===
+async function updateUltimateStillness(isStill) {
+  const presenceId = localStorage.getItem('omPresenceId');
+  
+  // Only update if user is in OM presence
+  if (!presenceId) {
+    console.log('No OM presence, skipping ultimate stillness update');
+    return false;
+  }
+  
+  try {
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/update-ultimate-stillness', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        presence_id: presenceId,
+        ultimate_stillness: isStill
+      })
+    });
+    
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`);
+    }
+    
+    return true;
+  } catch (err) {
+    console.error('Failed to update ultimate stillness:', err);
+    return false;
+  }
+}
+
+// New meditation function specifically for ultimate stillness (challenge history)
+function toggleUltimateStillnessMeditation(minutes) {
+  const audio = document.getElementById("yogiMeditationAudio");
+  const dim = document.getElementById("deep-dim-layer");
+  const timerDisplay = document.getElementById("deep-timer");
+
+  // Helper: show temporary messages
+  function showYogiMessage(msg, duration, next) {
+    timerDisplay.innerText = msg;
+    timerDisplay.style.opacity = "1";
+    timerDisplay.style.transition = "opacity 1s";
+    timerDisplay.style.fontSize = "2.1rem";
+    const timeoutId = setTimeout(() => {
+      timerDisplay.innerText = "";
+      if (typeof next === "function") next();
+    }, duration);
+    return timeoutId;
+  }
+
+  // Clear pause timer if user closes early
+  function stopMusicPause() {
+    if (musicPauseTimeout) {
+      clearTimeout(musicPauseTimeout);
+      musicPauseTimeout = null;
+    }
+  }
+
+  function playCycleMusic() {
+    yogiAudioLoops = 0;
+    audio.currentTime = 0;
+    
+    const playPromise = audio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.error("Audio playback failed:", error);
+        timerDisplay.innerText = t('presence.clickToPlay');
+      });
+    }
+
+    audio.onended = function() {
+      if (!yogiPlaying) return;
+      yogiAudioLoops += 1;
+      if (yogiAudioLoops < 3) {
+        audio.currentTime = 0;
+        audio.play();
+      } else {
+        musicPauseTimeout = setTimeout(() => {
+          if (!yogiPlaying) return;
+          yogiAudioLoops = 0;
+          audio.currentTime = 0;
+          audio.play();
+        }, 3 * 60 * 1000);
+      }
+    };
+  }
+
+  if (!yogiPlaying) {
+    yogiPlaying = true;
+    let remaining = minutes * 60;
+    dim.style.opacity = "0.5";
+    dim.style.pointerEvents = "auto";
+
+    // Update backend that ultimate stillness has started
+    updateUltimateStillness(true).then(success => {
+      if (!success) {
+        console.warn('Could not update ultimate stillness status, but continuing meditation');
+      }
+    });
+	
+    playCycleMusic();
+    
+    // Show start message for ultimate stillness
+    startMessageTimeout = showYogiMessage('🌌 Ultimate Stillness Begins 🌌', 6000, () => {
+      startMessageTimeout = null;
+      
+      timerDisplay.style.fontSize = "";
+      yogiInterval = setInterval(() => {
+        let m = Math.floor(remaining / 60);
+        let s = remaining % 60;
+        timerDisplay.innerText =
+          String(m).padStart(2,"0") + ":" +
+          String(s).padStart(2,"0");
+        remaining--;
+        if (remaining < 0) clearInterval(yogiInterval);
+      }, 1000);
+
+      yogiTimer = setTimeout(() => {
+        audio.pause();
+        stopMusicPause();
+        clearInterval(yogiInterval);
+
+        // On natural finish
+        updateUltimateStillness(false).then(() => {		
+          showYogiMessage('✨ Ultimate Stillness Achieved ✨', 6000, () => {
+            dim.style.opacity = "0";
+            dim.style.pointerEvents = "none";
+            timerDisplay.innerText = "";
+            yogiPlaying = false;
+            audio.onended = null;
+          });
+        });
+      }, minutes * 60000);
+    });
+	
+  } else {
+    // End early
+    yogiPlaying = false;
+
+    // Update backend that ultimate stillness has ended
+    updateUltimateStillness(false).then(() => {
+      // Continue with UI cleanup
+    });
+	
+    if (startMessageTimeout) {
+      clearTimeout(startMessageTimeout);
+      startMessageTimeout = null;
+    }
+
+    audio.pause();
+    audio.currentTime = 0;
+    stopMusicPause();
+    audio.onended = null;
+    clearTimeout(yogiTimer);
+    clearInterval(yogiInterval);
+
+    showYogiMessage(t('presence.be'), 3000, () => {
+      dim.style.opacity = "0";
+      dim.style.pointerEvents = "none";
+      timerDisplay.innerText = "";
+    });
+  }
+}
+
+
 // Sacred Lines
 let lines = [];
 let index = 0;
@@ -11391,7 +11557,6 @@ function updateStats() {
 
 }
 
-
 const streakCountElem = document.getElementById('challenge-streak');
 const modal = document.getElementById('challenge-history-modal');
 const overlay = document.getElementById('challenge-history-modal-overlay');
@@ -11453,7 +11618,12 @@ modal.innerHTML = `
     <span style="color:orange">${t('challenge_history_challenges')}</span>
     <span style="color:blue">${totalSessions} </span>
     <span style="color:indigo">${t('challenge_history_sessions_label')}</span>
-    <span style="color:violet">${totalMinutes}</span>
+        <span 
+      id="total-minutes-meditation" 
+      class="cursor-pointer hover:text-purple-400 transition-colors"
+      style="color:violet"
+      title="Click to meditate"
+    >${totalMinutes}</span>
     <span style="color:yellow">${t('challenge_history_minutes_label')}</span>
   </div>
   <button id="challenge-history-close" class="block mx-auto mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">${t('challenge_history_close')}</button>
@@ -11465,6 +11635,19 @@ modal.innerHTML = `
   // Prevent background scroll
   document.body.style.overflow = 'hidden';
 
+// Modified click handler for total minutes meditation
+document.getElementById('total-minutes-meditation').onclick = (e) => {
+  e.stopPropagation();
+  
+  // Close the modal
+  modal.classList.add('hidden');
+  overlay.classList.add('hidden');
+  document.body.style.overflow = '';
+  
+  // Trigger the ULTIMATE STILLNESS meditation (not regular deep presence)
+  toggleUltimateStillnessMeditation(totalMinutes);
+};
+  
   // Close modal on clicking overlay or button
   document.getElementById('challenge-history-close').onclick = () => {
     modal.classList.add('hidden');
