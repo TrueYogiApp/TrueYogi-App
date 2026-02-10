@@ -5619,27 +5619,34 @@ function toggleYogiMeditation() {
     }
   }
 
-  function playCycleMusic() {
+function playCycleMusic() {
   yogiAudioLoops = 0;
+  
+  // Reset and try to play
   audio.currentTime = 0;
   
-  // Add .catch() to the play() call
-  audio.play().catch(() => {
-    // Silent catch - don't show any message
-  });
+  // Handle autoplay blocking gracefully
+  const playPromise = audio.play();
+  
+  if (playPromise !== undefined) {
+    playPromise.catch(error => {
+      // Just log it, don't show message or request tap
+      console.log("Audio autoplay blocked - meditation will continue silently");
+    });
+  }
 
   audio.onended = function() {
     if (!yogiPlaying) return;
     yogiAudioLoops += 1;
     if (yogiAudioLoops < 3) {
       audio.currentTime = 0;
-      audio.play().catch(() => {}); // Add catch here too
+      audio.play().catch(e => {}); // Ignore errors on loops
     } else {
       musicPauseTimeout = setTimeout(() => {
         if (!yogiPlaying) return;
         yogiAudioLoops = 0;
         audio.currentTime = 0;
-        audio.play().catch(() => {}); // And here
+        audio.play().catch(e => {}); // Ignore errors
       }, 3 * 60 * 1000);
     }
   };
