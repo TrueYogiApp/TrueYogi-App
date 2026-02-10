@@ -4657,7 +4657,7 @@ button[disabled] {
 <audio id="spaceship-notice-sound" src="https://assets.trueyogi.app/assets/Spaceship-takeoff.wav" preload="auto"></audio>
 <audio id="spaceship-heal-sound" src="https://assets.trueyogi.app/assets/Spaceship-heal.wav" preload="auto"></audio>
 
-<audio id="yogiMeditationAudio">
+<audio id="yogiMeditationAudio" preload="auto>
   <source src="https://assets.trueyogi.app/assets/deep.space.mp3" type="audio/mpeg">
 </audio>
 
@@ -5620,26 +5620,30 @@ function toggleYogiMeditation() {
   }
 
   function playCycleMusic() {
-    yogiAudioLoops = 0;
-    audio.currentTime = 0;
-    audio.play();
+  yogiAudioLoops = 0;
+  audio.currentTime = 0;
+  
+  // Add .catch() to the play() call
+  audio.play().catch(() => {
+    // Silent catch - don't show any message
+  });
 
-    audio.onended = function() {
-      if (!yogiPlaying) return;
-      yogiAudioLoops += 1;
-      if (yogiAudioLoops < 3) {
+  audio.onended = function() {
+    if (!yogiPlaying) return;
+    yogiAudioLoops += 1;
+    if (yogiAudioLoops < 3) {
+      audio.currentTime = 0;
+      audio.play().catch(() => {}); // Add catch here too
+    } else {
+      musicPauseTimeout = setTimeout(() => {
+        if (!yogiPlaying) return;
+        yogiAudioLoops = 0;
         audio.currentTime = 0;
-        audio.play();
-      } else {
-        musicPauseTimeout = setTimeout(() => {
-          if (!yogiPlaying) return;
-          yogiAudioLoops = 0;
-          audio.currentTime = 0;
-          audio.play();
-        }, 3 * 60 * 1000);
-      }
-    };
-  }
+        audio.play().catch(() => {}); // And here
+      }, 3 * 60 * 1000);
+    }
+  };
+}
 
   if (!yogiPlaying) {
     yogiPlaying = true;
