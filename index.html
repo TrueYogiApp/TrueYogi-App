@@ -4405,6 +4405,88 @@ button[disabled] {
   </div>
 </div>
 
+
+<!-- Add this modal HTML after your spaceship-challenge-container -->
+<div id="spaceship-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4">
+  <div id="spaceship-overlay" class="absolute inset-0 bg-black bg-opacity-60"></div>
+  
+  <div class="relative w-auto max-w-sm bg-gray-900 border-2 border-purple-600 
+              rounded-2xl shadow-2xl overflow-hidden">
+
+    <!-- Header with gradient background -->
+    <div class="bg-gradient-to-r from-purple-900 to-pink-800 p-5 text-center">
+      <div id="spaceship-header-icon" class="inline-block text-4xl mb-2 animate-pulse">
+        <!-- 🛸 icon, use tkey if dynamic -->
+        <span id="spaceship-header-icon-text"></span>
+      </div>
+      <h3 id="spaceship-title" class="text-xl font-bold text-white"></h3>
+      <p id="spaceship-subtitle" class="text-sm text-purple-200 mt-1"></p>
+    </div>
+    
+    <!-- Content -->
+    <div class="p-6">
+      <div class="space-y-4 mb-6">
+        <!-- Step 1 -->
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 
+                      rounded-full flex items-center justify-center mr-3 mt-0.5">
+            <span id="spaceship-step1-icon" class="text-white text-sm">🕉️</span>
+          </div>
+          <div>
+            <p id="spaceship-step1-title" class="font-semibold text-gray-200"></p>
+            <p id="spaceship-step1-desc" class="text-sm text-gray-400"></p>
+          </div>
+        </div>
+        
+        <!-- Step 2 -->
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 
+                      rounded-full flex items-center justify-center mr-3 mt-0.5">
+            <span id="spaceship-step2-icon" class="text-white text-sm">🧘</span>			  
+          </div>
+          <div>
+            <p id="spaceship-step2-title" class="font-semibold text-gray-200"></p>
+            <p id="spaceship-step2-desc" class="text-sm text-gray-400"></p>
+          </div>
+        </div>
+        
+        <!-- Step 3 -->
+        <div class="flex items-start">
+          <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-purple-600 to-pink-600 
+                      rounded-full flex items-center justify-center mr-3 mt-0.5">
+            <span id="spaceship-step3-icon" class="text-white text-sm">✨</span>		 		  
+          </div>
+          <div>
+            <p id="spaceship-step3-title" class="font-semibold text-gray-200"></p>
+            <p id="spaceship-step3-desc" class="text-sm text-gray-400"></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Simple message -->
+      <div class="bg-purple-900 bg-opacity-30 border border-purple-700 rounded-xl p-4 mb-6">
+        <p class="text-center text-sm italic text-gray-200">
+          <span class="font-light">"</span>
+          <span id="spaceship-quote-line" class="text-pink-300 font-medium"></span>
+          <span class="font-light">"</span>
+        </p>
+        <p id="spaceship-quote-author" class="text-center text-xs text-purple-300 mt-1"></p>
+      </div>
+
+      <!-- Button -->
+      <button id="spaceship-close" 
+              class="w-full bg-gradient-to-r from-purple-600 to-indigo-600 
+                     hover:from-purple-700 hover:to-indigo-700
+                     text-white font-medium py-3 px-4 rounded-xl 
+                     transition-all duration-200 active:scale-[0.98]
+                     shadow-lg shadow-purple-900/30 flex items-center justify-center space-x-2 cursor-pointer">
+        <span id="spaceship-close-label"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+
       <!-- Timer Section -->
       <div id="timer-section" class="hidden flex flex-col items-center mt-6">
         <div class="text-center mb-4">
@@ -5547,6 +5629,29 @@ document.addEventListener('keydown', function(e) {
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
+
+
+// Add click event to spaceship challenge count
+document.getElementById('spaceship-challenge-count').addEventListener('click', function() {
+  document.getElementById('spaceship-modal').classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+});
+
+// Close modal
+document.getElementById('spaceship-close').onclick = closeSpaceshipModal;
+document.getElementById('spaceship-overlay').onclick = closeSpaceshipModal;
+
+function closeSpaceshipModal() {
+  document.getElementById('spaceship-modal').classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// Optional: Close with ESC key
+document.addEventListener('keydown', function(e) {
+  if(e.key === 'Escape' && !document.getElementById('spaceship-modal').classList.contains('hidden')) {
+    closeSpaceshipModal();
+  }
+});
 
 
 // === Deep Presence Tracking ===
@@ -13046,6 +13151,20 @@ document.getElementById('go-back-button').textContent = t('goBackButton');
   '<i class="fas fa-seedling text-green-400"></i> <strong class="text-yellow-300">' 
   + t('config.confirm.seed.strong') + 
   '</strong> ' + t('config.confirm.seed.body');
+  
+document.getElementById('spaceship-header-icon-text').textContent = t('spaceshipModal.headerIcon');
+document.getElementById('spaceship-title').textContent = t('spaceshipModal.title');
+document.getElementById('spaceship-subtitle').textContent = t('spaceshipModal.subtitle');
+document.getElementById('spaceship-step1-title').textContent = t('spaceshipModal.steps.enable');
+document.getElementById('spaceship-step1-desc').textContent = t('spaceshipModal.steps.enable.desc');
+document.getElementById('spaceship-step2-title').textContent = t('spaceshipModal.steps.challenge');
+document.getElementById('spaceship-step2-desc').textContent = t('spaceshipModal.steps.challenge.desc');
+document.getElementById('spaceship-step3-title').textContent = t('spaceshipModal.steps.complete');
+document.getElementById('spaceship-step3-desc').textContent = t('spaceshipModal.steps.complete.desc');
+document.getElementById('spaceship-quote-line').textContent = t('spaceshipModal.quote.line');
+document.getElementById('spaceship-quote-author').textContent = '— ' + t('spaceshipModal.quote.author');
+document.getElementById('spaceship-close-label').textContent = t('spaceshipModal.closeBtn');
+  
 }
 
 document.addEventListener('DOMContentLoaded', updateUILanguage);

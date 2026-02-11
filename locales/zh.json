@@ -434,5 +434,18 @@
   "spaceship.offlineInfo.gotit": "知道了！",
   "presence.begins": "进入更深的宁静",
   "presence.be": "与自己的觉察同在",
-  "presence.deepened": "宁静更深了"
+  "presence.deepened": "宁静更深了",
+  
+    "spaceshipModal.title": "瑜伽宇宙飞船挑战",
+  "spaceshipModal.subtitle": "快速入门指南",
+  "spaceshipModal.headerIcon": "🛸",
+  "spaceshipModal.steps.enable": "启用飞船模式",
+  "spaceshipModal.steps.enable.desc": "下载内容，开启你的旅程",
+  "spaceshipModal.steps.challenge": "离线创建挑战",
+  "spaceshipModal.steps.challenge.desc": "只需设置一次，随时随地冥想",
+  "spaceshipModal.steps.complete": "无需联网完成挑战",
+  "spaceshipModal.steps.complete.desc": "每一次呼吸，毫无干扰",
+  "spaceshipModal.quote.line": "千里之行，始于足下的第一口呼吸",
+  "spaceshipModal.quote.author": "古代智慧",
+  "spaceshipModal.closeBtn": "关闭"
 }

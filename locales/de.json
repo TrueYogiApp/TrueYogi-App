@@ -433,5 +433,18 @@
   "spaceship.offlineInfo.gotit": "Verstanden!",
   "presence.begins": "In tiefere Stille eintreten",
   "presence.be": "Sei mit deiner Präsenz",
-  "presence.deepened": "Stille vertieft"
+  "presence.deepened": "Stille vertieft",
+  
+    "spaceshipModal.title": "Yogi Raumschiff Herausforderung",
+  "spaceshipModal.subtitle": "Schnellstart-Anleitung",
+  "spaceshipModal.headerIcon": "🛸",
+  "spaceshipModal.steps.enable": "Raumschiff-Modus aktivieren",
+  "spaceshipModal.steps.enable.desc": "Laden Sie den Inhalt für Ihre Reise herunter",
+  "spaceshipModal.steps.challenge": "Erstelle eine Herausforderung im Offline-Modus",
+  "spaceshipModal.steps.challenge.desc": "Einmal einrichten, überall meditieren",
+  "spaceshipModal.steps.complete": "Abschluss der Herausforderung ohne Internet",
+  "spaceshipModal.steps.complete.desc": "Ein Atemzug nach dem anderen, ohne Ablenkung",
+  "spaceshipModal.quote.line": "Die Reise von tausend Meilen beginnt mit einem einzigen Atemzug",
+  "spaceshipModal.quote.author": "Uralte Weisheit",
+  "spaceshipModal.closeBtn": "Schließen"
 }

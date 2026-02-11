@@ -434,6 +434,19 @@
   "spaceship.offlineInfo.gotit": "Ho capito!",
   "presence.begins": "Entrando in una quiete più profonda",
   "presence.be": "Sii con la tua presenza",
-  "presence.deepened": "Quiete approfondita"
+  "presence.deepened": "Quiete approfondita",
+  
+    "spaceshipModal.title": "Sfida Nave Yogi",
+  "spaceshipModal.subtitle": "Guida rapida",
+  "spaceshipModal.headerIcon": "🛸",
+  "spaceshipModal.steps.enable": "Attiva la modalità nave spaziale",
+  "spaceshipModal.steps.enable.desc": "Scarica il contenuto per il tuo viaggio",
+  "spaceshipModal.steps.challenge": "Crea una sfida offline",
+  "spaceshipModal.steps.challenge.desc": "Imposta una volta, medita ovunque",
+  "spaceshipModal.steps.complete": "Completa la sfida senza essere online",
+  "spaceshipModal.steps.complete.desc": "Un respiro alla volta, senza distrazioni",
+  "spaceshipModal.quote.line": "Il viaggio di mille miglia inizia con un solo respiro",
+  "spaceshipModal.quote.author": "Saggezza antica",
+  "spaceshipModal.closeBtn": "Chiudi"
   
 }

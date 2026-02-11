@@ -438,7 +438,20 @@
   "spaceship.offlineInfo.gotit": "Got it!",
   "presence.begins": "Entering deeper Stillness",
   "presence.be": "Be with your Presence",
-  "presence.deepened": "Stillness Deepened"
+  "presence.deepened": "Stillness Deepened",
+  
+    "spaceshipModal.title": "Yogi Spaceship Challenge",
+  "spaceshipModal.subtitle": "Quick Start Guide",
+  "spaceshipModal.headerIcon": "🛸",
+  "spaceshipModal.steps.enable": "Enable Spaceship Mode",
+  "spaceshipModal.steps.enable.desc": "Download the content for your journey",
+  "spaceshipModal.steps.challenge": "Create challenge while offline",
+  "spaceshipModal.steps.challenge.desc": "Set up once, meditate anywhere",
+  "spaceshipModal.steps.complete": "Complete the challenge without going online",
+  "spaceshipModal.steps.complete.desc": "One breath at a time, without distraction",
+  "spaceshipModal.quote.line": "The journey of a thousand miles begins with a single breath",
+  "spaceshipModal.quote.author": "Ancient Wisdom",
+  "spaceshipModal.closeBtn": "Close"
 
   
 }

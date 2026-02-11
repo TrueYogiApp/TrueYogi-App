@@ -438,6 +438,21 @@
   "spaceship.offlineInfo.gotit": "Compris !",
   "presence.begins": "Entrer dans une plus grande immobilité",
   "presence.be": "Sois avec ta présence",
-  "presence.deepened": "Immobilité approfondie"
+  "presence.deepened": "Immobilité approfondie",
+  
+    "spaceshipModal.title": "Défi du vaisseau Yogi",
+  "spaceshipModal.subtitle": "Guide de démarrage rapide",
+  "spaceshipModal.headerIcon": "🛸",
+  "spaceshipModal.steps.enable": "Activer le mode vaisseau",
+  "spaceshipModal.steps.enable.desc": "Téléchargez le contenu pour votre voyage",
+  "spaceshipModal.steps.challenge": "Créer un défi hors ligne",
+  "spaceshipModal.steps.challenge.desc": "Configurez une fois, méditez partout",
+  "spaceshipModal.steps.complete": "Terminez le défi sans connexion",
+  "spaceshipModal.steps.complete.desc": "Une respiration à la fois, sans distraction",
+  "spaceshipModal.quote.line": "Le voyage de mille kilomètres commence par un seul souffle",
+  "spaceshipModal.quote.author": "Sagesse ancienne",
+  "spaceshipModal.closeBtn": "Fermer",
+  
+
 
 }
