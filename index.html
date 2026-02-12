@@ -4737,7 +4737,7 @@ button[disabled] {
 <audio id="spaceship-notice-sound" src="https://assets.trueyogi.app/assets/Spaceship-takeoff.wav" preload="auto"></audio>
 <audio id="spaceship-heal-sound" src="https://assets.trueyogi.app/assets/Spaceship-heal.wav" preload="auto"></audio>
 
-<audio id="yogiMeditationAudio" preload="auto">
+<audio id="yogiMeditationAudio" preload="auto" loop>
   <source src="https://assets.trueyogi.app/assets/deep.space.mp3" type="audio/mpeg">
 </audio>
 
@@ -5687,11 +5687,12 @@ async function updateDeepPresence(isDeep) {
 let yogiPlaying = false;
 let yogiTimer = null;
 let yogiInterval = null;
+let startMessageTimeout = null;
+let silenceTimeout = null;
 
-// === for music cycling ===
-let yogiAudioLoops = 0;
-let musicPauseTimeout = null;
-let startMessageTimeout = null; // <-- NEW: track start message timeout
+// === CONFIGURATION: Easy to customize ===
+const PAUSE_AFTER_MINUTES = 30;  // When to pause music (in minutes)
+const PAUSE_DURATION_MINUTES = 1; // How long to pause (in minutes)
 
 function toggleYogiMeditation() {
   const minutesText = document.getElementById("yogi-total-minutes").innerText;
@@ -5713,50 +5714,6 @@ function toggleYogiMeditation() {
     return timeoutId;
   }
 
-  // Clear pause timer if user closes early
-  function stopMusicPause() {
-    if (musicPauseTimeout) {
-      clearTimeout(musicPauseTimeout);
-      musicPauseTimeout = null;
-    }
-  }
-
-  function playCycleMusic() {
-    yogiAudioLoops = 0;
-    // Start playing music and set up 'ended' event
-    audio.currentTime = 0;
-    
-    // Play audio immediately
-    const playPromise = audio.play();
-    
-    // Handle autoplay restrictions
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.error("Audio playback failed:", error);
-        // Show message to user about clicking to play audio
-        timerDisplay.innerText = t('presence.clickToPlay');
-      });
-    }
-
-    audio.onended = function() {
-      if (!yogiPlaying) return; // User may have quit
-      yogiAudioLoops += 1;
-      if (yogiAudioLoops < 3) {
-        // play again
-        audio.currentTime = 0;
-        audio.play();
-      } else {
-        // 3 loops have finished, start pause
-        musicPauseTimeout = setTimeout(() => {
-          if (!yogiPlaying) return; // User may have quit
-          yogiAudioLoops = 0;
-          audio.currentTime = 0;
-          audio.play();
-        }, 3 * 60 * 1000); // 3 minutes pause
-      }
-    };
-  }
-
   if (!yogiPlaying) {
     yogiPlaying = true;
     let remaining = minutes * 60;
@@ -5769,16 +5726,41 @@ function toggleYogiMeditation() {
         console.warn('Could not update deep presence status, but continuing meditation');
       }
     });
-	
-    // Start music immediately when meditation begins
-    playCycleMusic();
+
+    // Start music immediately (will loop automatically due to "loop" attribute)
+    audio.currentTime = 0;
+    const playPromise = audio.play();
     
-    // 1. Show start message
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.error("Audio playback failed:", error);
+        timerDisplay.innerText = t('presence.clickToPlay');
+      });
+    }
+
+    // Schedule silence pause (if meditation is long enough)
+    if (minutes > PAUSE_AFTER_MINUTES) {
+      silenceTimeout = setTimeout(() => {
+        if (!yogiPlaying) return; // User may have quit
+        
+        // Pause audio
+        audio.pause();
+        
+        // Resume after configured duration
+        setTimeout(() => {
+          if (!yogiPlaying) return; // User may have quit
+          audio.play();
+        }, PAUSE_DURATION_MINUTES * 60 * 1000);
+        
+      }, PAUSE_AFTER_MINUTES * 60 * 1000);
+    }
+
+    // Show start message
     startMessageTimeout = showYogiMessage(t('presence.begins'), 6000, () => {
       startMessageTimeout = null;
       
-      // update timer every second (after message disappears)
-      timerDisplay.style.fontSize = ""; // reset for timer view
+      // Update timer every second
+      timerDisplay.style.fontSize = "";
       yogiInterval = setInterval(() => {
         let m = Math.floor(remaining / 60);
         let s = remaining % 60;
@@ -5791,22 +5773,21 @@ function toggleYogiMeditation() {
 
       yogiTimer = setTimeout(() => {
         audio.pause();
-        stopMusicPause();
+        if (silenceTimeout) clearTimeout(silenceTimeout);
         clearInterval(yogiInterval);
 
         // On natural finish
-        updateDeepPresence(false).then(() => {		
-        showYogiMessage(t('presence.deepened'), 6000, () => {
-          dim.style.opacity = "0";
-          dim.style.pointerEvents = "none";
-          timerDisplay.innerText = "";
-          yogiPlaying = false;
-          audio.onended = null;
+        updateDeepPresence(false).then(() => {
+          showYogiMessage(t('presence.deepened'), 6000, () => {
+            dim.style.opacity = "0";
+            dim.style.pointerEvents = "none";
+            timerDisplay.innerText = "";
+            yogiPlaying = false;
+          });
         });
-	   });
       }, minutes * 60000);
     });
-	
+
   } else {
     // End early
     yogiPlaying = false;
@@ -5815,21 +5796,23 @@ function toggleYogiMeditation() {
     updateDeepPresence(false).then(() => {
       // Continue with UI cleanup
     });
-	
-    // Clear start message timeout if it's still pending
+
+    // Clear all timeouts
     if (startMessageTimeout) {
       clearTimeout(startMessageTimeout);
       startMessageTimeout = null;
     }
+    if (silenceTimeout) {
+      clearTimeout(silenceTimeout);
+      silenceTimeout = null;
+    }
 
     audio.pause();
-    audio.currentTime = 0; // Reset audio to start
-    stopMusicPause();
-    audio.onended = null;
+    audio.currentTime = 0;
     clearTimeout(yogiTimer);
     clearInterval(yogiInterval);
 
-    // Show early stop message, then hide
+    // Show early stop message
     showYogiMessage(t('presence.be'), 3000, () => {
       dim.style.opacity = "0";
       dim.style.pointerEvents = "none";
@@ -5876,6 +5859,10 @@ async function updateUltimateStillness(isStill) {
   }
 }
 
+// === CONFIGURATION for Ultimate Stillness ===
+const ULTIMATE_PAUSE_AFTER_MINUTES = 60;  // When to pause music (in minutes)
+const ULTIMATE_PAUSE_DURATION_MINUTES = 3; // How long to pause (in minutes)
+
 // New meditation function specifically for ultimate stillness (challenge history)
 function toggleUltimateStillnessMeditation(minutes) {
   const audio = document.getElementById("yogiMeditationAudio");
@@ -5895,44 +5882,6 @@ function toggleUltimateStillnessMeditation(minutes) {
     return timeoutId;
   }
 
-  // Clear pause timer if user closes early
-  function stopMusicPause() {
-    if (musicPauseTimeout) {
-      clearTimeout(musicPauseTimeout);
-      musicPauseTimeout = null;
-    }
-  }
-
-  function playCycleMusic() {
-    yogiAudioLoops = 0;
-    audio.currentTime = 0;
-    
-    const playPromise = audio.play();
-    
-    if (playPromise !== undefined) {
-      playPromise.catch(error => {
-        console.error("Audio playback failed:", error);
-        timerDisplay.innerText = t('presence.clickToPlay');
-      });
-    }
-
-    audio.onended = function() {
-      if (!yogiPlaying) return;
-      yogiAudioLoops += 1;
-      if (yogiAudioLoops < 3) {
-        audio.currentTime = 0;
-        audio.play();
-      } else {
-        musicPauseTimeout = setTimeout(() => {
-          if (!yogiPlaying) return;
-          yogiAudioLoops = 0;
-          audio.currentTime = 0;
-          audio.play();
-        }, 3 * 60 * 1000);
-      }
-    };
-  }
-
   if (!yogiPlaying) {
     yogiPlaying = true;
     let remaining = minutes * 60;
@@ -5945,8 +5894,34 @@ function toggleUltimateStillnessMeditation(minutes) {
         console.warn('Could not update ultimate stillness status, but continuing meditation');
       }
     });
-	
-    playCycleMusic();
+
+    // Start music immediately (will loop automatically due to "loop" attribute)
+    audio.currentTime = 0;
+    const playPromise = audio.play();
+    
+    if (playPromise !== undefined) {
+      playPromise.catch(error => {
+        console.error("Audio playback failed:", error);
+        timerDisplay.innerText = t('presence.clickToPlay');
+      });
+    }
+
+    // Schedule silence pause (if meditation is long enough)
+    if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES) {
+      silenceTimeout = setTimeout(() => {
+        if (!yogiPlaying) return; // User may have quit
+        
+        // Pause audio
+        audio.pause();
+        
+        // Resume after configured duration
+        setTimeout(() => {
+          if (!yogiPlaying) return; // User may have quit
+          audio.play();
+        }, ULTIMATE_PAUSE_DURATION_MINUTES * 60 * 1000);
+        
+      }, ULTIMATE_PAUSE_AFTER_MINUTES * 60 * 1000);
+    }
     
     // Show start message for ultimate stillness
     startMessageTimeout = showYogiMessage('🌌 Ultimate Stillness Begins 🌌', 6000, () => {
@@ -5965,7 +5940,7 @@ function toggleUltimateStillnessMeditation(minutes) {
 
       yogiTimer = setTimeout(() => {
         audio.pause();
-        stopMusicPause();
+        if (silenceTimeout) clearTimeout(silenceTimeout);
         clearInterval(yogiInterval);
 
         // On natural finish
@@ -5975,7 +5950,6 @@ function toggleUltimateStillnessMeditation(minutes) {
             dim.style.pointerEvents = "none";
             timerDisplay.innerText = "";
             yogiPlaying = false;
-            audio.onended = null;
           });
         });
       }, minutes * 60000);
@@ -5990,15 +5964,18 @@ function toggleUltimateStillnessMeditation(minutes) {
       // Continue with UI cleanup
     });
 	
+    // Clear all timeouts
     if (startMessageTimeout) {
       clearTimeout(startMessageTimeout);
       startMessageTimeout = null;
     }
+    if (silenceTimeout) {
+      clearTimeout(silenceTimeout);
+      silenceTimeout = null;
+    }
 
     audio.pause();
     audio.currentTime = 0;
-    stopMusicPause();
-    audio.onended = null;
     clearTimeout(yogiTimer);
     clearInterval(yogiInterval);
 
