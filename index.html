@@ -7564,6 +7564,11 @@ async function confirmFullReset() {
   }
 }
 
+    if (!omUserId) {
+	omUserId = crypto.randomUUID();   // or use any UUID generator
+	localStorage.setItem('omUserId', omUserId);
+	}
+	
     // Initialize the app
       document.addEventListener('DOMContentLoaded', async () => {
 	  cleanUpLocalSessions();
@@ -7574,11 +7579,6 @@ async function confirmFullReset() {
 	const syncDot = document.getElementById('sync-dot');
 	const syncTooltip = document.getElementById('sync-tooltip');
 
-    if (!omUserId) {
-	omUserId = crypto.randomUUID();   // or use any UUID generator
-	localStorage.setItem('omUserId', omUserId);
-	}
-	
 	if (!isMobile()) {
 	document.querySelector('.auth-section-container').style.display = 'none';
 	document.getElementById('mobile-reminder-card').classList.remove('hidden');
