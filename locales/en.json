@@ -328,7 +328,7 @@
   "challengeCompleteButtonNewJourney": "Start a New Journey",
   "close": "close",
 	"enable_offline_faq_heading": "Enable Spaceship Mode",
-	"enable_offline_faq_description": "Download all meditation content (~100MB) for full offline access.",
+	"enable_offline_faq_description": "Download all meditation content (~150MB) for full offline access.",
 	"enable_offline_faq_note": "You can delete data later using Clear offline data.",
 	"enable_offline_faq_button": "Enable Spaceship Mode",
 	"enabled_offline_faq_button": "Spaceship Mode Enabled",

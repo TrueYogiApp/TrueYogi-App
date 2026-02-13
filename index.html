@@ -4764,6 +4764,9 @@ button[disabled] {
 <audio id="yogiMeditationAudio" preload="auto" loop>
   <source src="https://assets.trueyogi.app/assets/deep.space.mp3" type="audio/mpeg">
 </audio>
+<audio id="yogiMeditationAudio2" preload="auto" loop>
+  <source src="https://assets.trueyogi.app/assets/ultimate.stillness.mp3" type="audio/mpeg">
+</audio>
 
  <!-- Certificate Page HTML  --> 
 <div id="certificate-page" class="hidden">	
@@ -5889,7 +5892,7 @@ const ULTIMATE_PAUSE_DURATION_MINUTES = 3; // How long to pause (in minutes)
 
 // New meditation function specifically for ultimate stillness (challenge history)
 function toggleUltimateStillnessMeditation(minutes) {
-  const audio = document.getElementById("yogiMeditationAudio");
+  const audio = document.getElementById("yogiMeditationAudio2");
   const dim = document.getElementById("deep-dim-layer");
   const timerDisplay = document.getElementById("deep-timer");
 
@@ -19538,7 +19541,7 @@ function updateStorageFallback() {
   if (isOfflineInstalled) {
     // User has offline mode - show approximate size
     if (storageEl) {
-      storageEl.textContent = '~125MB';
+      storageEl.textContent = '~150MB';
       storageEl.className = 'font-medium text-green-400';
     }
   } else {
