@@ -10155,14 +10155,15 @@ async function saveMeditationStart(startData, retries = 3) {
 
 function confirmStartMeditation() {
   document.getElementById('start-meditation-modal').classList.add('hidden');
-  beginMeditationSession(); // Proceed with the original meditation start
+  beginMeditationSession();
 
-  // Save session data earlier
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   const deviceType = isMobile ? "mobile" : "desktop";  
   const startTime = Date.now();
   
-  let omUserId = localStorage.getItem('omUserId');
+  // ✅ Use global, fallback to localStorage if somehow undefined
+  const userId = omUserId || localStorage.getItem('omUserId');
+  
   let yogiChallenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
   
   const startData = {
@@ -10170,15 +10171,14 @@ function confirmStartMeditation() {
     mode: currentMode,
     duration: targetDuration,
     device_type: deviceType,
-    omUserId,
+    omUserId: userId,  // ✅ Defensive approach
     challengeId: yogiChallenge.challengeId || null,
     startDate: yogiChallenge.startDate || null,
     endDate: yogiChallenge.endDate || null,
-	lastSessionDate: yogiChallenge.lastSessionDate || null,
-    currentDay: yogiChallenge.currentDay || 0, // Default to day 0 if no challenge
+    lastSessionDate: yogiChallenge.lastSessionDate || null,
+    currentDay: yogiChallenge.currentDay || 0,
   };
 
-  // Retry logic for saving meditation start
   saveMeditationStart(startData);
   
   setTimeout(updateLiveCountVisibility, 350);
