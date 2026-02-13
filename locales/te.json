@@ -451,6 +451,10 @@
   "spaceshipModal.steps.complete": "ఆన్‌లైన్‌ లేకుండా ఛాలెంజ్‌ను పూర్తి చేయండి",
   "spaceshipModal.steps.complete.desc": "ఒక్కో శ్వాసతో, ఉపద్రవం లేకుండా",
   "spaceshipModal.quote.line": "బయట స్రవంతిలోకి ప్రయాణించండి, కానీ లోపల ఉన్న విశ్వాన్ని కనుగొనండి.",
-  "spaceshipModal.closeBtn": "Close"
+  "spaceshipModal.closeBtn": "Close",
+  "fullReset.typeDeleteConfirmation": "నిర్ధారించడానికి \"DELETE\" టైప్ చేయండి:",
+"fullReset.typeConfirmationPlaceholder": "ఇక్కడ టైప్ చేయండి...",
+"fullReset.understandCheckbox": "ఇది నా మొత్తం డేటాను శాశ్వతంగా తొలగిస్తుందని మరియు రద్దు చేయలేమని నేను అర్థం చేసుకున్నాను.",
+"fullReset.confirmButton": "యావన్ సెట్టింగ్స్ మరియు డేటాను రీసెట్"
 
 }

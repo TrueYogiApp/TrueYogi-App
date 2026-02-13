@@ -447,5 +447,8 @@
   "spaceshipModal.steps.complete": "Completa el desafío sin conexión a internet",
   "spaceshipModal.steps.complete.desc": "Un respiro a la vez, sin distracciones",
   "spaceshipModal.quote.line": "Lánzate al cosmos, pero descubre el universo en tu interior.",
-  "spaceshipModal.closeBtn": "Close"
+  "spaceshipModal.closeBtn": "Close",
+"fullReset.typeDeleteConfirmation": "Escribe \"DELETE\" para confirmar:",
+"fullReset.typeConfirmationPlaceholder": "Escribe aquí...",
+"fullReset.understandCheckbox": "Entiendo que esto eliminará permanentemente TODOS mis datos y no se puede deshacer."  
 }

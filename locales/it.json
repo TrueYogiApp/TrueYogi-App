@@ -448,6 +448,10 @@
   "spaceshipModal.steps.complete": "Completa la sfida senza essere online",
   "spaceshipModal.steps.complete.desc": "Un respiro alla volta, senza distrazioni",
 "spaceshipModal.quote.line": "Lanciati nel cosmo, ma scopri l’universo dentro di te.",
-  "spaceshipModal.closeBtn": "Close"
+  "spaceshipModal.closeBtn": "Close",
+"fullReset.typeDeleteConfirmation": "Digita \"DELETE\" per confermare:",
+"fullReset.typeConfirmationPlaceholder": "Digita qui...",
+"fullReset.understandCheckbox": "Comprendo che questo eliminerà permanentemente TUTTI i miei dati e non può essere annullato."  
+  
   
 }

@@ -448,5 +448,8 @@
   "spaceshipModal.steps.complete": "无需联网完成挑战",
   "spaceshipModal.steps.complete.desc": "每一次呼吸，毫无干扰",
 "spaceshipModal.quote.line": "启航进入宇宙，但要发现你内心的宇宙。",
-  "spaceshipModal.closeBtn": "Close"
+  "spaceshipModal.closeBtn": "Close",
+"fullReset.typeDeleteConfirmation": "输入 \"DELETE\" 确认：",
+"fullReset.typeConfirmationPlaceholder": "在此输入...",
+"fullReset.understandCheckbox": "我理解这将永久删除我的所有数据且无法撤消。"  
 }

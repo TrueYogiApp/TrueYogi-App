@@ -4030,7 +4030,7 @@ button[disabled] {
   </div>
 </div>
 
-<!-- full-reset-confirmation-modal   -->
+<!-- full-reset-confirmation-modal -->
 <div id="full-reset-confirmation-modal" class="hidden fixed inset-0 flex items-center justify-center z-50">
   <div class="confirmation-modal max-w-md mx-4 p-6 rounded-xl text-center">
     <div class="text-red-400 text-5xl mb-4">
@@ -4039,19 +4039,43 @@ button[disabled] {
     <h2 id="reset-confirm-title" class="text-xl font-semibold text-red-300 mb-2">Reset Everything?</h2>
     <p id="reset-confirm-description" class="text-gray-200 mb-4"></p>
        
-      <ul class="text-left text-gray-300 text-sm my-3 space-y-1">
-        <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list1"></span></li>
-        <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list2"></span></li>
-        <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list3"></span></li>
-        <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list4"></span></li>
-      </ul>
-      <p id="reset-confirm-warning" class="text-gray-200 mb-4"></p>
+    <ul class="text-left text-gray-300 text-sm my-3 space-y-1">
+      <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list1"></span></li>
+      <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list2"></span></li>
+      <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list3"></span></li>
+      <li><i class="fas fa-check-circle mr-2 text-red-400"></i> <span id="reset-confirm-list4"></span></li>
+    </ul>
+    <p id="reset-confirm-warning" class="text-gray-200 mb-4"></p>
+    
+	<!-- ADD THIS SECTION - Validation Fields -->
+	<div class="mb-4 p-3 bg-gray-800/50 rounded-lg">
+	  <p id="full-reset-type-label" class="text-gray-400 text-sm mb-2">
+		Type <span class="text-red-400 font-mono">"DELETE"</span> to confirm:
+	  </p>
+	  <input type="text" id="full-reset-type-input" 
+			 class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded text-white text-center tracking-wider text-sm"
+			 style="font-size: 16px;"
+			 placeholder="Type here..."
+			 oninput="checkFullResetButton()">
+	</div>
+
+	<div class="mb-4 text-left">
+	  <label class="flex items-start space-x-2 text-gray-300 text-sm">
+		<input type="checkbox" id="full-reset-checkbox" 
+			   class="mt-0.5 w-4 h-4 text-red-600 bg-gray-700 border-gray-600 rounded"
+			   onchange="checkFullResetButton()">
+		<span id="full-reset-checkbox-label">I understand this will permanently delete ALL my data and cannot be undone.</span>
+	  </label>
+	</div>
+	<!-- END VALIDATION SECTION -->
      
     <div class="flex justify-center gap-4 mt-4">
-      <button id="reset-confirm-button" onclick="confirmFullReset()" class="mode-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button id="reset-confirm-button" onclick="confirmFullReset()" 
+              disabled
+              class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
         <i class="fas fa-trash-alt mr-1"></i> Reset Everything
       </button>
-      <button id="reset-confirm-cancel" onclick="closeFullResetConfirmation()" class="mode-btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button id="reset-confirm-cancel" onclick="closeFullResetConfirmation()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         Cancel
       </button>
     </div>
@@ -7479,6 +7503,20 @@ const journeyWallet = localStorage.getItem('currentJourneyWallet');
 
 function closeFullResetConfirmation() {
   document.getElementById('full-reset-confirmation-modal').classList.add('hidden');
+}
+
+
+// Simple validation check for full reset - ONLY accept uppercase "DELETE"
+function checkFullResetButton() {
+  const textInput = document.getElementById('full-reset-type-input');
+  const checkbox = document.getElementById('full-reset-checkbox');
+  const button = document.getElementById('reset-confirm-button');
+  
+  if (textInput && checkbox && button) {
+    // Don't convert to uppercase - check exact match
+    const isValid = textInput.value === 'DELETE' && checkbox.checked;
+    button.disabled = !isValid;
+  }
 }
 
 async function confirmFullReset() {
@@ -13138,6 +13176,27 @@ document.getElementById('spaceship-step3-title').textContent = t('spaceshipModal
 document.getElementById('spaceship-step3-desc').textContent = t('spaceshipModal.steps.complete.desc');
 document.getElementById('spaceship-quote-line').textContent = t('spaceshipModal.quote.line');
 document.getElementById('spaceship-close-label').textContent = t('spaceshipModal.closeBtn');
+
+   // Type DELETE label - handle the mixed content with HTML
+  const typeLabel = document.getElementById('full-reset-type-label');
+  if (typeLabel) {
+    typeLabel.innerHTML = t('fullReset.typeDeleteConfirmation').replace(
+      '"DELETE"', 
+      '<span class="text-red-400 font-mono">"DELETE"</span>'
+    );
+  }
+  
+  // Input placeholder
+  const typeInput = document.getElementById('full-reset-type-input');
+  if (typeInput) {
+    typeInput.setAttribute('placeholder', t('fullReset.typeConfirmationPlaceholder'));
+  }
+  
+  // Checkbox label
+  const checkboxLabel = document.getElementById('full-reset-checkbox-label');
+  if (checkboxLabel) {
+    checkboxLabel.textContent = t('fullReset.understandCheckbox');
+  }
   
 }
 

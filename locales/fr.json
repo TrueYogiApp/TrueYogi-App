@@ -452,7 +452,10 @@
   "spaceshipModal.steps.complete": "Terminez le défi sans connexion",
   "spaceshipModal.steps.complete.desc": "Une respiration à la fois, sans distraction",
   "spaceshipModal.quote.line": "Le voyage de mille kilomètres commence par un seul souffle",
-  "spaceshipModal.closeBtn": "Close"
+  "spaceshipModal.closeBtn": "Close",
+  "fullReset.typeDeleteConfirmation": "Tapez \"DELETE\" pour confirmer :",
+"fullReset.typeConfirmationPlaceholder": "Tapez ici...",
+"fullReset.understandCheckbox": "Je comprends que cela supprimera définitivement TOUTES mes données et ne peut pas être annulé."
   
 
 

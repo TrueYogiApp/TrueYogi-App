@@ -448,6 +448,9 @@
   "spaceshipModal.steps.complete": "Завершите челлендж без доступа к интернету",
   "spaceshipModal.steps.complete.desc": "Один вдох за раз, без отвлечений",
 "spaceshipModal.quote.line": "Отправляйся в космос, но открой вселенную внутри себя.",
-  "spaceshipModal.closeBtn": "Close"
+  "spaceshipModal.closeBtn": "Close",
+"fullReset.typeDeleteConfirmation": "Введите \"DELETE\" для подтверждения:",
+"fullReset.typeConfirmationPlaceholder": "Введите здесь...",
+"fullReset.understandCheckbox": "Я понимаю, что это навсегда удалит ВСЕ мои данные и не может быть отменено."  
   
 }

@@ -447,6 +447,9 @@
   "spaceshipModal.steps.complete": "ऑनलाइन हुए बिना चुनौती पूरी करें",
   "spaceshipModal.steps.complete.desc": "एक बार में एक सांस, बिना किसी ध्यानभंग के",
 "spaceshipModal.quote.line": "ब्रह्मांड में प्रस्थान करें, परंतु अपने भीतर का ब्रह्मांड खोजें।",
-  "spaceshipModal.closeBtn": "Close"
+  "spaceshipModal.closeBtn": "Close",
+"fullReset.typeDeleteConfirmation": "पुष्टि करने के लिए \"DELETE\" टाइप करें:",
+"fullReset.typeConfirmationPlaceholder": "यहाँ टाइप करें...",
+"fullReset.understandCheckbox": "मैं समझता हूं कि यह मेरे सभी डेटा को स्थायी रूप से हटा देगा और इसे पूर्ववत नहीं किया जा सकता।"  
 
 }
