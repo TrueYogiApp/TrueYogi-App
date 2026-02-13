@@ -5924,7 +5924,7 @@ function toggleUltimateStillnessMeditation(minutes) {
     }
     
     // Show start message for ultimate stillness
-    startMessageTimeout = showYogiMessage('🌌 Ultimate Stillness Begins 🌌', 6000, () => {
+    startMessageTimeout = showYogiMessage(t('presence2.begins'), 6000, () => {
       startMessageTimeout = null;
       
       timerDisplay.style.fontSize = "";
@@ -5945,7 +5945,7 @@ function toggleUltimateStillnessMeditation(minutes) {
 
         // On natural finish
         updateUltimateStillness(false).then(() => {		
-          showYogiMessage('✨ Ultimate Stillness Achieved ✨', 6000, () => {
+          showYogiMessage(t('presence2.deepened'), 6000, () => {
             dim.style.opacity = "0";
             dim.style.pointerEvents = "none";
             timerDisplay.innerText = "";
