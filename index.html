@@ -5848,9 +5848,21 @@ function toggleYogiMeditation() {
   }
 }
 
+// Add this after the first click handler
 document.getElementById("deep-dim-layer").addEventListener("click", () => {
   if (yogiPlaying) {
-    toggleYogiMeditation();
+    // Check which meditation is playing by seeing which audio is currently playing
+    const audio1 = document.getElementById("yogiMeditationAudio");
+    const audio2 = document.getElementById("yogiMeditationAudio2");
+    
+    if (!audio1.paused) {
+      toggleYogiMeditation();
+    } else if (!audio2.paused) {
+      // Need to know the minutes - you'd need to store this when starting
+      // For now, you might need to retrieve it from somewhere
+      const minutes = parseInt(document.getElementById("yogi-total-minutes").innerText) || 0;
+      toggleUltimateStillnessMeditation(minutes);
+    }
   }
 });
 
