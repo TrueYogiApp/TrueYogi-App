@@ -6936,7 +6936,72 @@ certificateTab.addEventListener('click', () => {
   showCertificateInFaq();
 });
 
+async function syncLocalCertificatesToDB() {
+  let localCertificates = JSON.parse(localStorage.getItem('completedChallenges') || '[]');
+  const jwtToken = localStorage.getItem('jwtToken');
+  const wallet = window.walletPublicKey;
+
+  if (!(jwtToken && wallet && localCertificates.length > 0)) return;
+
+  // 1. Fetch backend certificates for this user
+  let remoteCerts = [];
+  try {
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi_certificates', {
+      method: 'GET',
+      headers: {
+        'Authorization': 'Bearer ' + jwtToken,
+        'Content-Type': 'application/json'
+      },
+      credentials: 'include'
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.success && Array.isArray(data.certificates)) {
+        remoteCerts = data.certificates;
+      }
+    }
+  } catch (e) {
+    // Ignore error -- user is likely offline
+  }
+
+  // 2. Make a set of remote challenge IDs (or cert_ids)
+  const remoteIds = new Set(remoteCerts.map(cert => cert.challenge_id || cert.cert_id));
+
+  // 3. For each local certificate, if NOT in remote, POST to backend
+  for (const cert of localCertificates) {
+    const cid = cert.challengeId || cert.cert_id || cert.challenge_id;
+    if (!remoteIds.has(cid)) {
+      // Build payload as you'd do at completion
+      const payload = {
+        user_id: wallet,
+        challenge_id: cert.challengeId,
+        start_date: cert.startDate,
+        end_date: cert.endDate || cert.completionDate,
+        completion_date: cert.completionDate,
+        total_tokens: cert.totalTokens,
+        total_minutes: cert.totalMinutes,
+        claimed: !!cert.claimed,
+        cert_id: cert.certId || `TR_${cert.challengeId}`
+      };
+      try {
+        await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi_certificates', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwtToken
+          },
+          credentials: 'include',
+          body: JSON.stringify({ certificate: payload })
+        });
+      } catch (postErr) {
+        // Ignore, will retry next time
+      }
+    }
+  }
+}
+
 async function showCertificateInFaq() {
+await syncLocalCertificatesToDB();
   const container = document.getElementById('certificate-faq-content');
   if (!container) return;
   
