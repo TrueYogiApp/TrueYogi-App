@@ -2784,6 +2784,26 @@ button[disabled] {
   animation: lotusGlow 2.5s ease-in-out infinite;
 }  
 
+/* spaceship modal heading */
+.cosmic-sparkle {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 2; /* Try 2 so it's above background but behind content */
+  background-image:
+    radial-gradient(circle at 24% 18%, #fff 3px, transparent 4px),
+    radial-gradient(circle at 67% 50%, #ffe066 2.5px, transparent 4px),
+    radial-gradient(circle at 35% 80%, #b4e3ff 2.2px, transparent 4px),
+    radial-gradient(circle at 82% 27%, #fff 2px, transparent 3px),
+    radial-gradient(circle at 59% 70%, #fff 1.5px, transparent 2.5px);
+  animation: sparkle-move 5s linear infinite;
+  opacity: 0.8; /* Easier to see at first! Lower later */
+}
+
+@keyframes sparkle-move {
+  0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0;}
+  100% { background-position: 50px 40px, 20px 60px, 60px 10px, 10px 50px, 80px 80px;}
+}
  
 </style>
   
@@ -4438,14 +4458,18 @@ button[disabled] {
               rounded-2xl shadow-2xl overflow-hidden">
 
     <!-- Header with gradient background -->
-    <div class="bg-gradient-to-r from-purple-900 to-pink-800 p-5 text-center">
-      <div id="spaceship-header-icon" class="inline-block text-4xl mb-2 animate-pulse">
-        <!-- 🛸 icon, use tkey if dynamic -->
-        <span id="spaceship-header-icon-text"></span>
-      </div>
-      <h3 id="spaceship-title" class="text-xl font-bold text-white"></h3>
-      <p id="spaceship-subtitle" class="text-sm text-purple-200 mt-1"></p>
-    </div>
+	<div style="background: linear-gradient(90deg, #6d28d9 0%, #2563eb 50%, #ec4899 100%);" class="p-5 relative overflow-hidden">
+	  <!-- Sparkle effect (more obvious) -->
+	  <div class="cosmic-sparkle"></div>
+
+	  <div class="bg-gradient-to-r from-purple-900 to-pink-800 p-5 text-center relative z-10">
+		<div id="spaceship-header-icon" class="inline-block text-4xl mb-2 animate-pulse">
+		  <span id="spaceship-header-icon-text">🛸</span>
+		</div>
+		<h3 id="spaceship-title" class="text-xl font-bold text-white">Yogi Spaceship Challenge</h3>
+		<p id="spaceship-subtitle" class="text-sm text-purple-200 mt-1">Quick Start Guide</p>
+	  </div>
+	</div>
     
     <!-- Content -->
     <div class="p-6">
@@ -4498,7 +4522,7 @@ button[disabled] {
 
 		  <!-- Button -->
 	<button id="spaceship-close" 
-	  class="w-full bg-yellow-400 hover:bg-yellow-500
+	  class="mode-btn w-full bg-yellow-400 hover:bg-yellow-500
 			 text-black font-medium py-3 px-4 rounded-xl 
 			 transition-all duration-200 active:scale-[0.98]
 			 shadow-lg shadow-yellow-400/30 flex items-center justify-center space-x-2 cursor-pointer">
@@ -11824,7 +11848,7 @@ modal.innerHTML = `
     >${totalMinutes}</span>
     <span style="color:yellow">${t('challenge_history_minutes_label')}</span>
   </div>
-  <button id="challenge-history-close" class="block mx-auto mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">${t('challenge_history_close')}</button>
+  <button id="challenge-history-close" class="mode-btn block mx-auto mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">${t('challenge_history_close')}</button>
 `;
 
   modal.classList.remove('hidden');
