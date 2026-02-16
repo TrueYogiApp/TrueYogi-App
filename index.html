@@ -15860,10 +15860,10 @@ async function fetchUserCountryStats() {
 
 let ipCountryCache = null;
 let cacheTimestamp = 0;
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour cache for IP lookups
+const CACHE_TTL = 30 * 24 * 60 * 60 * 1000; // 30 days in ms
 
 async function getUserCountryInfo() {
-  // 1. Check OM presence (DB) first
+  // 1. OM DB check
   const omPresenceId = localStorage.getItem('omPresenceId');
   if (omPresenceId && typeof supabase !== 'undefined') {
     try {
@@ -15882,25 +15882,27 @@ async function getUserCountryInfo() {
     } catch (e) {}
   }
 
-  // 2. Optionally, try a free IP API (only if you like!)
+  // 2. Cached country (from backend geoinfo), not expired
+  const now = Date.now();
+  if (ipCountryCache && (now - cacheTimestamp) < CACHE_TTL) {
+    return { ...ipCountryCache, connected: false };
+  }
+
+  // 3. Get from backend (Cloudflare geoinfo)
   try {
-    const res = await fetch('https://ip-api.io/json');
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/api/geoinfo');
     if (res.ok) {
       const data = await res.json();
-      if (data.country && data.country_code) {
-        return {
-          country: data.country,
-          countryCode: data.country_code.toLowerCase(),
-          connected: false
-        };
-      }
+      ipCountryCache = data;
+      cacheTimestamp = now;
+      return { ...data, connected: false };
     }
   } catch (e) {}
 
-  // 3. If not connected and no API works: show connect prompt
+  // 4. Fallback: show prompt and UN flag
   return {
-    country: "",
-    countryCode: "un", // You can use "?" or blank or omit the flag in your UI
+    country: "Connect to OM",
+    countryCode: "un",
     connected: false
   };
 }
