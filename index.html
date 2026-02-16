@@ -15895,50 +15895,50 @@ async function getUserCountryInfo() {
   try {
     const controller = new AbortController();
     setTimeout(() => controller.abort(), 3000);
-    
-    const res = await fetch('https://ipapi.co/json/', { 
-      signal: controller.signal 
-    });
-    const data = await res.json();
-    
-    ipCountryCache = {
-      country: data.country_name,
-      countryCode: data.country_code
-    };
-    cacheTimestamp = now;
-    return ipCountryCache;
-  } catch {
-    try {
-      const res = await fetch('https://ipwho.is/');
+
+    const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+    if (res.ok) {   // <--- KEY CHANGE: Only use if HTTP 200
       const data = await res.json();
-      
+      ipCountryCache = {
+        country: data.country_name,
+        countryCode: data.country_code
+      };
+      cacheTimestamp = now;
+      return ipCountryCache;
+    }
+  } catch {}
+
+  try {
+    const res = await fetch('https://ipwho.is/');
+    if (res.ok) {   // <--- KEY CHANGE: Only use if HTTP 200
+      const data = await res.json();
       ipCountryCache = {
         country: data.country,
         countryCode: data.country_code
       };
       cacheTimestamp = now;
       return ipCountryCache;
-    } catch {
-      // 4. Browser fallback (no cache)
-      const lang = navigator.language || 'en-US';
-      const countryMap = {
-        'en-US': ['United States', 'us'],
-        'en-CA': ['Canada', 'ca'],
-        'en-GB': ['United Kingdom', 'gb'],
-        'en-IN': ['India', 'in'],
-        'en-AU': ['Australia', 'au'],
-        'fr-CA': ['Canada', 'ca']
-      };
-      
-      for (const [key, [country, code]] of Object.entries(countryMap)) {
-        if (lang.includes(key.slice(0, 2))) {
-          return { country, countryCode: code };
-        }
-      }
-      
-      return { country: "Unknown", countryCode: "un" };
+    }
+  } catch {}
+
+  // 4. Browser fallback (no cache or all above fail)
+  const lang = navigator.language || 'en-US';
+  const countryMap = {
+    'en-US': ['United States', 'us'],
+    'en-CA': ['Canada', 'ca'],
+    'en-GB': ['United Kingdom', 'gb'],
+    'en-IN': ['India', 'in'],
+    'en-AU': ['Australia', 'au'],
+    'fr-CA': ['Canada', 'ca']
+  };
+
+  for (const [key, [country, code]] of Object.entries(countryMap)) {
+    if (lang.includes(key.slice(0, 2))) {
+      return { country, countryCode: code };
     }
   }
+
+  return { country: "Unknown", countryCode: "un" };
 }
 
 async function showUserTravelBar() {
