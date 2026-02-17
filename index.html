@@ -16164,7 +16164,6 @@ async function showCountryUserListPopup(country, x, y) {
     listPopup.innerHTML = `
       <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:6px;text-align:center;">
         <strong>${country.replace(/_/g, ' ')}</strong>
-        <div style="font-size:0.7rem;color:#aaa;margin-top:2px;">sorted by most recent session</div>
       </div>
       ${userIds.map((id, index) => {
         const isCurrentUser = id === currentUserId;
