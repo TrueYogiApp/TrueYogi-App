@@ -16073,13 +16073,15 @@ async function showCountryUserListPopup(country, x, y) {
   const oldList = document.getElementById('country-user-list-popup');
   if (oldList) oldList.remove();
 
-  // Fetch all sessions for the country
+  // Fetch all sessions for the country, ordered by most recent first using started_at
   let { data, error } = await supabase
     .from('om_sessions')
-    .select('user_id, country, duration_seconds')
-    .eq('country', country);
+    .select('user_id, country, duration_seconds, started_at')
+    .eq('country', country)
+    .order('started_at', { ascending: false });
 
   if (error || !data) {
+    console.error('Supabase error:', error);
     // fallback: show error
     const listPopup = document.createElement('div');
     listPopup.id = 'country-user-list-popup';
@@ -16089,11 +16091,24 @@ async function showCountryUserListPopup(country, x, y) {
     return;
   }
 
-  // Group and sum durations by user
-  const userDurations = {};
+  // Track unique users by most recent session
+  const userSessions = {};
+  const userOrder = []; // To maintain order of first occurrence (most recent session)
+  
   data.forEach(row => {
     if (!row.user_id) return;
-    userDurations[row.user_id] = (userDurations[row.user_id] || 0) + (row.duration_seconds || 0);
+    
+    // Only add user if not seen before (first occurrence is most recent due to query order)
+    if (!userSessions[row.user_id]) {
+      userSessions[row.user_id] = {
+        totalDuration: row.duration_seconds || 0,
+        latestSession: row.started_at // Store the most recent session time
+      };
+      userOrder.push(row.user_id);
+    } else {
+      // Still sum durations for total
+      userSessions[row.user_id].totalDuration += (row.duration_seconds || 0);
+    }
   });
 
   // Prepare popup
@@ -16114,50 +16129,68 @@ async function showCountryUserListPopup(country, x, y) {
     max-height: 320px;
     overflow-y: auto;
     text-align: left;
-	  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: #fde68a #000000;
+    scrollbar-width: thin;
+    scrollbar-color: #fde68a #000000;
   `;
   
-const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
-const currentUserId = localStorage.getItem('omUserId');
+  const userIds = userOrder; // Use the ordered list
+  const currentUserId = localStorage.getItem('omUserId');
 
-if (userIds.length === 0) {
-  listPopup.innerHTML = "<i>No users found for this country.</i>";
-} else {
-  const liveIds = new Set(livePresenceRows.map(row => row.user_id));
-  const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
-    <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
-  </svg>`;
-  const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
-    <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
-  </svg>`;
+  if (userIds.length === 0) {
+    listPopup.innerHTML = "<i>No users found for this country.</i>";
+  } else {
+    const liveIds = new Set(livePresenceRows.map(row => row.user_id));
+    const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
+      <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
+    </svg>`;
+    const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
+      <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
+    </svg>`;
 
-  listPopup.innerHTML = `
-    <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-      <strong>${country.replace(/_/g, ' ')}</strong>
-    </div>
-    ${userIds.map((id, index) => {
-      const isCurrentUser = id === currentUserId;
-      const isLive = liveIds.has(id);
-      return `
-        <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-          <span style="color:#888;font-size:0.8rem;min-width:18px;">${index + 1}</span>
-          <span style="margin:0 2px;display:inline-block;vertical-align:middle;">
-            ${isLive ? liveSvg : blankSvg}
-          </span>
-          <span style="font-family:monospace; color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-            ${getShortUserId(id)}
-          </span>
-          <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
-          <span style="color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-            ${formatDurationGrid(userDurations[id])}
-          </span>
-        </div>
-      `;
-    }).join('')}
-  `;
-}
+    // Format the latest session time for display (optional)
+    const formatRecentTime = (timestamp) => {
+      if (!timestamp) return '';
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diffMs = now - date;
+      const diffMins = Math.floor(diffMs / 60000);
+      
+      if (diffMins < 1) return 'just now';
+      if (diffMins < 60) return `${diffMins}m ago`;
+      if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
+      return `${Math.floor(diffMins / 1440)}d ago`;
+    };
+
+    listPopup.innerHTML = `
+      <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:6px;text-align:center;">
+        <strong>${country.replace(/_/g, ' ')}</strong>
+        <div style="font-size:0.7rem;color:#aaa;margin-top:2px;">sorted by most recent session</div>
+      </div>
+      ${userIds.map((id, index) => {
+        const isCurrentUser = id === currentUserId;
+        const isLive = liveIds.has(id);
+        const recentTime = formatRecentTime(userSessions[id].latestSession);
+        return `
+          <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+            <span style="color:#888;font-size:0.8rem;min-width:18px;">${index + 1}</span>
+            <span style="margin:0 2px;display:inline-block;vertical-align:middle;">
+              ${isLive ? liveSvg : blankSvg}
+            </span>
+            <span style="font-family:monospace; color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
+              ${getShortUserId(id)}
+            </span>
+            <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
+            <span style="color:${isCurrentUser ? '#fff' : '#ffd700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
+              ${formatDurationGrid(userSessions[id].totalDuration)}
+            </span>
+            <span style="font-size:0.65rem;color:#888;margin-left:4px;" title="${userSessions[id].latestSession}">
+              ${recentTime}
+            </span>
+          </div>
+        `;
+      }).join('')}
+    `;
+  }
 
   document.body.appendChild(listPopup);
   setTimeout(() => { listPopup.remove(); }, 12000);
