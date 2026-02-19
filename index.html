@@ -10668,6 +10668,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // This is the actual meditation start that gets called after confirmation
 async function beginMeditationSession() {
+  // User has clicked/tapped to start, so allow/unmute
+  const bell = document.getElementById('bell');
+  if (bell) bell.muted = false;
+  
   startMeditationBackground();
   updateHideUiBtnVisibility();
   updateHideUiButtonVisibility();
@@ -10945,20 +10949,20 @@ function updateTimer() {
 	  showCompletionStats();
 	  updateLiveCountVisibility();
     
-    const bell = document.getElementById('bell');
-    if (bell) {
-      bell.muted = false;
-      bell.play().catch(e => console.log("Bell sound error:", e));
-    }
+	const bell = document.getElementById('bell');
+	if (bell) {
+	  bell.currentTime = 0;
+	  bell.play().catch(e => console.log("Bell play error:", e));
+	}
 
-const bgMusicPlayer = document.getElementById('bg-music-player');
-if (bgMusicPlayer) {
-  bgMusicPlayer.pause();
-  bgMusicPlayer.currentTime = 0;
-  backgroundAudio = null;
-  stopMeditationSelfHeal();
-}
-
+	const bgMusicPlayer = document.getElementById('bg-music-player');
+	if (bgMusicPlayer) {
+	  bgMusicPlayer.pause();
+	  bgMusicPlayer.currentTime = 0;
+	  backgroundAudio = null;
+	  stopMeditationSelfHeal();
+	}
+	
     document.removeEventListener('visibilitychange', handleVisibilityChange);
     currentSessionTime = null;
   } else {
