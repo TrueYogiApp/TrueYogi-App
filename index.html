@@ -6461,33 +6461,6 @@ function closeChallengeCompletedModal() {
   modal.classList.add('hidden');
 }
 
-function showClearCacheModal() {
-  document.getElementById('clearCacheModal').classList.remove('hidden');
-}
-function hideClearCacheModal() {
-  document.getElementById('clearCacheModal').classList.add('hidden');
-}
-
-function clearAppCache() {
-  hideClearCacheModal();
-  if (navigator.serviceWorker && navigator.serviceWorker.controller) {
-    // Ask SW to clear caches (if active)
-    navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_APP_CACHE' });
-  }
-  // Optionally, also unregister the SW for a total reset
-  navigator.serviceWorker.getRegistration().then(function(reg) {
-    if (reg) {
-      reg.unregister().then(function(success) {
-        // Use setTimeout to avoid any race with navigation events/SW deactivation
-        setTimeout(function() {
-          window.location.reload(true);
-        }, 100);
-      });
-    } else {
-      window.location.reload(true);
-    }
-  });
-}
 
 function enableMobileAudioResume() {
   const htmlEl = document.documentElement;
