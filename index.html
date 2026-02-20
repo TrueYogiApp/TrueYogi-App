@@ -2804,7 +2804,26 @@ button[disabled] {
   0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0;}
   100% { background-position: 50px 40px, 20px 60px, 60px 10px, 10px 50px, 80px 80px;}
 }
- 
+
+/* truemeditat.svg pulse */
+.heart-pulse {
+  background: radial-gradient(circle, #f472b6 55%, transparent 70%);
+  border-radius: 50%;
+  opacity: 0.85;
+  animation: heartPulse 2.1s infinite;
+  box-shadow: 0 0 14px #ffd7008c, 0 0 25px #ffd70038;
+  pointer-events: none;
+  width: 6px;
+  height: 6px;
+}
+
+@keyframes heartPulse {
+  0%   { transform: scale(1) translate(-50%, -50%); opacity: 0.9; }
+  60%  { transform: scale(1.45) translate(-50%, -50%); opacity: 0.25; }
+  100% { transform: scale(1) translate(-50%, -50%); opacity: 0.9; }
+} 
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -11894,8 +11913,10 @@ function clearYogiSessions() {
 function updateMeditationGuideImage(mode) {
   const imageDiv = document.getElementById('meditation-guide-image');
   if (!imageDiv) return;
-  // Remove previous image if exists
+
+  // Remove previous image/pulse if exists
   imageDiv.innerHTML = '';
+
   let imgSrc = '/assets/meditate.svg';
   let altText = 'Meditating Person';
 
@@ -11907,21 +11928,37 @@ function updateMeditationGuideImage(mode) {
     altText = 'Flow Meditation';
   }
 
+  // Setup main SVG/image
   const img = document.createElement('img');
   img.src = imgSrc;
   img.alt = altText;
   img.style.height = '143px';
   img.style.width = 'auto';
   img.style.display = 'block';
-  
-      if (mode === 'yogi') {
-    img.id = 'truemeditate-img-svg'; // Set the ID ONLY here for Yogi
-  }
-  
+  img.style.margin = '0 auto';
+  // For positioning overlay, wrap div needs relative
+  imageDiv.style.position = 'relative';
+
+  // Add SVG
   imageDiv.appendChild(img);
-  
-    // Only attach music to truemeditate image
+
+  // Only add pulse if yogi mode (truemeditate image)
   if (mode === 'yogi') {
+    img.id = 'truemeditate-img-svg'; // Set the ID only here for Yogi
+
+    // Pulse overlay positioned at heart spot (tweak top/left for your SVG)
+    const pulse = document.createElement('div');
+    pulse.id = 'truemeditate-heart-pulse';
+    pulse.className = 'heart-pulse';
+    pulse.style.position = 'absolute';
+    pulse.style.left = '51%';   // Center horizontally over image
+    pulse.style.top = '54%';    // Adjust for heart location!
+    pulse.style.transform = 'translate(-50%, -50%)'; // Perfectly center
+
+    // Insert overlay
+    imageDiv.appendChild(pulse);
+
+    // Only attach music handler for yogi
     attachMeditationMusicHandler();
   }
 }
