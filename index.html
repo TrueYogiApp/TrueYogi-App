@@ -20325,6 +20325,10 @@ spaceships.push(mothership);
 
 <script>
 let idleTimeout;
+let bellIdleTimeout;
+let harmonyIdleTimeout;
+let chimesIdleTimeout;
+let gongIdleTimeout;
 let screensaverActive = false;
 
 const canvasEl = document.getElementById("particles-canvas");
@@ -20339,11 +20343,49 @@ function resetIdleTimer() {
     hideScreensaver();
   }
   clearTimeout(idleTimeout);
+  clearTimeout(bellIdleTimeout);
+  clearTimeout(harmonyIdleTimeout);
+  clearTimeout(chimesIdleTimeout);
+  clearTimeout(gongIdleTimeout);
+
+  // Screensaver after 30s idle
   idleTimeout = setTimeout(() => {
     if (isHomeScreen()) {
       showScreensaver();
     }
-  }, 30000); // 1 minute = 60000ms
+  }, 30000);
+
+  // 1min: Bell (top-left)
+  bellIdleTimeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      playZoneSound && playZoneSound('top-left');
+      showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight / 4, 'top-left');
+    }
+  }, 60000);
+
+  // 2min: Harmony bell (top-right)
+  harmonyIdleTimeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      playZoneSound && playZoneSound('top-right');
+      showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight / 4, 'top-right');
+    }
+  }, 120000);
+
+  // 3min: Tamtam gong (bottom-left)
+  chimesIdleTimeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      playZoneSound && playZoneSound('bottom-left');
+      showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight * 3/4, 'bottom-left');
+    }
+  }, 180000);
+
+  // 4min: Tao chi gong (bottom-right)
+  gongIdleTimeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      playZoneSound && playZoneSound('bottom-right');
+      showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight * 3/4, 'bottom-right');
+    }
+  }, 240000);
 }
 
 function isHomeScreen() {
@@ -20357,7 +20399,7 @@ function showScreensaver() {
 }
 
 function hideScreensaver() {
- if (modalPopupActive) return;
+  if (typeof modalPopupActive !== "undefined" && modalPopupActive) return;
   canvasEl.classList.add("hidden");
   screensaverActive = false;
 }
