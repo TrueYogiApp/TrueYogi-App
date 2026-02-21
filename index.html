@@ -18910,6 +18910,61 @@ function closeDashboardPanel() {
   dashboardActive = false;
 }
 
+
+// Unlock both DOM <audio> and AudioContext on first tap/click/key
+function unlockMeditationAudio() {
+  ['sound-bell','sound-bowl','sound-chimes','sound-gong'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) {
+      el.muted = true;    // ← Mute for real silence
+      el.volume = 0;
+      el.play()
+        .then(() => {
+          setTimeout(() => {
+            el.pause();
+            el.currentTime = 0;
+            el.muted = false; // ← Unmute for future!
+            el.volume = 1;    // Reset to normal loudness
+          }, 50);
+        });
+    }
+  });
+  window.yogiAudioCtx = window.yogiAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  window.yogiAudioCtx.resume && window.yogiAudioCtx.resume();
+}
+
+['touchstart', 'mousedown', 'keydown'].forEach(evt =>
+  document.addEventListener(evt, unlockMeditationAudio, {once:true})
+);
+
+// 2. Always use this function to play your meditation sounds
+function tryPlayZoneSound(zone) {
+  const soundIdMap = {
+    'top-left': 'sound-bell',
+    'top-right': 'sound-bowl',
+    'bottom-left': 'sound-chimes',
+    'bottom-right': 'sound-gong'
+  };
+  const audioId = soundIdMap[zone];
+  const el = document.getElementById(audioId);
+
+  if (el) {
+    el.currentTime = 0;
+    el.volume = 1;
+    el.play().catch(() => {
+      // WebAudio Fallback
+      fetch(el.src)
+        .then(r => r.arrayBuffer())
+        .then(buf => window.yogiAudioCtx.decodeAudioData(buf, src => {
+          const node = window.yogiAudioCtx.createBufferSource();
+          node.buffer = src;
+          node.connect(window.yogiAudioCtx.destination);
+          node.start();
+        }));
+    });
+  }
+}
+
   </script>
 	
 <script>
@@ -20358,7 +20413,7 @@ function resetIdleTimer() {
   // 1min: Bell (top-left)
   bellIdleTimeout = setTimeout(() => {
     if (isHomeScreen() && screensaverActive) {
-      playZoneSound && playZoneSound('top-left');
+      tryPlayZoneSound && tryPlayZoneSound('top-left');
       showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight / 4, 'top-left');
     }
   }, 60000);
@@ -20366,7 +20421,7 @@ function resetIdleTimer() {
   // 2min: Harmony bell (top-right)
   harmonyIdleTimeout = setTimeout(() => {
     if (isHomeScreen() && screensaverActive) {
-      playZoneSound && playZoneSound('top-right');
+      tryPlayZoneSound && tryPlayZoneSound('top-right');
       showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight / 4, 'top-right');
     }
   }, 120000);
@@ -20374,7 +20429,7 @@ function resetIdleTimer() {
   // 3min: Tamtam gong (bottom-left)
   chimesIdleTimeout = setTimeout(() => {
     if (isHomeScreen() && screensaverActive) {
-      playZoneSound && playZoneSound('bottom-left');
+      tryPlayZoneSound && tryPlayZoneSound('bottom-left');
       showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight * 3/4, 'bottom-left');
     }
   }, 180000);
@@ -20382,7 +20437,7 @@ function resetIdleTimer() {
   // 4min: Tao chi gong (bottom-right)
   gongIdleTimeout = setTimeout(() => {
     if (isHomeScreen() && screensaverActive) {
-      playZoneSound && playZoneSound('bottom-right');
+      tryPlayZoneSound && tryPlayZoneSound('bottom-right');
       showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight * 3/4, 'bottom-right');
     }
   }, 240000);
