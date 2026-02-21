@@ -450,5 +450,7 @@
   "spaceshipModal.closeBtn": "Close",
 "fullReset.typeDeleteConfirmation": "Escribe \"DELETE\" para confirmar:",
 "fullReset.typeConfirmationPlaceholder": "Escribe aquí...",
-"fullReset.understandCheckbox": "Entiendo que esto eliminará permanentemente TODOS mis datos y no se puede deshacer."  
+"fullReset.understandCheckbox": "Entiendo que esto eliminará permanentemente TODOS mis datos y no se puede deshacer.",
+"configErrorGapBetweenSessions": "Debe haber al menos 3 horas de diferencia entre el final de una sesión y el comienzo de la siguiente."
+
 }

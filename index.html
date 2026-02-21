@@ -9610,7 +9610,7 @@ if (challengeData.currentDay >= 22 && !isMobile()) {
   for (let i = 1; i < timesInMinutes.length; i++) {
     const prevEnd = timesInMinutes[i - 1].start + timesInMinutes[i - 1].duration;
     if (timesInMinutes[i].start - prevEnd < 180) {
-      document.getElementById('config-error').textContent = 'Session times must have at least a 3-hour gap between the end of one session and the start of the next.';
+      document.getElementById('config-error').textContent = t('configErrorGapBetweenSessions');
       document.getElementById('config-error').classList.remove('hidden');
       return;
     }

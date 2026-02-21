@@ -456,7 +456,8 @@
   
   "fullReset.typeDeleteConfirmation": "Type \"DELETE\" to confirm:",
 "fullReset.typeConfirmationPlaceholder": "Type here...",
-"fullReset.understandCheckbox": "I understand this will permanently delete ALL my data and cannot be undone."
+"fullReset.understandCheckbox": "I understand this will permanently delete ALL my data and cannot be undone.",
+"configErrorGapBetweenSessions": "Session times must have at least a 3-hour gap between the end of one session and the start of the next."
 
   
 }

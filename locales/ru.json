@@ -451,6 +451,7 @@
   "spaceshipModal.closeBtn": "Close",
 "fullReset.typeDeleteConfirmation": "Введите \"DELETE\" для подтверждения:",
 "fullReset.typeConfirmationPlaceholder": "Введите здесь...",
-"fullReset.understandCheckbox": "Я понимаю, что это навсегда удалит ВСЕ мои данные и не может быть отменено."  
+"fullReset.understandCheckbox": "Я понимаю, что это навсегда удалит ВСЕ мои данные и не может быть отменено.",
+"configErrorGapBetweenSessions": "Между окончанием одной сессии и началом следующей должен быть минимум 3-часовой перерыв."
   
 }

@@ -455,6 +455,7 @@
   "fullReset.typeDeleteConfirmation": "నిర్ధారించడానికి \"DELETE\" టైప్ చేయండి:",
 "fullReset.typeConfirmationPlaceholder": "ఇక్కడ టైప్ చేయండి...",
 "fullReset.understandCheckbox": "ఇది నా మొత్తం డేటాను శాశ్వతంగా తొలగిస్తుందని మరియు రద్దు చేయలేమని నేను అర్థం చేసుకున్నాను.",
-"fullReset.confirmButton": "యావన్ సెట్టింగ్స్ మరియు డేటాను రీసెట్"
+"fullReset.confirmButton": "యావన్ సెట్టింగ్స్ మరియు డేటాను రీసెట్",
+"configErrorGapBetweenSessions": "ప్రతి సెషన్ ముగింపు మరియు తరువాతి సెషన్ ప్రారంభం మధ్య కనీసం 3 గంటల వ్యవధి ఉండాలి."
 
 }

@@ -455,8 +455,8 @@
   "spaceshipModal.closeBtn": "Close",
   "fullReset.typeDeleteConfirmation": "Tapez \"DELETE\" pour confirmer :",
 "fullReset.typeConfirmationPlaceholder": "Tapez ici...",
-"fullReset.understandCheckbox": "Je comprends que cela supprimera définitivement TOUTES mes données et ne peut pas être annulé."
+"fullReset.understandCheckbox": "Je comprends que cela supprimera définitivement TOUTES mes données et ne peut pas être annulé.",
+"configErrorGapBetweenSessions": "Les horaires de session doivent avoir au moins 3 heures d’intervalle entre la fin d’une session et le début de la suivante."
   
-
 
 }
