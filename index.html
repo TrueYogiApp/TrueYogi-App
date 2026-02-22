@@ -16698,271 +16698,6 @@ document.addEventListener('click', function(e) {
   }
 });
 
-async function showAllFlameKeepers(x, y) {
-await fetchCallPermission();
-  // Remove if already open
-  const oldList = document.getElementById('flame-keeper-list');
-  if (oldList) oldList.remove();
-
-  // Fetch sessions during this flame period 
-  let { data, error } = await supabase
-    .from('om_sessions')
-    .select('user_id, country, countryCode, duration_seconds, started_at, ended_at, deep_presence, ultimate_stillness')
-    .gte('started_at', lastFlameStarted.toISOString());
-
-  if (error || !data) {
-    // fallback UI
-    // ... same fallback as before ...
-    return;
-  }
-
-  // Group and sum durations by user
-  const userDurations = {}; // user_id => total seconds
-  const userRows = {};      // user_id => store country/countryCode from any row
-  const userDeepPresence = {}; // <-- NEW: user_id => true if ANY session has deep_presence
-  const userUltimateStillness = {};
-  
-	data.forEach(row => {
-	  if (!row.user_id) return;
-	  let duration = 0;
-
-	  if (row.ended_at) {
-		duration = row.duration_seconds || (
-		  Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000)
-		);
-	  } else {
-		duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
-	  }
-
-	  userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
-
-	  if (!userRows[row.user_id]) userRows[row.user_id] = row;
-
-	  // Track deep presence: if ANY session is deep, mark the user as deep
-	  if (row.deep_presence) {
-		userDeepPresence[row.user_id] = true;
-	  }
-	  	  if (row.ultimate_stillness) {
-		userUltimateStillness[row.user_id] = true;
-	  }
-	});
-
-  // Display list of users with flag, shortUserId, SUMMED duration
-  const listPopup = document.createElement('div');
-  listPopup.id = 'flame-keeper-list';
-  listPopup.style.cssText = `
-    position: fixed;
-    left: ${x}px; top: ${y + 32}px;
-    transform: translate(-50%, 0);
-    background: rgba(0,0,0,0.96);
-    color: #ffd700;
-    font-size: 0.98rem;
-    padding: 9px 18px;
-    border-radius: 11px;
-    box-shadow: 0 0 14px #ffd70066;
-    z-index: 10050;
-    min-width: 0;
-    max-width: 320px;
-    width: 100%;
-    max-height: 240px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
-    text-align: left;
-    /* Scrollbar styling */
-    scrollbar-width: thin;
-    scrollbar-color: #fde68a #000000;
-  `;
-
-  // Add this to prevent scroll propagation
-  listPopup.addEventListener('wheel', (e) => {
-    e.stopPropagation();
-  });
-
-  // Add touch event prevention for mobile
-  listPopup.addEventListener('touchmove', (e) => {
-    e.stopPropagation();
-  });
-
-  // Sort user IDs: longest duration first
-const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
-const currentUserId = localStorage.getItem('omUserId');
-const liveIds = new Set(livePresenceRows.map(row => row.user_id));
-const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
-  <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
-</svg>`;
-const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
-  <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
-</svg>`;
-
-// const longestDurationUserId = userIds[0]; // top flame keeper
-//const longestDurationUserId = await fetchUserWithHighestDuration();
-const deepPresenceSvg = `<img src="assets/deep.presence.svg" class="lotus-glow deep-presence-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:4px; transform:translateY(-2px); cursor:pointer;">`;
-const ultimateStillnessSvg = `<img src="assets/deep.presence.svg" class="lotus-glow ultimate-stillness-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:4px; transform:translateY(-2px); cursor:pointer;">`;
-
-
-if (userIds.length === 0) {
-  listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
-} else {
-  listPopup.innerHTML = `
-  <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-    <strong>Flame Keepers</strong>
-  </div>
-	${userIds.map((id, index) => {
-	  const isCurrentUser = id === currentUserId;
-	  const isLive = liveIds.has(id);
-	  const isDeepPresence = userDeepPresence[id]; // <-- CHECK THIS
-	  const isUltimateStillness = userUltimateStillness[id];
-	  const row = userRows[id];
-	  const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
-
-	  let callIcon = '';
-	  if (
-		canStartCall &&
-		!isCurrentUser &&
-		isLive
-	  ) {
-		callIcon = `<span class="call-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Start call">☎️</span>`;
-	  }
-
-		return `
-		  <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-			<span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
-			<span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
-			  ${isLive ? liveSvg : blankSvg}
-			</span>
-			<img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
-			<span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-			  ${getShortUserId(id)}
-			</span>
-			<img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
-			<span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-			  ${formatDurationGrid(userDurations[id])}
-			</span>
-			${isDeepPresence ? deepPresenceSvg : ''}
-			${isUltimateStillness ? ultimateStillnessSvg : ''}
-			${callIcon}
-		  </div>
-		`;
-	}).join('')}
-  `;
-}
-
-// ADD THIS DIRECTLY AFTER listPopup.innerHTML IS ASSIGNED
-Array.from(listPopup.querySelectorAll('.call-icon')).forEach(el => {
-  el.onclick = function(e) {
-    e.stopPropagation();
-    const currentUserId = localStorage.getItem('omUserId'); // Top keeper (host)
-    const targetUserId = this.getAttribute('data-userid');  // Invited user
-    const targetUserName = this.getAttribute('data-username'); // optional, if you have from HTML
-	const shortId = getShortUserId(targetUserId);
-
-    // Show custom confirmation dialog
-    showCallConfirm(shortId, targetUserName, async (result) => {
-      if (!result) return; // Cancelled
-
-      // Request a new Whereby room from your backend server
-      let resp;
-      try {
-        resp = await fetch('https://trueyogi-backend-knkq.onrender.com/create-whereby-room', {
-          method: 'POST', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            hostUserId: currentUserId,
-            targetUserId: targetUserId
-          })
-        });
-      } catch (err) {
-        alert('Network error or backend is down.');
-        return;
-      }
-
-      if (!resp.ok) {
-        // Show error to user, log for debug
-        const text = await resp.text();
-        alert('Failed to create call: ' + text);
-        return;
-      }
-
-      let data;
-      try {
-        data = await resp.json();
-      } catch (err) {
-        alert('Backend did not return valid JSON.');
-        return;
-      }
-
-      if (!data.hostUrl) {
-        alert('Backend did not provide host link.');
-        return;
-      }
-      showWherebyHostDialog(data.hostUrl, data.callId);
-    });
-  };
-});
-
-
-// Add tooltip event handlers for deep presence icons
-Array.from(listPopup.querySelectorAll('.deep-presence-icon')).forEach(el => {
-  // For touch devices (mobile)
-  el.addEventListener('touchstart', function(e) {
-    e.stopPropagation();
-    showDeepPresenceTooltip(this, 'In Deep Presence');
-  });
-  
-  // For desktop hover
-  el.addEventListener('mouseenter', function(e) {
-    showDeepPresenceTooltip(this, 'In Deep Presence');
-  });
-  
-  el.addEventListener('mouseleave', function(e) {
-    removeDeepPresenceTooltip();
-  });
-});
-
-  document.body.appendChild(listPopup);
-  setTimeout(() => listPopup.remove(), 12000);
-}
-
-// Helper functions for deep presence tooltip
-function showDeepPresenceTooltip(element, text) {
-  // Remove any existing tooltip
-  removeDeepPresenceTooltip();
-  
-  const tooltip = document.createElement('div');
-  tooltip.id = 'deep-presence-tooltip';
-  tooltip.textContent = text;
-  tooltip.style.cssText = `
-    position: fixed;
-    background: rgba(0,0,0,0.95);
-    color: #ffd700;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    z-index: 10060;
-    pointer-events: none;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(255,215,0,0.3);
-    border: 1px solid rgba(255,215,0,0.5);
-  `;
-  
-  document.body.appendChild(tooltip);
-  
-  // Position the tooltip above the icon
-  const rect = element.getBoundingClientRect();
-  const tooltipRect = tooltip.getBoundingClientRect();
-  tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-  tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
-  
-  // Auto-remove after 3 seconds (for touch)
-  setTimeout(() => removeDeepPresenceTooltip(), 3000);
-}
-
-function removeDeepPresenceTooltip() {
-  const tooltip = document.getElementById('deep-presence-tooltip');
-  if (tooltip) tooltip.remove();
-}
-
 
 async function showAllFlameKeepers(x, y) {
 await fetchCallPermission();
@@ -17067,12 +16802,22 @@ const deepPresenceSvg = `<img src="assets/deep.presence.svg" class="lotus-glow d
 const ultimateStillnessSvg = `<img src="assets/deep.presence.svg" class="lotus-glow ultimate-stillness-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:4px; transform:translateY(-2px); cursor:pointer;">`;
 
 
+// After getting userIds array
+const permissionsResponse = await fetch('https://trueyogi-backend-test.onrender.com/api/permissions/batch', {
+  method: 'POST',
+  headers: {'Content-Type': 'application/json'},
+  credentials: 'include',
+  body: JSON.stringify({ userIds })
+});
+const permissions = (await permissionsResponse.json()).userPermissions || {};
+
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
 } else {
   listPopup.innerHTML = `
   <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
     <strong>Flame Keepers</strong>
+	<div id="my-notifications" style="margin-top:5px;"></div>
   </div>
 	${userIds.map((id, index) => {
 	  const isCurrentUser = id === currentUserId;
@@ -17091,6 +16836,14 @@ if (userIds.length === 0) {
 		callIcon = `<span class="call-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Start call">☎️</span>`;
 	  }
 
+// To each keeper row, add bell icon for main user (to_user_id), visible to others (from_user_id)
+const isRowCallable = permissions[id]?.canStartCall;
+const amILive = liveIds.has(currentUserId);
+let callbackBell = '';
+if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or similar logic for eligible main users
+  callbackBell = `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Request Call Back">🔔</span>`;
+}
+
 		return `
 		  <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
 			<span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
@@ -17108,6 +16861,7 @@ if (userIds.length === 0) {
 			${isDeepPresence ? deepPresenceSvg : ''}
 			${isUltimateStillness ? ultimateStillnessSvg : ''}
 			${callIcon}
+			${callbackBell}
 		  </div>
 		`;
 	}).join('')}
@@ -17130,7 +16884,7 @@ Array.from(listPopup.querySelectorAll('.call-icon')).forEach(el => {
       // Request a new Whereby room from your backend server
       let resp;
       try {
-        resp = await fetch('https://trueyogi-backend-knkq.onrender.com/create-whereby-room', {
+        resp = await fetch('https://trueyogi-backend-test.onrender.com/create-whereby-room', {
           method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -17165,6 +16919,26 @@ Array.from(listPopup.querySelectorAll('.call-icon')).forEach(el => {
       showWherebyHostDialog(data.hostUrl, data.callId);
     });
   };
+});
+
+Array.from(listPopup.querySelectorAll('.callback-bell-icon')).forEach(el => {
+  el.onclick = function(e) {
+    e.stopPropagation();
+    const toUserId = this.getAttribute('data-userid');
+    const fromUserId = localStorage.getItem('omUserId'); // current user
+    if (!toUserId || !fromUserId || toUserId === fromUserId) return;
+
+    if (!confirm("Let this user know you'd like a call back?")) return;
+
+    fetch('https://trueyogi-backend-test.onrender.com/api/callback-request', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ to_user_id: toUserId, from_user_id: fromUserId })
+    }).then(r => r.json())
+      .then(data => {
+        alert(data.success ? "Request sent!" : (data.message || "Something went wrong!"));
+      });
+  }
 });
 
 // Add tooltip event handlers for deep presence icons
@@ -17205,6 +16979,95 @@ Array.from(listPopup.querySelectorAll('.ultimate-stillness-icon')).forEach(el =>
 
   // ONLY ONE appendChild and setTimeout here
   document.body.appendChild(listPopup);
+  
+  // Now, show notification badge for the main user:
+if (document.getElementById('my-notifications')) {
+  fetchMyCallbackRequests().then(requests => {
+    if (requests.length) {
+      // Create a clickable badge
+      document.getElementById('my-notifications').innerHTML =
+        `<span id="callback-requests-badge"
+               style="cursor:pointer;color:#ffe066;font-size:1.1em;">
+          🔔 ${requests.length} callback requests!
+         </span>`;
+
+      // Add click handler for badge
+	document.getElementById('callback-requests-badge').onclick = function() {
+	  // Build checkbox list for each requester
+	  const userList = requests.map(req =>
+		`<li style="margin-bottom:8px;font-family:monospace;">
+		  <label style="cursor:pointer;">
+			<input type="checkbox" class="acknowledge-checkbox" value="${req.id}" style="vertical-align:middle;margin-right:6px;">
+			<span>${getShortUserId(req.from_user_id)}</span>
+		  </label>
+		</li>`
+	  ).join('');
+
+	  // Modal HTML with an "Acknowledge Selected" button
+	  const modal = document.createElement('div');
+	  modal.style = `
+		position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10100;
+		background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;`;
+
+	  modal.innerHTML = `
+		<div style="background:#222;color:#ffd700;padding:24px 30px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:290px;">
+		  <h3 style="margin-bottom:15px;font-size:1.17em;">Callback Requests</h3>
+		  <ul style="list-style:none;padding-left:0;">${userList}</ul>
+		  <div style="margin-top:10px;">
+			<button style="margin-right:11px;padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;"
+			  id="acknowledge-selected-btn">Acknowledge Selected</button>
+			<button style="padding:7px 17px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;font-size:1em;cursor:pointer;"
+			  id="close-callback-requests-modal">Close</button>
+		  </div>
+		</div>
+	  `;
+	  document.body.appendChild(modal);
+
+	  // Close button handler
+	  document.getElementById('close-callback-requests-modal').onclick = () => modal.remove();
+
+	  // Acknowledge selected handler
+	  document.getElementById('acknowledge-selected-btn').onclick = function() {
+		// Get checked request IDs
+		const checkedIds = Array.from(modal.querySelectorAll('.acknowledge-checkbox'))
+		  .filter(box => box.checked)
+		  .map(box => box.value);
+
+		if (checkedIds.length === 0) {
+		  alert("Select at least one user to acknowledge!");
+		  return;
+		}
+
+		// PATCH to backend to mark these as seen
+		fetch('https://trueyogi-backend-test.onrender.com/api/callback-requests/mark-seen', {
+		  method: 'PATCH',
+		  headers: { 'Content-Type': 'application/json' },
+		  body: JSON.stringify({ ids: checkedIds })
+		}).then(r => r.json())
+		  .then(data => {
+			// Remove modal
+			modal.remove();
+			// Optionally, refresh badge and show updated remaining requests
+			if (document.getElementById('my-notifications')) {
+			  fetchMyCallbackRequests().then(requests => {
+				document.getElementById('my-notifications').innerHTML =
+				  requests.length
+				  ? `<span id="callback-requests-badge"
+					  style="cursor:pointer;color:#ffe066;font-size:1.1em;">
+					  🔔 ${requests.length} callback requests!
+					 </span>`
+				  : '';
+			  });
+			}
+		  });
+	  };
+	};;
+    } else {
+      document.getElementById('my-notifications').innerHTML = '';
+    }
+  });
+}
+
   setTimeout(() => listPopup.remove(), 12000);
 }
 
