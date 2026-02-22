@@ -16803,7 +16803,7 @@ const ultimateStillnessSvg = `<img src="assets/deep.presence.svg" class="lotus-g
 
 
 // After getting userIds array
-const permissionsResponse = await fetch('https://trueyogi-backend-test.onrender.com/api/permissions/batch', {
+const permissionsResponse = await fetch('https://trueyogi-backend-knkq.onrender.com/api/permissions/batch', {
   method: 'POST',
   headers: {'Content-Type': 'application/json'},
   credentials: 'include',
@@ -16884,7 +16884,7 @@ Array.from(listPopup.querySelectorAll('.call-icon')).forEach(el => {
       // Request a new Whereby room from your backend server
       let resp;
       try {
-        resp = await fetch('https://trueyogi-backend-test.onrender.com/create-whereby-room', {
+        resp = await fetch('https://trueyogi-backend-knkq.onrender.com/create-whereby-room', {
           method: 'POST', credentials: 'include',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -16930,7 +16930,7 @@ Array.from(listPopup.querySelectorAll('.callback-bell-icon')).forEach(el => {
 
     if (!confirm("Let this user know you'd like a call back?")) return;
 
-    fetch('https://trueyogi-backend-test.onrender.com/api/callback-request', {
+    fetch('https://trueyogi-backend-knkq.onrender.com/api/callback-request', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ to_user_id: toUserId, from_user_id: fromUserId })
@@ -17039,7 +17039,7 @@ if (document.getElementById('my-notifications')) {
 		}
 
 		// PATCH to backend to mark these as seen
-		fetch('https://trueyogi-backend-test.onrender.com/api/callback-requests/mark-seen', {
+		fetch('https://trueyogi-backend-knkq.onrender.com/api/callback-requests/mark-seen', {
 		  method: 'PATCH',
 		  headers: { 'Content-Type': 'application/json' },
 		  body: JSON.stringify({ ids: checkedIds })
