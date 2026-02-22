@@ -16284,6 +16284,14 @@ async function canUserBroadcast() {
   }
 }
 
+async function fetchMyCallbackRequests() {
+  const myId = localStorage.getItem('omUserId');
+  if (!myId) return [];
+  const res = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests?user_id=${encodeURIComponent(myId)}`);
+  const data = await res.json();
+  return data.requests || [];
+}
+
 // --- Main renderer (called whenever data changes or grid opens) ---
 function renderEarthGrid() {
   // --- Setup container, canvas, and label ---
