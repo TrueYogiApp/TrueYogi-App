@@ -16936,18 +16936,148 @@ Array.from(listPopup.querySelectorAll('.callback-bell-icon')).forEach(el => {
     const fromUserId = localStorage.getItem('omUserId'); // current user
     if (!toUserId || !fromUserId || toUserId === fromUserId) return;
 
-    if (!confirm("Let this user know you'd like a call back?")) return;
+    // Show custom confirmation modal instead of confirm()
+    showCallbackConfirmModal(toUserId, fromUserId);
+  }
+});
 
+// Add these helper functions after your existing tooltip functions
+
+function showCallbackConfirmModal(toUserId, fromUserId) {
+  // Create modal overlay
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10100;
+    background: rgba(0,0,0,0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+
+  // Create modal content
+  modal.innerHTML = `
+    <div style="
+      background: #222;
+      color: #ffd700;
+      padding: 24px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px #ffd70055;
+      min-width: 320px;
+      max-width: 400px;
+      text-align: center;
+    ">
+      <h3 style="margin-bottom: 20px; font-size: 1.2em; color: #ffd700;">Ring the Guidance Bell</h3>
+      <p style="margin-bottom: 25px; color: #fff; font-size: 1.1em;">
+        Send a gentle bell to invite connection.
+You will be contacted when available.
+      </p>
+      <div style="display: flex; gap: 12px; justify-content: center;">
+        <button id="confirm-callback-yes" style="
+          padding: 10px 25px;
+          border-radius: 8px;
+          background: #ffe066;
+          color: #222;
+          font-weight: bold;
+          font-size: 1em;
+          cursor: pointer;
+          border: none;
+          min-width: 100px;
+        ">🔔 Ring Bell </button>
+        <button id="confirm-callback-no" style="
+          padding: 10px 25px;
+          border-radius: 8px;
+          background: #444;
+          color: #ffd700;
+          font-weight: bold;
+          font-size: 1em;
+          cursor: pointer;
+          border: none;
+          min-width: 100px;
+        ">Cancel</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Handle Yes button
+  document.getElementById('confirm-callback-yes').onclick = () => {
+    modal.remove();
+    
+    // Make the API call
     fetch('https://trueyogi-backend-knkq.onrender.com/api/callback-request', {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ to_user_id: toUserId, from_user_id: fromUserId })
-    }).then(r => r.json())
-      .then(data => {
-        alert(data.success ? "Request sent!" : (data.message || "Something went wrong!"));
-      });
-  }
-});
+    })
+    .then(r => r.json())
+    .then(data => {
+      // Show result modal instead of alert()
+      showCallbackResultModal(data.success ? "Bell sent. Remain in stillness!" : (data.message || "Something went wrong!"));
+    });
+  };
+
+  // Handle No button
+  document.getElementById('confirm-callback-no').onclick = () => {
+    modal.remove();
+  };
+}
+
+function showCallbackResultModal(message) {
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 10100;
+    background: rgba(0,0,0,0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+
+  modal.innerHTML = `
+    <div style="
+      background: #222;
+      color: #ffd700;
+      padding: 24px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 20px #ffd70055;
+      min-width: 320px;
+      max-width: 400px;
+      text-align: center;
+    ">
+      <p style="margin-bottom: 25px; color: #fff; font-size: 1.1em;">
+        ${message}
+      </p>
+      <button id="result-modal-ok" style="
+        padding: 10px 30px;
+        border-radius: 8px;
+        background: #ffe066;
+        color: #222;
+        font-weight: bold;
+        font-size: 1em;
+        cursor: pointer;
+        border: none;
+        min-width: 120px;
+      ">OK</button>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+
+  // Handle OK button
+  document.getElementById('result-modal-ok').onclick = () => {
+    modal.remove();
+  };
+}
 
 // Add tooltip event handlers for deep presence icons
 Array.from(listPopup.querySelectorAll('.deep-presence-icon')).forEach(el => {
