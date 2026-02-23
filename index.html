@@ -5084,8 +5084,8 @@ button[disabled] {
 
   <!-- Tab bar -->
   <div style="display:flex;gap:10px;justify-content:center;padding:12px 0 0 0;">
-    <button id="tab-pdf" class="dashboard-tab dashboard-tab-active">📚 PDFs</button>
-    <button id="tab-video" class="dashboard-tab">🎬 Videos</button>
+    <button id="tab-pdf" class="mode-btn dashboard-tab dashboard-tab-active">📚 PDFs</button>
+    <button id="tab-video" class="mode-btn dashboard-tab">🎬 Videos</button>
   </div>
 
   <!-- PDF List -->
@@ -5112,7 +5112,7 @@ button[disabled] {
       flex-shrink: 0;
     ">
       <div id="pdf-title" style="font-size: 16px; font-weight: bold;">Loading PDF...</div>
-      <button onclick="closePDFinline()" style="
+      <button onclick="closePDFinline()" class="mode-btn" style="
         background: rgba(239,68,68,0.3);
         border: 1px solid rgba(239,68,68,0.5);
         color: #fca5a5;
@@ -5146,7 +5146,7 @@ button[disabled] {
       <div id="video-player-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;"></div>
       <iframe id="youtube-player" width="350" height="210" src="" frameborder="0" allowfullscreen style="border-radius:10px;box-shadow:0 0 10px #92823344;"></iframe>
       <div>
-        <button onclick="closeVideoPlayer()" style="margin:17px 0 7px 0;padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
+        <button onclick="closeVideoPlayer()" class="mode-btn" style="margin:17px 0 7px 0;padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
       </div>
     </div>
   </div>
@@ -5287,7 +5287,7 @@ function renderVideoList() {
         <div style="flex:1;">
           <div style="font-weight:bold;font-size:1.08rem;">${vid.title}</div>
           <div style="color:#adbbef;font-size:0.95rem;">${vid.author || ''}</div>
-          <button onclick="openVideoPlayer('${vid.youtubeId}','${vid.title.replace(/'/g,'\\\'')}')" style="margin-top:7px;padding:5px 14px;background:#ffe85a;color:#2c1d00;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">Watch</button>
+          <button onclick="openVideoPlayer('${vid.youtubeId}','${vid.title.replace(/'/g,'\\\'')}')" class="mode-btn" style="margin-top:7px;padding:5px 14px;background:#ffe85a;color:#2c1d00;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">Watch</button>
         </div>
       </div>`;
     list.insertAdjacentHTML('beforeend', html);
@@ -5349,7 +5349,7 @@ overlay.innerHTML = `
       <div id="${playerId}" style="width:350px;height:210px;"></div>
     </div>
     <div class="video-controls" style="transition:opacity .4s;opacity:1;pointer-events:auto;">
-      <button onclick="closeVideoPlayer()" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
+      <button onclick="closeVideoPlayer()" class="mode-btn" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
     </div>
   </div>
 `;
@@ -17091,7 +17091,7 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 You will be contacted when available.
       </p>
       <div style="display: flex; gap: 12px; justify-content: center;">
-        <button id="confirm-callback-yes" style="
+        <button id="confirm-callback-yes" class="mode-btn" style="
           padding: 10px 25px;
           border-radius: 8px;
           background: #ffe066;
@@ -17102,7 +17102,7 @@ You will be contacted when available.
           border: none;
           min-width: 100px;
         ">🔔 Ring Bell </button>
-        <button id="confirm-callback-no" style="
+        <button id="confirm-callback-no" class="mode-btn" style="
           padding: 10px 25px;
           border-radius: 8px;
           background: #444;
@@ -17171,7 +17171,7 @@ function showCallbackResultModal(message) {
       <p style="margin-bottom: 25px; color: #fff; font-size: 1.1em;">
         ${message}
       </p>
-      <button id="result-modal-ok" style="
+      <button id="result-modal-ok" class="mode-btn" style="
         padding: 10px 30px;
         border-radius: 8px;
         background: #ffe066;
@@ -17266,9 +17266,9 @@ if (document.getElementById('my-notifications')) {
 		  <h3 style="margin-bottom:15px;font-size:1.17em;">Callback Requests</h3>
 		  <ul style="list-style:none;padding-left:0;">${userList}</ul>
 		  <div style="margin-top:10px;">
-			<button style="margin-right:11px;padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;"
+			<button class="mode-btn" style="margin-right:11px;padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;"
 			  id="acknowledge-selected-btn">Acknowledge Selected</button>
-			<button style="padding:7px 17px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;font-size:1em;cursor:pointer;"
+			<button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;font-size:1em;cursor:pointer;"
 			  id="close-callback-requests-modal">Close</button>
 		  </div>
 		</div>
