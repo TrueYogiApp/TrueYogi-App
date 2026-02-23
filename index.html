@@ -17132,7 +17132,7 @@ You will be contacted when available.
     .then(r => r.json())
     .then(data => {
       // Show result modal instead of alert()
-      showCallbackResultModal(data.success ? "Bell sent. Remain in stillness!" : (data.message || "Something went wrong!"));
+      showCallbackResultModal(data.success ? "Bell sent. Remain in Stillness!" : (data.message || "Something went wrong!"));
     });
   };
 
@@ -18522,6 +18522,142 @@ function startCallPolling() {
       }
     }
   }, 3000);
+}
+
+// Add this function to play bell sound (loops 3 times)
+function playCallbackBellSound() {
+  try {
+    const audio = new Audio('https://assets.trueyogi.app/assets/incomingbell.wav');
+    audio.volume = 0.9; // Set to 90% volume
+    
+    let playCount = 0;
+    const maxPlays = 3;
+    
+    // Function to play and handle loop
+    function playWithLoop() {
+      if (playCount < maxPlays) {
+        playCount++;
+        audio.play()
+          .catch(e => console.log('Audio play failed:', e));
+      }
+    }
+    
+    // When audio ends, play again if we haven't reached max plays
+    audio.addEventListener('ended', () => {
+      if (playCount < maxPlays) {
+        playWithLoop();
+      }
+    });
+    
+    // Start first play
+    playWithLoop();
+    
+  } catch (e) {
+    console.log('Bell sound error:', e);
+  }
+}
+
+// Add this to your existing startCallPolling function or create a separate one
+function startCallbackPolling() {
+  if (typeof supabase === "undefined") {
+    setTimeout(startCallbackPolling, 500);
+    return;
+  }
+
+  // Track which callback requests we've already notified about
+  let notifiedCallbacks = new Set();
+
+  setInterval(async () => {
+    const currentUserId = localStorage.getItem('omUserId');
+    if (!currentUserId) return;
+
+    // Poll for new callback requests where current user is the recipient (to_user_id)
+    // and they haven't been seen/acknowledged yet
+    const { data, error } = await supabase
+      .from('callback_requests')
+      .select('id, from_user_id, created_at')
+      .eq('to_user_id', currentUserId)
+      .eq('seen', false) // Assuming you have a 'seen' field in your callback_requests table
+      .gte('created_at', new Date(Date.now() - 60000).toISOString()); // Last 60 seconds
+
+    if (data && data.length) {
+      data.forEach(request => {
+        // Check if we've already notified about this request
+        if (!notifiedCallbacks.has(request.id)) {
+          // Play the bell sound
+          playCallbackBellSound();
+          
+          // Mark as notified
+          notifiedCallbacks.add(request.id);
+          
+          // Optional: Show a subtle notification
+          showCallbackNotification(request.from_user_id);
+        }
+      });
+    }
+
+    // Clean up old notified IDs (keep last 50 to prevent memory growth)
+    if (notifiedCallbacks.size > 50) {
+      const idsArray = Array.from(notifiedCallbacks);
+      notifiedCallbacks = new Set(idsArray.slice(-50));
+    }
+  }, 3000); // Poll every 3 seconds, same as call polling
+}
+
+function showCallbackNotification(fromUserId) {
+  // Create a temporary notification that fades out
+  const notification = document.createElement('div');
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: rgba(0,0,0,0.96);
+    color: #ffd700;
+    padding: 12px 20px;
+    border-radius: 11px;
+    box-shadow: 0 0 14px #ffd70066;
+    z-index: 10150;
+    font-size: 0.98rem;
+    border-left: 4px solid #ffd700;
+    animation: slideIn 0.3s ease;
+    max-width: 280px;
+  `;
+
+  const shortId = getShortUserId(fromUserId);
+  notification.innerHTML = `
+    <div style="display: flex; align-items: center; gap: 10px;">
+      <span>🔔</span>
+      <span><strong>${shortId}</strong> would like a call back</span>
+    </div>
+  `;
+
+  document.body.appendChild(notification);
+
+  // Add animation
+  const style = document.createElement('style');
+  style.textContent = `
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  `;
+  document.head.appendChild(style);
+
+  // Remove after 9 seconds
+  setTimeout(() => {
+    if (notification && notification.parentNode) {
+      notification.style.animation = 'slideOut 0.3s ease';
+      notification.style.transform = 'translateX(100%)';
+      notification.style.opacity = '0';
+      setTimeout(() => notification.remove(), 300);
+    }
+  }, 9000);
 }
 
 function closeEarthGrid() {
@@ -22340,6 +22476,7 @@ window.addEventListener('online', () => {
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
   startCallPolling();
+  startCallbackPolling();
   
 </script>
 </body>
