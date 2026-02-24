@@ -17047,6 +17047,17 @@ Array.from(listPopup.querySelectorAll('.callback-bell-icon')).forEach(el => {
   }
 });
 
+// Add this function for confirmation click sound
+function playConfirmSound() {
+  try {
+    const audio = new Audio('https://assets.trueyogi.app/assets/confirmbell.wav'); // You'll need to add this sound file
+    audio.volume = 0.6; // Set to 60% volume
+    audio.play().catch(e => console.log('Confirm sound play failed:', e));
+  } catch (e) {
+    console.log('Confirm sound error:', e);
+  }
+}
+
 // Add these helper functions after your existing tooltip functions
 
 function showCallbackConfirmModal(toUserId, fromUserId) {
@@ -17111,22 +17122,28 @@ You will be connected when available.
 
   document.body.appendChild(modal);
 
-  // Handle Yes button
-  document.getElementById('confirm-callback-yes').onclick = () => {
-    modal.remove();
-    
-    // Make the API call
-    fetch('https://trueyogi-backend-knkq.onrender.com/api/callback-request', {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ to_user_id: toUserId, from_user_id: fromUserId })
-    })
-    .then(r => r.json())
-    .then(data => {
-      // Show result modal instead of alert()
-      showCallbackResultModal(data.success ? "Bell sent. Remain in Stillness!" : (data.message || "Something went wrong!"));
-    });
-  };
+// Handle Yes button
+	document.getElementById('confirm-callback-yes').onclick = () => {
+	  // Play confirmation sound
+	  playConfirmSound();
+	  
+	  // Small delay to let the sound play before removing modal
+	  setTimeout(() => {
+		modal.remove();
+		
+		// Make the API call
+		fetch('https://trueyogi-backend-knkq.onrender.com/api/callback-request', {
+		  method: "POST",
+		  headers: { "Content-Type": "application/json" },
+		  body: JSON.stringify({ to_user_id: toUserId, from_user_id: fromUserId })
+		})
+		.then(r => r.json())
+		.then(data => {
+		  // Show result modal instead of alert()
+		  showCallbackResultModal(data.success ? "Bell sent. Remain in stillness!" : (data.message || "Something went wrong!"));
+		});
+	  }, 100); // 100ms delay is barely noticeable but lets the sound start
+	};
 
   // Handle No button
   document.getElementById('confirm-callback-no').onclick = () => {
