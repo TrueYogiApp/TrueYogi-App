@@ -17050,7 +17050,7 @@ Array.from(listPopup.querySelectorAll('.callback-bell-icon')).forEach(el => {
 // Add this function for confirmation click sound
 function playConfirmSound() {
   try {
-    const audio = new Audio('https://assets.trueyogi.app/assets/confirmbell.wav'); // You'll need to add this sound file
+    const audio = new Audio('https://assets.trueyogi.app/assets/confirmbell.wav'); 
     audio.volume = 0.6; // Set to 60% volume
     audio.play().catch(e => console.log('Confirm sound play failed:', e));
   } catch (e) {
