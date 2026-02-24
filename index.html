@@ -20644,6 +20644,13 @@ let bellIdleTimeout;
 let harmonyIdleTimeout;
 let chimesIdleTimeout;
 let gongIdleTimeout;
+
+// New timeouts for the 31-34 minute sounds
+let bell31Timeout;
+let harmony32Timeout;
+let chimes33Timeout;
+let gong34Timeout;
+
 let screensaverActive = false;
 
 const canvasEl = document.getElementById("particles-canvas");
@@ -20657,11 +20664,19 @@ function resetIdleTimer() {
   if (screensaverActive) {
     hideScreensaver();
   }
+  
+  // Clear all timeouts
   clearTimeout(idleTimeout);
   clearTimeout(bellIdleTimeout);
   clearTimeout(harmonyIdleTimeout);
   clearTimeout(chimesIdleTimeout);
   clearTimeout(gongIdleTimeout);
+  
+  // Clear the 31-34 minute timeouts
+  clearTimeout(bell31Timeout);
+  clearTimeout(harmony32Timeout);
+  clearTimeout(chimes33Timeout);
+  clearTimeout(gong34Timeout);
 
   // Screensaver after 30s idle
   idleTimeout = setTimeout(() => {
@@ -20701,6 +20716,81 @@ function resetIdleTimer() {
       showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight * 3/4, 'bottom-right');
     }
   }, 240000);
+
+  // ===== 31-34 MINUTE SOUNDS =====
+  // These will repeat every 30 minutes after the first cycle
+  
+  // 31min: Bell (top-left)
+  bell31Timeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      tryPlayZoneSound && tryPlayZoneSound('top-left');
+      showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight / 4, 'top-left');
+    }
+    // Schedule the next one at 61 minutes
+    scheduleNextCycle();
+  }, 1860000); // 31 minutes = 31 * 60 * 1000
+
+  // 32min: Harmony bell (top-right)
+  harmony32Timeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      tryPlayZoneSound && tryPlayZoneSound('top-right');
+      showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight / 4, 'top-right');
+    }
+  }, 1920000); // 32 minutes
+
+  // 33min: Tamtam gong (bottom-left)
+  chimes33Timeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      tryPlayZoneSound && tryPlayZoneSound('bottom-left');
+      showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight * 3/4, 'bottom-left');
+    }
+  }, 1980000); // 33 minutes
+
+  // 34min: Tao chi gong (bottom-right)
+  gong34Timeout = setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      tryPlayZoneSound && tryPlayZoneSound('bottom-right');
+      showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight * 3/4, 'bottom-right');
+    }
+  }, 2040000); // 34 minutes
+}
+
+function scheduleNextCycle() {
+  // Schedule the next cycle (at 61,62,63,64 minutes)
+  setTimeout(() => {
+    if (isHomeScreen() && screensaverActive) {
+      // 61 min
+      tryPlayZoneSound && tryPlayZoneSound('top-left');
+      showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight / 4, 'top-left');
+      
+      // 62 min
+      setTimeout(() => {
+        if (isHomeScreen() && screensaverActive) {
+          tryPlayZoneSound && tryPlayZoneSound('top-right');
+          showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight / 4, 'top-right');
+        }
+      }, 60000);
+      
+      // 63 min
+      setTimeout(() => {
+        if (isHomeScreen() && screensaverActive) {
+          tryPlayZoneSound && tryPlayZoneSound('bottom-left');
+          showZoneIcon && showZoneIcon(window.innerWidth / 4, window.innerHeight * 3/4, 'bottom-left');
+        }
+      }, 120000);
+      
+      // 64 min
+      setTimeout(() => {
+        if (isHomeScreen() && screensaverActive) {
+          tryPlayZoneSound && tryPlayZoneSound('bottom-right');
+          showZoneIcon && showZoneIcon(window.innerWidth * 3/4, window.innerHeight * 3/4, 'bottom-right');
+        }
+      }, 180000);
+      
+      // Schedule next cycle (91,92,93,94)
+      scheduleNextCycle();
+    }
+  }, 1800000); // 30 minutes later
 }
 
 function isHomeScreen() {
