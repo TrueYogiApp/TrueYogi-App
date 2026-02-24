@@ -7253,14 +7253,6 @@ await syncLocalCertificatesToDB();
               <i class="fas fa-times-circle" style="margin-right:5px;"></i>${t('TokensUnclaimed')}
             </div>
           `}
-          
-          ${idx >= 3 ? `
-            <button
-              onclick="openWherebyForCertificate('${cert.challengeId || cert.certId || ''}')"
-              ...style...>
-              <i class="fas fa-users"></i> Join Conscious Session
-            </button>
-          ` : ''}
         </div>
         `;
       }).join('')}
