@@ -5584,8 +5584,6 @@ function closeVideoPlayer() {
   
   // Clear reference
   window.currentVideoOverlay = null;
-  
-clearTimeout(videoScreensaverTimer);
 }
 
 // Also add ESC key support
@@ -11494,6 +11492,7 @@ if (
     saveChallengeData();
     updateProgressDisplay && updateProgressDisplay();
   }
+  
   // --- FINAL SAFE-CHECK: If user completed challenge, streak is always 41 ---
 const mode = localStorage.getItem('currentMode') || 'yogi';
 const isCompleter = mode === 'yogi'
