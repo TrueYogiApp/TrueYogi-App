@@ -11392,6 +11392,7 @@ function checkDayReset() {
     // Use diffDays (actual day) not challengeData.currentDay
 	const hasCompletedChallenge = currentMode === 'yogi'
 	  && challengeData.currentDay >= 41
+	  && window.walletPublicKey
 	  && localStorage.getItem('jwtToken');
     
     // Check if user is blocked (day >= 22, no wallet/JWT)
@@ -11493,6 +11494,18 @@ if (
     saveChallengeData();
     updateProgressDisplay && updateProgressDisplay();
   }
+  // Final failsafe: if user completed all days with wallet & jwt, streak stays 41
+const mode = localStorage.getItem('currentMode') || 'yogi';
+const isCompleter = mode === 'yogi'
+  && challengeData.currentDay >= 41
+  && window.walletPublicKey
+  && localStorage.getItem('jwtToken');
+
+if (isCompleter) {
+  challengeData.streakDays = 41;
+  saveChallengeData();
+  updateProgressDisplay && updateProgressDisplay();
+}
 }
 
 
