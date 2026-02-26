@@ -11494,6 +11494,21 @@ if (
     saveChallengeData();
     updateProgressDisplay && updateProgressDisplay();
   }
+  // --- FINAL SAFE-CHECK: If user completed challenge, streak is always 41 ---
+const mode = localStorage.getItem('currentMode') || 'yogi';
+const isCompleter = mode === 'yogi'
+    && challengeData.currentDay >= 41    // use >= just in case
+    && (window.walletPublicKey || localStorage.getItem('currentJourneyWallet'))
+    && localStorage.getItem('jwtToken');
+
+if (isCompleter) {
+  if (challengeData.streakDays !== 41) {
+    console.log('Streak failsafe: force streakDays to 41 for completer!');
+  }
+  challengeData.streakDays = 41;
+  saveChallengeData();
+  updateProgressDisplay && updateProgressDisplay();
+}
 }
 
 
