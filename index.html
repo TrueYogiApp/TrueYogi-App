@@ -11390,10 +11390,10 @@ function checkDayReset() {
     
     // Check if user has completed challenge (day 41+ with wallet/JWT)
     // Use diffDays (actual day) not challengeData.currentDay
-    const hasCompletedChallenge = currentMode === 'yogi' && 
-                                  diffDays > 41 &&  // 👈 Changed to > 41
-                                  window.walletPublicKey && 
-                                  localStorage.getItem('jwtToken');
+	const hasCompletedChallenge = currentMode === 'yogi'
+	  && challengeData.currentDay === 41
+	  && window.walletPublicKey
+	  && localStorage.getItem('jwtToken');
     
     // Check if user is blocked (day >= 22, no wallet/JWT)
     const isBlocked = currentMode === 'yogi' && 
