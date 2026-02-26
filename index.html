@@ -5849,19 +5849,16 @@ function toggleYogiMeditation() {
 
 // Add this after the first click handler
 document.getElementById("deep-dim-layer").addEventListener("click", () => {
-  if (yogiPlaying) {
-    // Check which meditation is playing by seeing which audio is currently playing
-    const audio1 = document.getElementById("yogiMeditationAudio");
-    const audio2 = document.getElementById("yogiMeditationAudio2");
-    
-    if (!audio1.paused) {
-      toggleYogiMeditation();
-    } else if (!audio2.paused) {
-      // Need to know the minutes - you'd need to store this when starting
-      // For now, you might need to retrieve it from somewhere
-      const minutes = parseInt(document.getElementById("yogi-total-minutes").innerText) || 0;
-      toggleUltimateStillnessMeditation(minutes);
-    }
+  const audio1 = document.getElementById("yogiMeditationAudio");
+  const audio2 = document.getElementById("yogiMeditationAudio2");
+
+  if (yogiPlaying && !audio1.paused) {
+    toggleYogiMeditation();
+  } else if (ultimatePlaying && !audio2.paused) {
+    // Make sure to get the correct minutes for ultimate if needed
+    const minutes = ultimateSessionMinutes || 
+      parseInt(document.getElementById("yogi-total-minutes").innerText) || 0;
+    toggleUltimateStillnessMeditation(minutes);
   }
 });
 
@@ -5872,7 +5869,7 @@ async function updateUltimateStillness(isStill) {
   
   // Only update if user is in OM presence
   if (!presenceId) {
-    console.log('No OM presence, skipping ultimate stillness update');
+    //console.log('No OM presence, skipping ultimate stillness update');
     return false;
   }
   
@@ -5897,15 +5894,60 @@ async function updateUltimateStillness(isStill) {
   }
 }
 
-// Use this for ultimate silence
+// === Ultimate Stillness CONFIG ===
+const ULTIMATE_PAUSE_AFTER_MINUTES = 60;
+const ULTIMATE_PAUSE_DURATION_MINUTES = 3;
+
+// --- GLOBAL STATE FOR ULTIMATE STILLNESS ---
+let ultimatePlaying = false;
+let ultimateTimer = null;
+let ultimateInterval = null;
+let ultimateStartMessageTimeout = null;
+let ultimateSilenceTimeout = null;
+let ultimateResumeTimeout = null;
+let ultimateMeditationStartTime = null;
+let ultimateSessionMinutes = null;
+
+// --- Helper for session messages (reuse!)
+function showUltimateMessage(timerDisplay, msg, duration, next) {
+  timerDisplay.innerText = msg;
+  timerDisplay.style.opacity = "1";
+  timerDisplay.style.transition = "opacity 1s";
+  timerDisplay.style.fontSize = "2.1rem";
+  const timeoutId = setTimeout(() => {
+    timerDisplay.innerText = "";
+    if (typeof next === "function") next();
+  }, duration);
+  return timeoutId;
+}
+
+// --- Helper to update display ---
+function updateUltimateTimerDisplay() {
+  if (!ultimateMeditationStartTime) return;
+  const timerDisplay = document.getElementById("deep-timer");
+  const minutes = ultimateSessionMinutes || 0;
+  const now = Date.now();
+  const elapsedMs = now - ultimateMeditationStartTime;
+  const elapsedSeconds = Math.floor(elapsedMs / 1000);
+  const totalSeconds = minutes * 60;
+  const remaining = totalSeconds - elapsedSeconds;
+  if (remaining >= 0) {
+    let m = Math.floor(remaining / 60);
+    let s = remaining % 60;
+    timerDisplay.innerText =
+      String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+  }
+}
+
+// --- Repeated volume silence ---
 function scheduleUltimateAudioVolumeSilence(minutes, audio) {
-  silenceTimeout = setTimeout(() => {
-    if (!yogiPlaying) return;
+  ultimateSilenceTimeout = setTimeout(() => {
+    if (!ultimatePlaying) return;
     audio.volume = 0.0;
     audio.muted = true;
 
-    resumeTimeout = setTimeout(() => {
-      if (!yogiPlaying) return;
+    ultimateResumeTimeout = setTimeout(() => {
+      if (!ultimatePlaying) return;
       audio.volume = 1.0;
       audio.muted = false;
       scheduleUltimateAudioVolumeSilence(minutes, audio);
@@ -5914,52 +5956,18 @@ function scheduleUltimateAudioVolumeSilence(minutes, audio) {
   }, ULTIMATE_PAUSE_AFTER_MINUTES * 60 * 1000);
 }
 
-function updateUltimateTimerDisplay(meditationStartTime, minutes) {
-  const timerDisplay = document.getElementById("deep-timer");
-  if (!meditationStartTime) return;
-  const now = Date.now();
-  const elapsedMs = now - meditationStartTime;
-  const elapsedSeconds = Math.floor(elapsedMs / 1000);
-  const totalSeconds = minutes * 60;
-  const remaining = totalSeconds - elapsedSeconds;
-  if (remaining >= 0) {
-    let m = Math.floor(remaining / 60);
-    let s = remaining % 60;
-    timerDisplay.innerText = String(m).padStart(2,"0") + ':' + String(s).padStart(2,"0");
-  }
-}
-
-// === Ultimate Stillness CONFIG ===
-const ULTIMATE_PAUSE_AFTER_MINUTES = 60;  // When to pause music (in minutes)
-const ULTIMATE_PAUSE_DURATION_MINUTES = 3; // How long to pause (in minutes)
-
+// --- MAIN FUNCTION ---
 function toggleUltimateStillnessMeditation(minutes) {
   const audio = document.getElementById("yogiMeditationAudio2");
   const dim = document.getElementById("deep-dim-layer");
   const timerDisplay = document.getElementById("deep-timer");
-  let meditationStartTime = null;
-  let yogiInterval = null;
-  let yogiTimer = null;
-  let startMessageTimeout = null;
-  let silenceTimeout = null;
-  let resumeTimeout = null;
 
-  // Only this helper for messages
-  function showYogiMessage(msg, duration, next) {
-    timerDisplay.innerText = msg;
-    timerDisplay.style.opacity = "1";
-    timerDisplay.style.transition = "opacity 1s";
-    timerDisplay.style.fontSize = "2.1rem";
-    const timeoutId = setTimeout(() => {
-      timerDisplay.innerText = "";
-      if (typeof next === "function") next();
-    }, duration);
-    return timeoutId;
-  }
-  
-  if (!yogiPlaying) {
-    yogiPlaying = true;
-    meditationStartTime = Date.now();
+  if (!ultimatePlaying) {
+    // --- START ---
+    ultimatePlaying = true;
+    ultimateMeditationStartTime = Date.now();
+	ultimateSessionMinutes = minutes;
+
     dim.style.opacity = "0.5";
     dim.style.pointerEvents = "auto";
 
@@ -5976,64 +5984,90 @@ function toggleUltimateStillnessMeditation(minutes) {
       });
     }
 
-    // Show start message
-    startMessageTimeout = setTimeout(() => {
-      timerDisplay.innerText = "";
-      timerDisplay.style.fontSize = "";
-      yogiInterval = setInterval(() => {
-        updateUltimateTimerDisplay(meditationStartTime, minutes);
-      }, 1000);
+    ultimateStartMessageTimeout = showUltimateMessage(
+      timerDisplay,
+      t('presence2.begins'),
+      6000,
+      () => {
+        ultimateStartMessageTimeout = null;
+        timerDisplay.style.fontSize = "";
+        // Start timer interval
+        ultimateInterval = setInterval(updateUltimateTimerDisplay, 1000);
+        // Schedule silence logic
+        if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES) {
+          scheduleUltimateAudioVolumeSilence(minutes, audio);
+        }
 
-      // Repeated silence with volume/mute every ULTIMATE_PAUSE_AFTER_MINUTES
-      if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES) {
-        scheduleUltimateAudioVolumeSilence(minutes, audio);
+        // End timer
+        ultimateTimer = setTimeout(() => {
+          audio.pause();
+          audio.volume = 1.0;
+          audio.muted = false;
+          clearInterval(ultimateInterval);
+          if (ultimateSilenceTimeout) clearTimeout(ultimateSilenceTimeout);
+          if (ultimateResumeTimeout) clearTimeout(ultimateResumeTimeout);
+
+          updateUltimateStillness && updateUltimateStillness(false);
+
+          showUltimateMessage(
+            timerDisplay,
+            t('presence2.deepened'),
+            6000,
+            () => {
+              dim.style.opacity = "0";
+              dim.style.pointerEvents = "none";
+              timerDisplay.innerText = "";
+              ultimatePlaying = false;
+			  ultimateSessionMinutes = null,
+              ultimateMeditationStartTime = null;
+            }
+          );
+        }, minutes * 60000);
       }
-
-      // End timer
-      yogiTimer = setTimeout(() => {
-        audio.pause();
-        audio.volume = 1.0;
-        audio.muted = false;
-        clearInterval(yogiInterval);
-        if (silenceTimeout) clearTimeout(silenceTimeout);
-        if (resumeTimeout) clearTimeout(resumeTimeout);
-
-        updateUltimateStillness && updateUltimateStillness(false);
-
-        timerDisplay.innerText = "";
-        dim.style.opacity = "0";
-        dim.style.pointerEvents = "none";
-        yogiPlaying = false;
-        meditationStartTime = null;
-      }, minutes * 60000);
-
-    }, 6000); // showYogiMessage duration
-
-    timerDisplay.innerText = t('presence2.begins');
-    timerDisplay.style.fontSize = "2.1rem";
-
+    );
   } else {
-    // End early
-    yogiPlaying = false;
+    // --- STOP EARLY ---
+    ultimatePlaying = false;
     updateUltimateStillness && updateUltimateStillness(false);
 
-    if (startMessageTimeout) { clearTimeout(startMessageTimeout); startMessageTimeout = null; }
-    if (silenceTimeout) { clearTimeout(silenceTimeout); silenceTimeout = null; }
-    if (resumeTimeout) { clearTimeout(resumeTimeout); resumeTimeout = null; }
-    if (yogiTimer) { clearTimeout(yogiTimer); yogiTimer = null; }
-    if (yogiInterval) { clearInterval(yogiInterval); yogiInterval = null; }
+    if (ultimateStartMessageTimeout) {
+      clearTimeout(ultimateStartMessageTimeout);
+      ultimateStartMessageTimeout = null;
+    }
+    if (ultimateSilenceTimeout) {
+      clearTimeout(ultimateSilenceTimeout);
+      ultimateSilenceTimeout = null;
+    }
+    if (ultimateResumeTimeout) {
+      clearTimeout(ultimateResumeTimeout);
+      ultimateResumeTimeout = null;
+    }
+    if (ultimateTimer) {
+      clearTimeout(ultimateTimer);
+      ultimateTimer = null;
+    }
+    if (ultimateInterval) {
+      clearInterval(ultimateInterval);
+      ultimateInterval = null;
+    }
 
     audio.pause();
     audio.currentTime = 0;
     audio.volume = 1.0;
     audio.muted = false;
 
-	showYogiMessage(t('presence.be'), 3000, () => {
-	  dim.style.opacity = "0";
-	  dim.style.pointerEvents = "none";
-	  timerDisplay.innerText = "";
-	  meditationStartTime = null;
-	});
+    showUltimateMessage(
+      timerDisplay,
+      t('presence.be'),
+      3000,
+      () => {
+        dim.style.opacity = "0";
+        dim.style.pointerEvents = "none";
+        timerDisplay.innerText = "";
+		ultimateSessionMinutes = null;
+        ultimateMeditationStartTime = null;
+      }
+    );
   }
 }
 
