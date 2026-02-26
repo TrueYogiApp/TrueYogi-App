@@ -5944,6 +5944,19 @@ function toggleUltimateStillnessMeditation(minutes) {
   let silenceTimeout = null;
   let resumeTimeout = null;
 
+  // Only this helper for messages
+  function showYogiMessage(msg, duration, next) {
+    timerDisplay.innerText = msg;
+    timerDisplay.style.opacity = "1";
+    timerDisplay.style.transition = "opacity 1s";
+    timerDisplay.style.fontSize = "2.1rem";
+    const timeoutId = setTimeout(() => {
+      timerDisplay.innerText = "";
+      if (typeof next === "function") next();
+    }, duration);
+    return timeoutId;
+  }
+  
   if (!yogiPlaying) {
     yogiPlaying = true;
     meditationStartTime = Date.now();
@@ -6015,10 +6028,12 @@ function toggleUltimateStillnessMeditation(minutes) {
     audio.volume = 1.0;
     audio.muted = false;
 
-    timerDisplay.innerText = t('presence.be');
-    dim.style.opacity = "0";
-    dim.style.pointerEvents = "none";
-    meditationStartTime = null;
+	showYogiMessage(t('presence.be'), 3000, () => {
+	  dim.style.opacity = "0";
+	  dim.style.pointerEvents = "none";
+	  timerDisplay.innerText = "";
+	  meditationStartTime = null;
+	});
   }
 }
 
