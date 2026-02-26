@@ -11385,18 +11385,22 @@ function checkDayReset() {
         showMissedSessionModal();
       }
       
-     // ============ FIX: CHECK FOR CHALLENGE COMPLETION FIRST ============
+    // ============ FIX: CHECK FOR CHALLENGE COMPLETION FIRST ============
       const currentMode = localStorage.getItem('currentMode') || 'yogi';
       
+      // Calculate actual day based on start date (without capping)
+      const actualDay = Math.min(diffDays, 41); // This is what currentDay will become
+      
       // Check if user has completed challenge (day 41+ with wallet/JWT)
+      // Use diffDays (actual calendar day) instead of challengeData.currentDay
       const hasCompletedChallenge = currentMode === 'yogi' && 
-                                    challengeData.currentDay >= 41 &&
+                                    diffDays >= 41 &&  // 👈 CHANGE HERE: use diffDays
                                     window.walletPublicKey && 
                                     localStorage.getItem('jwtToken');
       
       // Check if user is blocked (day >= 22, no wallet/JWT)
       const isBlocked = currentMode === 'yogi' && 
-                        challengeData.currentDay >= 22 && 
+                        diffDays >= 22 &&  // 👈 CHANGE HERE: use diffDays
                         (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
       
       // Only reset streak if NOT blocked AND NOT challenge completer
