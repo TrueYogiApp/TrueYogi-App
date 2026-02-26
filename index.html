@@ -11385,20 +11385,25 @@ function checkDayReset() {
         showMissedSessionModal();
       }
       
-      // ============ WALLET/JWT CHECK FOR BLOCKED USERS ============
-      // Only reset streak if user is NOT blocked from continuing
-      // Get current mode - adjust based on how you store it
-      const currentMode = localStorage.getItem('currentMode') || 'yogi'; 
+     // ============ FIX: CHECK FOR CHALLENGE COMPLETION FIRST ============
+      const currentMode = localStorage.getItem('currentMode') || 'yogi';
+      
+      // Check if user has completed challenge (day 41+ with wallet/JWT)
+      const hasCompletedChallenge = currentMode === 'yogi' && 
+                                    challengeData.currentDay >= 41 &&
+                                    window.walletPublicKey && 
+                                    localStorage.getItem('jwtToken');
       
       // Check if user is blocked (day >= 22, no wallet/JWT)
       const isBlocked = currentMode === 'yogi' && 
                         challengeData.currentDay >= 22 && 
                         (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
       
-      // Only reset streak if NOT blocked
-      if (!isBlocked) {
+      // Only reset streak if NOT blocked AND NOT challenge completer
+      if (!isBlocked && !hasCompletedChallenge) {
         challengeData.streakDays = 0;
       }
+      // If blocked OR challenge completer, streak stays as is
       // If blocked, streak stays as is (user can't continue anyway)
     }
 
