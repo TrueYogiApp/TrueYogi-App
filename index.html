@@ -11369,51 +11369,47 @@ function checkDayReset() {
   const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
 
   if (diffDays > challengeData.currentDay) {
-    // Only reset streak if yesterday was incomplete
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    const yesterdayStr = getLocalDateString(yesterday);
+  // Only reset streak if yesterday was incomplete
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  const yesterdayStr = getLocalDateString(yesterday);
 
-    const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
-    if (yesterdaySessions < challengeData.requiredSessions && today > startDate) {
-      const yesterdayMissed = userSessionTimes.some(sessionTime => {
-        return !challengeData.sessionsCompleted.some(
-          s => s.date === yesterdayStr && s.time === sessionTime.time
-        );
-      });
-      if (yesterdayMissed) {
-        showMissedSessionModal();
-      }
-      
-    // ============ FIX: CHECK FOR CHALLENGE COMPLETION FIRST ============
-      const currentMode = localStorage.getItem('currentMode') || 'yogi';
-      
-      // Calculate actual day based on start date (without capping)
-      const actualDay = Math.min(diffDays, 41); // This is what currentDay will become
-      
-      // Check if user has completed challenge (day 41+ with wallet/JWT)
-      // Use diffDays (actual calendar day) instead of challengeData.currentDay
-      const hasCompletedChallenge = currentMode === 'yogi' && 
-                                    diffDays >= 41 &&  // 👈 CHANGE HERE: use diffDays
-                                    window.walletPublicKey && 
-                                    localStorage.getItem('jwtToken');
-      
-      // Check if user is blocked (day >= 22, no wallet/JWT)
-      const isBlocked = currentMode === 'yogi' && 
-                        diffDays >= 22 &&  // 👈 CHANGE HERE: use diffDays
-                        (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
-      
-      // Only reset streak if NOT blocked AND NOT challenge completer
-      if (!isBlocked && !hasCompletedChallenge) {
-        challengeData.streakDays = 0;
-      }
-      // If blocked OR challenge completer, streak stays as is
-      // If blocked, streak stays as is (user can't continue anyway)
+  const yesterdaySessions = challengeData.sessionsCompleted.filter(s => s.date === yesterdayStr).length;
+  if (yesterdaySessions < challengeData.requiredSessions && today > startDate) {
+    const yesterdayMissed = userSessionTimes.some(sessionTime => {
+      return !challengeData.sessionsCompleted.some(
+        s => s.date === yesterdayStr && s.time === sessionTime.time
+      );
+    });
+    if (yesterdayMissed) {
+      showMissedSessionModal();
     }
-
-    challengeData.currentDay = Math.min(diffDays, 41);
-    saveChallengeData();
+    
+    // ============ FIX: CHECK FOR CHALLENGE COMPLETERS HERE ============
+    const currentMode = localStorage.getItem('currentMode') || 'yogi'; 
+    
+    // Check if user has completed challenge (day 41+ with wallet/JWT)
+    // Use diffDays (actual day) not challengeData.currentDay
+    const hasCompletedChallenge = currentMode === 'yogi' && 
+                                  diffDays > 41 &&  // 👈 Changed to > 41
+                                  window.walletPublicKey && 
+                                  localStorage.getItem('jwtToken');
+    
+    // Check if user is blocked (day >= 22, no wallet/JWT)
+    const isBlocked = currentMode === 'yogi' && 
+                      challengeData.currentDay >= 22 && 
+                      (!window.walletPublicKey || !localStorage.getItem('jwtToken'));
+    
+    // Only reset streak if NOT blocked AND NOT challenge completer
+    if (!isBlocked && !hasCompletedChallenge) {  // 👈 Added hasCompletedChallenge check
+      challengeData.streakDays = 0;
+    }
+    // If blocked OR challenge completer, streak stays as is
   }
+
+  challengeData.currentDay = Math.min(diffDays, 41);
+  saveChallengeData();
+}
 
   updateSessionTimesDisplay();
 
