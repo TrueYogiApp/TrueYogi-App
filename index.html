@@ -19074,12 +19074,25 @@ const isOnMainScreen = !isBackBtnVisible;
 	else if (
 	  isOnMainScreen &&
 	  !mode &&
-	  localStorage.getItem('yogiChallenge')
+	  (
+		(
+		  localStorage.getItem('yogiChallenge') &&
+		  (() => {
+			const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+			return challenge.startDate && challenge.startDate !== "null";
+		  })()
+		)
+		||
+		(
+		  localStorage.getItem('challengeHistory') &&
+		  (() => {
+			const arr = JSON.parse(localStorage.getItem('challengeHistory') || '[]');
+			return Array.isArray(arr) && arr.length > 0 && arr.some(ch => ch.challengeId);
+		  })()
+		)
+	  )
 	) {
-	  const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
-	  if (challenge.startDate && challenge.startDate !== "null") {
-		openDashboardPanel();
-	  }
+	  openDashboardPanel();
 	}
   // In mode: swipe right from left edge closes FAQ if open, otherwise returns to mode selection
   else if (appInterface && !appInterface.classList.contains('hidden') && backBtn && !backBtn.classList.contains('hidden')) {
