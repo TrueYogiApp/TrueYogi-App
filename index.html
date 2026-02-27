@@ -2804,6 +2804,24 @@ button[disabled] {
   0% { background-position: 0 0, 0 0, 0 0, 0 0, 0 0;}
   100% { background-position: 50px 40px, 20px 60px, 60px 10px, 10px 50px, 80px 80px;}
 }
+
+/* Live video pulse*/
+.live-dot {
+  display: inline-block;
+  width: 13px;
+  height: 13px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: #ff365a;
+  box-shadow: 0 0 4px #ff365a55;
+  animation: pulseLive 2s infinite;
+  vertical-align: middle;
+}
+@keyframes pulseLive {
+  0% { box-shadow: 0 0 10px 2px #ff365a55, 0 0 0 0 #ff365a; }
+  50% { box-shadow: 0 0 16px 8px #ff365a88, 0 0 0 8px #ff365a33; }
+  100% { box-shadow: 0 0 10px 2px #ff365a55, 0 0 0 0 #ff365a; }
+}
  
 </style>
   
@@ -5091,12 +5109,16 @@ button[disabled] {
   <div style="display:flex;gap:10px;justify-content:center;padding:12px 0 0 0;">
     <button id="tab-pdf" class="mode-btn dashboard-tab dashboard-tab-active">📚 PDFs</button>
     <button id="tab-video" class="mode-btn dashboard-tab">🎬 Videos</button>
+	<button id="tab-live" class="mode-btn dashboard-tab">
+  <span class="live-dot"></span> Live
+</button>
   </div>
 
   <!-- PDF List -->
   <div id="pdf-list" style="padding: 20px; overflow-y: auto; flex: 1;"></div>
   <!-- Video List (initially hidden) -->
   <div id="video-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;"></div>
+  <div id="live-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;"></div>
 
   <!-- PDF Viewer Overlay (same as before) -->
   <div id="pdf-viewer-overlay" style="
@@ -5316,14 +5338,26 @@ document.addEventListener('DOMContentLoaded', function() {
 document.getElementById('tab-pdf').onclick = function() {
   document.getElementById('pdf-list').style.display = '';
   document.getElementById('video-list').style.display = 'none';
+  document.getElementById('live-list').style.display = 'none';
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-video').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-live').classList.remove('dashboard-tab-active');
 };
 document.getElementById('tab-video').onclick = function() {
   document.getElementById('video-list').style.display = '';
   document.getElementById('pdf-list').style.display = 'none';
+  document.getElementById('live-list').style.display = 'none';
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-live').classList.remove('dashboard-tab-active');
+};
+document.getElementById('tab-live').onclick = function() {
+  document.getElementById('live-list').style.display = '';
+  document.getElementById('pdf-list').style.display = 'none';
+  document.getElementById('video-list').style.display = 'none';
+  this.classList.add('dashboard-tab-active');
+  document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-video').classList.remove('dashboard-tab-active');
 };
 
 // SINGLE Video overlay function - dynamic approach for proper cleanup
@@ -5598,6 +5632,52 @@ document.addEventListener('keydown', function(e) {
   }
 });
 
+
+let liveStreams = [];
+
+// Fetch live content
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('https://assets.trueyogi.app/assets/Material/live.json')
+    .then(r => r.json())
+    .then(data => {
+      liveStreams = data;
+      renderLiveList();
+    })
+    .catch(e => {
+      document.getElementById('live-list').innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">Failed to load live events.</div>';
+    });
+});
+
+function renderLiveList() {
+  const list = document.getElementById('live-list');
+  list.innerHTML = "";
+
+  // Get current language (from localStorage or global)
+  const currentLang = localStorage.getItem('lang') || 'en';
+
+  // Filter live streams
+  const filteredLive = liveStreams;
+
+  if (filteredLive.length === 0) {
+    list.innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">No live streams for this language.</div>';
+    return;
+  }
+
+  filteredLive.forEach((live) => {
+    const html = `
+      <div style="background:rgba(241,74,74,0.10);border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(200,40,40,0.07);">
+        <img src="${live.thumb || 'https://img.youtube.com/vi/' + live.youtubeId + '/hqdefault.jpg'}"
+          alt="live thumbnail"
+          style="width:75px;height:52px;border-radius:8px;object-fit:cover;">
+        <div style="flex:1;">
+          <div style="font-weight:bold;font-size:1.08rem;color:#fb7185;">🔴 ${live.title}</div>
+          <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
+          <button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}')" class="mode-btn" style="margin-top:7px;padding:5px 14px;background:#ff365a;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">Watch Live</button>
+        </div>
+      </div>`;
+    list.insertAdjacentHTML('beforeend', html);
+  });
+}
 
 </script>
 
