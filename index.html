@@ -19066,9 +19066,16 @@ console.log('FAQ open:', isFAQOpen, 'mode:', mode, 'isOnMainScreen:', isOnMainSc
     selectMode(mode);
   }
   // If user swiped on non-button space (and on main), open dashboard
-  else if (isOnMainScreen && !mode) {
-    openDashboardPanel();
-  }
+	else if (
+	  isOnMainScreen &&
+	  !mode &&
+	  localStorage.getItem('yogiChallenge')
+	) {
+	  const challenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+	  if (challenge.startDate && challenge.startDate !== "null") {
+		openDashboardPanel();
+	  }
+	}
   // In mode: swipe right from left edge closes FAQ if open, otherwise returns to mode selection
   else if (appInterface && !appInterface.classList.contains('hidden') && backBtn && !backBtn.classList.contains('hidden')) {
     if (isFAQOpen) {
