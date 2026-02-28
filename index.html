@@ -5664,17 +5664,21 @@ function renderLiveList() {
   }
 
   filteredLive.forEach((live) => {
-    const html = `
-      <div style="background:rgba(241,74,74,0.10);border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(200,40,40,0.07);">
-        <img src="${live.thumb || 'https://img.youtube.com/vi/' + live.youtubeId + '/hqdefault.jpg'}"
-          alt="live thumbnail"
-          style="width:75px;height:52px;border-radius:8px;object-fit:cover;">
-        <div style="flex:1;">
-          <div style="font-weight:bold;font-size:1.08rem;color:#fb7185;">${live.title}</div>
-          <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
-          <button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}')" class="mode-btn" style="margin-top:7px;padding:5px 14px;background:#ff365a;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">Watch Live</button>
-        </div>
-      </div>`;
+	const html = `
+	  <div style="background:#232136;border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(0,0,0,0.10);">
+		<img src="${live.thumb || 'https://img.youtube.com/vi/' + live.youtubeId + '/hqdefault.jpg'}"
+		  alt="live thumbnail"
+		  style="width:75px;height:52px;border-radius:8px;object-fit:cover;">
+		<div style="flex:1;">
+		  <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${live.title}</div>
+		  <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
+		  <button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}')"
+				  class="mode-btn"
+				  style="margin-top:7px;padding:5px 14px;background:#ff365a;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #ff365a22;">
+			Tune In
+		  </button>
+		</div>
+	  </div>`;
     list.insertAdjacentHTML('beforeend', html);
   });
 }
