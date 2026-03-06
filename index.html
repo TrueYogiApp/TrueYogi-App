@@ -5395,10 +5395,6 @@ window.isVideoOverlayActive = true;
   if (window.mainInterval) { clearInterval(window.mainInterval); window.mainInterval = null; }
   if (window.mainRaf) { cancelAnimationFrame(window.mainRaf); window.mainRaf = null; }
 
-  // HIDE canvases (as before)
-  document.getElementById('particles-canvas')?.classList.add('hidden');
-  document.getElementById('spiritual-canvas')?.classList.add('hidden');
-  document.getElementById('meditation-canvas')?.classList.add('hidden');
 
   // NEW: STOP screensaver and ALL idle timeouts!
   clearAllIdleTimeouts();
@@ -5661,13 +5657,6 @@ function closeVideoPlayer() {
   // Clear reference
   window.currentVideoOverlay = null;
   
-  // === SHOW BACKGROUND CANVASES AGAIN (if you want them) ===
-  document.getElementById('particles-canvas')?.classList.remove('hidden');
-  document.getElementById('spiritual-canvas')?.classList.remove('hidden');
-  document.getElementById('meditation-canvas')?.classList.remove('hidden');  
-  
-    // === RESTART idle timer logic for screensaver and zone sounds, etc ===
-  resetIdleTimer();  
   window.isVideoOverlayActive = false;
 }
 
