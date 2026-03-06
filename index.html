@@ -5371,12 +5371,38 @@ document.getElementById('tab-live').onclick = function() {
   document.getElementById('tab-video').classList.remove('dashboard-tab-active');
 };
 
+function clearAllIdleTimeouts() {
+  clearTimeout(idleTimeout);
+  clearTimeout(bellIdleTimeout);
+  clearTimeout(harmonyIdleTimeout);
+  clearTimeout(chimesIdleTimeout);
+  clearTimeout(gongIdleTimeout);
+  clearTimeout(bell31Timeout);
+  clearTimeout(harmony32Timeout);
+  clearTimeout(chimes33Timeout);
+  clearTimeout(gong34Timeout);
+}
+
 // SINGLE Video overlay function - dynamic approach for proper cleanup
 // Global wake lock variables
 let videoWakeLock = null;
 let isVideoFullscreen = false;
+window.isVideoOverlayActive = false;
 
 function openVideoPlayer(youtubeId, title) {
+window.isVideoOverlayActive = true;
+  // PAUSE intervals and animations (as before)
+  if (window.mainInterval) { clearInterval(window.mainInterval); window.mainInterval = null; }
+  if (window.mainRaf) { cancelAnimationFrame(window.mainRaf); window.mainRaf = null; }
+
+  // HIDE canvases (as before)
+  document.getElementById('particles-canvas')?.classList.add('hidden');
+  document.getElementById('spiritual-canvas')?.classList.add('hidden');
+  document.getElementById('meditation-canvas')?.classList.add('hidden');
+
+  // NEW: STOP screensaver and ALL idle timeouts!
+  clearAllIdleTimeouts();
+  
   // Remove existing
   const existing = document.querySelector('.video-overlay-container');
   if (existing) existing.remove();
@@ -5634,6 +5660,15 @@ function closeVideoPlayer() {
   
   // Clear reference
   window.currentVideoOverlay = null;
+  
+  // === SHOW BACKGROUND CANVASES AGAIN (if you want them) ===
+  document.getElementById('particles-canvas')?.classList.remove('hidden');
+  document.getElementById('spiritual-canvas')?.classList.remove('hidden');
+  document.getElementById('meditation-canvas')?.classList.remove('hidden');  
+  
+    // === RESTART idle timer logic for screensaver and zone sounds, etc ===
+  resetIdleTimer();  
+  window.isVideoOverlayActive = false;
 }
 
 // Also add ESC key support
@@ -19252,6 +19287,9 @@ function unlockMeditationAudio() {
 
 // 2. Always use this function to play your meditation sounds
 function tryPlayZoneSound(zone) {
+  // Block sounds while YouTube overlay is active!
+  if (window.isVideoOverlayActive) return;
+  
   const soundIdMap = {
     'top-left': 'sound-bell',
     'top-right': 'sound-bowl',
