@@ -5908,15 +5908,27 @@ function renderLiveList() {
 // Build user's avatar URL in Supabase
     const supabaseAvatarUrl = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`;
 
+// Add this function to control reset button visibility
+function toggleResetButton(show) {
+  const resetBtn = document.querySelector('.reset-avatar-btn');
+  if (resetBtn) {
+    resetBtn.style.display = show ? 'flex' : 'none';
+  }
+}
+
 // Load user's avatar, use cache-busting param
 if (userId) {
   fetch(supabaseAvatarUrl, { method: "HEAD" })
     .then(res => {
-      if (res.ok) avatarImg.src = supabaseAvatarUrl + '?t=' + Date.now();
-      // else: keep the default avatar image already shown
+      if (res.ok) {
+        avatarImg.src = supabaseAvatarUrl + '?t=' + Date.now();
+        toggleResetButton(true); // Show reset button if custom avatar exists
+      } else {
+        toggleResetButton(false); // Hide reset button if using default
+      }
     })
     .catch(() => {
-      // Ignore all HEAD errors for missing file (do nothing)
+      toggleResetButton(false); // Hide reset button on error
     });
 }
 
@@ -5931,6 +5943,7 @@ avatarInput.addEventListener('change', async function(e) {
 
   if (!error) {
     avatarImg.src = supabaseAvatarUrl + '?t=' + Date.now();
+    toggleResetButton(true); // Show reset button after successful upload
   } else {
     alert('Upload failed! ' + error.message);
   }
@@ -5967,6 +5980,7 @@ async function resetAvatar() {
   if (!userId) return;
   await supabase.storage.from('avatars').remove([avatarPath]);
   avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
+  toggleResetButton(false); // Hide reset button after reset to default
 }
   
 let avatarActionsTimeout = null;
