@@ -10542,19 +10542,29 @@ function updateNowDisplay() {
       const currentTime = currentHours * 60 + currentMinutes;
       const today = getLocalDateString(now);
 
-      userSessionTimes.forEach(session => {
-        const [hours, minutes] = session.time.split(':').map(Number);
-        const sessionTime = hours * 60 + minutes;
-        const isCompleted = challengeData.sessionsCompleted.some(
-          completed => completed.time === session.time && completed.date === today
-        );
-        if (!isCompleted && Math.abs(sessionTime - currentTime) <= notificationWindow) {
-          new Notification('TrueYogi Session Reminder', {
-            body: `Your ${formatTime(session.time)} (${formatDuration(session.duration)}) meditation session is starting soon!`,
-            icon: 'assets/favicon.ico'
-          });
-        }
-      });
+	userSessionTimes.forEach(session => {
+	  const [hours, minutes] = session.time.split(':').map(Number);
+	  const sessionTime = hours * 60 + minutes;
+	  const isCompleted = challengeData.sessionsCompleted.some(
+		completed => completed.time === session.time && completed.date === today
+	  );
+	  if (
+		!isCompleted &&
+		Math.abs(sessionTime - currentTime) <= notificationWindow &&
+		'Notification' in window &&
+		Notification.permission === 'granted'
+	  ) {
+		try {
+		  new Notification('TrueYogi Session Reminder', {
+			body: `Your ${formatTime(session.time)} (${formatDuration(session.duration)}) meditation session is starting soon!`,
+			icon: 'assets/favicon.ico'
+		  });
+		} catch (err) {
+		  console.error("Notification error:", err);
+		  // Do nothing else! Don't break flow!
+		}
+	  }
+	});
 
       setTimeout(checkSessionNotifications, 60000);
     }
