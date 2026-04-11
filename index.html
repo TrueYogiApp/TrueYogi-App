@@ -5843,11 +5843,11 @@ function renderLiveList() {
 		<div style="flex:1;">
 		  <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${live.title}</div>
 		  <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
-		  <button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}')"
-				  class="mode-btn"
-				  style="margin-top:7px;padding:5px 14px;background:#ff365a;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #ff365a22;">
+	<button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}')"
+			class="mode-btn"
+			style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
 			Tune In
-		  </button>
+	</button>
 		</div>
 	  </div>`;
     list.insertAdjacentHTML('beforeend', html);
