@@ -452,7 +452,6 @@
 "fullReset.typeDeleteConfirmation": "输入 \"DELETE\" 确认：",
 "fullReset.typeConfirmationPlaceholder": "在此输入...",
 "fullReset.understandCheckbox": "我理解这将永久删除我的所有数据且无法撤消。",
-"configErrorGapBetweenSessions": "每个会话结束和下一个会话开始之间必须至少有3小时的间隔。",
-"samedaySession": "所有会话时间必须在同一天！请调整您之前的时间或时长。"
+"configErrorGapBetweenSessions": "每个会话结束和下一个会话开始之间必须至少有3小时的间隔。"
 
 }

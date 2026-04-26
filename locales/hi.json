@@ -451,7 +451,6 @@
 "fullReset.typeDeleteConfirmation": "पुष्टि करने के लिए \"DELETE\" टाइप करें:",
 "fullReset.typeConfirmationPlaceholder": "यहाँ टाइप करें...",
 "fullReset.understandCheckbox": "मैं समझता हूं कि यह मेरे सभी डेटा को स्थायी रूप से हटा देगा और इसे पूर्ववत नहीं किया जा सकता।",
-"configErrorGapBetweenSessions": "प्रत्येक सत्र की समाप्ति और अगले सत्र की शुरुआत के बीच कम से कम 3 घंटे का अंतर होना चाहिए।",
-"samedaySession": "सभी सत्र समय एक ही दिन में होने चाहिए! कृपया अपने पिछले समय या अवधि समायोजित करें।"
+"configErrorGapBetweenSessions": "प्रत्येक सत्र की समाप्ति और अगले सत्र की शुरुआत के बीच कम से कम 3 घंटे का अंतर होना चाहिए।"
 
 }

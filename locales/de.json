@@ -451,7 +451,6 @@
   "fullReset.typeDeleteConfirmation": "Geben Sie \"DELETE\" ein, um zu bestätigen:",
 "fullReset.typeConfirmationPlaceholder": "Hier eingeben...",
 "fullReset.understandCheckbox": "Ich verstehe, dass dadurch ALLE meine Daten dauerhaft gelöscht werden und dies nicht rückgängig gemacht werden kann.",
-"configErrorGapBetweenSessions": "Zwischen dem Ende einer Sitzung und dem Beginn der nächsten Sitzung muss mindestens 3 Stunden Abstand bestehen.",
-"samedaySession": "Alle Sitzungszeiten müssen am selben Tag liegen! Passen Sie Ihre vorherigen Zeiten oder Dauern an."
+"configErrorGapBetweenSessions": "Zwischen dem Ende einer Sitzung und dem Beginn der nächsten Sitzung muss mindestens 3 Stunden Abstand bestehen."
 
 }
