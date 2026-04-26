@@ -9888,6 +9888,14 @@ function getLocalTimeString() {
     const gapInMinutes = 180; // 3-hour gap
     const totalMinutes = lastTimeInMinutes + lastDuration + gapInMinutes;
     const newTotalMinutes = totalMinutes % (24 * 60); // Handle midnight overflow
+	  // ⬇️==== BLOCK SESSIONS THAT WRAP TO NEXT DAY ====⬇️
+  if (totalMinutes >= 24 * 60) {
+    // This means it would cross midnight
+    const errorElement = document.getElementById('config-error');
+    errorElement.textContent = t('samedaySession');
+    errorElement.classList.remove('hidden');
+    return; // Block adding this session
+  }
     const newHours = Math.floor(newTotalMinutes / 60);
     const newMinutes = newTotalMinutes % 60;
     newTime = `${newHours.toString().padStart(2, '0')}:${newMinutes.toString().padStart(2, '0')}`;
