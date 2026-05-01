@@ -2944,6 +2944,10 @@ button[disabled] {
   to { opacity: 1;   transform: scale(1);}
 }
 
+/* welcome modal lock */
+body.modal-open {
+  overflow: hidden;
+}
  
 </style>
   
@@ -8359,17 +8363,18 @@ async function loadWelcomeMessages() {
 
 function showWelcomeModal() {
   document.getElementById('welcome-message').classList.remove('hidden');
+  document.body.classList.add('modal-open'); // ADD THIS LINE - lock scroll
   
   // Auto-close after 5 minutes (300,000 milliseconds)
   setTimeout(() => {
     closeWelcomeMessage();
-  }, 300000); // Changed from 5000 to 300000
+  }, 300000);
 }
 
-
-    function closeWelcomeMessage() {
-      document.getElementById('welcome-message').classList.add('hidden');
-    }
+function closeWelcomeMessage() {
+  document.getElementById('welcome-message').classList.add('hidden');
+  document.body.classList.remove('modal-open'); // ADD THIS LINE - restore scroll
+}
 
     function showCompletedSessionsModal(requiredSessions) {
       const modal = document.getElementById('completed-sessions-modal');
