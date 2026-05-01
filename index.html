@@ -11161,6 +11161,15 @@ if (document.getElementById('music-toggle').checked) {
   bgMusicPlayer.loop = true;
   bgMusicPlayer.volume = 0.5;
   
+  // Add this safety timeout as a backup
+  // This ensures music stops when timer ends even if updateTimer isn't running
+  if (meditationEndTimeout) clearTimeout(meditationEndTimeout);
+  meditationEndTimeout = setTimeout(() => {
+    if (sessionActive) {
+      stopMeditationMusic();
+    }
+  }, targetDuration * 1000);
+  
     // ---- ADD THIS CHECK RIGHT HERE ----
   const isMobile = /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
   if (isMobile) {
@@ -11298,16 +11307,23 @@ if (bgMusicPlayer) {
   updateSessionTimesDisplay();
 }
 
+let meditationEndTimeout = null;
+
+// Replace your existing updateTimer function with this enhanced version
 function updateTimer() {
   if (!sessionActive) {
-    timerRunning = false; // Mark as not running
+    timerRunning = false;
     return;
   }
 
-  timerRunning = true; // Mark as running
-
+  timerRunning = true;
   const now = Date.now();
   const remainingTime = Math.max(0, endTime - now);
+  
+  // Store remaining time in localStorage for visibility check
+  localStorage.setItem('meditationRemainingTime', remainingTime);
+  localStorage.setItem('meditationEndTime', endTime);
+  
   const seconds = Math.floor((remainingTime / 1000) % 60);
   const minutes = Math.floor(remainingTime / (1000 * 60));
   document.getElementById('timer').textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
@@ -11317,14 +11333,19 @@ function updateTimer() {
   document.getElementById('progress-ring').setAttribute('stroke-dashoffset', circumference * (1 - progress));
 
   if (remainingTime <= 0) {
+    // Stop music immediately when timer ends
+    stopMeditationMusic();
     sessionActive = false;
     timerRunning = false;
     localStorage.removeItem('activeSession');
-	updateHideUiButtonVisibility();
-	updateHideUiBtnVisibility();
-	releaseWakeLock();
-	disableMobileAudioResume();
-	stopMeditationSelfHeal();
+    localStorage.removeItem('meditationRemainingTime');
+    localStorage.removeItem('meditationEndTime');
+    
+    updateHideUiButtonVisibility();
+    updateHideUiBtnVisibility();
+    releaseWakeLock();
+    disableMobileAudioResume();
+    stopMeditationSelfHeal();
     
     const modal = document.getElementById('end-meditation-modal');
     if (!modal.classList.contains('hidden')) {
@@ -11334,13 +11355,13 @@ function updateTimer() {
     const actualMinutes = Math.round(targetDuration / 60);
     updateDurationMessage(actualMinutes);
     saveSession(actualMinutes, currentSessionTime);
-	localStorage.setItem('lastCompletedMode', currentMode);
+    localStorage.setItem('lastCompletedMode', currentMode);
 
     if (currentMode === 'yogi') {
       const sessionDate = new Date(startTime).toDateString();
-      const sessionTimeStr = currentSessionTime; // Always the scheduled 'HH:MM'
+      const sessionTimeStr = currentSessionTime;
       const sessionDay = getLocalDateString(new Date(startTime));
-      // Only push if not already present
+      
       if (!challengeData.sessionsCompleted.some(
         completed => completed.time === sessionTimeStr && completed.date === sessionDay
       )) {
@@ -11355,7 +11376,6 @@ function updateTimer() {
         saveChallengeData();
         checkDayReset();
         syncOfflineChallengeToServer();
-        // Immediately update Yogi stats display
         document.getElementById('yogi-total-sessions').textContent = challengeData.totalSessions;
         document.getElementById('yogi-total-minutes').textContent = challengeData.totalMinutes;
         document.getElementById('current-streak').textContent = challengeData.streakDays;
@@ -11375,27 +11395,36 @@ function updateTimer() {
     updateSessionTimesDisplay();
     stopMeditationBackground();
     cleanupAfterSessionEnd();
-	  showCompletionStats();
-	  updateLiveCountVisibility();
+    showCompletionStats();
+    updateLiveCountVisibility();
     
     const bell = document.getElementById('bell');
     if (bell) {
       bell.muted = false;
       bell.play().catch(e => console.log("Bell sound error:", e));
     }
-
-	const bgMusicPlayer = document.getElementById('bg-music-player');
-	if (bgMusicPlayer) {
-	  bgMusicPlayer.pause();
-	  bgMusicPlayer.currentTime = 0;
-	  backgroundAudio = null;
-	  stopMeditationSelfHeal();
-	}
-	
+    
     document.removeEventListener('visibilitychange', handleVisibilityChange);
     currentSessionTime = null;
   } else {
     requestAnimationFrame(updateTimer);
+  }
+}
+
+// Add this new function to stop music properly
+function stopMeditationMusic() {
+  const bgMusicPlayer = document.getElementById('bg-music-player');
+  if (bgMusicPlayer) {
+    bgMusicPlayer.pause();
+    bgMusicPlayer.currentTime = 0;
+    backgroundAudio = null;
+  }
+  stopMeditationSelfHeal();
+  
+  // Clear any pending timeout
+  if (meditationEndTimeout) {
+    clearTimeout(meditationEndTimeout);
+    meditationEndTimeout = null;
   }
 }
 
@@ -13983,6 +14012,11 @@ function cleanupAfterSessionEnd() {
     bgMusicPlayer.currentTime = 0;
   }
 
+  if (meditationEndTimeout) {
+    clearTimeout(meditationEndTimeout);
+    meditationEndTimeout = null;
+  }
+  
   // Cleanup event listeners
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
