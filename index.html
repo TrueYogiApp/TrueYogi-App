@@ -2948,6 +2948,21 @@ button[disabled] {
 body.modal-open {
   overflow: hidden;
 }
+
+#welcome-button {
+  animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes breathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
  
 </style>
   
