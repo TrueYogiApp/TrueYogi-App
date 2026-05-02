@@ -8367,24 +8367,26 @@ function applyMetatronSpinSpeed() {
   
   try {
     const challenge = JSON.parse(yogiChallenge);
-    const currentDay = challenge.currentDay;
+    const streakDays = challenge.streakDays || challenge.currentDay; // fallback to currentDay if streakDays doesn't exist
     const startDate = challenge.startDate;
     const totalDays = 41;
     
     // Check if startDate is null, undefined, or empty
     if (!startDate || startDate === 'null' || startDate === null) {
       metatronElement.style.animation = 'none';
+      //console.log('Metatron: No spin - startDate is null');
       return;
     }
     
-    // Also check if currentDay is valid
-    if (!currentDay || currentDay < 1 || currentDay > totalDays) {
+    // Check if streakDays is valid
+    if (!streakDays || streakDays < 1 || streakDays > totalDays) {
       metatronElement.style.animation = 'none';
+      console.log('Metatron: No spin - invalid streakDays');
       return;
     }
     
-    // Calculate speed: day 1 = 41s, day 41 = 1s
-    let speedInSeconds = totalDays - currentDay + 1;
+    // Calculate speed: streak 1 = 41s, streak 41 = 1s
+    let speedInSeconds = totalDays - streakDays + 1;
     
     // Safety check: keep between 1 and 41 seconds
     speedInSeconds = Math.min(41, Math.max(1, speedInSeconds));
@@ -8392,7 +8394,7 @@ function applyMetatronSpinSpeed() {
     // Apply the animation with calculated duration
     metatronElement.style.animation = `rotate-metatron ${speedInSeconds}s linear infinite`;
     
-    console.log(`Metatron spinning: Day ${currentDay}/${totalDays} - ${speedInSeconds}s per rotation`);
+    //console.log(`Metatron spinning: Streak ${streakDays}/${totalDays} - ${speedInSeconds}s per rotation`);
   } catch (error) {
     console.error('Error parsing yogiChallenge:', error);
     metatronElement.style.animation = 'none';
@@ -8445,7 +8447,7 @@ function showWelcomeModal() {
   document.body.classList.add('modal-open'); // ADD THIS LINE - lock scroll
   
   // Apply spin speed based on challenge
-  //applyMetatronSpinSpeed();
+  applyMetatronSpinSpeed();
   
   // Auto-close after 5 minutes (300,000 milliseconds)
   setTimeout(() => {
@@ -8459,9 +8461,9 @@ function closeWelcomeMessage() {
 }
 
 // Call this when your app initializes
-//document.addEventListener('DOMContentLoaded', () => {
- // applyMetatronSpinSpeed();
-//});
+document.addEventListener('DOMContentLoaded', () => {
+  applyMetatronSpinSpeed();
+});
 
     function showCompletedSessionsModal(requiredSessions) {
       const modal = document.getElementById('completed-sessions-modal');
