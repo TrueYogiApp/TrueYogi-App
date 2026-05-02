@@ -2975,10 +2975,11 @@ body.modal-open {
 }
 
 .metatron-rotate {
-  animation: rotate-metatron 1s linear infinite; /* 6s = faster */
+  animation: rotate-metatron linear infinite;
   transform-origin: center;
   display: inline-block;
-} 
+}
+
 
 </style>
   
@@ -3052,7 +3053,7 @@ body.modal-open {
   <div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="welcome-heading">
   <div class="welcome-message max-w-md mx-4 p-6 rounded-xl text-center">
 	<div class="flex justify-center mb-4">
-	  <img src="/assets/metatron.svg" alt="Metatron" class="w-14 h-14 text-yellow-400 mmetatron-rotate" style="max-width: 100%; height: auto;">
+	  <img src="/assets/metatron.svg" alt="Metatron" class="w-14 h-14 text-yellow-400 metatron-rotate" style="max-width: 100%; height: auto;">
 	</div>
     <h2 id="welcome-heading" class="text-xl font-semibold text-yellow-300 mb-2"></h2>
     <p class="text-gray-200 mb-4" id="welcome-text"></p>
@@ -8351,6 +8352,53 @@ async function loadWelcomeMessages() {
   }
 }
 
+function applyMetatronSpinSpeed() {
+  const metatronElement = document.querySelector('.metatron-rotate');
+  if (!metatronElement) return;
+  
+  // Check for yogiChallenge in localStorage
+  const yogiChallenge = localStorage.getItem('yogiChallenge');
+  
+  if (!yogiChallenge) {
+    // No challenge - remove spinning
+    metatronElement.style.animation = 'none';
+    return;
+  }
+  
+  try {
+    const challenge = JSON.parse(yogiChallenge);
+    const currentDay = challenge.currentDay;
+    const startDate = challenge.startDate;
+    const totalDays = 41;
+    
+    // Check if startDate is null, undefined, or empty
+    if (!startDate || startDate === 'null' || startDate === null) {
+      metatronElement.style.animation = 'none';
+      return;
+    }
+    
+    // Also check if currentDay is valid
+    if (!currentDay || currentDay < 1 || currentDay > totalDays) {
+      metatronElement.style.animation = 'none';
+      return;
+    }
+    
+    // Calculate speed: day 1 = 41s, day 41 = 1s
+    let speedInSeconds = totalDays - currentDay + 1;
+    
+    // Safety check: keep between 1 and 41 seconds
+    speedInSeconds = Math.min(41, Math.max(1, speedInSeconds));
+    
+    // Apply the animation with calculated duration
+    metatronElement.style.animation = `rotate-metatron ${speedInSeconds}s linear infinite`;
+    
+    console.log(`Metatron spinning: Day ${currentDay}/${totalDays} - ${speedInSeconds}s per rotation`);
+  } catch (error) {
+    console.error('Error parsing yogiChallenge:', error);
+    metatronElement.style.animation = 'none';
+  }
+}
+
     async function showWelcomeMessage() {
   const now = new Date();
   const lastVisitTime = localStorage.getItem('lastVisitTime');
@@ -8396,6 +8444,9 @@ function showWelcomeModal() {
   document.getElementById('welcome-message').classList.remove('hidden');
   document.body.classList.add('modal-open'); // ADD THIS LINE - lock scroll
   
+  // Apply spin speed based on challenge
+  //applyMetatronSpinSpeed();
+  
   // Auto-close after 5 minutes (300,000 milliseconds)
   setTimeout(() => {
     closeWelcomeMessage();
@@ -8406,6 +8457,11 @@ function closeWelcomeMessage() {
   document.getElementById('welcome-message').classList.add('hidden');
   document.body.classList.remove('modal-open'); // ADD THIS LINE - restore scroll
 }
+
+// Call this when your app initializes
+//document.addEventListener('DOMContentLoaded', () => {
+ // applyMetatronSpinSpeed();
+//});
 
     function showCompletedSessionsModal(requiredSessions) {
       const modal = document.getElementById('completed-sessions-modal');
