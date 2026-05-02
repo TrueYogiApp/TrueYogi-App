@@ -8367,7 +8367,7 @@ function applyMetatronSpinSpeed() {
   
   try {
     const challenge = JSON.parse(yogiChallenge);
-    const streakDays = challenge.streakDays || challenge.currentDay; // fallback to currentDay if streakDays doesn't exist
+    const streakDays = challenge.streakDays; // fallback to currentDay if streakDays doesn't exist
     const startDate = challenge.startDate;
     const totalDays = 41;
     
