@@ -2963,7 +2963,23 @@ body.modal-open {
     opacity: 1;
   }
 }
- 
+
+/* welcome metatron */ 
+@keyframes rotate-metatron {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.metatron-rotate {
+  animation: rotate-metatron 1s linear infinite; /* 6s = faster */
+  transform-origin: center;
+  display: inline-block;
+} 
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -3035,12 +3051,12 @@ body.modal-open {
   <!-- Welcome Message Modal -->
   <div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="welcome-heading">
   <div class="welcome-message max-w-md mx-4 p-6 rounded-xl text-center">
-    <div class="text-yellow-400 text-5xl mb-4">
-      <i class="fas fa-lotus"></i>
-    </div>
+	<div class="flex justify-center mb-4">
+	  <img src="/assets/metatron.svg" alt="Metatron" class="w-14 h-14 text-yellow-400 mmetatron-rotate" style="max-width: 100%; height: auto;">
+	</div>
     <h2 id="welcome-heading" class="text-xl font-semibold text-yellow-300 mb-2"></h2>
     <p class="text-gray-200 mb-4" id="welcome-text"></p>
-    <button id="welcome-button" onclick="closeWelcomeMessage()" class="mode-btn bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
+    <button id="welcome-button" onclick="closeWelcomeMessage()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
       Continue Journey
     </button>
   </div>
