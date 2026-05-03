@@ -3049,12 +3049,12 @@ body.modal-open {
     </div>
 </div>	
 
-  <!-- Welcome Message Modal -->
-  <div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="welcome-heading">
+<!-- Welcome Message Modal -->
+<div id="welcome-message" class="hidden fixed inset-0 flex items-center justify-center z-50" role="dialog" aria-modal="true" aria-labelledby="welcome-heading">
   <div class="welcome-message max-w-md mx-4 p-6 rounded-xl text-center">
-	<div class="flex justify-center mb-4">
-	  <img src="/assets/metatron.svg" alt="Metatron" class="w-14 h-14 text-yellow-400 metatron-rotate" style="max-width: 100%; height: auto;">
-	</div>
+    <div class="flex justify-center mb-4">
+      <img id="metatron-svg" src="/assets/metatron.svg" alt="Metatron" class="w-14 h-14 text-yellow-400 metatron-rotate cursor-pointer" style="max-width: 100%; height: auto;">
+    </div>
     <h2 id="welcome-heading" class="text-xl font-semibold text-yellow-300 mb-2"></h2>
     <p class="text-gray-200 mb-4" id="welcome-text"></p>
     <button id="welcome-button" onclick="closeWelcomeMessage()" class="bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
@@ -8401,6 +8401,66 @@ function applyMetatronSpinSpeed() {
   }
 }
 
+// Metatron music feature
+let metatronAudio = null;
+
+function initMetatronMusic() {
+  const metatronSvg = document.getElementById('metatron-svg');
+  
+  if (!metatronSvg) return;
+  
+  // Remove any existing listener to prevent duplicates
+  metatronSvg.removeEventListener('click', handleMetatronTap);
+  metatronSvg.addEventListener('click', handleMetatronTap);
+}
+
+function handleMetatronTap(e) {
+  e.stopPropagation(); // Prevent modal from closing
+  playMetatronMusic();
+}
+
+function playMetatronMusic() {
+  // Stop any currently playing metatron music
+  if (metatronAudio) {
+    metatronAudio.pause();
+    metatronAudio.currentTime = 0;
+  }
+  
+  // Create and play ONLY metatron.mp3
+  metatronAudio = new Audio();
+  metatronAudio.src = '/assets/metatron.mp3';  // Just play this file
+  metatronAudio.volume = 0.5;
+  metatronAudio.loop = false;
+  
+  // Add visual feedback
+  const svgImg = document.getElementById('metatron-svg');
+  if (svgImg) {
+    svgImg.classList.add('music-playing');
+    setTimeout(() => svgImg.classList.remove('music-playing'), 600);
+  }
+  
+  // Play with error handling
+  metatronAudio.play().catch(error => {
+    console.log('Metatron music play error:', error);
+    if (svgImg) {
+      svgImg.classList.add('play-error');
+      setTimeout(() => svgImg.classList.remove('play-error'), 500);
+    }
+  });
+  
+  metatronAudio.onended = function() {
+    metatronAudio = null;
+  };
+}
+
+function stopMetatronMusic() {
+  if (metatronAudio) {
+    metatronAudio.pause();
+    metatronAudio.currentTime = 0;
+    metatronAudio = null;
+  }
+}
+
     async function showWelcomeMessage() {
   const now = new Date();
   const lastVisitTime = localStorage.getItem('lastVisitTime');
@@ -8447,6 +8507,7 @@ function showWelcomeModal() {
   document.body.classList.add('modal-open'); // ADD THIS LINE - lock scroll
   
   // Apply spin speed based on challenge
+  initMetatronMusic();
   applyMetatronSpinSpeed();
   
   // Auto-close after 30 minutes (1800,000 milliseconds)
@@ -8456,6 +8517,7 @@ function showWelcomeModal() {
 }
 
 function closeWelcomeMessage() {
+  stopMetatronMusic();
   document.getElementById('welcome-message').classList.add('hidden');
   document.body.classList.remove('modal-open'); // ADD THIS LINE - restore scroll
 }
