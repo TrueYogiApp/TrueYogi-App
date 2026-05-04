@@ -3890,6 +3890,36 @@ body.modal-open {
       <a href="/privacy.html" target="_blank" style="color:#fde68a; text-decoration:underline;">Read our Privacy Policy</a>
     </p>
   </div>
+  
+      <!-- Scan Me Section -->
+<div class="faq-item">
+  <!-- Option 1 - Simple & clean -->
+<p class="text-gray-300 mt-1">
+  <a href="#" id="showBarcodeLink" style="color:#ffffff; text-decoration:none; border-bottom: 1px dotted rgba(255,255,255,0.4);">
+     Expand the circle
+  </a>
+</p>
+  <div id="barcodeImageContainer" 
+     style="
+       display: none; 
+       margin-top: 1rem; 
+       text-align: center;
+       opacity: 0;
+       transform: translateY(10px);
+       transition: opacity 0.5s ease, transform 0.5s ease;
+     ">
+    <img src="/assets/QR.PNG" 
+     alt="Scan to open site" 
+     style="
+       width: 100%;
+       max-width: 360px;
+       height: auto;
+       border-radius: 12px;
+     ">
+    <p class="text-gray-400 text-sm mt-2">Scan to access the app</p>
+  </div>
+</div>
+
   <div class="faq-item">
   <h3 class="text-yellow-200 font-medium">Contact</h3>
   <p class="text-gray-300 mt-1">
@@ -5934,6 +5964,33 @@ function renderLiveList() {
       challengeStreak: 0 // Add this line
     };
 
+
+   //  QR code scan
+    document.getElementById('showBarcodeLink').addEventListener('click', function(e) {
+  e.preventDefault();
+  var container = document.getElementById('barcodeImageContainer');
+
+  if (container.style.display === 'none' || container.style.display === '') {
+    // SHOW with animation
+    container.style.display = 'block';
+
+    // allow DOM to register display change
+    setTimeout(() => {
+      container.style.opacity = '1';
+      container.style.transform = 'translateY(0)';
+    }, 10);
+
+  } else {
+    // HIDE with animation
+    container.style.opacity = '0';
+    container.style.transform = 'translateY(10px)';
+
+    // wait for animation to finish before hiding
+    setTimeout(() => {
+      container.style.display = 'none';
+    }, 500);
+  }
+});
 
 //  User Avatar Upload, Select DOM elements
 	const userId = localStorage.getItem('omUserId'); // Or from your auth
