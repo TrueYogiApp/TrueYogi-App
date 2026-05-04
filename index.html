@@ -2980,6 +2980,15 @@ body.modal-open {
   display: inline-block;
 }
 
+@keyframes rainbowAll {
+    0% { border-color: red; background-position: 100% 50%; }
+    16% { border-color: orange; }
+    33% { border-color: yellow; }
+    50% { border-color: green; background-position: 50% 50%; }
+    66% { border-color: blue; }
+    83% { border-color: indigo; }
+    100% { border-color: violet; background-position: 0% 50%; }
+  }
 
 </style>
   
@@ -3891,14 +3900,15 @@ body.modal-open {
     </p>
   </div>
   
-      <!-- Scan Me Section -->
+    <!-- Scan Me Section -->
 <div class="faq-item">
   <!-- Option 1 - Simple & clean -->
 <p class="text-gray-300 mt-1">
-  <a href="#" id="showBarcodeLink" style="color:#ffffff; text-decoration:none; border-bottom: 1px dotted rgba(255,255,255,0.4);">
+  <a href="#" id="showBarcodeLink" style="text-decoration:none; border-bottom: 2px dotted; animation: rainbowAll 3s linear infinite; background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent;">
      Expand the circle
   </a>
 </p>
+
   <div id="barcodeImageContainer" 
      style="
        display: none; 
@@ -3908,7 +3918,7 @@ body.modal-open {
        transform: translateY(10px);
        transition: opacity 0.5s ease, transform 0.5s ease;
      ">
-    <img src="https://trueyogi.app/assets/QR.png" 
+    <img src="/private/var/mobile/Containers/Shared/AppGroup/6B893BAE-1333-4787-A4B1-3006612D68B0/Documents/Dapp edit/Assets/QR 2.PNG" 
      alt="Scan to open site" 
      style="
        width: 100%;
