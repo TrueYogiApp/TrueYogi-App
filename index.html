@@ -8570,6 +8570,7 @@ function stopMetatronMusic() {
 }
 
 function showWelcomeModal() {
+   setModalState(true);
   document.getElementById('welcome-message').classList.remove('hidden');
   document.body.classList.add('modal-open'); // ADD THIS LINE - lock scroll
   
@@ -8584,6 +8585,7 @@ function showWelcomeModal() {
 }
 
 function closeWelcomeMessage() {
+   setModalState(false);
   stopMetatronMusic();
   document.getElementById('welcome-message').classList.add('hidden');
   document.body.classList.remove('modal-open'); // ADD THIS LINE - restore scroll
@@ -21279,6 +21281,8 @@ spaceships.push(mothership);
 </script>
 
 <script>
+let isModalOpen = false;  // Track if any modal is open
+
 let idleTimeout;
 let bellIdleTimeout;
 let harmonyIdleTimeout;
@@ -21444,9 +21448,17 @@ function showScreensaver() {
 }
 
 function hideScreensaver() {
+  // Don't hide screensaver if ANY modal is open
+  if (isModalOpen) return;
+  
   if (typeof modalPopupActive !== "undefined" && modalPopupActive) return;
   canvasEl.classList.add("hidden");
   screensaverActive = false;
+}
+
+// Add this helper function to control modal state
+function setModalState(open) {
+  isModalOpen = open;
 }
 
 // Start timer initially
