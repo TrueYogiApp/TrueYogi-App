@@ -8498,7 +8498,7 @@ function playMetatronMusic() {
   metatronAudio = new Audio();
   metatronAudio.src = '/assets/metatron.mp3';  // Just play this file
   metatronAudio.volume = 0.5;
-  metatronAudio.loop = false;
+  metatronAudio.loop = true;
   
   // Add visual feedback
   const svgImg = document.getElementById('metatron-svg');
@@ -8516,9 +8516,6 @@ function playMetatronMusic() {
     }
   });
   
-  metatronAudio.onended = function() {
-    metatronAudio = null;
-  };
 }
 
 function stopMetatronMusic() {
