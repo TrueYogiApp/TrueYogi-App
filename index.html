@@ -2949,8 +2949,24 @@ body.modal-open {
   overflow: hidden;
 }
 
+/* Modal container breathing */
+.welcome-message {
+  animation: modalBreathe 4s ease-in-out infinite;
+}
+
 #welcome-button {
   animation: breathe 3s ease-in-out infinite;
+}
+
+@keyframes modalBreathe {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.98;
+  }
+  50% {
+    transform: scale(1.02);
+    opacity: 1;
+  }
 }
 
 @keyframes breathe {
