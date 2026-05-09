@@ -10546,27 +10546,27 @@ const isChallengeEnded = now >= endDatePlusOne;
       completed => completed.time === session.time && completed.date === today
     );
     
-// If challenge ended but streak is less than 40, show as missed
-if (isChallengeEnded && challengeData.streakDays < 40) {
-  const badge = document.createElement('span');
-  badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium missed';
-  badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
-  badge.setAttribute('data-tooltip', t('missed'));
-  badge.classList.add('status-tooltip', 'missed-tip');
-  list.appendChild(badge);
-  return;
-}
+	// If challenge ended but streak is less than 40, show as missed
+	if (isChallengeEnded && challengeData.streakDays < 40) {
+	  const badge = document.createElement('span');
+	  badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium missed';
+	  badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
+	  badge.setAttribute('data-tooltip', t('missed'));
+	  badge.classList.add('status-tooltip', 'missed-tip');
+	  list.appendChild(badge);
+	  return;
+	}
 
-// Only show green completed if streak >= 40
-if (isChallengeEnded && challengeData.streakDays >= 40) {
-  const badge = document.createElement('span');
-  badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium completed';
-  badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
-  badge.setAttribute('data-tooltip', t('challengeCompleted'));
-  badge.classList.add('status-tooltip', 'completed-tip');
-  list.appendChild(badge);
-  return;
-}
+	// Only show green completed if streak >= 40
+	if (isChallengeEnded && challengeData.streakDays >= 40) {
+	  const badge = document.createElement('span');
+	  badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium completed';
+	  badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
+	  badge.setAttribute('data-tooltip', t('challengeCompleted'));
+	  badge.classList.add('status-tooltip', 'completed-tip');
+	  list.appendChild(badge);
+	  return;
+	}
     
     // Original logic for active challenge period
     const isMissed = !isCompleted && (
