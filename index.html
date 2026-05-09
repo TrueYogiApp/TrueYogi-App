@@ -11049,7 +11049,7 @@ if (
   updateNowDisplay();
   initAudioContext();
   
- // First handle the Yogi mode validation and session selection
+// First handle the Yogi mode validation and session selection
 if (currentMode === 'yogi') {
   const now = new Date();
   const today = getLocalDateString(now);
@@ -11058,7 +11058,12 @@ if (currentMode === 'yogi') {
   if (challengeData.endDate) {
     const endDate = new Date(challengeData.endDate + "T23:59:59");
     if (now > endDate) {
-      showChallengeCompletedModal();
+      // Only show completed modal if streak days >= 40
+      if (challengeData.streakDays >= 40) {
+        showChallengeCompletedModal();
+      } else {
+        showMissedSessionModal();
+      }
       return;
     }
   }
