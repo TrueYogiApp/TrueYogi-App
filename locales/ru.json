@@ -338,7 +338,7 @@
 "storage_faq_heading": "Информация о хранилище",
 "storage_faq_label_content": "Контент космического корабля:",
 "storage_faq_label_version": "Версия приложения",
-"storage_faq_label_updated": "Последнее обновление:",
+"storage_faq_label_updated": "Последняя проверка:",
 "storage_faq_note": "Контент автоматически обновляется при интернет-соединении",
 "clear_modal_heading": "Очистить офлайн-данные",
 "clear_modal_description": "Будут удалены все загруженные материалы для медитации и отключен режим космического корабля.",

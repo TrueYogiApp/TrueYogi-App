@@ -338,7 +338,7 @@
 	"storage_faq_heading": "Storage Information",
 	"storage_faq_label_content": "Spaceship Content:",
 	"storage_faq_label_version": "App Version",
-	"storage_faq_label_updated": "Last Updated:",
+	"storage_faq_label_updated": "Last Checked:",
 	"storage_faq_note": "Content updates automatically when online",
 	"clear_modal_heading": "Clear Offline Data",
 	"clear_modal_description": "This will remove all downloaded meditation content and disable spaceship mode.",

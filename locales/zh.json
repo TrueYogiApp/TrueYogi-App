@@ -338,7 +338,7 @@
 "storage_faq_heading": "存储信息",
 "storage_faq_label_content": "太空船内容：",
 "storage_faq_label_version": "应用版本",
-"storage_faq_label_updated": "最近更新：",
+"storage_faq_label_updated": "上次检查：",
 "storage_faq_note": "内容在联网时会自动更新",
 "clear_modal_heading": "清除离线数据",
 "clear_modal_description": "这将移除所有已下载的冥想内容，并禁用太空船模式。",
