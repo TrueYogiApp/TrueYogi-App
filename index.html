@@ -16887,6 +16887,37 @@ async function showCountryUserListPopup(country, x, y) {
     return streak;
   };
 
+	// Calculate best streak ever from ALL user sessions
+	const calculateBestStreak = (sessionTimestamps) => {
+	  if (!sessionTimestamps || sessionTimestamps.length === 0) return 0;
+	  
+	  // Extract unique dates
+	  const uniqueDates = [...new Set(sessionTimestamps.map(ts => {
+		const d = new Date(ts);
+		return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+	  }))].sort();
+	  
+	  if (uniqueDates.length === 0) return 0;
+	  
+	  let maxStreak = 1;
+	  let currentStreak = 1;
+	  
+	  for (let i = 1; i < uniqueDates.length; i++) {
+		const prevDate = new Date(uniqueDates[i-1]);
+		const currDate = new Date(uniqueDates[i]);
+		const dayDiff = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
+		
+		if (dayDiff === 1) {
+		  currentStreak++;
+		  maxStreak = Math.max(maxStreak, currentStreak);
+		} else if (dayDiff > 1) {
+		  currentStreak = 1;
+		}
+	  }
+	  
+	  return maxStreak;
+	};
+
   // Now build user data with totals (from the country-specific data)
   const userSessions = {};
   const userOrder = [];
@@ -16970,6 +17001,8 @@ async function showCountryUserListPopup(country, x, y) {
         const allUserTimestamps = userAllSessions[id] || [];
         const streak = calculateUserStreak(allUserTimestamps);
         const hasStreak = streak > 0;
+		const bestStreak = calculateBestStreak(allUserTimestamps);
+	    const showBestStreak = !hasStreak && bestStreak > 0;
         
         return `
           <div style="border-bottom:1px solid #333;padding:6px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;border-radius:6px;margin:2px 0;padding:6px;' : ''}">
@@ -16985,15 +17018,21 @@ async function showCountryUserListPopup(country, x, y) {
               ${formatDurationGrid(userSessions[id].totalDuration)}
             </span>
             <span style="font-size:0.6rem;color:#666;" title="${userSessions[id].latestSession}">
-              ${recentTime}
+               ${recentTime}
             </span>
-            ${hasStreak ? `
-              <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(245,158,11,0.2);padding:2px 8px;border-radius:20px;margin-left:auto;">
-                <span style="color:#f59e0b;font-size:0.7rem;">🔥</span>
-                <span style="color:#f59e0b;font-weight:bold;font-size:0.75rem;">${streak}</span>
-              </span>
-            ` : `
-            `}
+			${hasStreak ? `
+			  <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(245,158,11,0.2);padding:2px 8px;border-radius:20px;margin-left:auto;">
+				<span style="color:#f59e0b;font-size:0.7rem;">🔥</span>
+				<span style="color:#f59e0b;font-weight:bold;font-size:0.75rem;">${streak}</span>
+				<span style="color:#f59e0b80;font-size:0.6rem;">${streak !== 1 ? 's' : ''}</span>
+			  </span>
+			` : showBestStreak ? `
+			  <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(156,163,175,0.15);padding:2px 8px;border-radius:20px;margin-left:auto;">
+				<span style="color:#9ca3af;font-weight:bold;font-size:0.75rem;">${bestStreak}</span>
+			  </span>
+			` : `
+			  <span style="margin-left:auto;font-size:0.6rem;color:#444;">—</span>
+			`}
           </div>
         `;
       }).join('')}
