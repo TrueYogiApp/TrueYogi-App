@@ -16819,10 +16819,11 @@ async function showCountryUserListPopup(country, x, y) {
     return;
   }
 
-  // Step 2: Fetch ALL sessions for these users (across all countries) for streak calculation
+// Step 2: Fetch ALL sessions for these users (across all countries) for streak calculation
+  // Include started_at AND last_heartbeat
   let { data: allUserSessions, error: sessionsError } = await supabase
     .from('om_sessions')
-    .select('user_id, started_at')
+    .select('user_id, started_at, last_heartbeat')
     .in('user_id', uniqueUserIds)
     .order('started_at', { ascending: false });
 
@@ -16832,91 +16833,120 @@ async function showCountryUserListPopup(country, x, y) {
 
   // Group sessions by user for streak calculation
   const userAllSessions = {};
+  const userAllHeartbeats = {};
   if (allUserSessions) {
     allUserSessions.forEach(session => {
       if (!session.user_id) return;
+      
+      // Collect started_at timestamps
       if (!userAllSessions[session.user_id]) {
         userAllSessions[session.user_id] = [];
       }
-      userAllSessions[session.user_id].push(session.started_at);
+      if (session.started_at) {
+        userAllSessions[session.user_id].push(session.started_at);
+      }
+      
+      // Collect last_heartbeat timestamps
+      if (!userAllHeartbeats[session.user_id]) {
+        userAllHeartbeats[session.user_id] = [];
+      }
+      if (session.last_heartbeat) {
+        userAllHeartbeats[session.user_id].push(session.last_heartbeat);
+      }
     });
   }
 
-  // Calculate streak from ALL user sessions (not just this country)
-  const calculateUserStreak = (sessionTimestamps) => {
-    if (!sessionTimestamps || sessionTimestamps.length === 0) return 0;
+// Calculate streak using BOTH started_at AND last_heartbeat
+const calculateUserStreak = (sessionTimestamps, userHeartbeats) => {
+  // Combine both sources of activity data
+  let allActivityDates = [...sessionTimestamps];
+  
+  // Add last_heartbeat dates if available
+  if (userHeartbeats && userHeartbeats.length) {
+    allActivityDates = [...allActivityDates, ...userHeartbeats];
+  }
+  
+  if (!allActivityDates || allActivityDates.length === 0) return 0;
+  
+  // Extract unique dates from timestamps
+  const uniqueDates = [...new Set(allActivityDates.map(ts => {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }))].sort().reverse();
+  
+  if (uniqueDates.length === 0) return 0;
+  
+  // Check if last activity was today or yesterday
+  const today = new Date();
+  const yesterday = new Date(today);
+  yesterday.setDate(yesterday.getDate() - 1);
+  
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+  
+  const lastActivityDate = uniqueDates[0];
+  
+  if (lastActivityDate !== todayStr && lastActivityDate !== yesterdayStr) {
+    return 0; // Streak broken
+  }
+  
+  // Count consecutive days
+  let streak = 1;
+  let currentDate = new Date(lastActivityDate);
+  
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const prevDate = new Date(uniqueDates[i]);
+    const dayDiff = Math.floor((currentDate - prevDate) / (1000 * 60 * 60 * 24));
     
-    // Extract unique dates from timestamps
-    const uniqueDates = [...new Set(sessionTimestamps.map(ts => {
-      const d = new Date(ts);
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    }))].sort().reverse();
-    
-    if (uniqueDates.length === 0) return 0;
-    
-    // Check if last session was today or yesterday
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-    const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
-    
-    const lastSessionDate = uniqueDates[0];
-    
-    if (lastSessionDate !== todayStr && lastSessionDate !== yesterdayStr) {
-      return 0; // Streak broken
+    if (dayDiff === 1) {
+      streak++;
+      currentDate = prevDate;
+    } else if (dayDiff > 1) {
+      break;
     }
-    
-    // Count consecutive days
-    let streak = 1;
-    let currentDate = new Date(lastSessionDate);
-    
-    for (let i = 1; i < uniqueDates.length; i++) {
-      const prevDate = new Date(uniqueDates[i]);
-      const dayDiff = Math.floor((currentDate - prevDate) / (1000 * 60 * 60 * 24));
-      
-      if (dayDiff === 1) {
-        streak++;
-        currentDate = prevDate;
-      } else if (dayDiff > 1) {
-        break;
-      }
-    }
-    
-    return streak;
-  };
+  }
+  
+  return streak;
+};
 
-	// Calculate best streak ever from ALL user sessions
-	const calculateBestStreak = (sessionTimestamps) => {
-	  if (!sessionTimestamps || sessionTimestamps.length === 0) return 0;
-	  
-	  // Extract unique dates
-	  const uniqueDates = [...new Set(sessionTimestamps.map(ts => {
-		const d = new Date(ts);
-		return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-	  }))].sort();
-	  
-	  if (uniqueDates.length === 0) return 0;
-	  
-	  let maxStreak = 1;
-	  let currentStreak = 1;
-	  
-	  for (let i = 1; i < uniqueDates.length; i++) {
-		const prevDate = new Date(uniqueDates[i-1]);
-		const currDate = new Date(uniqueDates[i]);
-		const dayDiff = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
-		
-		if (dayDiff === 1) {
-		  currentStreak++;
-		  maxStreak = Math.max(maxStreak, currentStreak);
-		} else if (dayDiff > 1) {
-		  currentStreak = 1;
-		}
-	  }
-	  
-	  return maxStreak;
-	};
+// Calculate best streak using BOTH started_at AND last_heartbeat
+const calculateBestStreak = (sessionTimestamps, userHeartbeats) => {
+  // Combine both sources of activity data
+  let allActivityDates = [...sessionTimestamps];
+  
+  // Add last_heartbeat dates if available
+  if (userHeartbeats && userHeartbeats.length) {
+    allActivityDates = [...allActivityDates, ...userHeartbeats];
+  }
+  
+  if (!allActivityDates || allActivityDates.length === 0) return 0;
+  
+  // Extract unique dates
+  const uniqueDates = [...new Set(allActivityDates.map(ts => {
+    const d = new Date(ts);
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }))].sort();
+  
+  if (uniqueDates.length === 0) return 0;
+  
+  let maxStreak = 1;
+  let currentStreak = 1;
+  
+  for (let i = 1; i < uniqueDates.length; i++) {
+    const prevDate = new Date(uniqueDates[i-1]);
+    const currDate = new Date(uniqueDates[i]);
+    const dayDiff = Math.floor((currDate - prevDate) / (1000 * 60 * 60 * 24));
+    
+    if (dayDiff === 1) {
+      currentStreak++;
+      maxStreak = Math.max(maxStreak, currentStreak);
+    } else if (dayDiff > 1) {
+      currentStreak = 1;
+    }
+  }
+  
+  return maxStreak;
+};
 
   // Now build user data with totals (from the country-specific data)
   const userSessions = {};
@@ -16999,10 +17029,11 @@ async function showCountryUserListPopup(country, x, y) {
         const recentTime = formatRecentTime(userSessions[id].latestSession);
         // Get streak from ALL sessions, not just this country
         const allUserTimestamps = userAllSessions[id] || [];
-        const streak = calculateUserStreak(allUserTimestamps);
-        const hasStreak = streak > 0;
-		const bestStreak = calculateBestStreak(allUserTimestamps);
-	    const showBestStreak = !hasStreak && bestStreak > 0;
+const allUserHeartbeatsList = userAllHeartbeats[id] || [];
+const streak = calculateUserStreak(allUserTimestamps, allUserHeartbeatsList);
+const hasStreak = streak > 0;  // ADD THIS LINE
+const bestStreak = calculateBestStreak(allUserTimestamps, allUserHeartbeatsList);
+const showBestStreak = !hasStreak && bestStreak > 0;
         
         return `
           <div style="border-bottom:1px solid #333;padding:6px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;border-radius:6px;margin:2px 0;padding:6px;' : ''}">
