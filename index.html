@@ -16876,18 +16876,15 @@ const calculateUserStreak = (sessionTimestamps, userHeartbeats) => {
   
   if (uniqueDates.length === 0) return 0;
   
-  // Check if last activity was today or yesterday
+  // Get today's date string
   const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-  
   const todayStr = `${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
-  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
   
   const lastActivityDate = uniqueDates[0];
   
-  if (lastActivityDate !== todayStr && lastActivityDate !== yesterdayStr) {
-    return 0; // Streak broken
+  // FIXED: Only count streak if last activity is TODAY
+  if (lastActivityDate !== todayStr) {
+    return 0; // Streak broken (yesterday or older)
   }
   
   // Count consecutive days
@@ -16946,6 +16943,27 @@ const calculateBestStreak = (sessionTimestamps, userHeartbeats) => {
   }
   
   return maxStreak;
+};
+
+// Check if user had activity yesterday but not today (to show gray encouragement streak)
+const hasYesterdayActivity = (sessionTimestamps, userHeartbeats) => {
+  let allActivityDates = [...sessionTimestamps];
+  if (userHeartbeats && userHeartbeats.length) {
+    allActivityDates = [...allActivityDates, ...userHeartbeats];
+  }
+  
+  if (!allActivityDates || allActivityDates.length === 0) return false;
+  
+  const yesterday = new Date();
+  yesterday.setDate(yesterday.getDate() - 1);
+  const yesterdayStr = `${yesterday.getFullYear()}-${String(yesterday.getMonth()+1).padStart(2,'0')}-${String(yesterday.getDate()).padStart(2,'0')}`;
+  
+  // Check if any activity on yesterday
+  return allActivityDates.some(ts => {
+    const d = new Date(ts);
+    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    return dateStr === yesterdayStr;
+  });
 };
 
   // Now build user data with totals (from the country-specific data)
@@ -17029,11 +17047,13 @@ const calculateBestStreak = (sessionTimestamps, userHeartbeats) => {
         const recentTime = formatRecentTime(userSessions[id].latestSession);
         // Get streak from ALL sessions, not just this country
         const allUserTimestamps = userAllSessions[id] || [];
-const allUserHeartbeatsList = userAllHeartbeats[id] || [];
-const streak = calculateUserStreak(allUserTimestamps, allUserHeartbeatsList);
-const hasStreak = streak > 0;  // ADD THIS LINE
-const bestStreak = calculateBestStreak(allUserTimestamps, allUserHeartbeatsList);
-const showBestStreak = !hasStreak && bestStreak > 0;
+		const allUserHeartbeatsList = userAllHeartbeats[id] || [];
+		const streak = calculateUserStreak(allUserTimestamps, allUserHeartbeatsList);
+		const hasStreak = streak > 0;
+		const bestStreak = calculateBestStreak(allUserTimestamps, allUserHeartbeatsList);
+		const hasYesterday = hasYesterdayActivity(allUserTimestamps, allUserHeartbeatsList);
+		const showGrayStreak = !hasStreak && hasYesterday && bestStreak > 0;
+		const showBestStreak = !hasStreak && !hasYesterday && bestStreak > 0;
         
         return `
           <div style="border-bottom:1px solid #333;padding:6px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;border-radius:6px;margin:2px 0;padding:6px;' : ''}">
@@ -17055,6 +17075,11 @@ const showBestStreak = !hasStreak && bestStreak > 0;
 			  <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(245,158,11,0.2);padding:2px 8px;border-radius:20px;margin-left:auto;">
 				<span style="color:#f59e0b;font-size:0.7rem;">🔥</span>
 				<span style="color:#f59e0b;font-weight:bold;font-size:0.75rem;">${streak}</span>
+			  </span>
+			` : showGrayStreak ? `
+			  <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(156,163,175,0.15);padding:2px 8px;border-radius:20px;margin-left:auto;">
+				<span style="color:#9ca3af;font-size:0.7rem;">🔥</span>
+				<span style="color:#9ca3af;font-weight:bold;font-size:0.75rem;">${bestStreak}</span>
 			  </span>
 			` : showBestStreak ? `
 			  <span style="display:inline-flex;align-items:center;gap:3px;background:rgba(156,163,175,0.15);padding:2px 8px;border-radius:20px;margin-left:auto;">
