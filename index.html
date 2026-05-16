@@ -7945,6 +7945,9 @@ function updateYogiIcon() {
   // How many completed sessions for today?
   const todaySessionsCompleted = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
   const allTodaySessionsDone = todaySessionsCompleted >= challengeData.requiredSessions;
+  
+  // Check if challenge is actually completed
+  const isChallengeCompleted = challengeData.streakDay >= 41 && allTodaySessionsDone;
 
   if (!startDateStr || !endDateStr) {
     sunIcon.classList.remove('fa-spin');
@@ -7961,19 +7964,24 @@ function updateYogiIcon() {
 
   // 2. On end date
   if (todayStr === endDateStr) {
-    if (!allTodaySessionsDone) {
-      sunIcon.classList.add('fa-spin');
-      sunIcon.style.color = '#000000'; // black
-    } else {
+    if (isChallengeCompleted) {
       sunIcon.classList.add('fa-spin');
       sunIcon.style.color = '#f59e0b'; // gold
+    } else {
+      sunIcon.classList.add('fa-spin');
+      sunIcon.style.color = '#000000'; // black
     }
     return;
   }
 
   // 3. After end date (challenge finished)
-  sunIcon.classList.add('fa-spin');
-  sunIcon.style.color = '#f59e0b'; // gold
+  if (isChallengeCompleted) {
+    sunIcon.classList.add('fa-spin');
+    sunIcon.style.color = '#f59e0b'; // gold
+  } else {
+    sunIcon.classList.add('fa-spin');
+    sunIcon.style.color = '#000000'; // black
+  }
 }
 
 function showStartOnChainJourneyModal(walletPublicKey) {
