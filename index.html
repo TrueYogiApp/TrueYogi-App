@@ -7942,12 +7942,9 @@ function updateYogiIcon() {
   const startDateStr = challengeData.startDate;
   const endDateStr = challengeData.endDate;
 
-  // Check if ALL required sessions were completed on the end date
-  const endDateSessionsCompleted = challengeData.sessionsCompleted.filter(s => s.date === endDateStr).length;
-  const allSessionsDoneOnEndDate = endDateSessionsCompleted >= challengeData.requiredSessions;
-  
-  // Check if challenge is actually completed (streakDay >= 41 AND all sessions done on end date)
-  const isChallengeCompleted = challengeData.streakDay >= 41 && allSessionsDoneOnEndDate;
+  // How many completed sessions for today?
+  const todaySessionsCompleted = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
+  const allTodaySessionsDone = todaySessionsCompleted >= challengeData.requiredSessions;
 
   if (!startDateStr || !endDateStr) {
     sunIcon.classList.remove('fa-spin');
@@ -7964,21 +7961,22 @@ function updateYogiIcon() {
 
   // 2. On end date
   if (todayStr === endDateStr) {
-    const todaySessionsCompleted = challengeData.sessionsCompleted.filter(s => s.date === todayStr).length;
-    const allTodaySessionsDone = todaySessionsCompleted >= challengeData.requiredSessions;
-    
-    if (challengeData.streakDay >= 41 && allTodaySessionsDone) {
-      sunIcon.classList.add('fa-spin');
-      sunIcon.style.color = '#f59e0b'; // gold
-    } else {
+    if (!allTodaySessionsDone) {
       sunIcon.classList.add('fa-spin');
       sunIcon.style.color = '#000000'; // black
+    } else {
+      sunIcon.classList.add('fa-spin');
+      sunIcon.style.color = '#f59e0b'; // gold
     }
     return;
   }
 
   // 3. After end date (challenge finished)
-  if (isChallengeCompleted) {
+  // Only show gold if streakDay >= 41 AND all sessions were done on end date
+  const endDateSessionsCompleted = challengeData.sessionsCompleted.filter(s => s.date === endDateStr).length;
+  const allEndDateSessionsDone = endDateSessionsCompleted >= challengeData.requiredSessions;
+  
+  if (challengeData.streakDay >= 41 && allEndDateSessionsDone) {
     sunIcon.classList.add('fa-spin');
     sunIcon.style.color = '#f59e0b'; // gold
   } else {
