@@ -7972,11 +7972,8 @@ function updateYogiIcon() {
   }
 
   // 3. After end date (challenge finished)
-  // Only show gold if streakDay >= 41 AND all sessions were done on end date
-  const endDateSessionsCompleted = challengeData.sessionsCompleted.filter(s => s.date === endDateStr).length;
-  const allEndDateSessionsDone = endDateSessionsCompleted >= challengeData.requiredSessions;
-  
-  if (challengeData.streakDay >= 41 && allEndDateSessionsDone) {
+  // Just check streakDay >= 41
+  if (challengeData.streakDay >= 41) {
     sunIcon.classList.add('fa-spin');
     sunIcon.style.color = '#f59e0b'; // gold
   } else {
