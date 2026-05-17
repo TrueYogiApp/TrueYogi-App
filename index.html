@@ -7972,8 +7972,14 @@ function updateYogiIcon() {
   }
 
   // 3. After end date (challenge finished)
-  sunIcon.classList.add('fa-spin');
-  sunIcon.style.color = '#f59e0b'; // gold
+  // Just check streakDay >= 41
+  if (challengeData.streakDays >= 40) {
+    sunIcon.classList.add('fa-spin');
+    sunIcon.style.color = '#f59e0b'; // gold
+  } else {
+    sunIcon.classList.add('fa-spin');
+    sunIcon.style.color = '#000000'; // black
+  }
 }
 
 function showStartOnChainJourneyModal(walletPublicKey) {
