@@ -16722,12 +16722,12 @@ bar.querySelectorAll('.user-scroll-flag').forEach(el => {
   const scrollDiv = bar.querySelector('#userTravelScroll');
   if (scrollDiv) {
     scrollDiv.querySelectorAll('.user-scroll-flag').forEach(el => {
-      el.onclick = function(e) {
-        showFlagPopup(el.getAttribute('data-country'), e);
-      };
-      el.ontouchstart = function(e) {
-        showFlagPopup(el.getAttribute('data-country'), e);
-      };
+el.onclick = function(e) {
+  showFlagPopup(el.getAttribute('data-country'), e, false);  // Added false
+};
+el.ontouchstart = function(e) {
+  showFlagPopup(el.getAttribute('data-country'), e, false);  // Added false
+};
     });
   }
 }
@@ -16763,7 +16763,7 @@ function showFlagPopup(country, event, allowUserList = false) {
     border-radius: 18px;
     z-index: 10003;
     box-shadow: 0 0 12px #fde68acc;
-    pointer-events: auto; // Make sure it's clickable
+    pointer-events: auto;
     white-space: nowrap;
     opacity: 0;
     transition: opacity 0.16s;
@@ -16771,24 +16771,111 @@ function showFlagPopup(country, event, allowUserList = false) {
   document.body.appendChild(popup);
   setTimeout(() => popup.style.opacity = 1, 10);
 
-popup.style.pointerEvents = 'auto'; // Make sure popup can be clicked
-
-
-  // --- ADD: Tap/click handler to show user list popup ---
+  // --- Tap/click handler based on allowUserList flag ---
   if (allowUserList) {
+    // For top bar - show list of users from this country
     popup.onclick = function(ev) {
       showCountryUserListPopup(country, x, y);
     };
     popup.ontouchstart = function(ev) {
       showCountryUserListPopup(country, x, y);
     };
+  } else {
+    // For bottom bar (user travel) - show user's own last 5 sessions for this country
+    popup.onclick = function(ev) {
+      const userId = localStorage.getItem('omUserId');
+      if (userId) {
+        showUserCountrySessions(userId, country, x, y);
+      }
+    };
+    popup.ontouchstart = function(ev) {
+      const userId = localStorage.getItem('omUserId');
+      if (userId) {
+        showUserCountrySessions(userId, country, x, y);
+      }
+    };
   }
 
-  // Remove after 6s (instead of 1.7s)
+  // Remove after 6 seconds
   setTimeout(() => {
     popup.style.opacity = 0;
     setTimeout(() => popup.remove(), 350);
   }, 6000);
+}
+
+async function showUserCountrySessions(userId, country, x, y) {
+  // Remove any existing popup
+  const oldPopup = document.getElementById('user-country-sessions');
+  if (oldPopup) oldPopup.remove();
+
+  // Fetch user's last 5 sessions for this specific country
+  let { data: sessions, error } = await supabase
+    .from('om_sessions')
+    .select('duration_seconds, started_at')
+    .eq('user_id', userId)
+    .eq('country', country)
+    .order('started_at', { ascending: false })
+    .limit(5);
+
+  if (error || !sessions || sessions.length === 0) {
+    const noSessions = document.createElement('div');
+    noSessions.id = 'user-country-sessions';
+    noSessions.textContent = `No sessions in ${country}`;
+    noSessions.style.cssText = `
+      position: fixed;
+      left: ${x}px; top: ${y - 50}px;
+      transform: translate(-50%, -100%);
+      background: rgba(0,0,0,0.9);
+      color: #fde68a;
+      padding: 8px 16px;
+      border-radius: 12px;
+      z-index: 10005;
+    `;
+    document.body.appendChild(noSessions);
+    setTimeout(() => noSessions.remove(), 3000);
+    return;
+  }
+
+  const formatRelativeTime = (timestamp) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMins = Math.floor((now - date) / 60000);
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins} min ago`;
+    if (diffMins < 1440) return `${Math.floor(diffMins / 60)} hours ago`;
+    return `${Math.floor(diffMins / 1440)} days ago`;
+  };
+
+  const popup = document.createElement('div');
+  popup.id = 'user-country-sessions';
+  popup.style.cssText = `
+    position: fixed;
+    left: ${x}px; top: ${y - 50}px;
+    transform: translate(-50%, -100%);
+    background: rgba(0,0,0,0.95);
+    color: #fde68a;
+    padding: 12px;
+    border-radius: 12px;
+    min-width: 260px;
+    z-index: 10005;
+    box-shadow: 0 0 12px rgba(253,230,138,0.3);
+  `;
+
+  popup.innerHTML = `
+    <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:8px;text-align:center;">
+      <strong>${country}</strong> - Your last ${sessions.length} sessions
+    </div>
+    ${sessions.map((session, idx) => `
+      <div style="padding:6px 0;border-bottom:1px solid #333;">
+        <span style="color:#ffd700;">${idx + 1}.</span>
+        <span style="float:right;">${formatDurationGrid(session.duration_seconds || 0)}</span>
+        <div style="font-size:0.7rem;color:#999;margin-top:3px;">${formatRelativeTime(session.started_at)}</div>
+      </div>
+    `).join('')}
+  `;
+
+  document.body.appendChild(popup);
+  setTimeout(() => popup.remove(), 8000);
 }
 
 async function showCountryUserListPopup(country, x, y) {
