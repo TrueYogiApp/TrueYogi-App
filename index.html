@@ -19608,32 +19608,39 @@ function closeEarthGrid() {
     flameTimerInterval = null;
   }
   
-    // Clear debounce timer
+  // Clear debounce timer
   if (renderDebounceTimer) {
     clearTimeout(renderDebounceTimer);
     renderDebounceTimer = null;
   }
   
-    // Clear starfield cache
+  // Clear starfield cache
   starfieldCanvas = null;
   starfieldCtx = null;
   
-  // Remove ALL zone popups + other tooltips
-  document.querySelectorAll('.earthzone-popup').forEach(el => el.remove());
+  // Remove ALL popups and tooltips - more aggressive approach
+  const popupSelectors = [
+    '.earthzone-popup',
+    '#flag-popup',
+    '#country-user-list-popup',
+    '#flame-keeper-list',
+    '#user-list-popup',
+    '#flame-tooltip',
+    '#current-user-mins-popup',
+    '#awareness-tooltip',
+    '#user-country-sessions'
+  ];
+  
+  popupSelectors.forEach(selector => {
+    document.querySelectorAll(selector).forEach(el => el.remove());
+  });
 
-  [
-    'flag-popup',
-    'country-user-list-popup',
-    'flame-keeper-list',
-    'user-list-popup',
-    'flame-tooltip',
-    'current-user-mins-popup',
-    'country-user-list-popup',
-    'user-country-sessions',
-	'awareness-tooltip', 
-  ].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.remove();
+  // Also remove any dynamically created popups that might not have IDs
+  const allPopups = document.querySelectorAll('[id*="popup"], [class*="popup"]');
+  allPopups.forEach(el => {
+    if (el.id.includes('flag') || el.id.includes('country') || el.id.includes('user')) {
+      el.remove();
+    }
   });
 
   const container = document.getElementById('earthGridContainer');
@@ -19641,6 +19648,7 @@ function closeEarthGrid() {
     container.style.opacity = 0;
     setTimeout(() => container.style.display = 'none', 1000);
   }
+  
   gridChannel?.unsubscribe();
   gridChannel = null;
 }
