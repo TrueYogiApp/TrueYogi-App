@@ -10950,6 +10950,12 @@ function confirmStartMeditation() {
 
 function cancelStartMeditation() {
   document.getElementById('start-meditation-modal').classList.add('hidden');
+  
+  // Re-enable the start button
+  const startButton = document.getElementById('start-button');
+  startButton.disabled = false;
+  startButton.style.opacity = '1';
+  startButton.style.cursor = 'pointer';
 }
 
 let meditationSelfHealInterval = null;
@@ -10975,177 +10981,244 @@ function stopMeditationSelfHeal() {
   }
 }
 
-  async function startMeditation() {
-   // 1. If journey wallet exists but wallet is not connected, block session start 
-  const journeyWallet = localStorage.getItem('currentJourneyWallet');
-  const walletIsConnected = !!window.walletPublicKey;
-  if (journeyWallet && !walletIsConnected) {
-    // Show modal: Please connect your wallet to continue your meditation journey.
-    showConnectWalletRequiredModal();
+async function startMeditation() {
+  const startButton = document.getElementById('start-button');
+  
+  // Prevent multiple clicks
+  if (startButton.disabled) {
     return;
   }
   
-  // Block meditation if wallet doesn't match journey wallet
-  if (window.walletPublicKey && journeyWallet && journeyWallet !== window.walletPublicKey) {
-    showWalletSwitchBlockModal(journeyWallet, window.walletPublicKey);
-    return;
-  }
-  // 2.5. Block and trigger verification if not verified (no valid JWT)
-  const jwtToken = localStorage.getItem('jwtToken');
-  const tokenValid = jwtToken && getJwtExpiry(jwtToken) > Date.now();
-  const jwtExpiry = getJwtExpiry(jwtToken);
-
-
-  if (
-    currentMode === 'yogi' &&
-    journeyWallet &&
-    walletIsConnected &&
-    !tokenValid
-  ) {
-    // Show verify identity modal and after user verifies, start meditation seamlessly
-    window.afterIdentityVerified = function() {
-      window.afterIdentityVerified = null;
-    };
-    showAuthRequiredModal();
-    return;
-  }
+  // Disable the button immediately
+  startButton.disabled = true;
+  startButton.style.opacity = '0.6';
+  startButton.style.cursor = 'not-allowed';
   
-  // NEW: Token valid but less than 2 hour left
-if (
-  currentMode === 'yogi' &&
-  journeyWallet &&
-  walletIsConnected &&
-  tokenValid &&
-  jwtExpiry - Date.now() < 7200 * 1000
-) {
-  window.afterIdentityVerified = function() {
-    window.afterIdentityVerified = null;
-  };
-  showAuthRequiredModal();
-  return;
-}
-
-  // Flow check (EXACT same logic)
-if (
-  currentMode === 'flow' &&
-  journeyWallet &&
-  walletIsConnected &&
-  !tokenValid
-) {
-  window.afterIdentityVerified = function() {
-    showStartMeditationModal();
-    window.afterIdentityVerified = null;
-  };
-  showAuthRequiredModal();
-  return;
-}
-
-// Day-21 device check (only in Yogi mode)
-if (
-  currentMode === 'yogi' &&
-  challengeData.currentDay >= 22 &&
-  !isMobile()
-) {
-  // Show modal and block session start
-  showMobileRequiredModal();
-  return;
-}
-
-// Day-21 wallet check (only in Yogi mode, **ONLY on mobile**)
-if (
-  currentMode === 'yogi' &&
-  challengeData.currentDay >= 22 &&
-  isMobile() &&       // added (only mobile devices)
-  (!window.walletPublicKey || !localStorage.getItem('jwtToken'))
-) {
-  document.getElementById('wallet-required-modal').classList.remove('hidden');
-  return;
-}
-
-  updateEndDateDisplay();
-  updateStartDateDisplay();
-  updateNowDisplay();
-  initAudioContext();
-  
-// First handle the Yogi mode validation and session selection
-if (currentMode === 'yogi') {
-  const now = new Date();
-  const today = getLocalDateString(now);
-  
-  // Check if challenge has ended
-  if (challengeData.endDate) {
-    const endDate = new Date(challengeData.endDate + "T23:59:59");
-    if (now > endDate) {
-      // Only show completed modal if streak days >= 40
-      if (challengeData.streakDays >= 40) {
-        showChallengeCompletedModal();
-      } else {
-        showMissedSessionModal();
-      }
+  try {
+    // 1. If journey wallet exists but wallet is not connected, block session start 
+    const journeyWallet = localStorage.getItem('currentJourneyWallet');
+    const walletIsConnected = !!window.walletPublicKey;
+    if (journeyWallet && !walletIsConnected) {
+      // Show modal: Please connect your wallet to continue your meditation journey.
+      showConnectWalletRequiredModal();
+      startButton.disabled = false;
+      startButton.style.opacity = '1';
+      startButton.style.cursor = 'pointer';
       return;
     }
-  }
-
-    // Block if missed session in Yogi mode
-if (hasMissedSession()) {
-  showMissedSessionModal();
-  return;
-}
-  
-  const currentHours = now.getHours();
-  const currentMinutes = now.getMinutes();
-  const currentTime = currentHours * 60 + currentMinutes;
-  let selectedSession = null;
-
-  // Check if before start date
-function getLocalDateString(dt) {
-  return dt.getFullYear() + "-" +
-    String(dt.getMonth()+1).padStart(2, "0") + "-" +
-    String(dt.getDate()).padStart(2, "0");
-}
-const todayStr = getLocalDateString(new Date());
-if (todayStr < challengeData.startDate) {
-  showSessionTimeModal();
-  return;
-}
-
-  for (const session of userSessionTimes) {
-    const [hours, minutes] = session.time.split(':').map(Number);
-    const sessionTime = hours * 60 + minutes;
-    const isCompleted = challengeData.sessionsCompleted.some(
-      completed => completed.time === session.time && completed.date === today
-    );
-    // Only allow if in window and not already completed
-    if (Math.abs(sessionTime - currentTime) <= 10 && !isCompleted) {
-      selectedSession = session;
-      break;
+    
+    // Block meditation if wallet doesn't match journey wallet
+    if (window.walletPublicKey && journeyWallet && journeyWallet !== window.walletPublicKey) {
+      showWalletSwitchBlockModal(journeyWallet, window.walletPublicKey);
+      startButton.disabled = false;
+      startButton.style.opacity = '1';
+      startButton.style.cursor = 'pointer';
+      return;
     }
-  }
+    
+    // 2.5. Block and trigger verification if not verified (no valid JWT)
+    const jwtToken = localStorage.getItem('jwtToken');
+    const tokenValid = jwtToken && getJwtExpiry(jwtToken) > Date.now();
+    const jwtExpiry = getJwtExpiry(jwtToken);
 
-  if (!selectedSession) {
-    const remainingSessions = userSessionTimes.filter(session => {
-      return !challengeData.sessionsCompleted.some(
-        completed => completed.time === session.time && completed.date === today
-      );
-    });
-    if (remainingSessions.length === 0) {
-      showCompletedSessionsModal(challengeData.requiredSessions);
+    if (
+      currentMode === 'yogi' &&
+      journeyWallet &&
+      walletIsConnected &&
+      !tokenValid
+    ) {
+      // Show verify identity modal and after user verifies, start meditation seamlessly
+      window.afterIdentityVerified = function() {
+        window.afterIdentityVerified = null;
+      };
+      showAuthRequiredModal();
+      startButton.disabled = false;
+      startButton.style.opacity = '1';
+      startButton.style.cursor = 'pointer';
+      return;
+    }
+    
+    // NEW: Token valid but less than 2 hour left
+    if (
+      currentMode === 'yogi' &&
+      journeyWallet &&
+      walletIsConnected &&
+      tokenValid &&
+      jwtExpiry - Date.now() < 7200 * 1000
+    ) {
+      window.afterIdentityVerified = function() {
+        window.afterIdentityVerified = null;
+      };
+      showAuthRequiredModal();
+      startButton.disabled = false;
+      startButton.style.opacity = '1';
+      startButton.style.cursor = 'pointer';
+      return;
+    }
+
+    // Flow check (EXACT same logic)
+    if (
+      currentMode === 'flow' &&
+      journeyWallet &&
+      walletIsConnected &&
+      !tokenValid
+    ) {
+      window.afterIdentityVerified = function() {
+        showStartMeditationModal();
+        window.afterIdentityVerified = null;
+      };
+      showAuthRequiredModal();
+      startButton.disabled = false;
+      startButton.style.opacity = '1';
+      startButton.style.cursor = 'pointer';
+      return;
+    }
+
+    // Day-21 device check (only in Yogi mode)
+    if (
+      currentMode === 'yogi' &&
+      challengeData.currentDay >= 22 &&
+      !isMobile()
+    ) {
+      // Show modal and block session start
+      showMobileRequiredModal();
+      startButton.disabled = false;
+      startButton.style.opacity = '1';
+      startButton.style.cursor = 'pointer';
+      return;
+    }
+
+    // Day-21 wallet check (only in Yogi mode, **ONLY on mobile**)
+    if (
+      currentMode === 'yogi' &&
+      challengeData.currentDay >= 22 &&
+      isMobile() &&
+      (!window.walletPublicKey || !localStorage.getItem('jwtToken'))
+    ) {
+      document.getElementById('wallet-required-modal').classList.remove('hidden');
+      startButton.disabled = false;
+      startButton.style.opacity = '1';
+      startButton.style.cursor = 'pointer';
+      return;
+    }
+
+    updateEndDateDisplay();
+    updateStartDateDisplay();
+    updateNowDisplay();
+    initAudioContext();
+    
+    // First handle the Yogi mode validation and session selection
+    if (currentMode === 'yogi') {
+      const now = new Date();
+      const today = getLocalDateString(now);
+      
+      // Check if challenge has ended
+      if (challengeData.endDate) {
+        const endDate = new Date(challengeData.endDate + "T23:59:59");
+        if (now > endDate) {
+          // Only show completed modal if streak days >= 40
+          if (challengeData.streakDays >= 40) {
+            showChallengeCompletedModal();
+          } else {
+            showMissedSessionModal();
+          }
+          startButton.disabled = false;
+          startButton.style.opacity = '1';
+          startButton.style.cursor = 'pointer';
+          return;
+        }
+      }
+
+      // Block if missed session in Yogi mode
+      if (hasMissedSession()) {
+        showMissedSessionModal();
+        startButton.disabled = false;
+        startButton.style.opacity = '1';
+        startButton.style.cursor = 'pointer';
+        return;
+      }
+      
+      const currentHours = now.getHours();
+      const currentMinutes = now.getMinutes();
+      const currentTime = currentHours * 60 + currentMinutes;
+      let selectedSession = null;
+
+      // Check if before start date
+      function getLocalDateString(dt) {
+        return dt.getFullYear() + "-" +
+          String(dt.getMonth()+1).padStart(2, "0") + "-" +
+          String(dt.getDate()).padStart(2, "0");
+      }
+      const todayStr = getLocalDateString(new Date());
+      if (todayStr < challengeData.startDate) {
+        showSessionTimeModal();
+        startButton.disabled = false;
+        startButton.style.opacity = '1';
+        startButton.style.cursor = 'pointer';
+        return;
+      }
+
+      for (const session of userSessionTimes) {
+        const [hours, minutes] = session.time.split(':').map(Number);
+        const sessionTime = hours * 60 + minutes;
+        const isCompleted = challengeData.sessionsCompleted.some(
+          completed => completed.time === session.time && completed.date === today
+        );
+        // Only allow if in window and not already completed
+        if (Math.abs(sessionTime - currentTime) <= 10 && !isCompleted) {
+          selectedSession = session;
+          break;
+        }
+      }
+
+      if (!selectedSession) {
+        const remainingSessions = userSessionTimes.filter(session => {
+          return !challengeData.sessionsCompleted.some(
+            completed => completed.time === session.time && completed.date === today
+          );
+        });
+        if (remainingSessions.length === 0) {
+          showCompletedSessionsModal(challengeData.requiredSessions);
+        } else {
+          showSessionTimeModal();
+        }
+        startButton.disabled = false;
+        startButton.style.opacity = '1';
+        startButton.style.cursor = 'pointer';
+        return;
+      }
+
+      targetDuration = selectedSession.duration;
+      currentSessionTime = selectedSession.time;
     } else {
-      showSessionTimeModal();
+      // Flow - get duration from dropdown
+      targetDuration = parseInt(document.getElementById('duration').value);
+      currentSessionTime = null;
     }
-    return;
-  }
 
-    targetDuration = selectedSession.duration;
-    currentSessionTime = selectedSession.time;
-  } else {
-    // Flow - get duration from dropdown
-    targetDuration = parseInt(document.getElementById('duration').value);
-    currentSessionTime = null;
+    // Now show the confirmation modal instead of starting immediately
+    showStartMeditationModal();
+    
+    // Note: Button stays disabled until meditation session actually starts
+    // We'll re-enable it if user cancels or when meditation finishes
+    
+  } catch (error) {
+    console.error('Error in startMeditation:', error);
+    // Re-enable button if there's an error
+    startButton.disabled = false;
+    startButton.style.opacity = '1';
+    startButton.style.cursor = 'pointer';
   }
+}
 
-  // Now show the confirmation modal instead of starting immediately
-  showStartMeditationModal();
+// Add this to re-enable the button when meditation session ends or is interrupted
+function enableStartButton() {
+  const startButton = document.getElementById('start-button');
+  if (startButton) {
+    startButton.disabled = false;
+    startButton.style.opacity = '1';
+    startButton.style.cursor = 'pointer';
+  }
 }
 
 
@@ -11514,6 +11587,7 @@ if (document.getElementById('music-toggle').checked) {
 	updateHideUiBtnVisibility();
 	updateHideUiButtonVisibility();
 	disableMobileAudioResume();
+	enableStartButton();
     hideBtn.style.display = 'none';
     meditationCanvas.classList.add('hidden');
 	if ("vibrate" in navigator) navigator.vibrate(20);
@@ -11610,6 +11684,7 @@ function updateTimer() {
     releaseWakeLock();
     disableMobileAudioResume();
     stopMeditationSelfHeal();
+	enableStartButton();
     
     const modal = document.getElementById('end-meditation-modal');
     if (!modal.classList.contains('hidden')) {
