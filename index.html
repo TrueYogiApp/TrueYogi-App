@@ -19987,6 +19987,10 @@ function canSwipe() {
   // ADD THIS LINE FIRST - Block swipes if welcome modal is open
   if (typeof openModalCount !== 'undefined' && openModalCount > 0) return false;
   
+   // ADD THIS LINE - Block if start meditation confirmation modal is open
+  const startModal = document.getElementById('start-meditation-modal');
+  if (startModal && !startModal.classList.contains('hidden')) return false;
+  
   if (typeof sessionActive !== 'undefined' && sessionActive) return false;
   const completeSection = document.getElementById('complete-section');
   const finalSection = document.getElementById('final-section');
