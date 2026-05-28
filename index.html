@@ -3006,6 +3006,34 @@ body.modal-open {
     100% { border-color: violet; background-position: 0% 50%; }
   }
 
+/* logo button feel */ 
+#logo-sacred {
+  cursor: pointer;
+  transition: transform 0.08s linear;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#logo-sacred:active {
+  transform: scale(0.94);
+}
+
+/* Optional: Add a subtle glow on tap */
+@keyframes tapGlow {
+  0% {
+    filter: drop-shadow(0 0 0px rgba(234, 179, 8, 0));
+  }
+  50% {
+    filter: drop-shadow(0 0 8px rgba(234, 179, 8, 0.8));
+  }
+  100% {
+    filter: drop-shadow(0 0 0px rgba(234, 179, 8, 0));
+  }
+}
+
+#logo-sacred:active {
+  animation: tapGlow 0.15s ease-out;
+}
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
