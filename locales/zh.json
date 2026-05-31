@@ -455,7 +455,7 @@
 "configErrorGapBetweenSessions": "每个会话结束和下一个会话开始之间必须至少有3小时的间隔。",
 "samedaySession": "所有会话时间必须在同一天！请调整您之前的时间或时长。",
   "changeAvatar": "更换头像",
-  "resetAvatar": "重置头像",
+  "resetAvatar": " ",
   "resetAvatarConfirm": "重置头像？",
   "yes": "是",
   "no": "否"

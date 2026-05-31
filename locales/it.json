@@ -455,7 +455,7 @@
 "configErrorGapBetweenSessions": "Gli orari delle sessioni devono avere almeno 3 ore di intervallo tra la fine di una sessione e l'inizio della successiva.",
 "samedaySession": "Gli orari delle sessioni devono tutti essere nello stesso giorno! Modifica gli orari o le durate precedenti.",
   "changeAvatar": "Cambia avatar",
-  "resetAvatar": "Reimposta avatar",
+  "resetAvatar": " ",
   "resetAvatarConfirm": "Reimpostare l'avatar?",
   "yes": "Sì",
   "no": "No"

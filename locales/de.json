@@ -454,7 +454,7 @@
 "configErrorGapBetweenSessions": "Zwischen dem Ende einer Sitzung und dem Beginn der nächsten Sitzung muss mindestens 3 Stunden Abstand bestehen.",
 "samedaySession": "Alle Sitzungszeiten müssen am selben Tag liegen! Passen Sie Ihre vorherigen Zeiten oder Dauern an.",
   "changeAvatar": "Avatar ändern",
-  "resetAvatar": "Avatar zurücksetzen",
+  "resetAvatar": " ",
   "resetAvatarConfirm": "Avatar zurücksetzen?",
   "yes": "Ja",
   "no": "Nein"

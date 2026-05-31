@@ -460,7 +460,7 @@
 "configErrorGapBetweenSessions": "Session times must have at least a 3-hour gap between the end of one session and the start of the next.",
 "samedaySession": "Session times must all be on the same day! Adjust your previous times or durations.",
 "changeAvatar": "Change Avatar",
-"resetAvatar": "Reset Avatar",
+"resetAvatar": "",
 "resetAvatarConfirm": "Reset Avatar?",
 "yes": "Yes",
 "no": "No"
