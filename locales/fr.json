@@ -457,7 +457,12 @@
 "fullReset.typeConfirmationPlaceholder": "Tapez ici...",
 "fullReset.understandCheckbox": "Je comprends que cela supprimera définitivement TOUTES mes données et ne peut pas être annulé.",
 "configErrorGapBetweenSessions": "Les horaires de session doivent avoir au moins 3 heures d’intervalle entre la fin d’une session et le début de la suivante.",
-"samedaySession": "Les horaires de session doivent tous être le même jour ! Modifiez vos horaires ou durées précédentes."
+"samedaySession": "Les horaires de session doivent tous être le même jour ! Modifiez vos horaires ou durées précédentes.",
+  "changeAvatar": "Changer l'avatar",
+  "resetAvatar": "Réinitialiser l'avatar",
+  "resetAvatarConfirm": "Réinitialiser l'avatar ?",
+  "yes": "Oui",
+  "no": "Non"
   
 
 }

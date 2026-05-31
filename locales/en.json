@@ -458,7 +458,12 @@
 "fullReset.typeConfirmationPlaceholder": "Type here...",
 "fullReset.understandCheckbox": "I understand this will permanently delete ALL my data and cannot be undone.",
 "configErrorGapBetweenSessions": "Session times must have at least a 3-hour gap between the end of one session and the start of the next.",
-"samedaySession": "Session times must all be on the same day! Adjust your previous times or durations."
+"samedaySession": "Session times must all be on the same day! Adjust your previous times or durations.",
+"changeAvatar": "Change Avatar",
+"resetAvatar": "Reset Avatar",
+"resetAvatarConfirm": "Reset Avatar?",
+"yes": "Yes",
+"no": "No"
 
   
 }
