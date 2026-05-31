@@ -6007,6 +6007,7 @@ function renderLiveList() {
     let spaceshipPopupTimer = null;
     let spaceshipPopupShown = false;
     let openModalCount = 0;
+	let meditateGuideTimer = null;
 	
     // Challenge Data
     let challengeData = {
@@ -12787,11 +12788,38 @@ function toggleMeditationGuide() {
   guide.classList.toggle('hidden');
 
   if (wasHidden) {
+    // OPENING the guide
     updateMeditationGuideImage(currentMode);
     startMeditationGuideAnimation();
+    
+    // Start 3-minute timer for auto music
+    meditateGuideTimer = setTimeout(() => {
+      // Simulate a click on the TrueYogi meditation image
+      const truemeditateImg = document.querySelector('#meditation-guide-image img[alt="TrueYogi Meditation"]');
+      if (truemeditateImg) {
+        // Create a fake click event at the center of the image
+        const rect = truemeditateImg.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const clickEvent = new MouseEvent('click', {
+          clientX: centerX,
+          clientY: centerY,
+          bubbles: true
+        });
+        truemeditateImg.dispatchEvent(clickEvent);
+      }
+    }, 180000); // 3 minutes
+    
   } else {
+    // CLOSING the guide
     stopMeditationGuideAnimation();
-    stopMeditationMusicOnClose();
+    stopMeditationMusicOnClose(); // This already stops the music
+    
+    // Clear the timer
+    if (meditateGuideTimer) {
+      clearTimeout(meditateGuideTimer);
+      meditateGuideTimer = null;
+    }
   }
 }
 
