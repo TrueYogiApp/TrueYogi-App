@@ -11305,19 +11305,35 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Update function (same as before)
-async function updateLiveCount() {
-  try {
-    const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_stats');
-    const data = await response.json();
+let cachedData = null;
+let cacheTimestamp2 = 0;
+const CACHE_DURATION2 = 15000; // 15 seconds cache
 
+// Modified updateLiveCount with caching
+async function updateLiveCount(forceRefresh = false) {
+  try {
+    let data;
+    
+    // Check cache first
+    const now = Date.now();
+    if (!forceRefresh && cachedData && (now - cacheTimestamp2) < CACHE_DURATION2) {
+      data = cachedData;
+    } else {
+      // Fetch only if cache expired
+      const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/meditation_stats');
+      data = await response.json();
+      cachedData = data;
+      cacheTimestamp2 = now;
+    }
+    
     // Set the count
     document.querySelectorAll('.live-count').forEach(el => {
       el.textContent = data.live_count || '0';
-	  			// RESTART ANIMATION:
-	  el.classList.remove('count-animate');
-	  // Trigger reflow to restart animation, works everywhere:
-	  void el.offsetWidth;
-	  el.classList.add('count-animate');
+      
+      // RESTART ANIMATION:
+      el.classList.remove('count-animate');
+      void el.offsetWidth;
+      el.classList.add('count-animate');
     });
 
     // Get the SVG image element
@@ -11356,61 +11372,79 @@ async function updateLiveCount() {
       const isCurrentUser = id === localStorage.getItem('omUserId');
       const userMode = user.mode ? ` <span style="color:#ccc;font-size:0.96em;">(${user.mode})</span>` : '';
 
-// If no challenge_id OR currentDay = 0, color stays #777777 (gray)
-	let color = '#777777';
-	const currentDay = user.current_day || 0;
-	const streakDays = user.streak_day || 0;
+      // Calculate remaining time based on CURRENT time
+      const now = Date.now();
+      const startTime = new Date(user.timestamp + 'Z').getTime();
+      const endTime = startTime + (user.duration * 1000);
+      const remainingSeconds = Math.max(0, Math.floor((endTime - now) / 1000));
 
-	// NEW: If streak is 0, force gray color
-	if (streakDays === 0 && currentDay > 1) {
-	  color = '#777777';
-	} else if (currentDay > 0 && user.challenge_id) {
-	  let isInactive21DayUser = false;
-	  let isInactive41DayUser = false;
-	  
-	  if (user.last_session_date && user.start_date) {
-		const start = new Date(user.start_date);
-		const last = new Date(user.last_session_date);
-		const today = new Date();
-		
-		const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
-		const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
-		
-		isInactive21DayUser = (daysSinceLastSession > 2 && daysBetween >= 21);
-		isInactive41DayUser = (daysSinceLastSession > 2 && daysBetween >= 41);
-	  }
-	  
-	  // Apply colors
-	  if (isInactive41DayUser) {
-		color = '#a855f7'; // Violet for inactive 41+ day users
-	  } else if (isInactive21DayUser) {
-		color = '#22c55e'; // Green for inactive 21-day users
-	  } else {
-		// Rainbow logic
-		if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';
-		else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42';
-		else if (currentDay >= 13 && currentDay <= 18) color = '#facc15';
-		else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e';
-		else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc';
-		else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1';
-		else if (currentDay >= 37) color = '#a855f7';
-	  }
-	}
-	  
-  out += `
+      // Only show remaining time if there's actually time left
+      let remainingTimeText = '';
+      if (remainingSeconds > 0) {
+        const remainingMinutes = Math.floor(remainingSeconds / 60);
+        const remainingSecs = remainingSeconds % 60;
+        remainingTimeText = ` (${remainingMinutes}:${remainingSecs.toString().padStart(2, '0')})`;
+      } else {
+        remainingTimeText = ' (0:00)';
+      }
+
+      const isExpired = remainingSeconds <= 0;
+
+      // Color logic (unchanged)
+      let color = '#777777';
+      const currentDay = user.current_day || 0;
+      const streakDays = user.streak_day || 0;
+
+      if (streakDays === 0 && currentDay > 1) {
+        color = '#777777';
+      } else if (currentDay > 0 && user.challenge_id) {
+        let isInactive21DayUser = false;
+        let isInactive41DayUser = false;
+        
+        if (user.last_session_date && user.start_date) {
+          const start = new Date(user.start_date);
+          const last = new Date(user.last_session_date);
+          const today = new Date();
+          
+          const daysBetween = Math.floor((last - start) / (1000 * 60 * 60 * 24)) + 1;
+          const daysSinceLastSession = Math.floor((today - last) / (1000 * 60 * 60 * 24));
+          
+          isInactive21DayUser = (daysSinceLastSession > 2 && daysBetween >= 21);
+          isInactive41DayUser = (daysSinceLastSession > 2 && daysBetween >= 41);
+        }
+        
+        if (isInactive41DayUser) {
+          color = '#a855f7';
+        } else if (isInactive21DayUser) {
+          color = '#22c55e';
+        } else {
+          if (currentDay >= 1 && currentDay <= 6) color = '#ef4444';
+          else if (currentDay >= 7 && currentDay <= 12) color = '#f59e42';
+          else if (currentDay >= 13 && currentDay <= 18) color = '#facc15';
+          else if (currentDay >= 19 && currentDay <= 24) color = '#22c55e';
+          else if (currentDay >= 25 && currentDay <= 30) color = '#7dd3fc';
+          else if (currentDay >= 31 && currentDay <= 36) color = '#6366f1';
+          else if (currentDay >= 37) color = '#a855f7';
+        }
+      }
+
+      out += `
 <tr${isCurrentUser ? ` style="background:#191b36;border-radius:7px;"` : ''}>
   <td style="padding:0 4px 0 0;color:${isCurrentUser ? '#fff' : '#777777'};font-weight:${isCurrentUser ? '700' : '400'}; display: flex; gap: 5px; align-items: center; justify-content: space-between;">
-    <span style="color:#fde68a;">${i + 1}.</span> <!-- Serial number styling -->
-    <span style="color:${color};">ID:</span> <!-- 'ID' styling -->
-    <span style="color:${color};">${shortId}</span>${userMode} <!-- Short ID styling -->
+    <span style="color:#fde68a;">${i + 1}.</span>
+    <span style="color:${color};">ID:</span>
+    <span style="color:${color};">${shortId}</span>${userMode}
     <img src="/assets/chakra.svg" alt="Chakra Spinner" class="chakra-spinner" style="
       height: 14px; width: 14px; animation: rotate 1.5s infinite linear; filter: drop-shadow(0px 0px 3px ${color});
-    "/> <!-- Chakra spinner -->
+    "/>
     ${isCurrentUser ? "<span class='pulsing-star' style='color:#facc15;font-size:1.2em;'>⭐️</span>" : ""}
   </td>
-  <td style="padding:0 0 0 14px;color:#bbf;text-align:right;">${Math.floor(user.duration / 60)}m</td>
+<td style="padding:0 0 0 14px;color:#bbf;text-align:right;">
+  ${Math.floor(user.duration / 60)}m${remainingTimeText}
+  ${isExpired ? ' <span style="color:#ff4444;">⚠️</span>' : ''}
+</td>
 </tr>`;
-});
+    });
     out += '</tbody></table>';
     listEl.innerHTML = out;
   } catch (error) {
@@ -11418,40 +11452,68 @@ async function updateLiveCount() {
   }
 }
 
-// Tooltip toggle for touch devices
-// Only for mobile/touch devices
+// Tooltip toggle with 15-second refresh (not 1 second)
 document.addEventListener('DOMContentLoaded', function() {
   const trigger = document.querySelector('.live-count-tooltip-trigger');
   const parent = document.querySelector('.live-tooltip-parent');
+  const tooltip = document.getElementById('live-meditators-tooltip');
   
   if (!trigger || !parent) return;
   
-  // Check if it's a touch device
+  let liveUpdateInterval = null;
+  
+  function startLiveUpdates() {
+    if (liveUpdateInterval) clearInterval(liveUpdateInterval);
+    // Update immediately
+    updateLiveCount();
+    // Update every 15 seconds (NOT every second)
+    liveUpdateInterval = setInterval(() => updateLiveCount(true), 15000);
+  }
+  
+  function stopLiveUpdates() {
+    if (liveUpdateInterval) {
+      clearInterval(liveUpdateInterval);
+      liveUpdateInterval = null;
+    }
+  }
+  
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
   
   if (isTouchDevice) {
-    // On mobile: toggle on click
     trigger.addEventListener('click', function(e) {
       e.stopPropagation();
-      parent.classList.toggle('active');
-    });
-    
-    // Close when clicking outside
-    document.addEventListener('click', function(e) {
-      if (!parent.contains(e.target)) {
+      const isActive = parent.classList.contains('active');
+      
+      if (!isActive) {
+        parent.classList.add('active');
+        startLiveUpdates();
+      } else {
         parent.classList.remove('active');
+        stopLiveUpdates();
       }
     });
     
-    // Prevent closing when clicking inside tooltip
-    const tooltip = document.getElementById('live-meditators-tooltip');
+    document.addEventListener('click', function(e) {
+      if (!parent.contains(e.target)) {
+        parent.classList.remove('active');
+        stopLiveUpdates();
+      }
+    });
+    
     if (tooltip) {
       tooltip.addEventListener('click', function(e) {
         e.stopPropagation();
       });
     }
+  } else {
+    parent.addEventListener('mouseenter', function() {
+      startLiveUpdates();
+    });
+    
+    parent.addEventListener('mouseleave', function() {
+      stopLiveUpdates();
+    });
   }
-  // On desktop, rely on CSS hover only (no JS needed)
 });
 
 
