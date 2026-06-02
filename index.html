@@ -11362,7 +11362,7 @@ async function updateLiveCount() {
 	const streakDays = user.streak_day || 0;
 
 	// NEW: If streak is 0, force gray color
-	if (streakDays === 0) {
+	if (streakDays === 0 && currentDay > 1) {
 	  color = '#777777';
 	} else if (currentDay > 0 && user.challenge_id) {
 	  let isInactive21DayUser = false;
