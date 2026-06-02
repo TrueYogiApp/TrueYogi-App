@@ -20066,7 +20066,7 @@ function canSwipe() {
       (finalSection && !finalSection.classList.contains('hidden')))
     return false;
   // Block if any overlay/modal
-  const modalBlocks = ['missed-session-modal','mobile-required-modal','reset-confirmation-modal','session-time-modal','next-session-modal'];
+  const modalBlocks = ['wallet-required-modal','missed-session-modal','mobile-required-modal','reset-confirmation-modal','session-time-modal','next-session-modal'];
   for (let id of modalBlocks) {
     const m = document.getElementById(id);
     if (m && !m.classList.contains('hidden')) return false;
