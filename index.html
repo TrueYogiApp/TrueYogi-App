@@ -17885,6 +17885,55 @@ if (longestFlameLink) {
   }, 30000);
 };
 
+// Add breathing animation styles for flame and tooltip
+const breathingStyles = document.createElement('style');
+breathingStyles.textContent = `
+  /* Flame breathing animation */
+  @keyframes flameBreathe {
+    0% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 9px #FF8800);
+    }
+    50% {
+      transform: scale(1.1);
+      filter: drop-shadow(0 0 18px #FF5500) drop-shadow(0 0 5px #FFAA00);
+    }
+    100% {
+      transform: scale(1);
+      filter: drop-shadow(0 0 9px #FF8800);
+    }
+  }
+  
+  /* Apply to your flame SVG */
+  .om-flame-heading-container img {
+    animation: flameBreathe 2.5s ease-in-out infinite;
+    cursor: pointer;
+  }
+  
+  /* Tooltip breathing animation */
+  @keyframes tooltipBreathe {
+    0% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+  }
+  
+  .breathing-tooltip-content {
+    animation: tooltipBreathe 2.5s ease-in-out infinite;
+    transform-origin: center;
+  }
+`;
+document.head.appendChild(breathingStyles);
+// === END OF ADDED CODE ===
+
 // Add click handler for the flame SVG in the tooltip
 document.addEventListener('click', function(e) {
   // Check if the clicked element is the flame SVG inside the tooltip
@@ -17903,7 +17952,7 @@ document.addEventListener('click', function(e) {
     const awarenessTooltip = document.createElement('div');
     awarenessTooltip.id = 'awareness-tooltip';
     awarenessTooltip.innerHTML = `
-<div style="text-align: center; max-width: 220px;">
+<div class="breathing-tooltip-content" style="text-align: center; max-width: 220px;">
   <div style="font-size: 1.2rem; font-weight: 700; color: #FFD700; margin-bottom: 10px; text-shadow: 0 0 12px #FFD700, 0 0 20px #FFA50088; letter-spacing: 0.5px;">
     Living Fire of Awareness
   </div>
