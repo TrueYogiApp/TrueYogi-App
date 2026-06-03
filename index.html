@@ -3034,6 +3034,26 @@ body.modal-open {
   animation: tapGlow 0.15s ease-out;
 }
 
+/* flame svg breath */
+@keyframes flameBreathe {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 9px #FF8800);
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 18px #FF5500) drop-shadow(0 0 5px #FFAA00);
+  }
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 9px #FF8800);
+  }
+}
+
+.om-flame-heading-container img {
+  animation: flameBreathe 2.5s ease-in-out infinite;
+}
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
