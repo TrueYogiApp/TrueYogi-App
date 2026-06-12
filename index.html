@@ -5023,7 +5023,7 @@ body.modal-open {
   
 <div id="lang-switch-container">
   <i class="fas fa-globe-asia"></i>
-  <select id="lang-switch" onchange="setLanguage(this.value)" aria-label="Select language">
+  <select id="lang-switch" onchange="handleLanguageChange(this.value)" aria-label="Select language">
     <option value="en" data-fullname="English">EN</option>
     <option value="te" data-fullname="Telugu">TE</option>
     <option value="hi" data-fullname="Hindi">HI</option>
@@ -5032,9 +5032,10 @@ body.modal-open {
     <option value="de" data-fullname="German">DE</option>
     <option value="zh" data-fullname="Chinese">ZH</option>
     <option value="ru" data-fullname="Russian">RU</option>
-    <option value="it" data-fullname="Italian">IT</option>	
-    <option value="pt" data-fullname="Portuguese">PT</option>
-    <option value="ar" data-fullname="Arabic">AR</option>		
+    <option value="it" data-fullname="Italian">IT</option>
+    <option value="ja" data-fullname="Japanese">JA</option>
+    <option value="more" data-fullname="More languages">➕ MORE</option>
+    <!-- PT and AR removed from here - they will only appear in modal -->
   </select>
 </div>
 
@@ -19969,45 +19970,270 @@ function closeEarthGrid() {
   gridChannel = null;
 }
 
-// Add this to your existing JavaScript
-document.addEventListener('DOMContentLoaded', function() {
-  const langSwitch = document.getElementById('lang-switch');
-  
-  // Store original options with full names.
+// Language map for full names
 const languageMap = {
   'en': 'English',
-  'te': 'తెలుగు',     // Telugu
-  'hi': 'हिन्दी',      // Hindi
-  'es': 'Español',     // Spanish
-  'fr': 'Français',    // French
-  'de': 'Deutsch',     // German
-  'zh': '中文',        // Chinese
-  'ru': 'Русский',     // Russian
-  'it': 'Italiano',    // Italian
-  'ja': '日本語',       // Japanese
-  'pt': 'Português',    // Portuguese
-  'ar': 'العربية',     // Arabic  
+  'te': 'తెలుగు',
+  'hi': 'हिन्दी',
+  'es': 'Español',
+  'fr': 'Français',
+  'de': 'Deutsch',
+  'zh': '中文',
+  'ru': 'Русский',
+  'it': 'Italiano',
+  'ja': '日本語',
+  'pt': 'Português',
+  'ar': 'العربية',
 };
+
+// Main languages always shown (9 languages)
+const mainLanguages = ['en', 'te', 'hi', 'es', 'fr', 'de', 'zh', 'ru', 'it'];
+
+// Rotating languages - only ONE of these appears in dropdown at a time
+const rotatingLanguages = ['ja', 'pt', 'ar'];
+
+// Store last selected language
+let lastSelectedLanguage = localStorage.getItem('lang') || 'en';
+let currentRotatingLanguage = localStorage.getItem('currentRotatingLanguage') || 'ja';
+
+// Build the dropdown based on current rotating language
+function buildLanguageDropdown() {
+  const langSwitch = document.getElementById('lang-switch');
+  const selectedLang = localStorage.getItem('lang') || 'en';
+  
+  // Clear existing options
+  langSwitch.innerHTML = '';
+  
+  // Add main languages
+  mainLanguages.forEach(langCode => {
+    const option = document.createElement('option');
+    option.value = langCode;
+    option.setAttribute('data-fullname', languageMap[langCode]);
+    option.textContent = langCode.toUpperCase();
+    langSwitch.appendChild(option);
+  });
+  
+  // Add the current rotating language
+  const rotatingOption = document.createElement('option');
+  rotatingOption.value = currentRotatingLanguage;
+  rotatingOption.setAttribute('data-fullname', languageMap[currentRotatingLanguage]);
+  rotatingOption.textContent = currentRotatingLanguage.toUpperCase();
+  langSwitch.appendChild(rotatingOption);
+  
+  // Add the MORE option
+  const moreOption = document.createElement('option');
+  moreOption.value = 'more';
+  moreOption.setAttribute('data-fullname', 'More languages');
+  moreOption.textContent = '➕ MORE';
+  langSwitch.appendChild(moreOption);
+  
+  // Set the selected value - FIXED: Don't reset to English
+  if (selectedLang === 'pt' || selectedLang === 'ar' || selectedLang === 'ja') {
+    // Always select the rotating language if it matches current
+    if (selectedLang === currentRotatingLanguage) {
+      langSwitch.value = selectedLang;
+    } else {
+      // If selected lang is PT/AR/JA but not current rotating, still try to show it
+      langSwitch.value = currentRotatingLanguage;
+      // Update localStorage to match
+      localStorage.setItem('lang', currentRotatingLanguage);
+      setLanguage(currentRotatingLanguage);
+    }
+  } else {
+    langSwitch.value = selectedLang;
+  }
+}
+
+// Show modal for additional languages
+function showMoreLanguagesModal() {
+  // Get available languages for modal (the two rotating languages NOT currently in dropdown)
+  const availableLanguages = rotatingLanguages.filter(lang => lang !== currentRotatingLanguage);
+  
+  const modal = document.createElement('div');
+  modal.id = 'more-languages-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: rgba(30,41,59,0.98);
+      border: 2px solid #eab308;
+      border-radius: 20px;
+      padding: 20px;
+      min-width: 200px;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    ">
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        ${availableLanguages.map(lang => `
+          <button onclick="selectRotatingLanguage('${lang}')" style="
+            background: rgba(234,179,8,0.2);
+            border: 1px solid #eab308;
+            color: #fde68a;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+          ">${languageMap[lang]}</button>
+        `).join('')}
+        <button onclick="closeMoreLanguagesModal()" style="
+          background: none;
+          border: none;
+          color: #999;
+          padding: 8px;
+          cursor: pointer;
+          margin-top: 10px;
+        ">Cancel</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) closeMoreLanguagesModal();
+  });
+}
+
+function selectRotatingLanguage(langCode) {
+  closeMoreLanguagesModal();
+  
+  // FIRST, set the language
+  lastSelectedLanguage = langCode;
+  localStorage.setItem('lang', langCode);
+  
+  // Apply language change BEFORE rebuilding dropdown
+  setLanguage(langCode);
+  
+  // Small delay to ensure setLanguage has completed
+  setTimeout(() => {
+    // Update current rotating language
+    currentRotatingLanguage = langCode;
+    localStorage.setItem('currentRotatingLanguage', currentRotatingLanguage);
+    
+    // Rebuild dropdown with new rotating language
+    buildLanguageDropdown();
+    
+    // FORCE the dropdown to show the short code (JA, PT, or AR)
+    const langSwitch = document.getElementById('lang-switch');
+    
+    // Set the value to the selected language
+    langSwitch.value = langCode;
+    
+    // Update ALL options to show short codes
+    Array.from(langSwitch.options).forEach(option => {
+      if (option.value === 'more') {
+        option.textContent = '➕ MORE';
+      } else if (option.value !== 'more') {
+        // Show the short code (uppercase)
+        option.textContent = option.value.toUpperCase();
+      }
+    });
+    
+    // Force a UI refresh
+    langSwitch.style.display = 'none';
+    setTimeout(() => {
+      langSwitch.style.display = '';
+    }, 10);
+  }, 50);
+}
+
+function closeMoreLanguagesModal() {
+  const modal = document.getElementById('more-languages-modal');
+  if (modal) modal.remove();
+}
+
+// Handle language selection from dropdown
+function handleLanguageChange(value) {
+  if (value === 'more') {
+    showMoreLanguagesModal();
+    // Reset dropdown to previous selection
+    const langSwitch = document.getElementById('lang-switch');
+    const savedLang = localStorage.getItem('lang') || 'en';
+    if (savedLang === currentRotatingLanguage || mainLanguages.includes(savedLang)) {
+      langSwitch.value = savedLang;
+    } else {
+      langSwitch.value = 'en';
+    }
+    return;
+  }
+  
+  lastSelectedLanguage = value;
+  localStorage.setItem('lang', value);
+  setLanguage(value);
+  
+  // Update dropdown to show short codes
+  const langSwitch = document.getElementById('lang-switch');
+  Array.from(langSwitch.options).forEach(option => {
+    if (option.value === 'more') {
+      option.textContent = '➕ MORE';
+    } else if (option.value !== 'more') {
+      option.textContent = option.value.toUpperCase();
+    }
+  });
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  buildLanguageDropdown();
+  
+  const langSwitch = document.getElementById('lang-switch');
+  const savedLang = localStorage.getItem('lang') || 'en';
+  
+  // Make sure the correct language is applied on page load
+  if (savedLang === 'pt' || savedLang === 'ar' || savedLang === 'ja') {
+    if (savedLang !== currentRotatingLanguage) {
+      currentRotatingLanguage = savedLang;
+      localStorage.setItem('currentRotatingLanguage', currentRotatingLanguage);
+      buildLanguageDropdown();
+    }
+    // Ensure setLanguage is called
+    setLanguage(savedLang);
+  }
   
   // Show full names when dropdown opens
   langSwitch.addEventListener('mousedown', function() {
     Array.from(this.options).forEach(option => {
-      option.textContent = languageMap[option.value];
+      if (option.value === 'more') {
+        option.textContent = '➕';
+      } else if (languageMap[option.value]) {
+        option.textContent = languageMap[option.value];
+      }
     });
   });
   
-  // Revert to codes when selection is made or dropdown closes
-  langSwitch.addEventListener('change', function() {
-    Array.from(this.options).forEach(option => {
-      option.textContent = option.value.toUpperCase();
-    });
-  });
-  
-  // Also revert if user clicks away without selecting
+  // Revert to short codes when dropdown closes
   langSwitch.addEventListener('blur', function() {
     Array.from(this.options).forEach(option => {
-      option.textContent = option.value.toUpperCase();
+      if (option.value === 'more') {
+        option.textContent = '➕ MORE';
+      } else if (option.value !== 'more') {
+        option.textContent = option.value.toUpperCase();
+      }
     });
+  });
+  
+  // Handle change events from dropdown
+  langSwitch.addEventListener('change', function() {
+    if (this.value !== 'more') {
+      Array.from(this.options).forEach(option => {
+        if (option.value === 'more') {
+          option.textContent = '➕ MORE';
+        } else if (option.value !== 'more') {
+          option.textContent = option.value.toUpperCase();
+        }
+      });
+    }
   });
 });
 
