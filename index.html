@@ -3077,6 +3077,19 @@ body.modal-open {
   }
 }
 
+/* videos sub-section */
+.filter-chip:hover {
+  background: rgba(255,255,255,0.15);
+  transform: translateY(-1px);
+}
+
+.filter-chip-active {
+  background: rgba(250,204,21,0.2) !important;
+  border-color: #facc15 !important;
+  color: #facc15 !important;
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -5450,9 +5463,65 @@ body.modal-open {
 
   <!-- PDF List -->
   <div id="pdf-list" style="padding: 20px; overflow-y: auto; flex: 1;"></div>
-  <!-- Video List (initially hidden) -->
-  <div id="video-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;"></div>
-  <div id="live-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;"></div>
+  <!-- Video List (initially hidden). -->
+  <!-- Video List with Filter Chips -->
+<div id="video-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;">
+  <!-- Filter Chips - Horizontal Scroll -->
+  <div style="
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 8px;
+  ">
+    <button id="filter-all-videos" class="filter-chip filter-chip-active" style="
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fef3c7;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      flex-shrink: 0;
+    ">📽️ All Videos</button>
+    
+    <button id="filter-bhagavad-gita" class="filter-chip" style="
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fef3c7;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      flex-shrink: 0;
+    ">📖 Bhagavad Gita</button>
+    
+    <!-- Vasistha Gita Button -->
+    <button id="filter-vasistha-gita" class="filter-chip" style="
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fef3c7;
+      padding: 8px 16px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 14px;
+      flex-shrink: 0;
+    ">📖 Vasistha Gita</button>
+    
+    <!-- You can add more filters here -->
+    <!-- <button id="filter-upanishads" class="filter-chip" style="flex-shrink:0;">🕉️ Upanishads</button> -->
+    <!-- <button id="filter-meditation" class="filter-chip" style="flex-shrink:0;">🧘 Meditation</button> -->
+  </div>
+  
+  <!-- Video container -->
+  <div id="video-container"></div>
+</div>
+
+<div id="live-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;"></div>
 
   <!-- PDF Viewer Overlay (same as before) -->
   <div id="pdf-viewer-overlay" style="
@@ -5512,7 +5581,6 @@ body.modal-open {
     </div>
   </div>
   
-
   <!-- Simple Footer -->
   <div style="
     padding: 15px;
@@ -5523,9 +5591,8 @@ body.modal-open {
   ">
     Tap any teaching to open, or watch a video from the Videos tab.
   </div>
-  
-
 </div>
+
 
 <script>
 // SIMPLE PDF FUNCTIONS
@@ -5622,20 +5689,41 @@ function closePDFinline() {
 }
 
 let videos = [];
+let currentVideoFilter = 'all'; // 'all', 'bhagavad-gita', or 'vasistha-gita'
 
-// Fetch and render videos
+// Fetch and render videos with filter
 function renderVideoList() {
-  const list = document.getElementById('video-list');
-  list.innerHTML = "";
+  const container = document.getElementById('video-container');
+  if (!container) return;
+  
+  container.innerHTML = "";
 
-  // Get current language (from localStorage or global)
+  // Get current language
   const currentLang = localStorage.getItem('lang') || 'en';
 
-  // Filter videos
-  const filteredVideos = videos.filter(v => (v.lang || 'en') === currentLang);
+  // Filter by language first
+  let filteredVideos = videos.filter(v => (v.lang || 'en') === currentLang);
+  
+  // Apply category filter
+  if (currentVideoFilter === 'bhagavad-gita') {
+    filteredVideos = filteredVideos.filter(v => 
+      v.category === 'bhagavad-gita' || 
+      v.title.toLowerCase().includes('bhagavad gita') ||
+      v.title.toLowerCase().includes('bhagavad-gita')
+    );
+  }
+  // NEW: Vasistha Gita filter
+  else if (currentVideoFilter === 'vasistha-gita') {
+    filteredVideos = filteredVideos.filter(v => 
+      v.category === 'vasistha-gita' || 
+      v.title.toLowerCase().includes('vasistha gita') ||
+      v.title.toLowerCase().includes('vasistha-gita') ||
+      v.title.toLowerCase().includes('vasishtha')
+    );
+  }
 
   if (filteredVideos.length === 0) {
-    list.innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">No videos for this language.</div>';
+    container.innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">No videos for this category/language.</div>';
     return;
   }
 
@@ -5651,17 +5739,70 @@ function renderVideoList() {
           <button onclick="openVideoPlayer('${vid.youtubeId}','${vid.title.replace(/'/g,'\\\'')}')" class="mode-btn" style="margin-top:7px;padding:5px 14px;background:#ffe85a;color:#2c1d00;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">Watch</button>
         </div>
       </div>`;
-    list.insertAdjacentHTML('beforeend', html);
+    container.insertAdjacentHTML('beforeend', html);
   });
+}
+
+// Setup filter buttons
+function setupVideoFilters() {
+  const filterAll = document.getElementById('filter-all-videos');
+  const filterGita = document.getElementById('filter-bhagavad-gita');
+  const filterVasistha = document.getElementById('filter-vasistha-gita'); // NEW
+  
+  if (filterAll) {
+    filterAll.onclick = function() {
+      currentVideoFilter = 'all';
+      updateFilterActiveState('all');
+      renderVideoList();
+    };
+  }
+  
+  if (filterGita) {
+    filterGita.onclick = function() {
+      currentVideoFilter = 'bhagavad-gita';
+      updateFilterActiveState('bhagavad-gita');
+      renderVideoList();
+    };
+  }
+  
+  // NEW: Vasistha Gita button handler
+  if (filterVasistha) {
+    filterVasistha.onclick = function() {
+      currentVideoFilter = 'vasistha-gita';
+      updateFilterActiveState('vasistha-gita');
+      renderVideoList();
+    };
+  }
+}
+
+function updateFilterActiveState(activeFilter) {
+  const filterAll = document.getElementById('filter-all-videos');
+  const filterGita = document.getElementById('filter-bhagavad-gita');
+  const filterVasistha = document.getElementById('filter-vasistha-gita'); // NEW
+  
+  // Reset all
+  if (filterAll) filterAll.classList.remove('filter-chip-active');
+  if (filterGita) filterGita.classList.remove('filter-chip-active');
+  if (filterVasistha) filterVasistha.classList.remove('filter-chip-active');
+  
+  // Activate the selected one
+  if (activeFilter === 'all' && filterAll) {
+    filterAll.classList.add('filter-chip-active');
+  } else if (activeFilter === 'bhagavad-gita' && filterGita) {
+    filterGita.classList.add('filter-chip-active');
+  } else if (activeFilter === 'vasistha-gita' && filterVasistha) { // NEW
+    filterVasistha.classList.add('filter-chip-active');
+  }
 }
 
 // Load videos
 document.addEventListener('DOMContentLoaded', function() {
-  fetch('https://assets.trueyogi.app/assets/Material/videos.json')
+  fetch('https://assets.trueyogi.app/assets/Material/videos3.json')
     .then(r => r.json())
     .then(data => {
       videos = data;
       renderVideoList();
+	  setupVideoFilters();
     })
     .catch(e => {
       document.getElementById('video-list').innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">Failed to load videos list.</div>';
