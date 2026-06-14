@@ -23702,19 +23702,39 @@ if (state === "hold_inhale" || state === "hold_exhale") {
  
 ctx.save();
 ctx.font = "bold 20px sans-serif";
-ctx.fillStyle = '#ffe066';    // bright, readable color
+ctx.fillStyle = '#ffe066';
 ctx.textAlign = "center";
+ctx.textBaseline = "middle";  // Better for complex scripts
 
 let labelKey = state === "inhale" ? "Inhale"
              : state === "exhale" ? "Exhale"
-             : "Hold2"; // use "Hold2" as your key
+             : "Hold2";
 
-let label = t(labelKey); // fetches translation from your loaded tkeys
+let label = t(labelKey);
 
+// Telugu often needs more space - use a slightly smaller font
+let currentFontSize = 18;  // Reduced from 20 for Telugu
+let minFontSize = 12;
+
+ctx.font = `bold ${currentFontSize}px sans-serif`;
+let metrics = ctx.measureText(label);
+
+// For Telugu, add extra padding because measureText underestimates width
+let estimatedWidth = metrics.width * 1.15;  // 15% extra for Telugu characters
+let maxWidth = ctx.canvas.width - 40;
+
+while (estimatedWidth > maxWidth && currentFontSize > minFontSize) {
+    currentFontSize--;
+    ctx.font = `bold ${currentFontSize}px sans-serif`;
+    metrics = ctx.measureText(label);
+    estimatedWidth = metrics.width * 1.15;
+}
+
+// Draw with some top padding to avoid clipping
 ctx.globalAlpha = 1;
 ctx.shadowColor = "#222";
 ctx.shadowBlur = 8;
-ctx.fillText(label, ctx.canvas.width/2, 21);
+ctx.fillText(label, ctx.canvas.width/2, 45);  // Moved down slightly from 40 to 45
 ctx.restore();
 
 // Inside drawFrame:
