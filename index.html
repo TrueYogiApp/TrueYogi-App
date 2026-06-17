@@ -3089,6 +3089,35 @@ body.modal-open {
   color: #facc15 !important;
 }
 
+/* yoga phoses css */
+.om-counter-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin: 18px auto 0 auto;
+}
+
+.yoga-svg {
+  width: 40px;
+  height: 40px;
+  opacity: 0.8;
+  display: none; /* Hidden by default */
+}
+
+.yoga-svg.visible {
+  display: block; /* Show when count > 0 */
+}
+
+@media (max-width: 600px) {
+  .yoga-svg {
+    width: 30px;
+    height: 30px;
+  }
+  .om-counter-wrapper {
+    gap: 10px;
+  }
+}
 
 </style>
   
@@ -3647,7 +3676,21 @@ body.modal-open {
 </button>
     </div>
 	
-<div id="om-counter" class="om-counter"></div>
+<!-- Replace inline SVGs with img tags -->
+<div class="om-counter-wrapper">
+  <!-- Left SVGs -->
+  <img src="assets/yoga/yoga1.svg" alt="Yoga Pose" class="yoga-svg left" id="yoga1-left">
+  <img src="assets/yoga/yoga2.svg" alt="Yoga Pose" class="yoga-svg left" id="yoga2-left">
+  <img src="assets/yoga/yoga3.svg" alt="Yoga Pose" class="yoga-svg left" id="yoga3-left">
+  
+  <!-- OM Counter -->
+  <div id="om-counter" class="om-counter"></div>
+  
+  <!-- Right SVGs -->
+  <img src="assets/yoga/yoga4.svg" alt="Yoga Pose" class="yoga-svg right" id="yoga1-right">
+  <img src="assets/yoga/yoga5.svg" alt="Yoga Pose" class="yoga-svg right" id="yoga2-right">
+  <img src="assets/yoga/yoga6.svg" alt="Yoga Pose" class="yoga-svg right" id="yoga3-right">
+</div>
 
 <!-- Desktop-only Mobile Reminder Card -->
 <div id="mobile-reminder-card" class="auth-card hidden" style="margin: 1.5em auto 0 auto; max-width: 330px; text-align: center;">
@@ -15155,21 +15198,20 @@ let lastCount = null; // Place this at the top (outside the function)
 async function updateCount() {
   try {
     // Get the up-to-date count directly from Supabase
-     const { count, error } = await supabase
-       .from('om_presence')
-       .select('*', { count: 'exact', head: true });
+    const { count, error } = await supabase
+      .from('om_presence')
+      .select('*', { count: 'exact', head: true });
     if (error) throw error;
-	
-	    // Get OM count from your backend API instead of Supabase directly!
-    //const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/om-count');
-    //const { count } = await resp.json();
-
+    
     const newCount = (typeof count === "number") ? count : 0;
 
     if (newCount > 0) {
       counterEl.innerHTML = `<span class="om-number">${newCount}</span>`;
       counterEl.classList.remove('hidden');
       counterEl.style.opacity = 1;
+
+      // Show SVGs when count > 0
+      toggleYogaSvgs(newCount);
 
       // Animate if the count changed
       if (lastCount !== null && newCount !== lastCount) {
@@ -15179,7 +15221,7 @@ async function updateCount() {
       }
       lastCount = newCount;
 
-        // --------- KEEP THIS BLOCK ---------
+      // --------- KEEP THIS BLOCK ---------
       const omNumber = counterEl.querySelector('.om-number');
       if (omNumber) {
         omNumber.onclick = function(e) {
@@ -15193,14 +15235,21 @@ async function updateCount() {
       counterEl.classList.add('hidden');
       counterEl.innerHTML = '';
       lastCount = 0;
+      
+      // Hide SVGs when count is 0
+      toggleYogaSvgs(0);
     }
   } catch (err) {
     counterEl.classList.add('hidden');
     counterEl.innerHTML = '';
     lastCount = 0;
+    
+    // Hide SVGs on error
+    toggleYogaSvgs(0);
     console.error(err);
   }
-    // Always sync OM counter glow ("active") with local omPresenceId
+  
+  // Always sync OM counter glow ("active") with local omPresenceId
   if (counterEl) {
     let omPresenceId = localStorage.getItem('omPresenceId');
     if (omPresenceId) {
@@ -15209,6 +15258,163 @@ async function updateCount() {
       counterEl.classList.remove('active');
     }
   }
+}
+
+// Add this at the top with your other variables
+const yogaPoses = [
+  'yoga1.svg',
+  'yoga2.svg',
+  'yoga3.svg',
+  'yoga4.svg',
+  'yoga5.svg',
+  'yoga6.svg',
+  'yoga7.svg',
+  'yoga8.svg',
+  'yoga9.svg',
+  'yoga10.svg',
+  'yoga11.svg',
+  'yoga12.svg',
+  'yoga13.svg',
+  'yoga14.svg',
+  'yoga15.svg'  
+];
+
+// Add this with your other variables
+const yogaColors = [
+  '#FF1A1A',    // red
+  '#FF8800',    // orange
+  '#FFD600',    // yellow
+  '#29D884',    // green
+  '#3B82F6',    // blue
+  '#4338CA',    // indigo
+  '#C026D3',    // violet
+  '#FFD700',    // gold
+  '#BFC9CA',    // silver
+  '#1a4fcc',    // sapphire
+  '#606060',    // dark-silver
+  '#FFFFFF'     // white
+];
+
+// Helper function to get random unique colors
+function getUniqueColors(count) {
+  const shuffled = [...yogaColors].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
+
+let poseInterval = null;
+
+// Helper function to get random unique poses
+function getUniquePoses(count) {
+  // Shuffle the array
+  const shuffled = [...yogaPoses].sort(() => Math.random() - 0.5);
+  // Return first 'count' items
+  return shuffled.slice(0, count);
+}
+
+function toggleYogaSvgs(count) {
+  const svgs = document.querySelectorAll('.yoga-svg');
+  
+  if (count > 0) {
+    // Get unique poses for all SVGs
+    const uniquePoses = getUniquePoses(svgs.length);
+    // Get unique colors for all SVGs
+    const uniqueColors = getUniqueColors(svgs.length);
+    
+    // Show SVGs with unique random poses and colors
+    svgs.forEach((svg, index) => {
+      const poseFile = uniquePoses[index] || yogaPoses[0];
+      const color = uniqueColors[index] || yogaColors[0];
+      
+      svg.src = `assets/yoga/${poseFile}`;
+      svg.classList.add('visible');
+      
+      // Apply color to SVG
+      applyColorToSvg(svg, color);
+    });
+    
+    // Clear existing interval
+    if (poseInterval) clearInterval(poseInterval);
+    
+    // Change only 1 random SVG every 5 seconds
+    poseInterval = setInterval(() => {
+      // Pick a random SVG to change
+      const randomSvgIndex = Math.floor(Math.random() * svgs.length);
+      const svgToChange = svgs[randomSvgIndex];
+      
+      // Get all current poses
+      const currentPoses = Array.from(svgs).map(svg => svg.src.split('/').pop());
+      
+      // Find a pose that's not currently being used
+      let availablePoses = yogaPoses.filter(pose => !currentPoses.includes(pose));
+      if (availablePoses.length === 0) {
+        availablePoses = yogaPoses;
+      }
+      
+      // Get all current colors
+      const currentColors = Array.from(svgs).map(svg => svg.dataset.color || '#fde68a');
+      
+      // Find a color that's not currently being used
+      let availableColors = yogaColors.filter(color => !currentColors.includes(color));
+      if (availableColors.length === 0) {
+        availableColors = yogaColors;
+      }
+      
+      const randomPoseIndex = Math.floor(Math.random() * availablePoses.length);
+      const poseFile = availablePoses[randomPoseIndex];
+      
+      const randomColorIndex = Math.floor(Math.random() * availableColors.length);
+      const color = availableColors[randomColorIndex];
+      
+      // Animate the change
+      svgToChange.style.transition = 'transform 0.4s ease, opacity 0.4s ease';
+      svgToChange.style.transform = 'scale(0.7) rotate(-10deg)';
+      svgToChange.style.opacity = '0.3';
+      
+      setTimeout(() => {
+        svgToChange.src = `assets/yoga/${poseFile}`;
+        svgToChange.dataset.color = color;
+        applyColorToSvg(svgToChange, color);
+        
+        svgToChange.style.transform = 'scale(1.1) rotate(0deg)';
+        svgToChange.style.opacity = '1';
+        
+        setTimeout(() => {
+          svgToChange.style.transform = 'scale(1)';
+        }, 300);
+      }, 400);
+      
+    }, 5000);
+    
+  } else {
+    svgs.forEach(svg => {
+      svg.classList.remove('visible');
+    });
+    if (poseInterval) {
+      clearInterval(poseInterval);
+      poseInterval = null;
+    }
+  }
+}
+
+// Function to apply color to SVG
+function applyColorToSvg(svgElement, color) {
+  // Method 1: If using img tag, we need to use CSS filter
+  // We'll apply a colored glow effect around it
+  
+  // Remove any existing glow
+  svgElement.style.filter = '';
+  svgElement.style.boxShadow = '';
+  
+  // Add glow effect with the color
+  svgElement.style.filter = `drop-shadow(0 0 12px ${color}CC) drop-shadow(0 0 24px ${color}88)`;
+  
+  // For more advanced color control, we could use SVG injection
+  // But for simplicity with img tags, we'll use the glow effect
+  
+  // Alternative: Add a colored border/outline
+  // svgElement.style.outline = `2px solid ${color}`;
+  // svgElement.style.outlineOffset = '4px';
+  // svgElement.style.borderRadius = '50%';
 }
 
 //setInterval(updateCount, 3000); // every 3 seconds
