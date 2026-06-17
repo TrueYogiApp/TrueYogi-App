@@ -3091,42 +3091,31 @@ body.modal-open {
 
 /* yoga phoses css */
 .om-counter-wrapper {
-  display: grid;
-  grid-template-columns: repeat(3, auto) 1fr repeat(3, auto);
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(8px, 1.5vw, 15px);
+  gap: 15px;
   margin: 18px auto 0 auto;
-  padding: 0 10px;
-  max-width: 100%;
 }
 
 .yoga-svg {
-  width: clamp(28px, 3.5vw, 40px);
-  height: clamp(28px, 3.5vw, 40px);
+  width: 40px;
+  height: 40px;
   opacity: 0.8;
-  display: none;
+  display: none; /* Hidden by default */
 }
 
 .yoga-svg.visible {
-  display: block;
+  display: block; /* Show when count > 0 */
 }
 
-#om-counter {
-  grid-column: 4;
-  text-align: center;
-  white-space: nowrap;
-  min-width: 1.5em;
-}
-
-@media (max-width: 480px) {
+@media (max-width: 600px) {
   .yoga-svg {
-    width: 22px;
-    height: 22px;
+    width: 30px;
+    height: 30px;
   }
   .om-counter-wrapper {
-    gap: 6px;
-    padding: 0 5px;
+    gap: 10px;
   }
 }
 
