@@ -3094,7 +3094,7 @@ body.modal-open {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 21px;
+  gap: 18px;
   margin: 18px auto 0 auto;
 }
 
@@ -3115,7 +3115,42 @@ body.modal-open {
     height: 30px;
   }
   .om-counter-wrapper {
-    gap: 21px;
+    gap: 18px;
+  }
+}
+
+/* Special meditation SVG */
+.meditation-svg-container {
+  display: none; /* Hidden by default - takes no space */
+  justify-content: center;
+  margin: 5px auto 0 auto;
+  opacity: 0;
+  transition: opacity 0.8s ease;
+  pointer-events: none; /* Prevent interaction */
+}
+
+.meditation-svg-container.visible {
+  display: flex; /* Show when visible */
+  opacity: 1;
+}
+
+.meditation-svg {
+  width: 60px;
+  height: 60px;
+  animation: floatMeditation 4s ease-in-out infinite;
+  transition: filter 0.8s ease, box-shadow 0.8s ease;
+  border-radius: 50%;
+}
+
+@keyframes floatMeditation {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@media (max-width: 600px) {
+  .meditation-svg {
+    width: 45px;
+    height: 45px;
   }
 }
 
@@ -3691,6 +3726,12 @@ body.modal-open {
   <img src="assets/yoga/yoga5.svg" alt="Yoga Pose" class="yoga-svg right" id="yoga2-right">
   <img src="assets/yoga/yoga6.svg" alt="Yoga Pose" class="yoga-svg right" id="yoga3-right">
 </div>
+
+<!-- Special Meditation SVG - Below the counter -->
+<div class="meditation-svg-container" id="meditation-container">
+  <img src="assets/yoga/yogameditate.svg" alt="Meditation" class="meditation-svg">
+</div>
+
 
 <!-- Desktop-only Mobile Reminder Card -->
 <div id="mobile-reminder-card" class="auth-card hidden" style="margin: 1.5em auto 0 auto; max-width: 330px; text-align: center;">
@@ -15125,24 +15166,24 @@ async function addCount() {
   if (!id) {
     // Now, add presence
     try {
-	const now = new Date();
-const localTimeString = now.getFullYear() + '-' +
-                        String(now.getMonth()+1).padStart(2, '0') + '-' +
-                        String(now.getDate()).padStart(2,'0') + 'T' +
-                        String(now.getHours()).padStart(2,'0') + ':' +
-                        String(now.getMinutes()).padStart(2,'0');
+      const now = new Date();
+      const localTimeString = now.getFullYear() + '-' +
+                              String(now.getMonth()+1).padStart(2, '0') + '-' +
+                              String(now.getDate()).padStart(2,'0') + 'T' +
+                              String(now.getHours()).padStart(2,'0') + ':' +
+                              String(now.getMinutes()).padStart(2,'0');
 
-const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    timezone,
-    user_id: omUserId,
-    local_joined_at: localTimeString
-  })
-});
+      const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          timezone,
+          user_id: omUserId,
+          local_joined_at: localTimeString
+        })
+      });
       const data = await res.json();
       localStorage.setItem('omPresenceId', data.id);
       omPresenceId = data.id;
@@ -15160,6 +15201,12 @@ const res = await fetch('https://trueyogi-backend-knkq.onrender.com/join-om', {
 
       updateCount();
       startHeartbeat();
+      
+      // --- Show meditation SVG immediately for this user ---
+      const currentCount = parseInt(counterEl.textContent) || 0;
+      toggleMeditationSvg(currentCount);
+      // ---
+      
     } catch (err) { console.error(err); }
   }
 }
@@ -15190,6 +15237,15 @@ async function removeCount() {
     // ➤ Remove active glow
     const counterEl = document.getElementById('om-counter');
     if (counterEl) counterEl.classList.remove('active');
+    
+    // --- Hide meditation SVG immediately for this user ---
+    const container = document.getElementById('meditation-container');
+    if (container) {
+      container.classList.remove('visible');
+      stopMeditationColorCycle();
+    }
+    // ---
+    
   } catch (err) { console.error(err); }
 }
 
@@ -15285,9 +15341,7 @@ const yogaPoses = [
   'yoga17.svg',
   'yoga18.svg',
   'yoga19.svg',
-  'yoga20.svg',
-  'yoga21.svg',
-  'yoga22.svg'   
+  'yoga20.svg'    
 ];
 
 // Add this with your other variables
@@ -15321,10 +15375,95 @@ function getUniquePoses(count) {
   return shuffled.slice(0, count);
 }
 
+// Add this with your other variables
+let meditationColorInterval = null;
+let currentMeditationColor = '#fde68a';
+let meditationColorIndex = 0; // Track which color to use next
+
+// Function to toggle meditation SVG (only for users with omPresenceId)
+function toggleMeditationSvg(count) {
+  const container = document.getElementById('meditation-container');
+  const omPresenceId = localStorage.getItem('omPresenceId');
+  
+  if (container) {
+    // Only show if count > 0 AND user has omPresenceId
+    if (count > 0 && omPresenceId) {
+      container.classList.add('visible');
+      // Start color cycling for meditation SVG
+      startMeditationColorCycle();
+    } else {
+      container.classList.remove('visible');
+      // Stop color cycling
+      stopMeditationColorCycle();
+    }
+  }
+}
+
+// Start cycling colors for meditation SVG
+function startMeditationColorCycle() {
+  // Clear existing interval
+  if (meditationColorInterval) clearInterval(meditationColorInterval);
+  
+  // Reset index
+  meditationColorIndex = 0;
+  
+  // Apply first color
+  applyRandomMeditationColor();
+  
+  // Change color every 5 seconds
+  meditationColorInterval = setInterval(() => {
+    applyRandomMeditationColor();
+  }, 5000);
+}
+
+// Stop color cycling
+function stopMeditationColorCycle() {
+  if (meditationColorInterval) {
+    clearInterval(meditationColorInterval);
+    meditationColorInterval = null;
+  }
+}
+
+// Alternative: Random but ensures all colors are used
+let usedMeditationColors = [];
+
+function applyRandomMeditationColor() {
+  const meditationSvg = document.querySelector('.meditation-svg');
+  if (!meditationSvg) return;
+  
+  // If all colors have been used, reset
+  if (usedMeditationColors.length >= yogaColors.length) {
+    usedMeditationColors = [];
+  }
+  
+  // Find a color that hasn't been used
+  let availableColors = yogaColors.filter(color => !usedMeditationColors.includes(color));
+  
+  // Pick random from available
+  const randomIndex = Math.floor(Math.random() * availableColors.length);
+  const color = availableColors[randomIndex];
+  
+  // Track it
+  usedMeditationColors.push(color);
+  currentMeditationColor = color;
+  
+  // Apply the color with glow
+  meditationSvg.style.filter = `
+    drop-shadow(0 0 15px ${color}EE) 
+    drop-shadow(0 0 30px ${color}AA) 
+    drop-shadow(0 0 60px ${color}66)
+  `;
+  
+  meditationSvg.dataset.color = color;
+}
+
 let svgsInitialized = false; // Add this at the top with your other variables
 
 function toggleYogaSvgs(count) {
   const svgs = document.querySelectorAll('.yoga-svg');
+  
+    // Toggle meditation SVG
+  toggleMeditationSvg(count);
   
   if (count > 0) {
     // Only initialize SVGs if they haven't been initialized yet
@@ -15438,6 +15577,8 @@ function toggleYogaSvgs(count) {
     }
     svgsInitialized = false; // Reset so they re-initialize when count returns
     selectedPoseIndex = null; // Reset selection
+	    // Stop meditation color cycling
+    stopMeditationColorCycle();
   }
 }
 
