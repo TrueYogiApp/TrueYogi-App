@@ -3126,12 +3126,12 @@ body.modal-open {
   margin: 5px auto 0 auto;
   opacity: 0;
   transition: opacity 0.8s ease;
-  pointer-events: none; /* Prevent interaction */
 }
 
 .meditation-svg-container.visible {
   display: flex; /* Show when visible */
   opacity: 1;
+  pointer-events: auto; /* Allow interaction when visible */
 }
 
 .meditation-svg {
@@ -3140,6 +3140,7 @@ body.modal-open {
   animation: floatMeditation 4s ease-in-out infinite;
   transition: filter 0.8s ease, box-shadow 0.8s ease;
   border-radius: 50%;
+  pointer-events: auto; /* Ensure SVG receives clicks */
 }
 
 @keyframes floatMeditation {
@@ -3153,6 +3154,7 @@ body.modal-open {
     height: 45px;
   }
 }
+
 
 </style>
   
@@ -3729,7 +3731,7 @@ body.modal-open {
 
 <!-- Special Meditation SVG - Below the counter -->
 <div class="meditation-svg-container" id="meditation-container">
-  <img src="assets/yoga/yogameditate.svg" alt="Meditation" class="meditation-svg">
+  <img src="assets/yoga/yogameditate.svg" alt="Meditation" class="meditation-svg" onclick="showEarthGrid(); event.stopPropagation();">
 </div>
 
 
@@ -15341,7 +15343,9 @@ const yogaPoses = [
   'yoga17.svg',
   'yoga18.svg',
   'yoga19.svg',
-  'yoga20.svg'    
+  'yoga20.svg',
+  'yoga21.svg',
+  'yoga22.svg'    
 ];
 
 // Add this with your other variables
@@ -15386,14 +15390,11 @@ function toggleMeditationSvg(count) {
   const omPresenceId = localStorage.getItem('omPresenceId');
   
   if (container) {
-    // Only show if count > 0 AND user has omPresenceId
     if (count > 0 && omPresenceId) {
       container.classList.add('visible');
-      // Start color cycling for meditation SVG
       startMeditationColorCycle();
     } else {
       container.classList.remove('visible');
-      // Stop color cycling
       stopMeditationColorCycle();
     }
   }
