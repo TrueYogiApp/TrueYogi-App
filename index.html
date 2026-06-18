@@ -15380,85 +15380,6 @@ function getUniquePoses(count) {
   return shuffled.slice(0, count);
 }
 
-// Add this with your other variables
-let meditationColorInterval = null;
-let currentMeditationColor = '#fde68a';
-let meditationColorIndex = 0; // Track which color to use next
-
-// Function to toggle meditation SVG (only for users with omPresenceId)
-function toggleMeditationSvg(count) {
-  const container = document.getElementById('meditation-container');
-  const omPresenceId = localStorage.getItem('omPresenceId');
-  
-  if (container) {
-    if (count > 0 && omPresenceId) {
-      container.classList.add('visible');
-      startMeditationColorCycle();
-    } else {
-      container.classList.remove('visible');
-      stopMeditationColorCycle();
-    }
-  }
-}
-
-// Start cycling colors for meditation SVG
-function startMeditationColorCycle() {
-  // Clear existing interval
-  if (meditationColorInterval) clearInterval(meditationColorInterval);
-  
-  // Reset index
-  meditationColorIndex = 0;
-  
-  // Apply first color
-  applyRandomMeditationColor();
-  
-  // Change color every 5 seconds
-  meditationColorInterval = setInterval(() => {
-    applyRandomMeditationColor();
-  }, 5000);
-}
-
-// Stop color cycling
-function stopMeditationColorCycle() {
-  if (meditationColorInterval) {
-    clearInterval(meditationColorInterval);
-    meditationColorInterval = null;
-  }
-}
-
-// Alternative: Random but ensures all colors are used
-let usedMeditationColors = [];
-
-function applyRandomMeditationColor() {
-  const meditationSvg = document.querySelector('.meditation-svg');
-  if (!meditationSvg) return;
-  
-  // If all colors have been used, reset
-  if (usedMeditationColors.length >= yogaColors.length) {
-    usedMeditationColors = [];
-  }
-  
-  // Find a color that hasn't been used
-  let availableColors = yogaColors.filter(color => !usedMeditationColors.includes(color));
-  
-  // Pick random from available
-  const randomIndex = Math.floor(Math.random() * availableColors.length);
-  const color = availableColors[randomIndex];
-  
-  // Track it
-  usedMeditationColors.push(color);
-  currentMeditationColor = color;
-  
-  // Apply the color with glow
-  meditationSvg.style.filter = `
-    drop-shadow(0 0 15px ${color}EE) 
-    drop-shadow(0 0 30px ${color}AA) 
-    drop-shadow(0 0 60px ${color}66)
-  `;
-  
-  meditationSvg.dataset.color = color;
-}
-
 let svgsInitialized = false; // Add this at the top with your other variables
 
 function toggleYogaSvgs(count) {
@@ -15651,6 +15572,85 @@ function handleDocumentClick(e) {
     });
     selectedPoseIndex = null; // Clear selection when clicking elsewhere
   }
+}
+
+// Add this with your other variables
+let meditationColorInterval = null;
+let currentMeditationColor = '#fde68a';
+let meditationColorIndex = 0; // Track which color to use next
+
+// Function to toggle meditation SVG (only for users with omPresenceId)
+function toggleMeditationSvg(count) {
+  const container = document.getElementById('meditation-container');
+  const omPresenceId = localStorage.getItem('omPresenceId');
+  
+  if (container) {
+    if (count > 0 && omPresenceId) {
+      container.classList.add('visible');
+      startMeditationColorCycle();
+    } else {
+      container.classList.remove('visible');
+      stopMeditationColorCycle();
+    }
+  }
+}
+
+// Start cycling colors for meditation SVG
+function startMeditationColorCycle() {
+  // Clear existing interval
+  if (meditationColorInterval) clearInterval(meditationColorInterval);
+  
+  // Reset index
+  meditationColorIndex = 0;
+  
+  // Apply first color
+  applyRandomMeditationColor();
+  
+  // Change color every 5 seconds
+  meditationColorInterval = setInterval(() => {
+    applyRandomMeditationColor();
+  }, 5000);
+}
+
+// Stop color cycling
+function stopMeditationColorCycle() {
+  if (meditationColorInterval) {
+    clearInterval(meditationColorInterval);
+    meditationColorInterval = null;
+  }
+}
+
+// Alternative: Random but ensures all colors are used
+let usedMeditationColors = [];
+
+function applyRandomMeditationColor() {
+  const meditationSvg = document.querySelector('.meditation-svg');
+  if (!meditationSvg) return;
+  
+  // If all colors have been used, reset
+  if (usedMeditationColors.length >= yogaColors.length) {
+    usedMeditationColors = [];
+  }
+  
+  // Find a color that hasn't been used
+  let availableColors = yogaColors.filter(color => !usedMeditationColors.includes(color));
+  
+  // Pick random from available
+  const randomIndex = Math.floor(Math.random() * availableColors.length);
+  const color = availableColors[randomIndex];
+  
+  // Track it
+  usedMeditationColors.push(color);
+  currentMeditationColor = color;
+  
+  // Apply the color with glow
+  meditationSvg.style.filter = `
+    drop-shadow(0 0 15px ${color}EE) 
+    drop-shadow(0 0 30px ${color}AA) 
+    drop-shadow(0 0 60px ${color}66)
+  `;
+  
+  meditationSvg.dataset.color = color;
 }
 
 //setInterval(updateCount, 3000); // every 3 seconds
