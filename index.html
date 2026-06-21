@@ -6315,6 +6315,100 @@ function renderLiveList() {
     };
 
 
+// Define music that require minimum duration
+const MUSIC_MIN_DURATION = {
+  'music8.m4a': 1800,    // Lalitha-Sahasranamam - 30+ minutes
+  // Add more as needed:
+  // 'music7.m4a': 900,  // Gayatri-mantra - 15+ minutes
+  // 'music5.m4a': 780,  // Tibetian-bowls - 13+ minutes
+};
+
+// Function to validate and adjust duration based on selected music
+function validateAndAdjustDuration() {
+  const musicSelect = document.getElementById('music-choice');
+  const durationSelect = document.getElementById('duration');
+  const selectedMusic = musicSelect.value;
+  const minRequired = MUSIC_MIN_DURATION[selectedMusic];
+  
+  if (minRequired) {
+    const currentDuration = parseInt(durationSelect.value);
+    
+    if (currentDuration < minRequired) {
+      // Get all duration options
+      const options = Array.from(durationSelect.options);
+      const validOptions = options.filter(opt => parseInt(opt.value) >= minRequired);
+      
+      if (validOptions.length > 0) {
+        // Find the smallest option that meets the requirement
+        const newDuration = Math.min(...validOptions.map(opt => parseInt(opt.value)));
+        durationSelect.value = newDuration;
+      }
+    }
+  }
+}
+
+// Disable invalid duration options when specific music is selected
+function updateDurationOptionsForMusic() {
+  const musicSelect = document.getElementById('music-choice');
+  const durationSelect = document.getElementById('duration');
+  const selectedMusic = musicSelect.value;
+  const minRequired = MUSIC_MIN_DURATION[selectedMusic];
+  
+  if (minRequired) {
+    // Loop through all duration options and disable/enable as needed
+    Array.from(durationSelect.options).forEach(option => {
+      const optionValue = parseInt(option.value);
+      if (optionValue < minRequired) {
+        option.disabled = true;
+        option.style.opacity = '0.5';
+        option.style.backgroundColor = '#4a5568';
+      } else {
+        option.disabled = false;
+        option.style.opacity = '1';
+        option.style.backgroundColor = '';
+      }
+    });
+    
+    // If current selected duration is invalid, change it
+    const currentDuration = parseInt(durationSelect.value);
+    if (currentDuration < minRequired) {
+      const firstValidOption = Array.from(durationSelect.options).find(opt => !opt.disabled);
+      if (firstValidOption) {
+        durationSelect.value = firstValidOption.value;
+      }
+    }
+  } else {
+    // Enable all options when no restriction
+    Array.from(durationSelect.options).forEach(option => {
+      option.disabled = false;
+      option.style.opacity = '1';
+      option.style.backgroundColor = '';
+    });
+  }
+}
+
+// Add CSS animation (keep this if you want the blur effect smooth, otherwise remove)
+const style = document.createElement('style');
+style.textContent = `
+  select option:disabled {
+    color: #6b7280;
+    background-color: #374151;
+  }
+`;
+document.head.appendChild(style);
+
+
+////Then in your DOMContentLoaded, add:
+
+const musicChoice = document.getElementById('music-choice');
+musicChoice.addEventListener('change', function() {
+  updateDurationOptionsForMusic();
+  validateAndAdjustDuration();
+});
+
+// Initialize on page load
+updateDurationOptionsForMusic();
+
    //  QR code scan
     document.getElementById('showBarcodeLink').addEventListener('click', function(e) {
   e.preventDefault();
