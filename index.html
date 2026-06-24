@@ -19571,7 +19571,55 @@ userIdDisplay.style.cursor = 'pointer'; // Show it's clickable
 userIdDisplay.onclick = async function(e) {
   const userId = localStorage.getItem('omUserId');
   const userRow = livePresenceRows.find(row => row.user_id === userId);
-  if (!userRow) return;
+  if (!userRow) {
+    // Show a friendly message instead
+    const rect = userIdDisplay.getBoundingClientRect();
+    const x = rect.left + rect.width / 2;
+    const y = rect.top - 10;
+    
+    // Remove any existing popup
+    const oldPopup = document.getElementById('current-user-mins-popup');
+    if (oldPopup) oldPopup.remove();
+    
+    const popup = document.createElement('div');
+    popup.id = 'current-user-mins-popup';
+    popup.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0;">
+        <span style="font-size:1.15em;font-weight:600;color:#ffd700;"> Connect to the OM Field</span>
+      </div>
+      <div style="font-size:0.85em;color:#ffeb99;opacity:0.7;margin-top:2px;">
+        Tap the sacred symbol to enter the resonance
+      </div>
+    `;
+    popup.style.cssText = `
+      position: fixed;
+      left: ${x}px; top: ${y}px;
+      transform: translate(-50%, -100%);
+      background: rgba(0,0,0,0.94);
+      color: #ffd700;
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.02rem;
+      padding: 14px 22px;
+      border-radius: 12px;
+      box-shadow: 0 0 20px #ffd70044, 0 0 60px #ffd70022;
+      z-index: 10020;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.18s;
+      text-align: center;
+      border: 1px solid rgba(255,215,0,0.15);
+    `;
+    document.body.appendChild(popup);
+    setTimeout(() => popup.style.opacity = 1, 10);
+    
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+      popup.style.opacity = 0;
+      setTimeout(() => popup.remove(), 400);
+    }, 9000);
+    
+    return; // Exit early
+  }
 
   // Calculate duration for current user
   let duration = "";
