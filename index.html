@@ -19734,6 +19734,40 @@ window.showNotification = function(message) {
   }, 6000);
 };
 
+// Add this to your app initialization
+async function cleanupAstralSilenceOnLoad() {
+  const currentUserId = localStorage.getItem('omUserId');
+  const omId = localStorage.getItem('omPresenceId');
+  
+  // If user has no OM presence but Astral Silence is active, disable it
+  if (!omId && currentUserId) {
+    try {
+      const { data } = await supabase
+        .from('user_preferences')
+        .select('astral_silence')
+        .eq('user_id', currentUserId)
+        .single();
+      
+      if (data?.astral_silence) {
+        await supabase
+          .from('user_preferences')
+          .upsert({
+            user_id: currentUserId,
+            astral_silence: false,
+            updated_at: new Date().toISOString()
+          }, { onConflict: 'user_id' });
+        console.log('🔄 Astral Silence cleaned up on app load');
+      }
+    } catch (err) {
+      console.error('Error cleaning up Astral Silence:', err);
+    }
+  }
+}
+
+// Call this when your app loads
+cleanupAstralSilenceOnLoad();
+
+
 async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starterUserId, x, y) {
   // Remove any previous keeper popup
   const oldList = document.getElementById('flame-keeper-list');
