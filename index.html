@@ -3156,6 +3156,53 @@ body.modal-open {
 }
 
 
+/* Astral Silence SVG Breathing Glow Animation */
+@keyframes astralBreath {
+  0% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px #6b47dc) drop-shadow(0 0 4px rgba(107, 71, 220, 0.3));
+    opacity: 0.85;
+  }
+  50% { 
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 18px #8b5cf6) drop-shadow(0 0 30px rgba(107, 71, 220, 0.4));
+    opacity: 1;
+  }
+  100% { 
+    transform: scale(1);
+    filter: drop-shadow(0 0 8px #6b47dc) drop-shadow(0 0 4px rgba(107, 71, 220, 0.3));
+    opacity: 0.85;
+  }
+}
+
+/* Optional: Gentle pulse ring around the icon */
+@keyframes astralPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(107, 71, 220, 0.35);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(107, 71, 220, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(107, 71, 220, 0);
+  }
+}
+
+.astral-active-wrapper {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 3px;
+  animation: astralPulse 2.5s ease-out infinite;
+}
+
+.astral-active {
+  animation: astralBreath 2.5s ease-in-out infinite;
+  display: inline-block;
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -19399,7 +19446,14 @@ function removeUltimateStillnessTooltip() {
 // SVG definition - moved OUTSIDE the main function
 const astralSilenceInactiveSvg = `<img src="assets/astral-silence-inactive.svg" style="width:20px; height:20px; vertical-align:middle; margin-left:4px; cursor:pointer;" title="Astral Silence Mode (Inactive)">`;
 
-const astralSilenceActiveSvg = `<img src="assets/astral-silence.svg" style="width:20px; height:20px; vertical-align:middle; margin-left:4px; cursor:pointer; filter: drop-shadow(0 0 12px #6b47dc);" title="Astral Silence Mode (Active)">`;
+const astralSilenceActiveSvg = `
+  <span class="astral-active-wrapper">
+    <img src="assets/astral-silence.svg" 
+         class="astral-active" 
+         style="width:20px; height:20px; vertical-align:middle; margin-left:4px; cursor:pointer;" 
+         title="Astral Silence Mode (Active)">
+  </span>
+`;
 
 // Check if user is in Astral Silence mode
 async function getAstralSilenceStatus(userId) {
