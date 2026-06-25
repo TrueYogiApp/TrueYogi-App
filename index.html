@@ -15330,17 +15330,48 @@ async function removeCount() {
     updateCount();
     stopHeartbeat();
     stopOmSelfHeal();
-    // ➤ Remove active glow
+    
     const counterEl = document.getElementById('om-counter');
     if (counterEl) counterEl.classList.remove('active');
     
-    // --- Hide meditation SVG immediately for this user ---
     const container = document.getElementById('meditation-container');
     if (container) {
       container.classList.remove('visible');
       stopMeditationColorCycle();
     }
-    // ---
+    
+    // ===== TURN OFF ASTRAL SILENCE (INLINE) =====
+    const currentUserId = localStorage.getItem('omUserId');
+    if (currentUserId) {
+      try {
+        // Check if Astral Silence is active
+        const { data, error } = await supabase
+          .from('user_preferences')
+          .select('astral_silence')
+          .eq('user_id', currentUserId)
+          .single();
+        
+        const isActive = data?.astral_silence || false;
+        
+        if (isActive) {
+          // Turn it off
+          const { error: updateError } = await supabase
+            .from('user_preferences')
+            .upsert({
+              user_id: currentUserId,
+              astral_silence: false,
+              updated_at: new Date().toISOString()
+            }, { onConflict: 'user_id' });
+          
+          if (!updateError) {
+            console.log('🔄 Astral Silence auto-disabled (user left OM)');
+          }
+        }
+      } catch (err) {
+        console.error('Error auto-disabling Astral Silence:', err);
+      }
+    }
+    // ==========================================
     
   } catch (err) { console.error(err); }
 }
@@ -18731,6 +18762,9 @@ document.addEventListener('click', function(e) {
 
 
 async function showAllFlameKeepers(x, y) {
+  // Store coordinates for refresh
+  window.lastFlameX = x;
+  window.lastFlameY = y;
 await fetchCallPermission();
   // Remove if already open
   const oldList = document.getElementById('flame-keeper-list');
@@ -18811,6 +18845,18 @@ await fetchCallPermission();
     e.stopPropagation();
   });
 
+// Add this RIGHT AFTER that:
+listPopup.addEventListener('click', async (e) => {
+  const astralIcon = e.target.closest('.astral-silence-icon');
+  if (astralIcon) {
+    const userId = astralIcon.dataset.userid;
+    const currentUserId = localStorage.getItem('omUserId');
+    
+    // Show popup when clicked
+    showAstralSilencePopup(userId);
+  }
+});
+
   // Add touch event prevention for mobile
   listPopup.addEventListener('touchmove', (e) => {
     e.stopPropagation();
@@ -18842,6 +18888,14 @@ const permissionsResponse = await fetch('https://trueyogi-backend-knkq.onrender.
 });
 const permissions = (await permissionsResponse.json()).userPermissions || {};
 
+// ----- ADD THIS: Fetch Astral Silence status for all users at once -----
+const astralSilenceStatuses = {};
+for (const userId of userIds) {
+  const status = await getAstralSilenceStatus(userId);
+  astralSilenceStatuses[userId] = status;
+}
+// ----------------------------------------------------------------
+
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
 } else {
@@ -18858,6 +18912,17 @@ if (userIds.length === 0) {
 	  const row = userRows[id];
 	  const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
 
+    // ----- ADD THIS: Get the astral silence status for this user -----
+    const isAstralSilenceActive = astralSilenceStatuses[id] || false;
+    const astralIconHtml = isAstralSilenceActive ? 
+      `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Active)">
+        ${astralSilenceActiveSvg}
+      </span>` :
+      `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Inactive)">
+        ${astralSilenceInactiveSvg}
+      </span>`;
+    // ----------------------------------------------------------------
+	
 	  let callIcon = '';
 	  if (
 		canStartCall &&
@@ -18893,6 +18958,7 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
 			${isUltimateStillness ? ultimateStillnessSvg : ''}
 			${callIcon}
 			${callbackBell}
+			${astralIconHtml}
 		  </div>
 		`;
 	}).join('')}
@@ -19246,7 +19312,7 @@ if (document.getElementById('my-notifications')) {
   });
 }
 
-  setTimeout(() => listPopup.remove(), 12000);
+  setTimeout(() => listPopup.remove(), 30000);
 }
 
 // Helper functions for deep presence tooltip
@@ -19326,6 +19392,346 @@ function removeUltimateStillnessTooltip() {
   const tooltip = document.getElementById('ultimate-stillness-tooltip');
   if (tooltip) tooltip.remove();
 }
+
+// ===== ASTRAL SILENCE FUNCTIONS =====
+// Place these at the VERY BOTTOM of your file, after all other functions
+
+// SVG definition - moved OUTSIDE the main function
+const astralSilenceInactiveSvg = `<img src="assets/astral-silence-inactive.svg" style="width:20px; height:20px; vertical-align:middle; margin-left:4px; cursor:pointer;" title="Astral Silence Mode (Inactive)">`;
+
+const astralSilenceActiveSvg = `<img src="assets/astral-silence.svg" style="width:20px; height:20px; vertical-align:middle; margin-left:4px; cursor:pointer; filter: drop-shadow(0 0 12px #6b47dc);" title="Astral Silence Mode (Active)">`;
+
+// Check if user is in Astral Silence mode
+async function getAstralSilenceStatus(userId) {
+  try {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('astral_silence')
+      .eq('user_id', userId)
+      .single();
+      
+    if (error) return false;
+    return data?.astral_silence || false;
+  } catch (error) {
+    console.error('Error fetching astral silence status:', error);
+    return false;
+  }
+}
+
+// Toggle Astral Silence for current user
+window.toggleAstralSilence = async function(userId) {
+  try {
+    const currentStatus = await getAstralSilenceStatus(userId);
+    const newStatus = !currentStatus;
+    
+    const { error } = await supabase
+      .from('user_preferences')
+      .upsert({
+        user_id: userId,
+        astral_silence: newStatus,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'user_id' });
+      
+    if (error) throw error;
+    
+    // Close current popup
+    const popup = document.getElementById('astral-silence-popup');
+    if (popup) popup.remove();
+    
+    // Show confirmation
+    showNotification(newStatus ? '🌙 Astral Silence ACTIVATED' : '🌙 Astral Silence DEACTIVATED');
+    
+    // Refresh the list - store coordinates when opening
+    if (window.lastFlameX && window.lastFlameY) {
+      showAllFlameKeepers(window.lastFlameX, window.lastFlameY);
+    }
+    
+  } catch (error) {
+    console.error('Error toggling astral silence:', error);
+    showNotification('Failed to toggle Astral Silence mode');
+  }
+};
+
+// Show Astral Silence popup
+window.showAstralSilencePopup = function(userId) {
+  // Remove existing popup if any
+  const existingPopup = document.getElementById('astral-silence-popup');
+  if (existingPopup) existingPopup.remove();
+  
+  const currentUserId = localStorage.getItem('omUserId');
+  const isCurrentUser = userId === currentUserId;
+  
+  // Create popup element
+  const popup = document.createElement('div');
+  popup.id = 'astral-silence-popup';
+  popup.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgba(0,0,0,0.95);
+    color: #ffd700;
+    padding: 24px 32px;
+    border-radius: 16px;
+    border: 1px solid #6b47dc;
+    box-shadow: 0 0 30px rgba(107, 71, 220, 0.3);
+    z-index: 20000;
+    max-width: 420px;
+    width: 90%;
+    text-align: center;
+    font-family: system-ui, -apple-system, sans-serif;
+    max-height: 90vh;
+    overflow-y: auto;
+  `;
+  
+  const shortId = getShortUserId(userId);
+  
+  if (isCurrentUser) {
+    // Get current status
+    getAstralSilenceStatus(userId).then(status => {
+      const statusText = status ? '🟣 ACTIVE' : '⚪ OFF';
+      const statusColor = status ? '#6b47dc' : '#888';
+      
+      // ===== DIFFERENT CONTENT BASED ON STATUS =====
+      let contentHtml = '';
+      
+      if (status) {
+        // --- USER IS ALREADY IN ASTRAL SILENCE (ACTIVE) ---
+        contentHtml = `
+          <div style="
+            background: rgba(107, 71, 220, 0.15);
+            padding: 16px;
+            border-radius: 10px;
+            margin: 12px 0;
+            text-align: center;
+            color: #ddd;
+            line-height: 1.6;
+          ">
+            <div style="font-size:1.1rem; color:#c4b5fd; margin-bottom:10px; font-weight:500;">
+              🌊 In Deep Meditation
+            </div>
+
+            <div style="font-size:0.95rem; color:#bbb; margin-bottom:12px;">
+              Your presence is active and resonant.<br>
+              You are in a state of undisturbed stillness.
+            </div>
+
+            <div style="
+              margin-top: 12px;
+              padding: 12px;
+              background: rgba(252, 211, 77, 0.08);
+              border-radius: 8px;
+              border-left: 3px solid #fcd34d;
+              text-align: left;
+            ">
+              <div style="font-size:0.8rem; color:#fcd34d; font-weight:500; margin-bottom:4px;">
+                ✦ Currently in Astral Silence ✦
+              </div>
+              <div style="font-size:0.75rem; color:#9ca3af; line-height:1.5;">
+                • Calls and notifications are muted<br>
+                • Your OM Flame remains active<br>
+                • You rest beyond the reach of others
+              </div>
+            </div>
+
+            <div style="margin-top: 12px; font-size:0.75rem; color:#6b7280; font-style:italic;">
+              Leave OM to automatically exit Astral Silence
+            </div>
+          </div>
+        `;
+      } else {
+        // --- USER IS NOT IN ASTRAL SILENCE (OFF) ---
+        contentHtml = `
+          <div style="
+            background: rgba(255,255,255,0.05);
+            padding: 16px;
+            border-radius: 10px;
+            margin: 12px 0;
+            text-align: center;
+            color: #ddd;
+            line-height: 1.6;
+          ">
+            <div style="font-size:1.1rem; color:#fff; margin-bottom:10px; font-weight:500;">
+              🌟 Stay connected. Become unavailable.
+            </div>
+
+            <div style="font-size:0.95rem; color:#bbb; margin-bottom:12px;">
+              Allow your presence to resonate<br>
+              while the outer world grows quiet.
+            </div>
+
+            <!-- Device Setup Instruction -->
+            <div style="
+              margin-top: 12px;
+              padding: 14px 12px;
+              background: rgba(107, 71, 220, 0.15);
+              border-radius: 8px;
+              border-left: 3px solid #6b47dc;
+              text-align: left;
+            ">
+              <div style="font-size:0.85rem; color:#c4b5fd; font-weight:600; margin-bottom:6px;">
+                📱 BEFORE ENTERING ASTRAL SILENCE:
+              </div>
+			<div style="font-size:0.8rem; color:#d1d5db; line-height:1.5;">
+			  Setup <strong style="color:#fcd34d;">Focus Mode</strong> or 
+			  <strong style="color:#fcd34d;">Do Not Disturb</strong> on your device<br>
+			  <span style="color:#9ca3af; font-size:0.75rem;">
+				⚙️ Settings → Focus / Do Not Disturb<br>
+				🔇 Choose: "Allow no calls" or "Only from Favorites"<br>
+				🔕 Mute all app notifications and alerts
+			  </span>
+			</div>
+            </div>
+
+            <div style="
+              margin-top: 12px;
+              font-size:0.8rem;
+              color: #fcd34d;
+              background: rgba(252, 211, 77, 0.08);
+              padding: 8px 12px;
+              border-radius: 6px;
+            ">
+              ✦ Your OM Flame and resonance remain active ✦
+            </div>
+
+            <div style="margin-top: 10px; font-size:0.75rem; color:#6b7280; font-style:italic;">
+              After leaving OM, Astral Silence will turn off automatically
+            </div>
+          </div>
+        `;
+      }
+      
+      popup.innerHTML = `
+        <div style="font-size: 2.4rem; margin-bottom: 12px;">${status ? '🌙' : '🌙'}</div>
+        <h3 style="margin: 8px 0 4px; color: #fff; font-size: 1.4rem;">Astral Silence</h3>
+        <p style="margin: 4px 0 12px; font-size: 0.9rem; color: #aaa;">
+          Your mode: <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
+        </p>
+
+        ${contentHtml}
+
+        <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap;">
+          <button onclick="window.toggleAstralSilence('${userId}')" style="
+            background: ${status ? '#ff4444' : '#6b47dc'};
+            color: white;
+            border: none;
+            padding: 10px 28px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 140px;
+          ">
+            ${status ? '🚫 Leave Astral Silence' : '🌙 Enter Astral Silence'}
+          </button>
+          <button onclick="document.getElementById('astral-silence-popup').remove()" style="
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+            padding: 10px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+          ">
+            Close
+          </button>
+        </div>
+      `;
+    });
+  } else {
+    // Showing other user's status
+    getAstralSilenceStatus(userId).then(status => {
+      const statusText = status ? '🟣 In Astral Silence' : '⚪ Available';
+      const statusColor = status ? '#6b47dc' : '#4CAF50';
+      
+      let statusMessageHtml = '';
+      if (status) {
+        statusMessageHtml = `
+          <div style="background: rgba(107, 71, 220, 0.15); padding: 14px; border-radius: 8px; margin: 12px 0; text-align: left;">
+            <div style="font-size:0.85rem; color:#c4b5fd; font-weight:600; margin-bottom:4px;">
+              🌊 In Deep Meditation
+            </div>
+            <p style="margin: 4px 0; font-size:0.9rem; color:#aaa; line-height:1.5;">
+              Their flame still burns,<br>
+              soft, steady, undisturbed.
+            </p>
+            <p style="margin: 6px 0 0 0; font-size:0.75rem; color:#6b7280;">
+              ✦ Honor their silence ✦
+            </p>
+          </div>
+        `;
+      } else {
+        statusMessageHtml = `
+          <div style="background: rgba(76, 175, 80, 0.08); padding: 12px; border-radius: 8px; margin: 12px 0;">
+            <p style="margin: 4px 0; font-size:0.9rem; color:#93c5fd;">
+              Available for connection
+            </p>
+          </div>
+        `;
+      }
+      
+      popup.innerHTML = `
+        <div style="font-size: 2.4rem; margin-bottom: 12px;">🌙</div>
+        <h3 style="margin: 8px 0 4px; color: #fff; font-size: 1.4rem;">Astral Silence</h3>
+        <p style="margin: 4px 0 8px; font-size: 1rem;">
+          ${shortId} is <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
+        </p>
+        ${statusMessageHtml}
+        <button onclick="document.getElementById('astral-silence-popup').remove()" style="
+          background: #6b47dc;
+          color: white;
+          border: none;
+          padding: 10px 32px;
+          border-radius: 8px;
+          font-size: 1rem;
+          cursor: pointer;
+          margin-top: 8px;
+          font-weight: 600;
+        ">
+          Close
+        </button>
+      `;
+    });
+  }
+  
+  document.body.appendChild(popup);
+  
+  // Close popup when clicking outside
+  popup.addEventListener('click', (e) => {
+    if (e.target === popup) {
+      popup.remove();
+    }
+  });
+};
+
+// Helper function to show notifications
+window.showNotification = function(message) {
+  // Remove existing notification
+  const existing = document.querySelector('.astral-notification');
+  if (existing) existing.remove();
+  
+  const notification = document.createElement('div');
+  notification.className = 'astral-notification';
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.9);
+    color: #ffd700;
+    padding: 12px 24px;
+    border-radius: 8px;
+    z-index: 30000;
+    border: 1px solid #6b47dc;
+    font-size: 0.9rem;
+  `;
+  notification.textContent = message;
+  document.body.appendChild(notification);
+  setTimeout(() => {
+    if (notification.parentNode) notification.remove();
+  }, 6000);
+};
 
 async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starterUserId, x, y) {
   // Remove any previous keeper popup
