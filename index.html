@@ -3203,20 +3203,27 @@ body.modal-open {
 }
 
 /* Consistent icon sizing for flame keepers list */
+/* Consistent icon sizing for flame keepers list */
 .flame-keeper-icons {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
+  gap: 2px;
   flex-shrink: 0;
   min-height: 24px;
 }
 
 .flame-keeper-icons img,
-.flame-keeper-icons svg {
+.flame-keeper-icons svg,
+.flame-keeper-icons .lotus-glow,
+.flame-keeper-icons .deep-presence-icon,
+.flame-keeper-icons .ultimate-stillness-icon {
   width: 20px !important;
   height: 20px !important;
   flex-shrink: 0;
   vertical-align: middle;
+  max-width: 20px !important;
+  max-height: 20px !important;
+  object-fit: contain;
 }
 
 .flame-keeper-icons .call-icon,
@@ -3229,9 +3236,14 @@ body.modal-open {
 /* Mobile adjustments */
 @media (max-width: 480px) {
   .flame-keeper-icons img,
-  .flame-keeper-icons svg {
+  .flame-keeper-icons svg,
+  .flame-keeper-icons .lotus-glow,
+  .flame-keeper-icons .deep-presence-icon,
+  .flame-keeper-icons .ultimate-stillness-icon {
     width: 18px !important;
     height: 18px !important;
+    max-width: 18px !important;
+    max-height: 18px !important;
   }
   .flame-keeper-icons .call-icon,
   .flame-keeper-icons .callback-bell-icon {
