@@ -18959,16 +18959,19 @@ if (userIds.length === 0) {
 	  const row = userRows[id];
 	  const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
 
-    // ----- ADD THIS: Get the astral silence status for this user -----
-    const isAstralSilenceActive = astralSilenceStatuses[id] || false;
-    const astralIconHtml = isAstralSilenceActive ? 
-      `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Active)">
-        ${astralSilenceActiveSvg}
-      </span>` :
-      `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Inactive)">
-        ${astralSilenceInactiveSvg}
-      </span>`;
-    // ----------------------------------------------------------------
+	  // ===== ONLY SHOW ASTRAL ICON FOR LIVE USERS =====
+	  let astralIconHtml = '';
+	  if (isLive) {
+		const isAstralSilenceActive = astralSilenceStatuses[id] || false;
+		astralIconHtml = isAstralSilenceActive ? 
+		  `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Active)">
+			${astralSilenceActiveSvg}
+		  </span>` :
+		  `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Inactive)">
+			${astralSilenceInactiveSvg}
+		  </span>`;
+	  }
+	  // ===============================================
 	
 	  let callIcon = '';
 	  if (
