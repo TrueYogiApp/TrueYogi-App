@@ -19510,6 +19510,7 @@ window.toggleAstralSilence = async function(userId) {
 };
 
 // Show Astral Silence popup
+// Show Astral Silence popup
 window.showAstralSilencePopup = function(userId) {
   // Remove existing popup if any
   const existingPopup = document.getElementById('astral-silence-popup');
@@ -19518,34 +19519,34 @@ window.showAstralSilencePopup = function(userId) {
   const currentUserId = localStorage.getItem('omUserId');
   const isCurrentUser = userId === currentUserId;
   
-  // Create popup element
-  const popup = document.createElement('div');
-  popup.id = 'astral-silence-popup';
-  popup.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0,0,0,0.95);
-    color: #ffd700;
-    padding: 24px 32px;
-    border-radius: 16px;
-    border: 1px solid #6b47dc;
-    box-shadow: 0 0 30px rgba(107, 71, 220, 0.3);
-    z-index: 20000;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    font-family: system-ui, -apple-system, sans-serif;
-    max-height: 90vh;
-    overflow-y: auto;
-  `;
-  
-  const shortId = getShortUserId(userId);
-  
-  if (isCurrentUser) {
-    // Get current status
-    getAstralSilenceStatus(userId).then(status => {
+  // ===== FETCH STATUS FIRST, THEN CREATE POPUP =====
+  getAstralSilenceStatus(userId).then(status => {
+    // Now create popup with the data
+    const popup = document.createElement('div');
+    popup.id = 'astral-silence-popup';
+    popup.style.cssText = `
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.95);
+      color: #ffd700;
+      padding: 24px 32px;
+      border-radius: 16px;
+      border: 1px solid #6b47dc;
+      box-shadow: 0 0 30px rgba(107, 71, 220, 0.3);
+      z-index: 20000;
+      max-width: 420px;
+      width: 90%;
+      text-align: center;
+      font-family: system-ui, -apple-system, sans-serif;
+      max-height: 90vh;
+      overflow-y: auto;
+    `;
+    
+    const shortId = getShortUserId(userId);
+    
+    if (isCurrentUser) {
       const statusText = status ? '🟣 ACTIVE' : '⚪ OFF';
       const statusColor = status ? '#6b47dc' : '#888';
       
@@ -19629,16 +19630,16 @@ window.showAstralSilencePopup = function(userId) {
               <div style="font-size:0.85rem; color:#c4b5fd; font-weight:600; margin-bottom:6px;">
                 📱 BEFORE ENTERING ASTRAL SILENCE:
               </div>
-			<div style="font-size:0.8rem; color:#d1d5db; line-height:1.5;">
-			  Setup <strong style="color:#fcd34d;">Focus Mode</strong> or 
-			  <strong style="color:#fcd34d;">Do Not Disturb</strong> on your device<br>
-			  <span style="color:#9ca3af; font-size:0.75rem;">
-				⚙️ Settings → Focus / Do Not Disturb<br>
-				🔇 Choose: "Allow no calls" or "Only from Favorites"<br>
-				🔕 Mute all app notifications and alerts<br>
-				📶 Keep WiFi ON
-			  </span>
-			</div>
+            <div style="font-size:0.8rem; color:#d1d5db; line-height:1.5;">
+              Setup <strong style="color:#fcd34d;">Focus Mode</strong> or 
+              <strong style="color:#fcd34d;">Do Not Disturb</strong> on your device<br>
+              <span style="color:#9ca3af; font-size:0.75rem;">
+                ⚙️ Settings → Focus / Do Not Disturb<br>
+                🔇 Choose: "Allow no calls" or "Only from Favorites"<br>
+                🔕 Mute all app notifications and alerts<br>
+                📶 Keep WiFi ON
+              </span>
+            </div>
             </div>
 
             <div style="
@@ -19660,7 +19661,7 @@ window.showAstralSilencePopup = function(userId) {
       }
       
       popup.innerHTML = `
-        <div style="font-size: 2.4rem; margin-bottom: 12px;">${status ? '🌙' : '🌙'}</div>
+        <div style="font-size: 2.4rem; margin-bottom: 12px;">🌙</div>
         <h3 style="margin: 8px 0 4px; color: #fff; font-size: 1.4rem;">Astral Silence</h3>
         <p style="margin: 4px 0 12px; font-size: 0.9rem; color: #aaa;">
           Your mode: <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
@@ -19681,7 +19682,7 @@ window.showAstralSilencePopup = function(userId) {
             transition: all 0.2s;
             min-width: 140px;
           ">
-            ${status ? '🚫 Leave Astral Silence' : '🌙 Enter Astral Silence'}
+            ${status ? 'Leave Astral Silence' : '🌙 Enter Astral Silence'}
           </button>
           <button onclick="document.getElementById('astral-silence-popup').remove()" style="
             background: transparent;
@@ -19696,10 +19697,8 @@ window.showAstralSilencePopup = function(userId) {
           </button>
         </div>
       `;
-    });
-  } else {
-    // Showing other user's status
-    getAstralSilenceStatus(userId).then(status => {
+    } else {
+      // Showing other user's status
       const statusText = status ? '🟣 In Astral Silence' : '⚪ Available';
       const statusColor = status ? '#6b47dc' : '#4CAF50';
       
@@ -19750,16 +19749,16 @@ window.showAstralSilencePopup = function(userId) {
           Close
         </button>
       `;
-    });
-  }
-  
-  document.body.appendChild(popup);
-  
-  // Close popup when clicking outside
-  popup.addEventListener('click', (e) => {
-    if (e.target === popup) {
-      popup.remove();
     }
+    
+    document.body.appendChild(popup);
+    
+    // Close popup when clicking outside
+    popup.addEventListener('click', (e) => {
+      if (e.target === popup) {
+        popup.remove();
+      }
+    });
   });
 };
 
