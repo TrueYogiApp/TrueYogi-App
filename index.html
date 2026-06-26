@@ -18995,19 +18995,27 @@ if (userIds.length === 0) {
 	  const row = userRows[id];
 	  const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
 
-	  // ===== ONLY SHOW ASTRAL ICON FOR LIVE USERS =====
-	  let astralIconHtml = '';
-	  if (isLive) {
+		// ----- Astral Silence Icon - Only for current user or active users -----
 		const isAstralSilenceActive = astralSilenceStatuses[id] || false;
-		astralIconHtml = isAstralSilenceActive ? 
-		  `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Active)">
+
+		let astralIconHtml = '';
+		if (isCurrentUser) {
+		  // Show for current user with toggle capability
+		  astralIconHtml = isAstralSilenceActive ? 
+			`<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Active)">
+			  ${astralSilenceActiveSvg}
+			</span>` :
+			`<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Inactive)">
+			  ${astralSilenceInactiveSvg}
+			</span>`;
+		} else if (isAstralSilenceActive) {
+		  // Show for other users ONLY if they are actively in Astral Silence
+		  astralIconHtml = `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Active)">
 			${astralSilenceActiveSvg}
-		  </span>` :
-		  `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:10px;cursor:pointer;" title="Astral Silence Mode (Inactive)">
-			${astralSilenceInactiveSvg}
 		  </span>`;
-	  }
-	  // ===============================================
+		}
+		// If not current user and not active, show nothing
+		// ----------------------------------------------------------------
 	
 	  let callIcon = '';
 	  if (
