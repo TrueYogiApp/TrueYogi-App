@@ -6510,16 +6510,16 @@ updateDurationOptionsForMusic();
   }
 });
 
-//  User Avatar Upload, Select DOM elements
-	const userId = localStorage.getItem('omUserId'); // Or from your auth
-    const avatarImg = document.getElementById('user-avatar');
-    const avatarInput = document.getElementById('avatar-upload');
-	const avatarPath = `users/${userId}.png`;
+
+// User Avatar Upload, Select DOM elements
+const userId = localStorage.getItem('omUserId');
+const avatarImg = document.getElementById('user-avatar');
+const avatarInput = document.getElementById('avatar-upload');
+const avatarPath = `users/${userId}.png`;
 
 // Build user's avatar URL in Supabase
-    const supabaseAvatarUrl = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`;
+const supabaseAvatarUrl = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`;
 
-// Add this function to control reset button visibility
 function toggleResetButton(show) {
   const resetBtn = document.querySelector('.reset-avatar-btn');
   if (resetBtn) {
@@ -6527,19 +6527,35 @@ function toggleResetButton(show) {
   }
 }
 
-// Load user's avatar, use cache-busting param
+// Load user's avatar - Using Supabase API to check file existence
 if (userId) {
-  fetch(supabaseAvatarUrl, { method: "HEAD" })
-    .then(res => {
-      if (res.ok) {
+  // First check if file exists using Supabase storage API
+  supabase.storage
+    .from('avatars')
+    .list('users/', {
+      limit: 100,
+      offset: 0,
+      sortBy: { column: 'name', order: 'asc' }
+    })
+    .then(({ data, error }) => {
+      // Check if our specific file exists in the list
+      const fileExists = data?.some(file => file.name === `${userId}.png`);
+      
+      if (fileExists) {
+        // File exists - load it
         avatarImg.src = supabaseAvatarUrl + '?t=' + Date.now();
-        toggleResetButton(true); // Show reset button if custom avatar exists
+        toggleResetButton(true);
       } else {
-        toggleResetButton(false); // Hide reset button if using default
+        // File doesn't exist - use default
+        avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
+        toggleResetButton(false);
       }
     })
-    .catch(() => {
-      toggleResetButton(false); // Hide reset button on error
+    .catch(err => {
+      // On any error, use default
+      console.warn('Avatar check failed:', err);
+      avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
+      toggleResetButton(false);
     });
 }
 
@@ -6554,7 +6570,7 @@ avatarInput.addEventListener('change', async function(e) {
 
   if (!error) {
     avatarImg.src = supabaseAvatarUrl + '?t=' + Date.now();
-    toggleResetButton(true); // Show reset button after successful upload
+    toggleResetButton(true);
   } else {
     alert('Upload failed! ' + error.message);
   }
@@ -6563,11 +6579,13 @@ avatarInput.addEventListener('change', async function(e) {
 function confirmAndResetAvatar(event) {
   hideAllTooltips();
   document.getElementById('reset-confirm').style.display = 'block';
-  if(event) event.stopPropagation(); // prevent bubbling, don't hide avatar actions
+  if(event) event.stopPropagation();
 }
+
 function hideResetConfirm() {
   document.getElementById('reset-confirm').style.display = 'none';
 }
+
 async function doResetAvatar() {
   await resetAvatar();
   hideResetConfirm();
@@ -6577,7 +6595,6 @@ async function doResetAvatar() {
 // Hide the confirmation tooltip when clicking outside it or the reset button
 document.addEventListener('mousedown', function(e) {
   const rc = document.getElementById('reset-confirm');
-  // If visible and click outside confirmation and outside the reset button, hide it
   if (
     rc.style.display === 'block' &&
     !rc.contains(e.target) &&
@@ -6589,11 +6606,18 @@ document.addEventListener('mousedown', function(e) {
 
 async function resetAvatar() {
   if (!userId) return;
-  await supabase.storage.from('avatars').remove([avatarPath]);
-  avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
-  toggleResetButton(false); // Hide reset button after reset to default
-}
   
+  try {
+    await supabase.storage.from('avatars').remove([avatarPath]);
+  } catch (err) {
+    // File might not exist, that's fine
+    console.log('No avatar to remove or removal failed');
+  }
+  
+  avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
+  toggleResetButton(false);
+}
+
 let avatarActionsTimeout = null;
 const avatarContainer = document.getElementById('avatar-container');
 const avatarActions = document.getElementById('avatar-actions');
@@ -6601,8 +6625,9 @@ const avatarActions = document.getElementById('avatar-actions');
 function showAvatarActions() {
   avatarActions.style.display = 'block';
   clearTimeout(avatarActionsTimeout);
-  avatarActionsTimeout = setTimeout(hideAvatarActions, 30000); // 30 sec
+  avatarActionsTimeout = setTimeout(hideAvatarActions, 30000);
 }
+
 function hideAvatarActions() {
   avatarActions.style.display = 'none';
   hideAllTooltips();
@@ -6620,18 +6645,15 @@ document.getElementById('user-avatar').addEventListener('click', showAvatarActio
 
 // Clicking outside = hide actions & tooltips
 document.addEventListener('mousedown', function(e) {
-  // If click is outside the avatar container OR on the avatar image itself, hide actions
   if (!avatarContainer.contains(e.target) || e.target === document.getElementById('user-avatar')) {
     hideAvatarActions();
   }
 });
 
-// Optional: When an action button is clicked, briefly show its tooltip, then hide on click elsewhere or after delay
+// Optional: When an action button is clicked, briefly show its tooltip
 document.querySelectorAll('.avatar-action-btn').forEach(btn => {
   btn.addEventListener('click', function(e) {
-    // Hide existing tooltips
     hideAllTooltips();
-    // Show its tooltip
     const tt = btn.querySelector('.avatar-tooltip');
     if (tt) {
       tt.style.visibility = 'visible';
@@ -6641,7 +6663,6 @@ document.querySelectorAll('.avatar-action-btn').forEach(btn => {
         tt.style.opacity = 0;
       }, 2000);
     }
-    // Prevent event bubbling to outside listener which would hide everything
     e.stopPropagation();
   });
 });
