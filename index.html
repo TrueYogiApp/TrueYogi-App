@@ -19707,7 +19707,7 @@ window.showAstralSilencePopup = function(userId) {
         ${contentHtml}
 
         <div style="display: flex; gap: 10px; justify-content: center; margin-top: 12px; flex-wrap: wrap;">
-          <button onclick="window.toggleAstralSilence('${userId}')" style="
+          <button onclick="window.toggleAstralSilence('${userId}')" class="mode-btn" style="
             background: ${status ? '#ff4444' : '#6b47dc'};
             color: white;
             border: none;
@@ -19721,7 +19721,7 @@ window.showAstralSilencePopup = function(userId) {
           ">
             ${status ? 'Leave Astral Silence' : '🌙 Enter Astral Silence'}
           </button>
-          <button onclick="document.getElementById('astral-silence-popup').remove()" style="
+          <button onclick="document.getElementById('astral-silence-popup').remove()" class="mode-btn" style="
             background: transparent;
             color: #888;
             border: 1px solid #444;
@@ -19772,7 +19772,7 @@ window.showAstralSilencePopup = function(userId) {
           ${shortId} is <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
         </p>
         ${statusMessageHtml}
-        <button onclick="document.getElementById('astral-silence-popup').remove()" style="
+        <button onclick="document.getElementById('astral-silence-popup').remove()" class="mode-btn" style="
           background: #6b47dc;
           color: white;
           border: none;
