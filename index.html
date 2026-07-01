@@ -17409,6 +17409,11 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 let starfieldCanvas = null;
 let starfieldCtx = null;
 
+// ===== ASTRAL STATUS CACHE =====
+window.astralStatusCache = {};
+window.astralCacheTimestamp = null;
+const ASTRAL_CACHE_DURATION = 300000; // 5 minutes
+
 // ADD THIS FUNCTION RIGHT HERE
 function getCountryData() {
   const now = Date.now();
@@ -19549,6 +19554,11 @@ window.toggleAstralSilence = async function(userId) {
       
     if (error) throw error;
     
+    // ===== CLEAR CACHE =====
+    window.astralStatusCache = {};
+    window.astralCacheTimestamp = null;
+    // ======================
+
     // Close current popup
     const popup = document.getElementById('astral-silence-popup');
     if (popup) popup.remove();
@@ -20908,20 +20918,58 @@ if (svgIcon) {
   }, 9000);
 }
 
-function showUserListPopup(users, parentPopup, x, y) {
+async function showUserListPopup(users, parentPopup, x, y) {
   // Remove any old user list popup
   const oldList = document.getElementById('user-list-popup');
   if (oldList) oldList.remove();
 
   // Get current user's ID
   const currentUserId = localStorage.getItem('omUserId');
-
+  
   // SORT USERS BY DURATION (highest first)
   const sortedUsers = users.sort((a, b) => {
     const durationA = a.joined_at ? (Date.now() - new Date(a.joined_at)) / 1000 : 0;
     const durationB = b.joined_at ? (Date.now() - new Date(b.joined_at)) / 1000 : 0;
-    return durationB - durationA; // Highest first
+    return durationB - durationA;
   });
+
+  // ===== BATCH FETCH WITH CACHE =====
+  const userIds = sortedUsers.map(u => u.user_id);
+  let astralStatuses = {};
+  
+  // Check if cache is valid
+  const now = Date.now();
+  const cacheValid = window.astralCacheTimestamp && 
+                     (now - window.astralCacheTimestamp) < ASTRAL_CACHE_DURATION &&
+                     Object.keys(window.astralStatusCache).length > 0;
+  
+  if (cacheValid) {
+    // Use cached data
+    astralStatuses = window.astralStatusCache;
+    // console.log('📦 Using cached Astral statuses');
+  } else {
+    // Fetch fresh data
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('user_id, astral_silence')
+        .in('user_id', userIds);
+      
+      if (!error && data) {
+        data.forEach(row => {
+          astralStatuses[row.user_id] = row.astral_silence || false;
+        });
+        
+        // Store in cache
+        window.astralStatusCache = { ...astralStatuses };
+        window.astralCacheTimestamp = now;
+        // console.log('🔄 Astral statuses cached');
+      }
+    } catch (err) {
+      console.error('Error fetching astral statuses:', err);
+    }
+  }
+  // ==================================
 
   // Create new popup
   const listPopup = document.createElement('div');
@@ -20941,46 +20989,70 @@ function showUserListPopup(users, parentPopup, x, y) {
     max-height: 320px;
     overflow-y: auto;
     text-align: left;
-	  /* Scrollbar styling */
-  scrollbar-width: thin;
-  scrollbar-color: #fde68a #000000;
+    scrollbar-width: thin;
+    scrollbar-color: #fde68a #000000;
   `;
 
   if (users.length === 0) {
     listPopup.innerHTML = "<i>No users found.</i>";
   } else {
-    // Get country name from first user (assuming all users in this popup are from same country)
     const countryName = users[0]?.country || "Active Users";
     
-    listPopup.innerHTML = `
+    let userHtml = `
       <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:6px;text-align:center;">
         <strong>${countryName.replace(/_/g, ' ')}</strong>
       </div>
-      ${users.map(u => {
-        let duration = "";
-        if (u.joined_at) {
-          const secs = Math.floor((Date.now() - new Date(u.joined_at)) / 1000);
-          duration = formatDuration(secs);
-        }
-        // Bold and highlight current user
-        const isCurrentUser = u.user_id === currentUserId;
-        return `
-          <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:14px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-            <b>ID:</b>
-            <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>
-            <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
-            <span style="color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${duration}</span>
-          </div>
-        `;
-      }).join('')}
     `;
+    
+    for (const u of sortedUsers) {
+      let duration = "";
+      if (u.joined_at) {
+        const secs = Math.floor((Date.now() - new Date(u.joined_at)) / 1000);
+        duration = formatDuration(secs);
+      }
+      const isCurrentUser = u.user_id === currentUserId;
+      
+      const isAstralSilenceActive = astralStatuses[u.user_id] || false;
+      
+      let astralIconHtml = '';
+      if (isAstralSilenceActive) {
+        astralIconHtml = `
+          <span class="astral-silence-icon" data-userid="${u.user_id}" style="margin-left:4px;cursor:pointer;" title="Astral Silence Mode (Active)">
+            <span class="astral-active-wrapper">
+              <img src="assets/astral-silence.svg" 
+                   class="astral-active" 
+                   style="width:20px; height:20px; vertical-align:middle;" 
+                   title="Astral Silence Mode (Active)">
+            </span>
+          </span>
+        `;
+      }
+      
+      userHtml += `
+        <div style="border-bottom:1px solid #333;padding:4px 0;display:flex;align-items:center;gap:8px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+          <b>ID:</b>
+          <span style="font-family:monospace; color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${getShortUserId(u.user_id)}</span>  
+          <img src="assets/clock.svg" style="width:18px; height:18px; vertical-align:middle;">
+          <span style="color:#ffd700;${isCurrentUser ? 'font-weight:bold;' : ''}">${duration}</span>
+          ${astralIconHtml}
+        </div>
+      `;
+    }
+    
+    listPopup.innerHTML = userHtml;
   }
   
   document.body.appendChild(listPopup);
   
-  // Optional: Remove on mouse leave
-  //listPopup.onmouseleave = () => listPopup.remove();
-  // Or remove after a timeout
+  // Add click handler for astral icons in this popup
+  listPopup.addEventListener('click', async (e) => {
+    const astralIcon = e.target.closest('.astral-silence-icon');
+    if (astralIcon) {
+      const userId = astralIcon.dataset.userid;
+      showAstralSilencePopup(userId);
+    }
+  });
+  
   setTimeout(() => { listPopup.remove(); }, 12000);
 }
 
