@@ -20447,6 +20447,9 @@ renderDebounceTimer = setTimeout(() => {
           'USA': 'us', 'US': 'us', 'United_States': 'us',
           'United States of America': 'us',
           'United States of America (the)': 'us',
+          'United Arab Emirates': 'ae',
+          'United Arab Emirates (the)': 'ae',
+          'United Kingdom of Great Britain and Northern Ireland (the)': 'gb',
           'India': 'in', 'IN': 'in',
           'China': 'cn', 'CN': 'cn',
           'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
@@ -20804,11 +20807,19 @@ function formatTotalDuration(seconds) {
 
 function getDisplayCountryName(zoneName) {
   if (!zoneName) return '';
-  const name = zoneName.toLowerCase();
-  if (name.includes('united states')) return 'United States';
-  if (name.includes('united states america')) return 'United States of America';
-  // Add more custom aliases here if needed (e.g., UK, UAE)
-  return zoneName.replace(/_/g, ' ');
+
+  const aliases = {
+    'united states of america': 'United States',
+    'united states of america (the)': 'United States',
+    'united kingdom of great britain and northern ireland (the)': 'United Kingdom',
+    'united arab emirates (the)': 'United Arab Emirates',
+    'uae': 'United Arab Emirates',
+    'uk': 'United Kingdom',
+    'usa': 'United States',
+  };
+
+  const normalized = zoneName.toLowerCase().replace(/_/g, ' ');
+  return aliases[normalized] || zoneName.replace(/_/g, ' ');
 }
 
 async function showZonePopup(zone, x, y) {
