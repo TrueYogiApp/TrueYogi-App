@@ -20400,11 +20400,20 @@ let omPresenceId = localStorage.getItem('omPresenceId');
 livePresenceRows.forEach(row => {
   const zone = row.country || row.zone || row.region;
   if (!zone) return;
-  countryCounts[zone] = (countryCounts[zone] || 0) + 1;
+
+  if (!countryCounts[zone]) {
+    countryCounts[zone] = {
+      count: 0,
+      countryCode: row.countryCode
+    };
+  }
+
+  countryCounts[zone].count++;
 });
 const zones = Object.keys(countryCounts).map(zone => ({
   zone,
-  count: countryCounts[zone]
+  count: countryCounts[zone].count,
+  countryCode: countryCounts[zone].countryCode
 }));
 
 // --- Draw flags and dots for each active zone/country ---
@@ -20441,32 +20450,10 @@ renderDebounceTimer = setTimeout(() => {
         const x = baseX + (coords.lon / 180) * radius * 0.9;
         const y = baseY - (coords.lat / 90) * radius * 0.45;
         const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
-        let countryCode = 'un';
-        if (country && country.cca2) countryCode = country.cca2.toLowerCase();
-        const codeMap = {
-          'USA': 'us', 'US': 'us', 'United_States': 'us',
-          'United States of America': 'us',
-          'United States of America (the)': 'us',
-          'United Arab Emirates': 'ae',
-          'United Arab Emirates (the)': 'ae',
-          'United Kingdom of Great Britain and Northern Ireland (the)': 'gb',
-		  'Finland': 'fi',
-		  'Taiwan (Province of China)': 'tw',
-          'India': 'in', 'IN': 'in',
-          'China': 'cn', 'CN': 'cn',
-          'UK': 'gb', 'GB': 'gb', 'United_Kingdom': 'gb',
-          'Australia': 'au', 'AU': 'au',
-          'Brazil': 'br', 'BR': 'br',
-          'Russia': 'ru', 'RU': 'ru',
-          'Japan': 'jp', 'JP': 'jp',
-          'Canada': 'ca', 'CA': 'ca',
-          'Mexico': 'mx', 'MX': 'mx',
-          'South_Africa': 'za', 'ZA': 'za',
-          'Egypt': 'eg', 'EG': 'eg',
-          'Indonesia': 'id', 'ID': 'id',
-          'Argentina': 'ar', 'AR': 'ar'
-        };
-        countryCode = codeMap[zoneName] || countryCode;
+		let countryCode =
+		  (typeof z === 'object' && z.countryCode)
+			? z.countryCode.toLowerCase()
+			: (country && country.cca2 ? country.cca2.toLowerCase() : 'un');
 
         // Only do the presenceRow lookup ONCE
         const presenceRow = livePresenceRows.find(row => row.country === zoneName);
