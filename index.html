@@ -17424,7 +17424,7 @@ function getCountryData() {
   }
   
   // Otherwise fetch fresh data
-  return fetch('https://restcountries.com/v3.1/all?fields=name,cca2,cca3,latlng')
+  return fetch('https://trueyogi-backend-test.onrender.com/api/countries')
     .then(res => res.json())
     .then(data => {
       cachedCountries = data;
@@ -20428,6 +20428,14 @@ renderDebounceTimer = setTimeout(() => {
   getCountryData()
     .then(allCountries => {
       const flagPromises = [];
+	  	  	  const continentCenters = {
+  Americas: { x: -70, y: -5 },
+  Europe:   { x: 0,   y: -42 },
+  Africa:   { x: 10,  y: 18 },
+  Asia:     { x: 60,  y: -5 },
+  Oceania:  { x: 100, y: 60 },
+  Other:    { x: 0,   y: 0 }
+};
       zones.forEach((z, i) => {
         let zoneName = typeof z === 'object' ? z.zone : z;
         // Normalize any USA variant to "United States"
@@ -20447,8 +20455,18 @@ renderDebounceTimer = setTimeout(() => {
           const angle = (i / zones.length) * 2 * Math.PI;
           coords = { lat: Math.sin(angle) * 60, lon: (angle / Math.PI) * 180 };
         }
-        const x = baseX + (coords.lon / 180) * radius * 0.9;
-        const y = baseY - (coords.lat / 90) * radius * 0.45;
+		
+		const continent = country?.region || "Other";
+		const center = continentCenters[continent];
+		const x =
+		  baseX +
+		  center.x +
+		  (coords.lon / 180) * 50;
+		const y =
+		  baseY +
+		  center.y -
+		  (coords.lat / 90) * 38;
+		  
         const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
 		let countryCode =
 		  (typeof z === 'object' && z.countryCode)
