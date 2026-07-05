@@ -17673,13 +17673,13 @@ async function getUserCountryInfo() {
     try {
       let { data } = await supabase
         .from('om_presence')
-        .select('country')
+        .select('country, countryCode')
         .eq('id', omPresenceId)
         .single();
       if (data?.country && data.country.toLowerCase() !== 'unknown') {
         return {
           country: data.country,
-          countryCode: data.country.slice(0, 2).toLowerCase(),
+          countryCode: data.countryCode,
           connected: true
         };
       }
