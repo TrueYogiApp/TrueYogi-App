@@ -17909,10 +17909,10 @@ async function showUserCountrySessions(userId, country, x, y) {
     box-shadow: 0 0 12px rgba(253,230,138,0.3);
   `;
 
-  popup.innerHTML = `
-    <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:8px;text-align:center;">
-      <strong>${country}</strong> - Your last ${sessions.length} sessions
-    </div>
+	popup.innerHTML = `
+	  <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:8px;text-align:center;">
+		<strong>${getDisplayCountryName(country)}</strong> - Your last ${sessions.length} sessions
+	  </div>
     ${sessions.map((session, idx) => `
       <div style="padding:6px 0;border-bottom:1px solid #333;">
         <span style="color:#ffd700;">${idx + 1}.</span>
@@ -21049,7 +21049,7 @@ async function showUserListPopup(users, parentPopup, x, y) {
     
     let userHtml = `
       <div style="border-bottom:1px solid #fde68a;padding-bottom:6px;margin-bottom:6px;text-align:center;font-size:${isMobile ? '0.85rem' : '1rem'};">
-        <strong>${countryName.replace(/_/g, ' ')}</strong>
+        <strong>${getDisplayCountryName(countryName)}</strong>
       </div>
     `;
     
