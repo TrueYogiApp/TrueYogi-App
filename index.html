@@ -20426,29 +20426,29 @@ renderDebounceTimer = setTimeout(() => {
 		const continent = country?.region || "Other";
 		const center = continentCenters[continent];
 		let x =
-  baseX +
-  center.x +
-  (coords.lon / 180) * 50;
+		  baseX +
+		  center.x +
+		  (coords.lon / 180) * 50;
 
-let y =
-  baseY +
-  center.y -
-  (coords.lat / 90) * 38;
+		let y =
+		  baseY +
+		  center.y -
+		  (coords.lat / 90) * 38;
 
-// Keep every country inside the globe
-const dx = x - baseX;
-const dy = y - baseY;
+		// Keep every country inside the globe
+		const dx = x - baseX;
+		const dy = y - baseY;
 
-const distance = Math.sqrt(dx * dx + dy * dy);
+		const distance = Math.sqrt(dx * dx + dy * dy);
 
-// Visible globe radius
-const maxRadius = radius - 8;
+		// Visible globe radius
+		const maxRadius = radius - 8;
 
-if (distance > maxRadius) {
-    const scale = maxRadius / distance;
-    x = baseX + dx * scale;
-    y = baseY + dy * scale;
-}
+		if (distance > maxRadius) {
+			const scale = maxRadius / distance;
+			x = baseX + dx * scale;
+			y = baseY + dy * scale;
+		}
 		  
         const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
 		let countryCode =
