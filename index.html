@@ -15435,39 +15435,6 @@ async function removeCount() {
       stopMeditationColorCycle();
     }
     
-    // ===== TURN OFF ASTRAL SILENCE (INLINE) =====
-    const currentUserId = localStorage.getItem('omUserId');
-    if (currentUserId) {
-      try {
-        // Check if Astral Silence is active
-        const { data, error } = await supabase
-          .from('user_preferences')
-          .select('astral_silence')
-          .eq('user_id', currentUserId)
-          .single();
-        
-        const isActive = data?.astral_silence || false;
-        
-        if (isActive) {
-          // Turn it off
-          const { error: updateError } = await supabase
-            .from('user_preferences')
-            .upsert({
-              user_id: currentUserId,
-              astral_silence: false,
-              updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id' });
-          
-          if (!updateError) {
-            console.log('🔄 Astral Silence auto-disabled (user left OM)');
-          }
-        }
-      } catch (err) {
-        console.error('Error auto-disabling Astral Silence:', err);
-      }
-    }
-    // ==========================================
-    
   } catch (err) { console.error(err); }
 }
 
