@@ -20387,7 +20387,8 @@ const zones = Object.keys(countryCounts).map(zone => ({
 const baseX = canvas.width / 2;
 const baseY = canvas.height / 2;
 const radius = 120;
-const dots = [];
+const maxRadius = radius - 18;
+let dots = [];
 
 // DEBOUNCED AND CACHED VERSION
 if (renderDebounceTimer) clearTimeout(renderDebounceTimer);
@@ -20395,152 +20396,193 @@ renderDebounceTimer = setTimeout(() => {
   getCountryData()
     .then(allCountries => {
       const flagPromises = [];
-	  	  	  const continentCenters = {
-  Americas: { x: -70, y: -5 },
-  Europe:   { x: 0,   y: -42 },
-  Africa:   { x: 10,  y: 18 },
-  Asia:     { x: 60,  y: -5 },
-  Oceania:  { x: 100, y: 60 },
-  Other:    { x: 0,   y: 0 }
-};
+      const continentCenters = {
+        Americas: { x: -70, y: -5 },
+        Europe:   { x: 0,   y: -42 },
+        Africa:   { x: 10,  y: 18 },
+        Asia:     { x: 60,  y: -5 },
+        Oceania:  { x: 100, y: 60 },
+        Other:    { x: 0,   y: 0 }
+      };
+      
+      // First calculate all positions
+      const positions = [];
       zones.forEach((z, i) => {
         let zoneName = typeof z === 'object' ? z.zone : z;
-        // Normalize any USA variant to "United States"
         if (zoneName && zoneName.toLowerCase().includes('united states')) {
           zoneName = 'United States';
         } 
-        let coords;
+        
         const country = allCountries.find(c => 
           c.name.common.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
           c.name.official.toUpperCase() === zoneName.toUpperCase().replace(/_/g, ' ') ||
           c.cca2 === zoneName ||
           c.cca3 === zoneName
         );
+        
+        let coords;
         if (country && country.latlng) {
           coords = { lat: country.latlng[0], lon: country.latlng[1] };
         } else {
           const angle = (i / zones.length) * 2 * Math.PI;
           coords = { lat: Math.sin(angle) * 60, lon: (angle / Math.PI) * 180 };
         }
-		
-		const continent = country?.region || "Other";
-		const center = continentCenters[continent];
-		let x =
-		  baseX +
-		  center.x +
-		  (coords.lon / 180) * 50;
+        
+        const continent = country?.region || "Other";
+        const center = continentCenters[continent];
+        
+        let x = baseX + center.x + (coords.lon / 180) * 50;
+        let y = baseY + center.y - (coords.lat / 90) * 38;
 
-		let y =
-		  baseY +
-		  center.y -
-		  (coords.lat / 90) * 38;
+        // Keep inside globe
+        const dx = x - baseX;
+        const dy = y - baseY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
 
-		// Keep every country inside the globe
-		const dx = x - baseX;
-		const dy = y - baseY;
-
-		const distance = Math.sqrt(dx * dx + dy * dy);
-
-		// Visible globe radius
-		const maxRadius = radius - 8;
-
-		if (distance > maxRadius) {
-			const scale = maxRadius / distance;
-			x = baseX + dx * scale;
-			y = baseY + dy * scale;
-		}
-		  
+        if (distance > maxRadius) {
+          const scale = maxRadius / distance;
+          x = baseX + dx * scale;
+          y = baseY + dy * scale;
+        }
+        
         const color = `hsl(${(i * 33) % 360}, 80%, 60%)`;
-		let countryCode =
-		  (typeof z === 'object' && z.countryCode)
-			? z.countryCode.toLowerCase()
-			: (country && country.cca2 ? country.cca2.toLowerCase() : 'un');
+        let countryCode = (typeof z === 'object' && z.countryCode)
+          ? z.countryCode.toLowerCase()
+          : (country && country.cca2 ? country.cca2.toLowerCase() : 'un');
 
-        // Only do the presenceRow lookup ONCE
         const presenceRow = livePresenceRows.find(row => row.country === zoneName);
         const id = presenceRow ? presenceRow.id : null;
 
+        positions.push({ 
+          x, y, zone: z, color, id, 
+          countryCode, 
+          zoneName: zoneName,
+          country: country,
+          continent: continent
+        });
+      });
+
+      // --- COLLISION FIX ---
+      console.log('Before collision:', positions.map(p => ({name: p.zoneName, x: p.x, y: p.y})));
+      
+      const MIN_DISTANCE = 30;
+      
+      for (let iter = 0; iter < 100; iter++) {
+        let moved = false;
+        
+        for (let i = 0; i < positions.length; i++) {
+          for (let j = i + 1; j < positions.length; j++) {
+            const dx = positions[j].x - positions[i].x;
+            const dy = positions[j].y - positions[i].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < MIN_DISTANCE && distance > 0.01) {
+              // Calculate push amount
+              const overlap = (MIN_DISTANCE - distance) / 2;
+              const angle = Math.atan2(dy, dx);
+              
+              // Push both flags apart
+              const pushX = Math.cos(angle) * overlap;
+              const pushY = Math.sin(angle) * overlap;
+              
+              positions[i].x -= pushX;
+              positions[i].y -= pushY;
+              positions[j].x += pushX;
+              positions[j].y += pushY;
+              moved = true;
+            }
+          }
+        }
+        
+        // Also push towards center if outside globe
+        positions.forEach(pos => {
+          const dx = pos.x - baseX;
+          const dy = pos.y - baseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist > maxRadius) {
+            const scale = (maxRadius - 5) / dist;
+            pos.x = baseX + dx * scale;
+            pos.y = baseY + dy * scale;
+          }
+        });
+        
+        if (!moved) break;
+      }
+      
+      console.log('After collision:', positions.map(p => ({name: p.zoneName, x: p.x, y: p.y})));
+      
+      // --- DRAW FLAGS USING UPDATED POSITIONS ---
+      positions.forEach((pos) => {
         const flagImg = new Image();
         flagImg.crossOrigin = "anonymous";
         const flagPromise = new Promise((resolve) => {
-          flagImg.onload = () => resolve({ img: flagImg, x, y, zone: z, color, id });
-          flagImg.onerror = () => resolve({ img: null, x, y, zone: z, color, id });
-          flagImg.src = `https://flagcdn.com/w20/${countryCode}.png`;
-        });
-        flagPromises.push(flagPromise);
-
-        dots.push({ x, y, zone: z, color, id });
-      });
-
-      Promise.all(flagPromises).then(flags => {
-        flags.forEach(({ img, x, y, zone, color, id }) => {
-          // Compare this dot's id to your saved omPresenceId
-          if (id && omPresenceId && id.toString() === omPresenceId.toString()) {
-            // Draw shine/glow under your flag
-            ctx.save();
+          flagImg.onload = () => {
+            // Draw flag at pos.x, pos.y (the updated positions)
+            if (pos.id && omPresenceId && pos.id.toString() === omPresenceId.toString()) {
+              ctx.save();
+              ctx.beginPath();
+              ctx.ellipse(pos.x, pos.y + 1, 9, 5, 0, 0, 1 * Math.PI);
+              ctx.fillStyle = '#fffde0';
+              ctx.globalAlpha = 0.38;
+              ctx.shadowColor = '#ffd700';
+              ctx.shadowBlur = 28;
+              ctx.fill();
+              ctx.restore();
+            }
+            
+            // Draw the flag
+            ctx.drawImage(flagImg, pos.x - 6, pos.y - 4, 12, 9);
+            resolve({ img: flagImg, x: pos.x, y: pos.y, zone: pos.zone, color: pos.color, id: pos.id });
+          };
+          flagImg.onerror = () => {
+            // Fallback dot
             ctx.beginPath();
-            ctx.ellipse(x, y + 1, 9, 5, 0, 0, 1 * Math.PI);
-            ctx.fillStyle = '#fffde0';
-            ctx.globalAlpha = 0.38;
-            ctx.shadowColor = '#ffd700';
-            ctx.shadowBlur = 28;
-            ctx.fill();
-            ctx.restore();
-          }
-
-          // Draw the flag as usual
-          if (img) {
-            ctx.drawImage(img, x - 6, y - 4, 12, 9);
-          } else {
-            ctx.beginPath();
-            ctx.arc(x, y, 4, 0, Math.PI * 2);
-            ctx.fillStyle = color;
-            ctx.shadowColor = color;
+            ctx.arc(pos.x, pos.y, 4, 0, Math.PI * 2);
+            ctx.fillStyle = pos.color;
+            ctx.shadowColor = pos.color;
             ctx.globalAlpha = 0.18;
             ctx.shadowBlur = 15;
             ctx.fill();
             ctx.beginPath();
-            ctx.arc(x, y, 6, 0, Math.PI * 2);
-            ctx.strokeStyle = color + '40';
+            ctx.arc(pos.x, pos.y, 6, 0, Math.PI * 2);
+            ctx.strokeStyle = pos.color + '40';
             ctx.lineWidth = 1;
             ctx.stroke();
+            resolve({ img: null, x: pos.x, y: pos.y, zone: pos.zone, color: pos.color, id: pos.id });
+          };
+          flagImg.src = `https://flagcdn.com/w20/${pos.countryCode}.png`;
+        });
+        flagPromises.push(flagPromise);
+        dots.push({ x: pos.x, y: pos.y, zone: pos.zone, color: pos.color, id: pos.id });
+      });
+
+      Promise.all(flagPromises).then(() => {
+        // Zone popup
+        getUserCountryInfo().then(userCountryInfo => {
+          const omPresenceId = localStorage.getItem('omPresenceId');
+          const userZoneDot = dots.find(dot => {
+            let zoneName = typeof dot.zone === 'object' ? dot.zone.zone : dot.zone;
+            return zoneName === userCountryInfo.country;
+          });
+
+          const canvasRect = canvas.getBoundingClientRect();
+
+          if (userZoneDot) {
+            showZonePopup(
+              typeof userZoneDot.zone === 'object' ? userZoneDot.zone : { zone: userZoneDot.zone, count: userZoneDot.count },
+              userZoneDot.x + canvasRect.left,
+              userZoneDot.y + canvasRect.top
+            );
+          } else {
+            const centerX = canvasRect.left + canvas.width / 2;
+            const centerY = canvasRect.top + canvas.height / 2;
+            const minimalZone = { zone: userCountryInfo.country, count: null };
+            showZonePopup(minimalZone, centerX, centerY);
           }
         });
       });
-      
-      // zonepopup 
-      getUserCountryInfo().then(userCountryInfo => {
-        const omPresenceId = localStorage.getItem('omPresenceId');
-        const isUserActive = !!omPresenceId;
-
-        // Try to find user's country among active nodes/dots
-        const userZoneDot = dots.find(dot => {
-          let zoneName = typeof dot.zone === 'object' ? dot.zone.zone : dot.zone;
-          return zoneName === userCountryInfo.country;
-        });
-
-        const canvasRect = canvas.getBoundingClientRect();
-
-        if (userZoneDot) {
-          // Show normal popup (with count)
-          showZonePopup(
-            typeof userZoneDot.zone === 'object' ? userZoneDot.zone : { zone: userZoneDot.zone, count: userZoneDot.count },
-            userZoneDot.x + canvasRect.left,
-            userZoneDot.y + canvasRect.top
-          );
-        } else {
-          // Show minimal popup at default flag location (center or calculated)
-          const centerX = canvasRect.left + canvas.width / 2;
-          const centerY = canvasRect.top + canvas.height / 2;
-
-          // Create a minimal zone object
-          const minimalZone = { zone: userCountryInfo.country, count: null };
-
-          showZonePopup(minimalZone, centerX, centerY);
-        }
-      });
     });
-}, 100); // 100ms delay before fetching
+}, 100);
 
   let glowActive = false;
 
