@@ -17391,7 +17391,7 @@ function getCountryData() {
   }
   
   // Otherwise fetch fresh data
-  return fetch('https://trueyogi-backend-test.onrender.com/api/countries')
+  return fetch('https://trueyogi-backend-knkq.onrender.com/api/countries')
     .then(res => res.json())
     .then(data => {
       cachedCountries = data;
