@@ -20760,20 +20760,27 @@ function closeCallDialog(button) {
 }
 
 function showWherebyHostDialog(hostUrl, callId) {
-  // Get host user info and enhance the URL
   const currentUserId = localStorage.getItem('omUserId') || 'Host';
   const shortId = getShortUserId(currentUserId);
-    // Add auto-join parameters to host URL
   const enhancedUrl = `${hostUrl}${hostUrl.includes('?') ? '&' : '?'}displayName=${encodeURIComponent(shortId)}&skipMediaPermissionPrompt=true&skipJoinDialog=true`;
-  
+
   const dlg = document.createElement('div');
   dlg.style = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10050;background:#232626;display:flex;flex-direction:column;align-items:center;justify-content:center;";
-  dlg.innerHTML = `<iframe src="${enhancedUrl}" allow="camera; microphone; fullscreen; speaker" style="border-radius:12px;border:none;width:96vw;height:90vh;max-width:700px;max-height:500px;background:#232626;"></iframe>
+
+  dlg.innerHTML = `
+    <iframe src="${enhancedUrl}" allow="camera; microphone; fullscreen; speaker" style="width:96vw; height:90vh; max-width:700px; max-height:500px; border:none; border-radius:12px; background:#232626;"></iframe>
+    <div style="margin-top:10px;">
+      <small style="color:#FFD700;">If camera/mic is blocked, open call in a new tab:</small><br>
+      <button id="whereby-open-tab-btn" style="margin-top:7px;padding:.4em 1em 0.4em 1em;background:#ffe066;color:#232626;border:none;border-radius:6px;">Open Call in New Tab</button>
+    </div>
     <button id="close-host-btn" style="margin-top:12px;padding:.5em 1.4em;background:#fde68a;color:#232626;border:none;border-radius:7px;font-weight:bold;box-shadow:0 2px 10px #eab30822;cursor:pointer;">Close</button>`;
   document.body.appendChild(dlg);
 
+  document.getElementById('whereby-open-tab-btn').onclick = function() {
+    window.open(enhancedUrl, '_blank', 'noopener');
+  };
+
   document.getElementById('close-host-btn').onclick = async function() {
-    // 👇 Force camera release
     const iframe = dlg.querySelector('iframe');
     if (iframe) iframe.src = 'about:blank';
 
@@ -20783,7 +20790,7 @@ function showWherebyHostDialog(hostUrl, callId) {
       if (callId) {
         await supabase.from('om_calls').update({ status: 'finish' }).eq('id', callId);
       }
-    }, 100); // 100ms delay
+    }, 100);
   }
 }
 
