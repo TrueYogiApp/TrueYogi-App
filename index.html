@@ -20463,7 +20463,7 @@ renderDebounceTimer = setTimeout(() => {
       });
 
       // --- COLLISION FIX ---
-      console.log('Before collision:', positions.map(p => ({name: p.zoneName, x: p.x, y: p.y})));
+      //console.log('Before collision:', positions.map(p => ({name: p.zoneName, x: p.x, y: p.y})));
       
       const MIN_DISTANCE = 30;
       
@@ -20509,7 +20509,7 @@ renderDebounceTimer = setTimeout(() => {
         if (!moved) break;
       }
       
-      console.log('After collision:', positions.map(p => ({name: p.zoneName, x: p.x, y: p.y})));
+      //console.log('After collision:', positions.map(p => ({name: p.zoneName, x: p.x, y: p.y})));
       
       // --- DRAW FLAGS USING UPDATED POSITIONS ---
       positions.forEach((pos) => {
@@ -20687,15 +20687,31 @@ function showWherebyParticipantDialog(participantUrl, callId) {
   dlg.id = 'participant-call-dialog';
   dlg.style = "position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:10050;background:#232626;display:flex;flex-direction:column;align-items:center;justify-content:center;";
 
+  // Initially hide the "Open Call in New Tab" section
   dlg.innerHTML = `
     <iframe src="${enhancedUrl}" allow="camera; microphone; fullscreen; speaker" style="border-radius:12px;border:none;width:96vw;height:90vh;max-width:700px;max-height:500px;background:#232626;"></iframe>
-    <div style="margin-top:10px;">
+    <div id="new-tab-section" style="margin-top:10px;display:none;">
       <small style="color:#FFD700;">If camera/mic is blocked, open call in a new tab:</small><br>
       <button id="whereby-open-tab-btn" style="margin-top:7px;padding:.4em 1em;background:#ffe066;color:#232626;border:none;border-radius:6px;">Open Call in New Tab</button>
     </div>
     <button style="margin-top:12px;padding:.5em 1.4em;background:#fde68a;color:#232626;border:none;border-radius:7px;font-weight:bold;box-shadow:0 2px 10px #eab30822;cursor:pointer;" onclick="closeCallDialog(this)">Close</button>
   `;
   document.body.appendChild(dlg);
+
+  // Show the "Open Call in New Tab" section after 10-20 seconds
+  const delay = 10000 + Math.random() * 10000; // Random between 10-20 seconds
+  setTimeout(() => {
+    const section = document.getElementById('new-tab-section');
+    if (section) {
+      section.style.display = 'block';
+      // Add a subtle fade-in effect
+      section.style.transition = 'opacity 0.5s ease';
+      section.style.opacity = '0';
+      setTimeout(() => {
+        section.style.opacity = '1';
+      }, 50);
+    }
+  }, delay);
 
   // Add click handler for new tab button
   document.getElementById('whereby-open-tab-btn').onclick = function() {
