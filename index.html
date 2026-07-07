@@ -8855,12 +8855,6 @@ if (musicChoiceEl) {
       updateStats();
       showRandomQuote();
 
-      if ('Notification' in window) {
-        Notification.requestPermission().then(permission => {
-          notificationPermission = permission === 'granted';
-        });
-      }
-
       document.getElementById('start-button').addEventListener('click', () => {
         document.querySelectorAll('audio').forEach(audio => {
           audio.volume = 0.5;
