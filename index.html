@@ -19602,7 +19602,26 @@ window.toggleAstralSilence = async function(userId) {
   }
 };
 
-// Show Astral Silence popup
+// At the top of your file (global scope)
+const meditationSvgs = [
+  'deepmeditation1.svg',
+  'deepmeditation2.svg',
+  'deepmeditation3.svg',
+  'deepmeditation4.svg',
+  'deepmeditation5.svg',
+  'deepmeditation6.svg',
+  'deepmeditation7.svg',
+  'deepmeditation8.svg',
+  'deepmeditation9.svg',
+  'deepmeditation10.svg'
+];
+
+// Helper function to get random SVG
+function getRandomMeditationSvg() {
+  const randomIndex = Math.floor(Math.random() * meditationSvgs.length);
+  return meditationSvgs[randomIndex];
+}
+
 // Show Astral Silence popup
 window.showAstralSilencePopup = function(userId) {
   // Remove existing popup if any
@@ -19792,26 +19811,63 @@ window.showAstralSilencePopup = function(userId) {
       `;
     } else {
       // Showing other user's status
-      const statusText = status ? '🟣 In Astral Silence' : '⚪ Available';
-      const statusColor = status ? '#6b47dc' : '#4CAF50';
-      
-      let statusMessageHtml = '';
-      if (status) {
-        statusMessageHtml = `
-          <div style="background: rgba(107, 71, 220, 0.15); padding: 14px; border-radius: 8px; margin: 12px 0; text-align: left;">
-            <div style="font-size:0.85rem; color:#c4b5fd; font-weight:600; margin-bottom:4px;">
-              🌊 In Deep Meditation
-            </div>
-            <p style="margin: 4px 0; font-size:0.9rem; color:#aaa; line-height:1.5;">
-              Their flame still burns,<br>
-              soft, steady, undisturbed.
-            </p>
-            <p style="margin: 6px 0 0 0; font-size:0.75rem; color:#6b7280;">
-              ✦ Honor their silence ✦
-            </p>
-          </div>
-        `;
-      } else {
+	const statusText = status ? '🟣 In Astral Silence' : '⚪ Available';
+	const statusColor = status ? '#6b47dc' : '#4CAF50';
+
+	let statusMessageHtml = '';
+	if (status) {
+	  // Get random SVG for this popup
+	  const randomSvg = getRandomMeditationSvg();
+	  
+	  statusMessageHtml = `
+		<div style="
+		  background: rgba(107, 71, 220, 0.12); 
+		  padding: 14px 16px; 
+		  border-radius: 10px; 
+		  margin: 12px 0; 
+		  display: flex;
+		  align-items: center;
+		  gap: 14px;
+		  border: 1px solid rgba(107, 71, 220, 0.08);
+		">
+		  <!-- Text -->
+		  <div style="flex: 1; text-align: left;">
+			<div style="font-size:0.85rem; color:#c4b5fd; font-weight:600; margin-bottom:2px;">
+			  🌊 In Deep Meditation
+			</div>
+			<p style="margin: 2px 0; font-size:0.85rem; color:#bbb; line-height:1.4;">
+			  Their flame still burns —<br>
+			  soft, steady, undisturbed.
+			</p>
+			<p style="margin: 4px 0 0 0; font-size:0.7rem; color:#6b7280; letter-spacing:0.3px;">
+			  ✦ Honor their silence ✦
+			</p>
+		  </div>
+		  
+		  <!-- Random SVG -->
+		  <div style="
+			flex-shrink: 0;
+			width: 70px;
+			height: 70px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			background: rgba(107, 71, 220, 0.08);
+			border-radius: 50%;
+			padding: 6px;
+		  ">
+			<img src="assets/${randomSvg}" 
+				 style="
+				   width: 56px; 
+				   height: 56px; 
+				   display: block;
+				   filter: drop-shadow(0 0 10px rgba(107, 71, 220, 0.2));
+				 " 
+				 alt="Deep Meditation">
+		  </div>
+		</div>
+	  `;
+	}else {
         statusMessageHtml = `
           <div style="background: rgba(76, 175, 80, 0.08); padding: 12px; border-radius: 8px; margin: 12px 0;">
             <p style="margin: 4px 0; font-size:0.9rem; color:#93c5fd;">
