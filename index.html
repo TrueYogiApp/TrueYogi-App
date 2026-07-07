@@ -3230,6 +3230,66 @@ body.modal-open {
   }
 }
 
+
+/* Cosmic background for deepmeditationsvg*/
+.cosmic-container {
+  flex-shrink: 0;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  padding: 4px;
+  background: radial-gradient(ellipse at center, #1a0a2e 0%, #0d0d2b 40%, #0a0a1a 100%);
+  box-shadow: 0 0 20px rgba(107, 71, 220, 0.15), inset 0 0 40px rgba(107, 71, 220, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.cosmic-container img {
+  width: 50px;
+  height: 50px;
+  display: block;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 15px rgba(107, 71, 220, 0.3));
+}
+
+/* Twinkling stars */
+.cosmic-container .stars {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+.cosmic-container .stars span {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cosmic-container .stars span:nth-child(1) { width: 2px; height: 2px; top: 10%; left: 20%; opacity: 0.8; box-shadow: 0 0 4px rgba(255,255,255,0.5); }
+.cosmic-container .stars span:nth-child(2) { width: 1.5px; height: 1.5px; top: 25%; right: 15%; opacity: 0.6; box-shadow: 0 0 3px rgba(255,255,255,0.4); }
+.cosmic-container .stars span:nth-child(3) { width: 2px; height: 2px; bottom: 20%; left: 10%; opacity: 0.7; box-shadow: 0 0 4px rgba(255,255,255,0.5); }
+.cosmic-container .stars span:nth-child(4) { width: 1px; height: 1px; bottom: 30%; right: 25%; opacity: 0.5; box-shadow: 0 0 2px rgba(255,255,255,0.3); }
+.cosmic-container .stars span:nth-child(5) { width: 1.5px; height: 1.5px; top: 50%; left: 5%; opacity: 0.4; box-shadow: 0 0 3px rgba(255,255,255,0.3); }
+.cosmic-container .stars span:nth-child(6) { width: 2px; height: 2px; top: 60%; right: 10%; opacity: 0.6; box-shadow: 0 0 4px rgba(255,255,255,0.4); }
+
+/* Gentle pulse animation */
+@keyframes cosmicPulse {
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.03); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
+}
+
+.cosmic-container.pulse {
+  animation: cosmicPulse 4s ease-in-out infinite;
+}
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -19839,26 +19899,13 @@ window.showAstralSilencePopup = function(userId) {
 		  </div>
 		  
 		  <!-- Random SVG -->
-		  <div style="
-			flex-shrink: 0;
-			width: 70px;
-			height: 70px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			background: rgba(107, 71, 220, 0.08);
-			border-radius: 50%;
-			padding: 6px;
-		  ">
-			<img src="assets/${randomSvg}" 
-				 style="
-				   width: 56px; 
-				   height: 56px; 
-				   display: block;
-				   filter: drop-shadow(0 0 10px rgba(107, 71, 220, 0.2));
-				 " 
-				 alt="Deep Meditation">
+		<div class="cosmic-container pulse">
+		  <div class="stars">
+			<span></span><span></span><span></span>
+			<span></span><span></span><span></span>
 		  </div>
+		  <img src="assets/${randomSvg}" alt="Deep Meditation">
+		</div>
 		</div>
 	  `;
 	}else {
