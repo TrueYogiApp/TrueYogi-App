@@ -4227,6 +4227,36 @@ body.modal-open {
 	  </p>
 	</div>  
 	
+    <!-- Scan Me Section -->
+<div class="faq-item">
+  <!-- Option 1 - Simple & clean -->
+<p class="text-gray-300 mt-1">
+  <a href="#" id="showBarcodeLink" style="text-decoration:none; border-bottom: 2px dotted; animation: rainbowAll 3s linear infinite; background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent;">
+     Expand the circle
+  </a>
+</p>
+
+  <div id="barcodeImageContainer" 
+     style="
+       display: none; 
+       margin-top: 1rem; 
+       text-align: center;
+       opacity: 0;
+       transform: translateY(10px);
+       transition: opacity 0.5s ease, transform 0.5s ease;
+     ">
+    <img src="https://trueyogi.app/assets/QR.png" 
+     alt="Scan to open site" 
+     style="
+       width: 100%;
+       max-width: 360px;
+       height: auto;
+       border-radius: 12px;
+     ">
+    <p class="text-gray-400 text-sm mt-2">Scan to access the app</p>
+  </div>
+</div>
+
 		<!-- Installation Guide Section -->
 <div class="faq-item">
   <h3 class="text-blue-400 font-medium" style="color: #60a5fa; cursor: pointer;" onclick="toggleInstallGuide()">
@@ -4267,36 +4297,6 @@ body.modal-open {
 		<div style="font-size: 0.8rem; color: #9ca3af;">Google Play Store version is in development. Stay tuned!</div>
 	  </div>
 	</div>
-  </div>
-</div>
-
-    <!-- Scan Me Section -->
-<div class="faq-item">
-  <!-- Option 1 - Simple & clean -->
-<p class="text-gray-300 mt-1">
-  <a href="#" id="showBarcodeLink" style="text-decoration:none; border-bottom: 2px dotted; animation: rainbowAll 3s linear infinite; background: linear-gradient(90deg, red, orange, yellow, green, blue, indigo, violet); background-size: 200% auto; -webkit-background-clip: text; background-clip: text; color: transparent;">
-     Expand the circle
-  </a>
-</p>
-
-  <div id="barcodeImageContainer" 
-     style="
-       display: none; 
-       margin-top: 1rem; 
-       text-align: center;
-       opacity: 0;
-       transform: translateY(10px);
-       transition: opacity 0.5s ease, transform 0.5s ease;
-     ">
-    <img src="https://trueyogi.app/assets/QR.png" 
-     alt="Scan to open site" 
-     style="
-       width: 100%;
-       max-width: 360px;
-       height: auto;
-       border-radius: 12px;
-     ">
-    <p class="text-gray-400 text-sm mt-2">Scan to access the app</p>
   </div>
 </div>
 
