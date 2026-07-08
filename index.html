@@ -19363,34 +19363,50 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
   }
 
   // Handle Yes button
-  document.getElementById('confirm-callback-yes').onclick = () => {
-    // Play confirmation sound
-    playConfirmSound();
+document.getElementById('confirm-callback-yes').onclick = () => {
+  // Play confirmation sound
+  playConfirmSound();
+  
+  // Get message from textarea
+  const message = document.getElementById('callback-message-input')?.value || '';
+  
+  // Small delay to let the sound play before removing modal
+  setTimeout(() => {
+    modal.remove();
     
-    // Get message from textarea
-    const message = document.getElementById('callback-message-input')?.value || '';
-    
-    // Small delay to let the sound play before removing modal
-    setTimeout(() => {
-      modal.remove();
-      
-      // Make the API call with message
-      fetch('https://trueyogi-backend-knkq.onrender.com/api/callback-request', {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          to_user_id: toUserId, 
-          from_user_id: fromUserId,
-          message: message.trim() || null // Send null if empty
-        })
+    // Make the API call with message
+    fetch('https://trueyogi-backend-knkq.onrender.com/api/callback-request', {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        to_user_id: toUserId, 
+        from_user_id: fromUserId,
+        message: message.trim() || null // Send null if empty
       })
-      .then(r => r.json())
-      .then(data => {
-        // Show result modal
-        showCallbackResultModal(data.success ? "Bell sent. Remain in stillness!" : (data.message || "Something went wrong!"));
-      });
-    }, 100);
-  };
+    })
+    .then(r => r.json())
+    .then(data => {
+      // Handle success or error
+      if (data.success) {
+        showCallbackResultModal("✨ Bell sent! Remain in stillness.");
+      } else if (data.error) {
+        // Show the error message directly from backend
+        // Backend sends: "⏳ Please wait Xs before sending another request"
+        showCallbackResultModal(`⏳ ${data.error}`);
+      } else if (data.message) {
+        // Handle other messages like "Already requested"
+        showCallbackResultModal(`🔔 ${data.message}`);
+      } else {
+        showCallbackResultModal("❌ Something went wrong. Please try again.");
+      }
+    })
+    .catch(err => {
+      // Network error
+      showCallbackResultModal("❌ Network error. Please try again.");
+      console.error("Callback request error:", err);
+    });
+  }, 100);
+};
 
   // Handle No button
   document.getElementById('confirm-callback-no').onclick = () => {
