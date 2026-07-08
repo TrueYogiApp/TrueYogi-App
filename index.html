@@ -4226,6 +4226,50 @@ body.modal-open {
 		<a href="/credits.html" target="_blank" style="color: #86efac; text-decoration: underline;">View Credits</a>
 	  </p>
 	</div>  
+	
+		<!-- Installation Guide Section -->
+<div class="faq-item">
+  <h3 class="text-blue-400 font-medium" style="color: #60a5fa; cursor: pointer;" onclick="toggleInstallGuide()">
+    Installation Guide <span id="install-toggle-icon" style="font-size: 0.8rem;">▼</span>
+  </h3>
+  
+  <div id="install-guide-content" style="display: none; margin-top: 1rem;">
+    <!-- Tab Navigation -->
+    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid #374151; padding-bottom: 0.5rem;">
+      <button onclick="switchInstallTab('ios')" id="ios-tab-btn" style="background: #4f46e5; color: white; padding: 0.4rem 1.2rem; border: none; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
+        🍎 iOS
+      </button>
+      <button onclick="switchInstallTab('android')" id="android-tab-btn" style="background: #374151; color: #9ca3af; padding: 0.4rem 1.2rem; border: none; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
+        🤖 Android
+      </button>
+    </div>
+    
+    <!-- iOS Content -->
+    <div id="ios-install-content" style="color: #d1d5db; font-size: 0.95rem; line-height: 1.6;">
+      <div style="margin-bottom: 0.8rem;">📱 <strong>Add TrueYogi to your home screen:</strong></div>
+      <div style="margin-bottom: 0.6rem;">1. Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+      <div style="margin-bottom: 0.6rem;">2. Scroll down and select <strong>Add to Home Screen</strong> <i class="fa-regular fa-square-plus"></i></div>
+      <div style="margin-bottom: 0.6rem;">3. Tap <strong>Add</strong> in the top right corner</div>
+      <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #9ca3af;">✨ For Safari browser only</div>
+    </div>
+    
+	<!-- Android Content -->
+	<div id="android-install-content" style="display: none; color: #d1d5db; font-size: 0.95rem; line-height: 1.6;">
+	  <div style="margin-bottom: 0.8rem;">📱 <strong>Add TrueYogi to your home screen (Chrome):</strong></div>
+	  <div style="margin-bottom: 0.6rem;">1. Tap the <strong>three dots</strong> menu <i class="fa-solid fa-ellipsis-vertical"></i></div>
+	  <div style="margin-bottom: 0.6rem;">2. Select <strong>Add to Home screen</strong> <i class="fa-regular fa-square-plus"></i></div>
+	  <div style="margin-bottom: 0.6rem;">3. Tap <strong>Install</strong> to confirm</div>
+	  <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #9ca3af;">✨ For Chrome browser on Android</div>
+	  
+	  <!-- Optional: Add a note about Play Store coming soon -->
+	  <div style="margin-top: 1rem; padding: 0.8rem; background: #1f2937; border-radius: 8px; border-left: 3px solid #fbbf24;">
+		<div style="font-size: 0.85rem; color: #fbbf24;">📌 <strong>Coming Soon:</strong></div>
+		<div style="font-size: 0.8rem; color: #9ca3af;">Google Play Store version is in development. Stay tuned!</div>
+	  </div>
+	</div>
+  </div>
+</div>
+
     <!-- Scan Me Section -->
 <div class="faq-item">
   <!-- Option 1 - Simple & clean -->
@@ -6447,6 +6491,46 @@ function renderLiveList() {
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
+
+
+// faq section Toggle installation guide section
+function toggleInstallGuide() {
+  const content = document.getElementById('install-guide-content');
+  const icon = document.getElementById('install-toggle-icon');
+  
+  if (content.style.display === 'none') {
+    content.style.display = 'block';
+    icon.textContent = '▲';
+  } else {
+    content.style.display = 'none';
+    icon.textContent = '▼';
+  }
+}
+
+// Switch between iOS and Android tabs
+function switchInstallTab(tab) {
+  // Get elements
+  const iosContent = document.getElementById('ios-install-content');
+  const androidContent = document.getElementById('android-install-content');
+  const iosBtn = document.getElementById('ios-tab-btn');
+  const androidBtn = document.getElementById('android-tab-btn');
+  
+  if (tab === 'ios') {
+    iosContent.style.display = 'block';
+    androidContent.style.display = 'none';
+    iosBtn.style.background = '#4f46e5';
+    iosBtn.style.color = 'white';
+    androidBtn.style.background = '#374151';
+    androidBtn.style.color = '#9ca3af';
+  } else {
+    iosContent.style.display = 'none';
+    androidContent.style.display = 'block';
+    androidBtn.style.background = '#4f46e5';
+    androidBtn.style.color = 'white';
+    iosBtn.style.background = '#374151';
+    iosBtn.style.color = '#9ca3af';
+  }
+}
 
 
 // Define music that require minimum duration
