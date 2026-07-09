@@ -26141,14 +26141,23 @@ window.addEventListener('online', () => {
         document.body.appendChild(highlight);
     }
 
-    function updateHighlight(rect) {
-        if (!highlight) return;
-        highlight.style.top = rect.top + 'px';
-        highlight.style.left = rect.left + 'px';
-        highlight.style.width = rect.width + 'px';
-        highlight.style.height = rect.height + 'px';
-        highlight.classList.add('visible');
-    }
+	function updateHighlight(rect) {
+		if (!highlight) return;
+		
+		// Force hardware acceleration
+		highlight.style.willChange = 'transform, top, left, width, height';
+		
+		// Update positions
+		highlight.style.top = rect.top + 'px';
+		highlight.style.left = rect.left + 'px';
+		highlight.style.width = rect.width + 'px';
+		highlight.style.height = rect.height + 'px';
+		
+		// Force a reflow to ensure changes apply
+		void highlight.offsetHeight;
+		
+		highlight.classList.add('visible');
+	}
 
     function hideHighlight() {
         if (highlight) {
@@ -26361,6 +26370,35 @@ window.addEventListener('online', () => {
         }
     }
 
+function setupResizeObserver() {
+    if (!window.ResizeObserver) return;
+    
+    const resizeObserver = new ResizeObserver(function() {
+        if (isActive && currentStep < STEPS.length) {
+            const step = STEPS[currentStep];
+            if (step) {
+                const target = getTargetElement(step.target);
+                if (target && isElementReady(target)) {
+                    const rect = getRect(target);
+                    updateHighlight(rect);
+                    positionTooltip(rect);
+                }
+            }
+        }
+    });
+    
+    // Observe the target element
+    const step = STEPS[currentStep];
+    if (step) {
+        const target = getTargetElement(step.target);
+        if (target) {
+            resizeObserver.observe(target);
+        }
+    }
+    
+    return resizeObserver;
+}
+
     // ─── CORE LOGIC ──────────────────────────────────────────────────────────
     function showStep(index) {
         if (!isActive) return;
@@ -26399,6 +26437,11 @@ window.addEventListener('online', () => {
                 positionTooltip(rect);
             });
         });
+		    // After setting up the step, observe the target for changes
+    if (window._resizeObserver) {
+        window._resizeObserver.disconnect();
+    }
+    window._resizeObserver = setupResizeObserver();
     }
 
     function handleAction(action) {
@@ -26442,6 +26485,10 @@ window.addEventListener('online', () => {
             startTimer = null;
         }
         isWaitingForModal = false;
+		    if (window._resizeObserver) {
+        window._resizeObserver.disconnect();
+        window._resizeObserver = null;
+    }
     }
 
     function onResize() {
@@ -26460,17 +26507,28 @@ window.addEventListener('online', () => {
         }, 100);
     }
 
-    function onScroll() {
-        if (isActive && currentStep < STEPS.length) {
-            const step = STEPS[currentStep];
-            if (step) {
-                const target = getTargetElement(step.target);
-                if (target && isElementReady(target)) {
-                    positionTooltip(getRect(target));
-                }
-            }
-        }
-    }
+	function onScroll() {
+		if (!isActive) return;
+		
+		// Clear any pending updates
+		if (resizeTimer) {
+			clearTimeout(resizeTimer);
+			resizeTimer = null;
+		}
+		
+		// Update immediately on scroll
+		if (currentStep < STEPS.length) {
+			const step = STEPS[currentStep];
+			if (step) {
+				const target = getTargetElement(step.target);
+				if (target && isElementReady(target)) {
+					const rect = getRect(target);
+					updateHighlight(rect);  // Update highlight position
+					positionTooltip(rect);  // Update tooltip position
+				}
+			}
+		}
+	}
 
     function onKeydown(e) {
         if (!isActive) return;
@@ -26531,7 +26589,7 @@ window.addEventListener('online', () => {
         createTooltip();
 
         window.addEventListener('resize', onResize);
-        window.addEventListener('scroll', onScroll, true);
+        window.addEventListener('scroll', onScroll, { passive: true, capture: true });
         document.addEventListener('keydown', onKeydown);
 
         setTimeout(() => {
