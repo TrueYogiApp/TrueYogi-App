@@ -25844,12 +25844,18 @@ window.addEventListener('online', () => {
         buttons: ['skip', 'next']
     }, {
         id: 'step-2',
+        target: '#wallet-action-btn',
+        title: '🔗 Connect Your Wallet',
+        description: 'Connect your wallet to unlock YOGI token rewards. (Optional)',
+        buttons: ['back', 'next']
+    }, {
+        id: 'step-3',
         target: '#lang-switch',
         title: '🌍 Your Language',
         description: 'Change the app language anytime from here.',
         buttons: ['back', 'next']
-    }, {
-        id: 'step-3',
+    }, {	
+        id: 'step-4',
         target: '#faq-tab',
         title: '❓ Need Help?',
         description: 'Find answers about meditation, challenges, rewards and other features.',
@@ -25860,7 +25866,7 @@ window.addEventListener('online', () => {
     const OVERLAY_ID = 'tw-overlay';
     const TOOLTIP_ID = 'tw-tooltip';
     const HIGHLIGHT_ID = 'tw-highlight';
-    const DELAY_MS = 12000; // 12 seconds
+    const DELAY_MS = 6000; // 6 seconds
 
     let currentStep = 0;
     let overlay = null;
@@ -26589,11 +26595,11 @@ window.addEventListener('online', () => {
     // ─── INIT ────────────────────────────────────────────────────────────────
     function init() {
         if (localStorage.getItem(STORAGE_KEY) === 'true') {
-            console.log('[Walkthrough] Already completed, skipping');
+            //console.log('[Walkthrough] Already completed, skipping');
             return;
         }
 
-        console.log('[Walkthrough] Initializing...');
+        //console.log('[Walkthrough] Initializing...');
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
@@ -26603,10 +26609,10 @@ window.addEventListener('online', () => {
                 setTimeout(function() {
                     if (!localStorage.getItem(STORAGE_KEY)) {
                         if (isWelcomeModalVisible()) {
-                            console.log('[Walkthrough] Welcome modal is visible, waiting for it to close');
+                            //console.log('[Walkthrough] Welcome modal is visible, waiting for it to close');
                             isWaitingForModal = true;
                         } else {
-                            console.log('[Walkthrough] Welcome modal is already hidden, starting countdown');
+                            //console.log('[Walkthrough] Welcome modal is already hidden, starting countdown');
                             scheduleWalkthrough();
                         }
                     }
