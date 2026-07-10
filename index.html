@@ -25828,7 +25828,7 @@ window.addEventListener('online', () => {
 </script>
 <script>
 /**
- * TrueYogi Onboarding Walkthrough - FIXED
+ * TrueYogi Onboarding Walkthrough - WITH CLOSE BUTTON
  * ONLY starts after welcome modal is closed
  */
 
@@ -25875,7 +25875,7 @@ window.addEventListener('online', () => {
     let resizeTimer = null;
     let isActive = false;
     let startTimer = null;
-    let isWaitingForModal = false; // Track if we're waiting for modal to close
+    let isWaitingForModal = false;
 
     // ─── STYLES (injected) ──────────────────────────────────────────────────
     function injectStyles() {
@@ -25941,6 +25941,34 @@ window.addEventListener('online', () => {
                 pointer-events: auto;
             }
 
+            /* Close Button */
+            #${TOOLTIP_ID} .tw-close-btn {
+                position: absolute;
+                top: 12px;
+                right: 16px;
+                background: none;
+                border: none;
+                font-size: 22px;
+                color: #8e8ea3;
+                cursor: pointer;
+                padding: 4px 8px;
+                border-radius: 50%;
+                transition: all 0.2s ease;
+                line-height: 1;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                z-index: 10;
+            }
+
+            #${TOOLTIP_ID} .tw-close-btn:hover {
+                color: #1e1e2e;
+                background: rgba(0, 0, 0, 0.06);
+                transform: rotate(90deg);
+            }
+
+            #${TOOLTIP_ID} .tw-close-btn:active {
+                transform: scale(0.9);
+            }
+
             #${TOOLTIP_ID} .tw-title {
                 font-size: 20px;
                 font-weight: 700;
@@ -25948,20 +25976,21 @@ window.addEventListener('online', () => {
                 letter-spacing: -0.3px;
                 line-height: 1.3;
                 color: #0b0b14;
+                padding-right: 30px; /* Make room for close button */
             }
-			#${TOOLTIP_ID} .tw-desc {
-				font-size: 15px;
-				line-height: 1.7;
-				margin: 0 0 20px 0;
-				color: #2d2d44;
-				font-weight: 450;
-				opacity: 0.95;
-				letter-spacing: 0.02em;
-				background: rgba(108, 92, 231, 0.05);
-				padding: 12px 16px;
-				border-radius: 12px;
-				border-left: 3px solid #6c5ce7;
-			}
+            #${TOOLTIP_ID} .tw-desc {
+                font-size: 15px;
+                line-height: 1.7;
+                margin: 0 0 20px 0;
+                color: #2d2d44;
+                font-weight: 450;
+                opacity: 0.95;
+                letter-spacing: 0.02em;
+                background: rgba(108, 92, 231, 0.05);
+                padding: 12px 16px;
+                border-radius: 12px;
+                border-left: 3px solid #6c5ce7;
+            }
             #${TOOLTIP_ID} .tw-actions {
                 display: flex;
                 flex-wrap: wrap;
@@ -26078,6 +26107,12 @@ window.addEventListener('online', () => {
                 #${TOOLTIP_ID} .tw-actions {
                     gap: 6px;
                 }
+                #${TOOLTIP_ID} .tw-close-btn {
+                    top: 10px;
+                    right: 12px;
+                    font-size: 20px;
+                    padding: 2px 6px;
+                }
             }
             @media (max-width: 380px) {
                 #${TOOLTIP_ID} {
@@ -26113,7 +26148,6 @@ window.addEventListener('online', () => {
     function isWelcomeModalVisible() {
         const modal = document.getElementById('welcome-message');
         if (!modal) return false;
-        // Check if modal has the 'hidden' class
         return !modal.classList.contains('hidden');
     }
 
@@ -26146,23 +26180,18 @@ window.addEventListener('online', () => {
         document.body.appendChild(highlight);
     }
 
-	function updateHighlight(rect) {
-		if (!highlight) return;
-		
-		// Force hardware acceleration
-		highlight.style.willChange = 'transform, top, left, width, height';
-		
-		// Update positions
-		highlight.style.top = rect.top + 'px';
-		highlight.style.left = rect.left + 'px';
-		highlight.style.width = rect.width + 'px';
-		highlight.style.height = rect.height + 'px';
-		
-		// Force a reflow to ensure changes apply
-		void highlight.offsetHeight;
-		
-		highlight.classList.add('visible');
-	}
+    function updateHighlight(rect) {
+        if (!highlight) return;
+        
+        highlight.style.willChange = 'transform, top, left, width, height';
+        highlight.style.top = rect.top + 'px';
+        highlight.style.left = rect.left + 'px';
+        highlight.style.width = rect.width + 'px';
+        highlight.style.height = rect.height + 'px';
+        
+        void highlight.offsetHeight;
+        highlight.classList.add('visible');
+    }
 
     function hideHighlight() {
         if (highlight) {
@@ -26207,7 +26236,9 @@ window.addEventListener('online', () => {
             finish: { label: 'Finish', class: 'tw-btn-primary', action: 'finish' }
         };
 
+        // ─── ADDED CLOSE BUTTON ──────────────────────────────────────────────
         let html = `
+            <button class="tw-close-btn" data-action="skip" aria-label="Close walkthrough">✕</button>
             <div class="tw-title">${step.title}</div>
             <div class="tw-desc">${step.description}</div>
             <div class="tw-actions">
@@ -26222,7 +26253,8 @@ window.addEventListener('online', () => {
         html += `</div>`;
         content.innerHTML = html;
 
-        content.querySelectorAll('.tw-btn').forEach(btn => {
+        // ─── EVENT LISTENERS FOR ALL BUTTONS INCLUDING CLOSE ────────────────
+        content.querySelectorAll('.tw-btn, .tw-close-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const action = this.dataset.action;
@@ -26375,34 +26407,33 @@ window.addEventListener('online', () => {
         }
     }
 
-function setupResizeObserver() {
-    if (!window.ResizeObserver) return;
-    
-    const resizeObserver = new ResizeObserver(function() {
-        if (isActive && currentStep < STEPS.length) {
-            const step = STEPS[currentStep];
-            if (step) {
-                const target = getTargetElement(step.target);
-                if (target && isElementReady(target)) {
-                    const rect = getRect(target);
-                    updateHighlight(rect);
-                    positionTooltip(rect);
+    function setupResizeObserver() {
+        if (!window.ResizeObserver) return;
+        
+        const resizeObserver = new ResizeObserver(function() {
+            if (isActive && currentStep < STEPS.length) {
+                const step = STEPS[currentStep];
+                if (step) {
+                    const target = getTargetElement(step.target);
+                    if (target && isElementReady(target)) {
+                        const rect = getRect(target);
+                        updateHighlight(rect);
+                        positionTooltip(rect);
+                    }
                 }
             }
+        });
+        
+        const step = STEPS[currentStep];
+        if (step) {
+            const target = getTargetElement(step.target);
+            if (target) {
+                resizeObserver.observe(target);
+            }
         }
-    });
-    
-    // Observe the target element
-    const step = STEPS[currentStep];
-    if (step) {
-        const target = getTargetElement(step.target);
-        if (target) {
-            resizeObserver.observe(target);
-        }
+        
+        return resizeObserver;
     }
-    
-    return resizeObserver;
-}
 
     // ─── CORE LOGIC ──────────────────────────────────────────────────────────
     function showStep(index) {
@@ -26410,14 +26441,14 @@ function setupResizeObserver() {
         const step = STEPS[index];
         if (!step) return;
 
-        if (index === 2) {
+        if (index === 3) { // FAQ tab is step 4 (index 3)
             showFaqTabForWalkthrough();
         }
 
         const target = getTargetElement(step.target);
         
         if (!target || !isElementReady(target)) {
-            if (index === 2) {
+            if (index === 3) {
                 setTimeout(() => {
                     if (isActive) showStep(index);
                 }, 300);
@@ -26442,11 +26473,11 @@ function setupResizeObserver() {
                 positionTooltip(rect);
             });
         });
-		    // After setting up the step, observe the target for changes
-    if (window._resizeObserver) {
-        window._resizeObserver.disconnect();
-    }
-    window._resizeObserver = setupResizeObserver();
+
+        if (window._resizeObserver) {
+            window._resizeObserver.disconnect();
+        }
+        window._resizeObserver = setupResizeObserver();
     }
 
     function handleAction(action) {
@@ -26490,10 +26521,10 @@ function setupResizeObserver() {
             startTimer = null;
         }
         isWaitingForModal = false;
-		    if (window._resizeObserver) {
-        window._resizeObserver.disconnect();
-        window._resizeObserver = null;
-    }
+        if (window._resizeObserver) {
+            window._resizeObserver.disconnect();
+            window._resizeObserver = null;
+        }
     }
 
     function onResize() {
@@ -26512,28 +26543,26 @@ function setupResizeObserver() {
         }, 100);
     }
 
-	function onScroll() {
-		if (!isActive) return;
-		
-		// Clear any pending updates
-		if (resizeTimer) {
-			clearTimeout(resizeTimer);
-			resizeTimer = null;
-		}
-		
-		// Update immediately on scroll
-		if (currentStep < STEPS.length) {
-			const step = STEPS[currentStep];
-			if (step) {
-				const target = getTargetElement(step.target);
-				if (target && isElementReady(target)) {
-					const rect = getRect(target);
-					updateHighlight(rect);  // Update highlight position
-					positionTooltip(rect);  // Update tooltip position
-				}
-			}
-		}
-	}
+    function onScroll() {
+        if (!isActive) return;
+        
+        if (resizeTimer) {
+            clearTimeout(resizeTimer);
+            resizeTimer = null;
+        }
+        
+        if (currentStep < STEPS.length) {
+            const step = STEPS[currentStep];
+            if (step) {
+                const target = getTargetElement(step.target);
+                if (target && isElementReady(target)) {
+                    const rect = getRect(target);
+                    updateHighlight(rect);
+                    positionTooltip(rect);
+                }
+            }
+        }
+    }
 
     function onKeydown(e) {
         if (!isActive) return;
@@ -26563,23 +26592,17 @@ function setupResizeObserver() {
     // ─── WALKTHROUGH START ──────────────────────────────────────────────────
     function startWalkthrough() {
         if (localStorage.getItem(STORAGE_KEY) === 'true') {
-            //console.log('[Walkthrough] Already completed');
             return;
         }
         
         if (isActive) {
-            //console.log('[Walkthrough] Already active');
             return;
         }
 
-        // Double-check modal is closed before starting
         if (isWelcomeModalVisible()) {
-            //console.log('[Walkthrough] Modal is still visible, waiting...');
             isWaitingForModal = true;
             return;
         }
-
-        //console.log('[Walkthrough] Starting walkthrough now!');
 
         if (!document.getElementById('tw-styles')) {
             injectStyles();
@@ -26604,13 +26627,10 @@ function setupResizeObserver() {
 
     function scheduleWalkthrough() {
         if (localStorage.getItem(STORAGE_KEY) === 'true') {
-            //console.log('[Walkthrough] Already completed, not scheduling');
             return;
         }
         
-        // Check if modal is visible - if so, don't schedule
         if (isWelcomeModalVisible()) {
-            //console.log('[Walkthrough] Modal is visible, will wait for close');
             isWaitingForModal = true;
             return;
         }
@@ -26620,7 +26640,6 @@ function setupResizeObserver() {
             startTimer = null;
         }
         
-        //console.log('[Walkthrough] Scheduling countdown for ' + DELAY_MS + 'ms');
         startTimer = setTimeout(function() {
             startWalkthrough();
             startTimer = null;
@@ -26633,49 +26652,33 @@ function setupResizeObserver() {
 
         if (typeof originalClose === 'function') {
             window.closeWelcomeMessage = function() {
-                // Call the original function
                 originalClose.apply(this, arguments);
-                
-                // Now modal is closed, start the countdown if we were waiting
-                //console.log('[Walkthrough] closeWelcomeMessage called, modal closed');
                 isWaitingForModal = false;
                 
-                // Start the walkthrough countdown after modal closes
                 setTimeout(function() {
                     if (!localStorage.getItem(STORAGE_KEY)) {
-                        //console.log('[Walkthrough] Welcome modal closed, starting countdown');
                         scheduleWalkthrough();
                     }
                 }, 300);
             };
-            
-            //console.log('[Walkthrough] Successfully hooked into closeWelcomeMessage');
-        } else {
-            console.warn('[Walkthrough] closeWelcomeMessage not found');
         }
     }
 
     // ─── INIT ────────────────────────────────────────────────────────────────
     function init() {
         if (localStorage.getItem(STORAGE_KEY) === 'true') {
-            //console.log('[Walkthrough] Already completed, skipping');
             return;
         }
-
-        //console.log('[Walkthrough] Initializing...');
 
         if (document.readyState === 'loading') {
             document.addEventListener('DOMContentLoaded', function() {
                 setTimeout(hookIntoCloseWelcome, 500);
                 
-                // Check initial state
                 setTimeout(function() {
                     if (!localStorage.getItem(STORAGE_KEY)) {
                         if (isWelcomeModalVisible()) {
-                            //console.log('[Walkthrough] Welcome modal is visible, waiting for it to close');
                             isWaitingForModal = true;
                         } else {
-                            //console.log('[Walkthrough] Welcome modal is already hidden, starting countdown');
                             scheduleWalkthrough();
                         }
                     }
@@ -26687,10 +26690,8 @@ function setupResizeObserver() {
             setTimeout(function() {
                 if (!localStorage.getItem(STORAGE_KEY)) {
                     if (isWelcomeModalVisible()) {
-                        //console.log('[Walkthrough] Welcome modal is visible, waiting for it to close');
                         isWaitingForModal = true;
                     } else {
-                        //console.log('[Walkthrough] Welcome modal is already hidden, starting countdown');
                         scheduleWalkthrough();
                     }
                 }
