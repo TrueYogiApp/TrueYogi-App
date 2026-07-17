@@ -3290,6 +3290,24 @@ body.modal-open {
   animation: cosmicPulse 4s ease-in-out infinite;
 }
 
+/* Enhanced challenge history overlay with blur */
+#challenge-history-modal-overlay {
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+}
+
+/* Modal container styling for better focus */
+#challenge-history-modal {
+  max-height: 90vh;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -13325,40 +13343,42 @@ let rows = history.map((h, i) =>
 ).join('');
 
 modal.innerHTML = `
-  <div class="mb-3 text-center font-bold text-2xl"
-   style="background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; color:transparent;">
-      ${t('challenge_history_title')}
+  <div class="relative z-50 p-6 bg-gray-900 rounded-2xl max-w-2xl mx-auto shadow-2xl border border-gray-700">
+    <div class="mb-3 text-center font-bold text-2xl"
+     style="background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; color:transparent;">
+        ${t('challenge_history_title')}
+    </div>
+    <hr style="height:3px; background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); border:none; margin-bottom:10px;" />
+    <div class="overflow-x-auto max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
+      <table style="min-width:420px; width:100%;">
+        <thead>
+          <tr>
+            <th class="pr-2 w-[8%] whitespace-nowrap" style="color:red"></th>
+            <th class="w-[22%] whitespace-nowrap" style="color:orange">${t('challenge_history_start')}</th>
+            <th class="w-[8%] text-center whitespace-nowrap"></th>
+            <th class="w-[22%] whitespace-nowrap" style="color:yellow">${t('challenge_history_end')}</th>
+            <th class="text-right w-[12%] whitespace-nowrap" style="color:green">${t('challenge_history_sessions')}</th>
+            <th class="text-right w-[12%] whitespace-nowrap" style="color:blue">${t('challenge_history_minutes')}</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+    <div class="mt-4 pt-3 border-t border-gray-700 text-center font-bold text-base">
+      <span style="color:green">${t('challenge_history_total')}</span> 
+      <span style="color:red">${history.length} </span>
+      <span style="color:orange">${t('challenge_history_challenges')}</span>
+      <span style="color:blue">${totalSessions} </span>
+      <span style="color:indigo">${t('challenge_history_sessions_label')}</span>
+      <span 
+        id="total-minutes-meditation" 
+        class="green-animate cursor-pointer hover:text-purple-400 transition-colors"
+        style="color:violet"
+      >${totalMinutes}</span>
+      <span style="color:yellow">${t('challenge_history_minutes_label')}</span>
+    </div>
+    <button id="challenge-history-close" class="mode-btn block mx-auto mt-4 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">${t('challenge_history_close')}</button>
   </div>
-  <hr style="height:3px; background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); border:none; margin-bottom:10px;" />
-  <div class="overflow-x-auto">
-    <table style="min-width:420px; width:100%;">
-	<thead>
-	  <tr>
-		<th class="pr-2 w-[8%] whitespace-nowrap" style="color:red"></th>
-		<th class="w-[22%] whitespace-nowrap" style="color:orange">${t('challenge_history_start')}</th>
-		<th class="w-[8%] text-center whitespace-nowrap"></th>
-		<th class="w-[22%] whitespace-nowrap"  style="color:yellow">${t('challenge_history_end')}</th>
-		<th class="text-right w-[12%] whitespace-nowrap" style="color:green">${t('challenge_history_sessions')}</th>
-		<th class="text-right w-[12%] whitespace-nowrap" style="color:blue">${t('challenge_history_minutes')}</th>
-	  </tr>
-	</thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>
-  <div class="mt-2 border-t border-gray-700 pt-2 text-center font-bold text-base">
-    <span style="color:green">${t('challenge_history_total')}</span> 
-    <span style="color:red">${history.length} </span>
-    <span style="color:orange">${t('challenge_history_challenges')}</span>
-    <span style="color:blue">${totalSessions} </span>
-    <span style="color:indigo">${t('challenge_history_sessions_label')}</span>
-        <span 
-      id="total-minutes-meditation" 
-      class="green-animate cursor-pointer hover:text-purple-400 transition-colors"
-      style="color:violet"
-    >${totalMinutes}</span>
-    <span style="color:yellow">${t('challenge_history_minutes_label')}</span>
-  </div>
-  <button id="challenge-history-close" class="mode-btn block mx-auto mt-4 bg-gray-700 hover:bg-gray-600 px-4 py-2 rounded">${t('challenge_history_close')}</button>
 `;
 
   modal.classList.remove('hidden');
