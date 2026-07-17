@@ -13343,14 +13343,14 @@ let rows = history.map((h, i) =>
 ).join('');
 
 modal.innerHTML = `
-  <div class="relative z-50 p-6 bg-gray-900 rounded-2xl max-w-2xl mx-auto shadow-2xl border border-gray-700">
+  <div class="relative w-auto max-w-sm mx-4 bg-gray-900 rounded-2xl shadow-2xl border border-gray-700 p-6 max-h-[90vh] flex flex-col">
     <div class="mb-3 text-center font-bold text-2xl"
      style="background: linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); -webkit-background-clip:text; color:transparent;">
         ${t('challenge_history_title')}
     </div>
     <hr style="height:3px; background:linear-gradient(90deg,red,orange,yellow,green,blue,indigo,violet); border:none; margin-bottom:10px;" />
-    <div class="overflow-x-auto max-h-[50vh] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
-      <table style="min-width:420px; width:100%;">
+    <div class="overflow-x-auto overflow-y-auto flex-1" style="max-height: 50vh;">
+      <table style="min-width:320px; width:100%;">
         <thead>
           <tr>
             <th class="pr-2 w-[8%] whitespace-nowrap" style="color:red"></th>
@@ -13364,7 +13364,7 @@ modal.innerHTML = `
         <tbody>${rows}</tbody>
       </table>
     </div>
-    <div class="mt-4 pt-3 border-t border-gray-700 text-center font-bold text-base">
+    <div class="mt-4 pt-3 border-t border-gray-700 text-center font-bold text-base flex-shrink-0">
       <span style="color:green">${t('challenge_history_total')}</span> 
       <span style="color:red">${history.length} </span>
       <span style="color:orange">${t('challenge_history_challenges')}</span>
@@ -13377,7 +13377,7 @@ modal.innerHTML = `
       >${totalMinutes}</span>
       <span style="color:yellow">${t('challenge_history_minutes_label')}</span>
     </div>
-    <button id="challenge-history-close" class="mode-btn block mx-auto mt-4 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg">${t('challenge_history_close')}</button>
+    <button id="challenge-history-close" class="mode-btn block mx-auto mt-4 bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 px-6 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg flex-shrink-0">${t('challenge_history_close')}</button>
   </div>
 `;
 
