@@ -20670,6 +20670,35 @@ setTimeout(() => {
 }, 12000);
 };
 
+// Auto-show grid id popup after 60 seconds idle (ONCE)
+let idleTimer;
+let idlePopupShown = false; // Add this flag
+
+function showIdlePopup() {
+  const userId = localStorage.getItem('omUserId');
+  const userRow = livePresenceRows.find(row => row.user_id === userId);
+  if (!userRow && !idlePopupShown) { // Check flag
+    idlePopupShown = true; // Set flag so it never shows again
+    userIdDisplay.click();
+  }
+}
+
+function resetIdleTimer1() {
+  clearTimeout(idleTimer);
+  // Only start timer if popup hasn't been shown yet
+  if (!idlePopupShown) {
+    idleTimer = setTimeout(showIdlePopup, 60000);
+  }
+}
+
+// Reset on any user interaction
+document.addEventListener('click', resetIdleTimer1);
+document.addEventListener('touchstart', resetIdleTimer1);
+document.addEventListener('keydown', resetIdleTimer1);
+
+// START THE TIMER when page loads
+resetIdleTimer1();
+
 showCountryStatsOnEarthGrid(); 
 showUserTravelBar();
 startFlameTimer();
