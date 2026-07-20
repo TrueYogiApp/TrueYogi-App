@@ -9812,6 +9812,11 @@ try {
   
   // Update the UI
   updateStats();
+  
+  // Reload page after 3 seconds to refresh everything
+	setTimeout(() => {
+	  location.reload();
+	}, 3000);    
 }
 
     function switchToFlowMode() {
@@ -10304,7 +10309,11 @@ async function confirmResetChallenge() {
       countdownSpan.textContent = '10'; // or whatever your default countdown is
     }
   }, 100);
-  
+
+  // Reload page after 3 seconds to refresh everything
+	setTimeout(() => {
+	  location.reload();
+	}, 3000);    
 }
 
 function restoreActiveSessionUI() {
