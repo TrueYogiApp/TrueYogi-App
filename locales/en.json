@@ -463,7 +463,14 @@
 "resetAvatar": "",
 "resetAvatarConfirm": "Reset Avatar?",
 "yes": "Yes",
-"no": "No"
+"no": "No",
+"intention.label": "Inner Intention",
+"intention.description": "If you wish, carry one intention throughout your Sacred Journey.",
+"intention.privacy": "Private • Stored only on this device",
+"intention.placeholder": "e.g. I cultivate peace within myself and share it with the world.",
+"intention.label2": "Inner Intention",
+"intention.label3": "Awakened Intention"
+
 
   
 }

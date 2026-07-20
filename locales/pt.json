@@ -456,5 +456,13 @@
   "changeAvatar": "Mudar Avatar",
   "resetAvatar": "",
   "resetAvatarConfirm": "Redefinir Avatar?",
-  "yes": "Sim"  
+  "yes": "Sim",
+  "no": "Não",
+"intention.label": "Intenção Interior",
+"intention.description": "Se desejar, leve uma intenção ao longo de toda sua Jornada Sagrada.",
+"intention.privacy": "Privado • Armazenado apenas neste dispositivo",
+"intention.placeholder": "ex. Cultivo a paz dentro de mim e a compartilho com o mundo.",
+"intention.label2": "Intenção Interior",
+"intention.label3": "Intenção Despertada"
+
 }

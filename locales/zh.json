@@ -359,7 +359,7 @@
 "cleared_offline_faq_button": "数据已清除",
 "launching_modal_heading": "正在启动太空船模式",
 "launching_modal_description": "正在下载冥想内容...",
-"launching_modal_note": "这需要几分钟（约100MB）",
+"launching_modal_note": "这需要几分钟（约",
 "launching_modal_warning": "⚠️ 下载完成前请保持此标签页开启",
 "launching_modal_progress_start": "正在开始...",
 "launching_modal_progress_preparing": "正在准备下载...",
@@ -458,6 +458,12 @@
   "resetAvatar": " ",
   "resetAvatarConfirm": "重置头像？",
   "yes": "是",
-  "no": "否"
+  "no": "否",
+  "intention.label": "内心意图",
+"intention.description": "如果您愿意，在整个神圣之旅中保持一个意图。",
+"intention.privacy": "隐私 • 仅存储在此设备上",
+"intention.placeholder": "例如 我在自己内心培养和平，并与世界分享。",
+"intention.label2": "内心意图",
+"intention.label3": "觉醒的意图"
 
 }

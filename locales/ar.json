@@ -456,5 +456,13 @@
   "changeAvatar": "تغيير الأفتار",
   "resetAvatar": "",
   "resetAvatarConfirm": "إعادة تعيين الأفتار؟",
-  "yes": "نعم"  
+  "yes": "نعم",
+  "no": "لا",
+"intention.label": "النية الداخلية",
+"intention.description": "إذا رغبت، احمل نية واحدة طوال رحلتك المقدسة.",
+"intention.privacy": "خاص • مخزن فقط على هذا الجهاز",
+"intention.placeholder": "مثال: أنا أزرع السلام داخل نفسي وأشاركه مع العالم.",
+"intention.label2": "النية الداخلية",
+"intention.label3": "النية المستيقظة"
+
 }

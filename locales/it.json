@@ -359,7 +359,7 @@
 "cleared_offline_faq_button": "Dati cancellati",
 "launching_modal_heading": "Avvio modalità astronave",
 "launching_modal_description": "Scaricando i contenuti di meditazione...",
-"launching_modal_note": "Ci vorranno alcuni minuti (~100MB)",
+"launching_modal_note": "Ci vorranno alcuni minuti",
 "launching_modal_warning": "⚠️ Per favore lascia questa scheda aperta fino a fine download",
 "launching_modal_progress_start": "Inizio...",
 "launching_modal_progress_preparing": "Preparazione al download...",
@@ -458,7 +458,13 @@
   "resetAvatar": " ",
   "resetAvatarConfirm": "Reimpostare l'avatar?",
   "yes": "Sì",
-  "no": "No"
+  "no": "No",
+  "intention.label": "Intenzione Interiore",
+"intention.description": "Se lo desideri, porta un'intenzione durante tutto il tuo Viaggio Sacro.",
+"intention.privacy": "Privato • Archiviato solo su questo dispositivo",
+"intention.placeholder": "es. Coltivo la pace in me stesso e la condivido con il mondo.",
+"intention.label2": "Intenzione Interiore",
+"intention.label3": "Intenzione Risvegliata"
   
   
 }

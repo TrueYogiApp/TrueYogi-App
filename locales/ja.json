@@ -456,6 +456,13 @@
   "changeAvatar": "アバターを変更",
   "resetAvatar": "",
   "resetAvatarConfirm": "アバターをリセットしますか？",
-  "yes": "はい"  
+  "yes": "はい",
+  "no": "いいえ",
+"intention.label": "内なる意図",
+"intention.description": "ご希望であれば、あなたの聖なる旅のすべてを通して、一つの意図を持ち続けてください。",
+"intention.privacy": "プライベート • このデバイスにのみ保存されます",
+"intention.placeholder": "例: 自分の中に平和を培い、それを世界と共有します。",
+"intention.label2": "内なる意図",
+"intention.label3": "目覚めた意図"
   
 }

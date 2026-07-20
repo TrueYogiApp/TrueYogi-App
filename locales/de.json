@@ -358,7 +358,7 @@
 "cleared_offline_faq_button": "Daten gelöscht",
 "launching_modal_heading": "Spaceship-Modus wird gestartet",
 "launching_modal_description": "Meditationsinhalte werden heruntergeladen...",
-"launching_modal_note": "Dies dauert einige Minuten (~100MB)",
+"launching_modal_note": "Dies dauert einige Minuten",
 "launching_modal_warning": "⚠️ Bitte lasse diesen Tab geöffnet, bis der Download abgeschlossen ist.",
 "launching_modal_progress_start": "Start...",
 "launching_modal_progress_preparing": "Download wird vorbereitet...",
@@ -457,6 +457,12 @@
   "resetAvatar": " ",
   "resetAvatarConfirm": "Avatar zurücksetzen?",
   "yes": "Ja",
-  "no": "Nein"
+  "no": "Nein",
+  "intention.label": "Innere Absicht",
+"intention.description": "Wenn Sie möchten, tragen Sie eine Absicht während Ihrer gesamten heiligen Reise.",
+"intention.privacy": "Privat • Nur auf diesem Gerät gespeichert",
+"intention.placeholder": "z. B. Ich pflege Frieden in mir selbst und teile ihn mit der Welt.",
+"intention.label2": "Innere Absicht",
+"intention.label3": "Erwachte Absicht"
 
 }

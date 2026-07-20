@@ -359,7 +359,7 @@
 "cleared_offline_faq_button": "Данные очищены",
 "launching_modal_heading": "Запуск режима космического корабля",
 "launching_modal_description": "Скачиваем материалы для медитации...",
-"launching_modal_note": "Это займет несколько минут (~100MB)",
+"launching_modal_note": "Это займет несколько минут",
 "launching_modal_warning": "⚠️ Пожалуйста, не закрывайте вкладку до завершения загрузки",
 "launching_modal_progress_start": "Начало...",
 "launching_modal_progress_preparing": "Подготовка к загрузке...",
@@ -458,6 +458,12 @@
   "resetAvatar": " ",
   "resetAvatarConfirm": "Сбросить аватар?",
   "yes": "Да",
-  "no": "Нет"
+  "no": "Нет",
+"intention.label": "Внутреннее намерение",
+"intention.description": "Если хотите, сохраняйте одно намерение на протяжении всего вашего Священного пути.",
+"intention.privacy": "Приватно • Сохранено только на этом устройстве",
+"intention.placeholder": "напр. Я развиваю мир в себе и делюсь им с миром.",
+"intention.label2": "Внутреннее намерение",
+"intention.label3": "Пробужденное намерение"
   
 }

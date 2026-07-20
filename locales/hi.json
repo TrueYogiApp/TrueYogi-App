@@ -358,7 +358,7 @@
 "cleared_offline_faq_button": "डेटा क्लियर किया गया",
 "launching_modal_heading": "स्पेसशिप मोड प्रारम्भ हो रहा है",
 "launching_modal_description": "फोकस सामग्री डाउनलोड की जा रही है...",
-"launching_modal_note": "इसमें कुछ मिनट लगेंगे (~100MB)",
+"launching_modal_note": "इसमें कुछ मिनट लगेंगे ",
 "launching_modal_warning": "⚠️ डाउनलोड पूरा होने तक इस टैब को खुला रखें",
 "launching_modal_progress_start": "शुरू हो रहा है...",
 "launching_modal_progress_preparing": "डाउनलोड की तैयारी...",
@@ -457,6 +457,12 @@
   "resetAvatar": "",
   "resetAvatarConfirm": "अवतार रीसेट करें?",
   "yes": "हाँ",
-  "no": "नहीं"
+  "no": "नहीं",
+  "intention.label": "आंतरिक इरादा",
+"intention.description": "यदि आप चाहें, तो अपनी पवित्र यात्रा के दौरान एक इरादा रखें।",
+"intention.privacy": "निजी • केवल इस डिवाइस पर संग्रहीत",
+"intention.placeholder": "उदा. मैं अपने अंदर शांति का पोषण करता हूं और इसे दुनिया के साथ साझा करता हूं।",
+"intention.label2": "आंतरिक इरादा",
+"intention.label3": "जागृत इरादा"
 
 }

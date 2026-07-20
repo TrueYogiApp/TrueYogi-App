@@ -462,7 +462,13 @@
   "resetAvatar": "",
   "resetAvatarConfirm": "Réinitialiser l'avatar ?",
   "yes": "Oui",
-  "no": "Non"
+  "no": "Non",
+  "intention.label": "Intention Intérieure",
+"intention.description": "Si vous le souhaitez, portez une intention tout au long de votre Voyage Sacré.",
+"intention.privacy": "Privé • Stocké uniquement sur cet appareil",
+"intention.placeholder": "ex. Je cultive la paix en moi et la partage avec le monde.",
+"intention.label2": "Intention Intérieure",
+"intention.label3": "Intention Éveillée"
   
 
 }

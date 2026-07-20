@@ -358,7 +358,7 @@
 "cleared_offline_faq_button": "Datos limpiados",
 "launching_modal_heading": "Lanzando modo nave espacial",
 "launching_modal_description": "Descargando contenido de meditación...",
-"launching_modal_note": "Esto tomará unos minutos (~100MB)",
+"launching_modal_note": "Esto tomará unos minutos",
 "launching_modal_warning": "⚠️ Por favor, mantén esta pestaña abierta hasta que termine la descarga",
 "launching_modal_progress_start": "Comenzando...",
 "launching_modal_progress_preparing": "Preparando descarga...",
@@ -457,6 +457,12 @@
   "resetAvatar": " ",
   "resetAvatarConfirm": "¿Restablecer avatar?",
   "yes": "Sí",
-  "no": "No"
+  "no": "No",
+  "intention.label": "Intención Interior",
+"intention.description": "Si lo deseas, lleva una intención a lo largo de tu Camino Sagrado.",
+"intention.privacy": "Privado • Almacenado solo en este dispositivo",
+"intention.placeholder": "p. ej. Cultivo la paz dentro de mí y la comparto con el mundo.",
+"intention.label2": "Intención Interior",
+"intention.label3": "Intención Despertada"
 
 }
