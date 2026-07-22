@@ -20211,6 +20211,15 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
 
   const currentUserId = localStorage.getItem('omUserId');
 
+  // Format dates for display
+  const startDate = new Date(flameStartedAt);
+  const endDate = new Date(flameEndedAt);
+  
+  const formatDate = (date) => {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  };
+
   // Build popup HTML
   const listPopup = document.createElement('div');
   listPopup.id = 'flame-keeper-list';
@@ -20228,7 +20237,7 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
     min-width: 0;
     max-width: 320px;
     width: 100%;
-    max-height: 240px;
+    max-height: 280px;
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
@@ -20241,7 +20250,10 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
 
   let keeperHtml = `
     <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-      <strong>Flame Keepers</strong>
+      <strong>🔥 Flame Keepers</strong>
+      <div style="font-size:0.85em;color:#fde68a;margin-top:3px;letter-spacing:0.5px;">
+        ${formatDate(startDate)} — ${formatDate(endDate)}
+      </div>
       <div style="font-size:0.89em;color:#bbb;margin-top:2px;">
         (${keeperUserIds.length + 1} Soul${keeperUserIds.length ? 's' : ''} Unified)
       </div>
