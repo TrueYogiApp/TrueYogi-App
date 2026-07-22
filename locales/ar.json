@@ -111,6 +111,7 @@
   "selecttimes": "أوقات الجلسة:",
   "addsessions": "إضافة جلسات",
   "beginJourney": "بدء الرحلة",
+  "configCancel": "إلغاء",  
   "sessionTimesLabel": "أوقات الجلسة والمدات (1–3):",
   "verifyIdentity": "التحقق من الهوية",
   "endDescription": "هل أنتِ متأكدة من رغبتك في إنهاء هذه الجلسة مبكراً؟ لن يتم تسجيل هذا الوقت من الهدوء في رحلة TrueYogi الخاصة بك.",

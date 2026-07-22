@@ -111,6 +111,7 @@
   "selecttimes": "Horaires des sessions :",
   "addsessions": "Ajouter une session",
   "beginJourney": "Commencer le voyage",
+  "configCancel": "Annuler",  
   "sessionTimesLabel": "Horaires et durées des sessions (1–3) :",
   "verifyIdentity": "Vérifier l’identité",
   "endDescription": "Voulez-vous vraiment terminer cette session plus tôt ? Ce temps de tranquillité ne sera pas enregistré dans votre parcours VraiYogi.",

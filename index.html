@@ -3700,8 +3700,11 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 	<button id="begin-journey" onclick="saveYogiConfig()" class="mode-btn w-full bg-gray-700 hover:bg-yellow-500 text-gray-400 hover:text-gray-900 px-4 py-3 rounded-lg font-medium cursor-pointer transition disabled:opacity-50 disabled:cursor-not-allowed" disabled>
 	  <i class="fas fa-check-circle mr-2"></i> Begin Journey
 	</button>
-    </div>
-  </div>
+		<!-- Add close button here -->
+	<button id="config-cancel" onclick="returnToModeSelection()" class="mode-btn w-full mt-2 bg-transparent hover:bg-gray-700/50 text-gray-500 hover:text-gray-300 px-4 py-2 rounded-lg font-medium cursor-pointer transition border border-gray-600/50">
+	  <i class="fas fa-times mr-2"></i> Cancel
+	</button>
+	
     </div>
   </div>
 
@@ -14579,6 +14582,7 @@ renderSpaceshipOfflineInfoPopup();
   document.getElementById('yogi-config-selecttimes').textContent = t('selecttimes');
   document.getElementById('yogi-config-addsessions').innerHTML = '<i class="fas fa-plus mr-1"></i>' + t('addsessions'); 
   document.getElementById('begin-journey').textContent = t('beginJourney');
+  document.getElementById('config-cancel').textContent = t('configCancel');  
   document.getElementById('verify-identity-btn').textContent = t('verifyIdentity');
   document.getElementById('end-meditation-description').textContent = t('endDescription'); 
   document.getElementById('next-session-modal-heading').textContent = t('nextSessionHeading');
@@ -22282,7 +22286,7 @@ function canSwipe() {
       (finalSection && !finalSection.classList.contains('hidden')))
     return false;
   // Block if any overlay/modal
-  const modalBlocks = ['mobile-wallet-modal','spaceship-modal','challenge-history-modal','wallet-required-modal','missed-session-modal','mobile-required-modal','reset-confirmation-modal','session-time-modal','next-session-modal'];
+  const modalBlocks = ['mobile-wallet-modal','spaceship-modal','challenge-history-modal','wallet-required-modal','missed-session-modal','mobile-required-modal','reset-confirmation-modal','session-time-modal','next-session-modal','yogi-config-modal'];
   for (let id of modalBlocks) {
     const m = document.getElementById(id);
     if (m && !m.classList.contains('hidden')) return false;

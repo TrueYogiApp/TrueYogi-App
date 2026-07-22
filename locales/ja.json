@@ -111,6 +111,7 @@
   "selecttimes": "セッション時間：",
   "addsessions": "セッションを追加",
   "beginJourney": "旅を始める",
+  "configCancel": "キャンセル",  
   "sessionTimesLabel": "セッション時間と期間（1～3）：",
   "verifyIdentity": "アイデンティティを検証",
   "endDescription": "このセッションを早く終わりたいですか？この静寂の時間はあなたのTrueYogiの旅に記録されません。",
