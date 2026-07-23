@@ -8952,6 +8952,7 @@ const musicChoiceEl = document.getElementById('music-choice');
 if (musicChoiceEl) {
   // Restore previous choice
   musicChoiceEl.value = selectedMusicFile;
+  updateDurationOptionsForMusic();
   musicChoiceEl.addEventListener('change', function() {
     selectedMusicFile = this.value;
     localStorage.setItem('selectedMusicFile', selectedMusicFile);
