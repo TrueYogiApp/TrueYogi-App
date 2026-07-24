@@ -47,7 +47,8 @@ const AUDIO_ASSETS = [
   '/assets/sacral_vam_417hz.mp3',
   '/assets/root_lam_396hz.mp3',
   '/assets/meditation-end.mp3',
-  '/assets/metatron.mp3'
+  '/assets/metatron.mp3',
+  '/assets/manifest.wav'     
 ];
 
 const PERMANENT_ASSETS = [
@@ -63,7 +64,9 @@ const PERMANENT_ASSETS = [
   '/assets/neptune.png',
   '/assets/saturn.png',
   '/assets/portal.png',  
-  '/assets/spaceship.mode.svg'
+  '/assets/spaceship.mode.svg',
+  '/assets/intention.svg',  
+  '/assets/intention2.svg'      
 ];
 
 // App files that change more often
