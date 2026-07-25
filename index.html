@@ -4418,12 +4418,21 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 		<!-- Installation Guide Section -->
 <div class="faq-item">
   <h3 class="text-blue-400 font-medium" style="color: #60a5fa; cursor: pointer;" onclick="toggleInstallGuide()">
-    Installation Guide <span id="install-toggle-icon" style="font-size: 0.8rem;">▼</span>
+    Installation <span id="install-toggle-icon" style="font-size: 0.8rem;">▼</span>
   </h3>
   
-  <div id="install-guide-content" style="display: none; margin-top: 1rem;">
+  <div id="install-guide-content"
+     style="
+       display:none;
+       margin-top:1rem;
+       background:#1b2233;
+       border:1px solid rgba(255,255,255,.08);
+       border-radius:14px;
+       padding:1rem;
+       box-shadow:0 0 18px rgba(0,0,0,.18);
+     ">
     <!-- Tab Navigation -->
-    <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem; border-bottom: 1px solid #374151; padding-bottom: 0.5rem;">
+    <div style="display: flex; justify-content:center; gap: 0.6rem; margin-bottom: 1rem; border-bottom: 1px solid #374151; padding-bottom: 0.8rem;">
       <button onclick="switchInstallTab('ios')" id="ios-tab-btn" style="background: #4f46e5; color: white; padding: 0.4rem 1.2rem; border: none; border-radius: 20px; cursor: pointer; font-size: 0.9rem; transition: all 0.3s;">
         🍎 iOS
       </button>
@@ -4433,28 +4442,35 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     </div>
     
     <!-- iOS Content -->
-    <div id="ios-install-content" style="color: #d1d5db; font-size: 0.95rem; line-height: 1.6;">
-      <div style="margin-bottom: 0.8rem;">📱 <strong>Add TrueYogi to your home screen:</strong></div>
-      <div style="margin-bottom: 0.6rem;">1. Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i></div>
-      <div style="margin-bottom: 0.6rem;">2. Scroll down and select <strong>Add to Home Screen</strong> <i class="fa-regular fa-square-plus"></i></div>
-      <div style="margin-bottom: 0.6rem;">3. Tap <strong>Add</strong> in the top right corner</div>
-      <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #9ca3af;">✨ For Safari browser only</div>
-    </div>
-    
-	<!-- Android Content -->
-	<div id="android-install-content" style="display: none; color: #d1d5db; font-size: 0.95rem; line-height: 1.6;">
-	  <div style="margin-bottom: 0.8rem;">📱 <strong>Add TrueYogi to your home screen (Chrome):</strong></div>
-	  <div style="margin-bottom: 0.6rem;">1. Tap the <strong>three dots</strong> menu <i class="fa-solid fa-ellipsis-vertical"></i></div>
-	  <div style="margin-bottom: 0.6rem;">2. Select <strong>Add to Home screen</strong> <i class="fa-regular fa-square-plus"></i></div>
-	  <div style="margin-bottom: 0.6rem;">3. Tap <strong>Install</strong> to confirm</div>
-	  <div style="margin-top: 0.8rem; font-size: 0.85rem; color: #9ca3af;">✨ For Chrome browser on Android</div>
-	  
-	  <!-- Optional: Add a note about Play Store coming soon -->
-	  <div style="margin-top: 1rem; padding: 0.8rem; background: #1f2937; border-radius: 8px; border-left: 3px solid #fbbf24;">
-		<div style="font-size: 0.85rem; color: #fbbf24;">📌 <strong>Coming Soon:</strong></div>
-		<div style="font-size: 0.8rem; color: #9ca3af;">Google Play Store version is in development. Stay tuned!</div>
+	<div id="ios-install-content" style="color:#d1d5db;font-size:.95rem;line-height:1.6;">
+	  <div style="margin-bottom:.8rem;">📱 <strong>Add TrueYogi to your Home Screen:</strong></div>
+	  <div style="background:#20283d;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1rem;margin:.5rem 0;">
+		<div style="margin-bottom:.5rem;">1. Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i></div>
+		<div style="margin-bottom:.5rem;">2. Scroll down and select <strong>Add to Home Screen</strong> <i class="fa-regular fa-square-plus"></i></div>
+		<div>3. Tap <strong>Add</strong> in the top right corner</div>
+	  </div>
+	  <div style="margin-top:.6rem;font-size:.85rem;color:#9ca3af;text-align:center;">
+		🔹 For Safari browser only
 	  </div>
 	</div>
+    
+    <!-- Android Content -->
+    <div id="android-install-content" style="display: none; color: #d1d5db; font-size: 0.95rem; line-height: 1.6;">
+      <div style="margin-bottom: 0.8rem;">📱 <strong>Install TrueYogi from Play Store:</strong></div>
+		<div style="background:#20283d;border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:1rem;text-align:center;margin:.6rem 0;">
+
+		  <a href="https://play.google.com/store/apps/details?id=app.trueyogi.android"
+			 target="_blank"
+			 style="display:inline-block;background:#4ade80;color:#1a1a2e;padding:.7rem 2rem;border-radius:50px;text-decoration:none;font-weight:bold;transition:all .25s ease;"
+			 onmouseover="this.style.transform='scale(1.05)'"
+			 onmouseout="this.style.transform='scale(1)'">
+			 📥 Download on Google Play
+		  </a>
+		  		  <div style="margin:.5rem 0 1rem;font-size:.85rem;color:#9ca3af;">
+			🔹 Fast, secure installation with automatic updates
+		  </div>
+		</div>
+    </div>
   </div>
 </div>
 
@@ -5513,55 +5529,36 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   <h3>📱 Install TrueYogi App</h3>
   <p>Add TrueYogi to your home screen for a better experience and quick access!</p>
   
-  <div class="steps">
-    <!-- iOS Instructions -->
-    <div id="ios-steps" style="display: none;">
-      <div>
-        <span class="number">1</span>
-        <span>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i></span>
-      </div>
-      <div>
-        <span class="number">2</span>
-        <span>Scroll down and select <strong>Add to Home Screen</strong> <i class="fa-regular fa-square-plus"></i></span>
-      </div>
-      <div>
-        <span class="number">3</span>
-        <span>Tap <strong>Add</strong> in the top right corner</span>
-      </div>
+<div class="steps">
+  <!-- iOS Instructions -->
+  <div id="ios-steps" style="display: none;">
+    <div>
+      <span class="number">1</span>
+      <span>Tap the <strong>Share</strong> button <i class="fa-solid fa-arrow-up-from-bracket"></i></span>
     </div>
-    
-    <!-- Android Chrome Instructions -->
-    <div id="android-chrome-steps" style="display: none;">
-      <div>
-        <span class="number">1</span>
-        <span>Tap the <strong>three dots</strong> menu <i class="fa-solid fa-ellipsis-vertical"></i></span>
-      </div>
-      <div>
-        <span class="number">2</span>
-        <span>Select <strong>Add to Home screen</strong> <i class="fa-regular fa-square-plus"></i></span>
-      </div>
-      <div>
-        <span class="number">3</span>
-        <span>Tap <strong>Install</strong> to confirm</span>
-      </div>
+    <div>
+      <span class="number">2</span>
+      <span>Scroll down and select <strong>Add to Home Screen</strong> <i class="fa-regular fa-square-plus"></i></span>
     </div>
-    
-    <!-- Samsung Browser Instructions -->
-    <div id="samsung-steps" style="display: none;">
-      <div>
-        <span class="number">1</span>
-        <span>Tap the <strong>menu button</strong> <i class="fa-solid fa-bars"></i></span>
-      </div>
-      <div>
-        <span class="number">2</span>
-        <span>Select <strong>Add page to</strong> → <strong>Home screen</strong></span>
-      </div>
-      <div>
-        <span class="number">3</span>
-        <span>Tap <strong>Add</strong> to confirm</span>
-      </div>
+    <div>
+      <span class="number">3</span>
+      <span>Tap <strong>Add</strong> in the top right corner</span>
     </div>
   </div>
+  
+  <!-- Android Instructions - Now with Play Store Link -->
+  <div id="android-steps" style="display: none;">
+    <div style="text-align: center; padding: 0.5rem 0;">
+      <a href="https://play.google.com/store/apps/details?id=app.trueyogi.android" 
+         target="_blank" 
+         style="display: inline-block; background: #4ade80; color: #1a1a2e; padding: 0.8rem 2.5rem; border-radius: 50px; text-decoration: none; font-weight: bold; font-size: 1.1rem; transition: transform 0.2s;"
+         onmouseover="this.style.transform='scale(1.05)'"
+         onmouseout="this.style.transform='scale(1)'">
+        📥 Download on Google Play
+      </a>
+    </div>
+  </div>
+</div>
   
 <div class="checkbox-container" style="display: flex; align-items: center; margin: 10px 0;">
   <input type="checkbox" id="dont-show-again" style="margin-right: 8px;">
@@ -15324,21 +15321,17 @@ document.addEventListener('visibilitychange', requestWakeLock);
 function detectPlatformAndShowInstructions() {
   const userAgent = navigator.userAgent || navigator.vendor || window.opera;
   const isIOS = /iPad|iPhone|iPod/.test(userAgent) && !window.MSStream;
-  const isSamsungBrowser = /SamsungBrowser/i.test(userAgent);
   
   // Hide all instruction sets first
   document.getElementById('ios-steps').style.display = 'none';
-  document.getElementById('android-chrome-steps').style.display = 'none';
-  document.getElementById('samsung-steps').style.display = 'none';
+  document.getElementById('android-steps').style.display = 'none';
   
   // Show relevant instructions
   if (isIOS) {
     document.getElementById('ios-steps').style.display = 'block';
-  } else if (isSamsungBrowser) {
-    document.getElementById('samsung-steps').style.display = 'block';
   } else {
-    // Default to Android Chrome (most common)
-    document.getElementById('android-chrome-steps').style.display = 'block';
+    // Android or other - show Play Store link
+    document.getElementById('android-steps').style.display = 'block';
   }
 }
 
