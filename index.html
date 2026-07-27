@@ -7251,10 +7251,40 @@ function copyOmUserId() {
     return;
   }
   
+  const displayElement = document.getElementById('display-om-user-id');
+  const textElement = document.getElementById('om-user-id-display');
+  
+  // Flash effect - color change
+  textElement.style.color = '#4ADE80';
+  textElement.style.textShadow = '0 0 30px rgba(74, 222, 128, 0.7)';
+  displayElement.style.transform = 'scale(1.05)';
+  displayElement.style.transition = 'all 0.15s';
+  
+  // Stronger shimmer overlay - white line moving across
+  displayElement.style.background = `
+    linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.3) 30%,
+      rgba(255, 255, 255, 0.6) 50%,
+      rgba(255, 255, 255, 0.3) 70%,
+      transparent 100%
+    )
+  `;
+  displayElement.style.backgroundSize = '300% 100%';
+  displayElement.style.backgroundPosition = '300% 0';
+  displayElement.style.borderRadius = '4px';
+  displayElement.style.padding = '2px 6px';
+  
+  // Animate shimmer - moves from right to left
+  setTimeout(() => {
+    displayElement.style.backgroundPosition = '-100% 0';
+    displayElement.style.transition = 'background-position 0.6s ease';
+  }, 10);
+  
   navigator.clipboard.writeText(omUserId).then(() => {
     showToast(t('copy.function.success'), 'success');
   }).catch(() => {
-    // Fallback
     const textarea = document.createElement('textarea');
     textarea.value = omUserId;
     document.body.appendChild(textarea);
@@ -7263,6 +7293,18 @@ function copyOmUserId() {
     document.body.removeChild(textarea);
     showToast(t('copy.function.success'), 'success');
   });
+  
+  // Reset after animation
+  setTimeout(() => {
+    textElement.style.color = '';
+    textElement.style.textShadow = '';
+    displayElement.style.transform = '';
+    displayElement.style.background = '';
+    displayElement.style.backgroundSize = '';
+    displayElement.style.backgroundPosition = '';
+    displayElement.style.padding = '';
+    displayElement.style.transition = '';
+  }, 800);
 }
 
 // Update OM User ID display
