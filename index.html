@@ -4629,14 +4629,16 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   
   <div class="mt-3 bg-gray-800/50 rounded-lg p-3">
     <!-- Backup Info -->
-    <div class="flex justify-between items-center mb-3">
-      <span id="backup-label-last" class="text-gray-400 text-xs">Last Backup:</span>
-      <span id="backup-date" class="text-amber-400 text-xs">Never</span>
-    </div>
-    
-    <div class="flex justify-between items-center mb-3">
-      <span id="backup-label-status" class="text-gray-400 text-xs">Status:</span>
-      <span id="backup-status" class="text-gray-400 text-xs">Checking...</span>
+    <div class="space-y-2 mb-4">
+      <div class="flex justify-between items-center">
+        <span id="backup-label-last" class="text-gray-400 text-xs">Last Backup:</span>
+        <span id="backup-date" class="text-amber-400 text-xs">Never</span>
+      </div>
+      
+      <div class="flex justify-between items-center">
+        <span id="backup-label-status" class="text-gray-400 text-xs">Status:</span>
+        <span id="backup-status" class="text-gray-400 text-xs">Checking...</span>
+      </div>
     </div>
     
     <!-- Action Buttons -->
