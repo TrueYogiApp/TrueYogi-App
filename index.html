@@ -3416,6 +3416,23 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     0 0 60px rgba(255, 215, 0, 0.05);
 }
 
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 20px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}
+
+.animate-slide-up {
+  animation: slideUp 0.3s ease-out;
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -4568,6 +4585,15 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 <div class="faq-item mt-6">
   <h3 id="storage-faq-heading" class="text-yellow-200 font-medium">Storage Information</h3>
   <div class="text-gray-300 mt-1">
+      <div class="flex justify-between items-center mb-2">
+      <span id="user-id-display" class="text-sm">User ID:</span>
+		<span id="display-om-user-id" class="font-medium text-blue-400 text-xs truncate max-w-[200px] cursor-pointer hover:text-blue-300 transition" onclick="copyOmUserId()">
+		  <span id="om-user-id-display">Not logged in</span>
+		  <button onclick="event.stopPropagation(); copyOmUserId();" class="ml-2 text-gray-400 hover:text-white text-xs">
+			<i class="fas fa-copy"></i>
+		  </button>
+		</span>
+    </div>
     <div class="flex justify-between items-center mb-2">
       <span id="storage-faq-label-content" class="text-sm">Spaceship Content:</span>
       <span id="storage-size" class="font-medium text-green-400">Checking...</span>
@@ -4593,7 +4619,62 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     <div id="technical-tools-heading" class="text-sm font-medium text-blue-300 mb-3 pl-2 border-l-4 border-blue-500">
       🛠️ Technical Tools
     </div>
+ 
+<!-- Backup & Restore Section -->
+<div class="faq-item mb-4">
+  <h3 id="backup-title" class="text-yellow-200 font-medium">Cloud Backup & Restore</h3>
+  <p id="backup-description" class="text-gray-300 text-sm mt-1">
+    Safely backup your progress to the cloud and restore if data is lost.
+  </p>
+  
+  <div class="mt-3 bg-gray-800/50 rounded-lg p-3">
+    <!-- Backup Info -->
+    <div class="flex justify-between items-center mb-3">
+      <span id="backup-label-last" class="text-gray-400 text-xs">Last Backup:</span>
+      <span id="backup-date" class="text-amber-400 text-xs">Never</span>
+    </div>
     
+    <div class="flex justify-between items-center mb-3">
+      <span id="backup-label-status" class="text-gray-400 text-xs">Status:</span>
+      <span id="backup-status" class="text-gray-400 text-xs">Checking...</span>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="grid grid-cols-2 gap-2">
+      <button id="backup-btn" onclick="backupToCloud()" 
+        style="background-color: #16A34A; color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;"
+		class="mode-btn"
+        onmouseover="this.style.backgroundColor='#15803D'" 
+        onmouseout="this.style.backgroundColor='#16A34A'">
+        <i class="fas fa-cloud-upload-alt mr-2"></i><span id="backup-btn-text">Backup to Cloud</span>
+      </button>
+      
+      <button id="restore-btn" onclick="showRestoreModal()" 
+        style="background-color: #2563EB; color: white; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;"
+		class="mode-btn"
+        onmouseover="this.style.backgroundColor='#1D4ED8'" 
+        onmouseout="this.style.backgroundColor='#2563EB'">
+        <i class="fas fa-cloud-download-alt mr-2"></i><span id="restore-btn-text">Restore from Cloud</span>
+      </button>
+    </div>
+      
+    <div class="mt-3">
+      <button id="delete-backup-btn" onclick="deleteBackup()" 
+        style="width: 100%; background-color: #DC2626; color: white; padding: 8px; border-radius: 8px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;"
+		class="mode-btn"
+        onmouseover="this.style.backgroundColor='#B91C1C'" 
+        onmouseout="this.style.backgroundColor='#DC2626'">
+        <i class="fas fa-trash mr-1"></i><span id="delete-backup-btn-text">Delete Cloud Backup</span>
+      </button>
+    </div>
+    
+    <div id="backup-info-text" class="mt-2 text-gray-500 text-xs border-t border-gray-700 pt-2">
+      <i class="fas fa-info-circle mr-1"></i>
+      <span id="backup-info-content">Data is encrypted with your user ID. Only you can access it.</span>
+    </div>
+  </div>
+</div>
+ 
     <div class="faq-item">
       <h3 id="faq-clear-cache-heading" class="text-yellow-200 font-medium">Clear App Cache</h3>
       <p id="faq-clear-cache-description" class="text-gray-300 mt-1">
@@ -4645,6 +4726,69 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     <button onclick="closeFAQModal()" class="mode-btn mt-6 w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 py-2 rounded-lg cursor-pointer">
       Close
     </button>
+  </div>
+</div>
+
+<!-- RESTORE MODAL -->
+<div id="restoreModal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 hidden">
+  <div class="bg-gray-900 border border-gray-700 rounded-xl max-w-md w-full mx-4 p-6 shadow-2xl">
+    <!-- Modal Header -->
+    <div class="flex justify-between items-center mb-4">
+      <h3 id="restore-modal-title" class="text-xl font-semibold text-blue-400">
+        <i class="fas fa-cloud-download-alt mr-2"></i><span id="restore-modal-title-text">Restore from Cloud</span>
+      </h3>
+      <button onclick="closeRestoreModal()" class="text-gray-400 hover:text-white transition">
+        <i class="fas fa-times text-xl"></i>
+      </button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="mb-4">
+      <p id="restore-modal-description" class="text-gray-300 text-sm mb-3">
+        Enter your OM User ID to restore your backup. You can find this in your wallet or previous login.
+      </p>
+      
+      <div class="bg-yellow-900/30 border border-yellow-700/50 rounded-lg p-3 mb-4">
+        <p id="restore-modal-warning" class="text-yellow-300 text-xs">
+          <i class="fas fa-info-circle mr-1"></i>
+          <span id="restore-modal-warning-text">Your OM User ID is unique to you. Make sure you enter the correct one used for your backup.</span>
+        </p>
+      </div>
+      
+      <label id="restore-modal-label" for="restoreOmUserId" class="block text-sm font-medium text-gray-300 mb-2">
+        OM User ID
+      </label>
+      <input 
+        type="text" 
+        id="restoreOmUserId" 
+        placeholder="Enter your OM User ID (e.g., d60ad0a8-8368-4f5a-91b0-341c2f452720)"
+        class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
+        autocomplete="off"
+      />
+      
+      <div id="restoreError" class="hidden mt-2 text-red-400 text-xs">
+        <i class="fas fa-exclamation-circle mr-1"></i>
+        <span id="restoreErrorMessage">Invalid OM User ID</span>
+      </div>
+    </div>
+    
+    <!-- Modal Footer -->
+    <div class="flex gap-3">
+      <button id="restore-modal-cancel" onclick="closeRestoreModal()" 
+        style="flex: 1; background-color: #374151; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;"
+        onmouseover="this.style.backgroundColor='#4B5563'" 
+        class="mode-btn" 
+        onmouseout="this.style.backgroundColor='#374151'">
+        <span id="restore-modal-cancel-text">Cancel</span>
+      </button>
+      <button id="restoreConfirmBtn" onclick="performRestore()" 
+        style="flex: 1; background-color: #2563EB; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;"
+        onmouseover="this.style.backgroundColor='#1D4ED8'" 
+        class="mode-btn" 
+        onmouseout="this.style.backgroundColor='#2563EB'">
+        <i class="fas fa-cloud-download-alt mr-2"></i><span id="restore-modal-restore-text">Restore</span>
+      </button>
+    </div>
   </div>
 </div>
 
@@ -6679,6 +6823,677 @@ function renderLiveList() {
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
+
+
+// ===== BACKUP & RESTORE FUNCTIONS =====
+
+// Keys to backup
+const BACKUP_KEYS = [
+  'yogiConfig',
+  'yogiChallenge', 
+  'yogi_manifestation',
+  'trueyogi_offline_installed',
+  'omUserId',
+  'meditationStartData',
+  'meditationSessions',
+  'hasSeenFirstWelcome',
+  'challengeHistory',
+  'walkthroughCompleted'
+];
+
+// Backup function with translation support
+async function backupToCloud() {
+  try {
+    // Ask user for their User ID
+    const omUserId = await showInputModal({
+      title: t('backup.function.modal.title'),
+      message: t('backup.function.modal.message'),
+      placeholder: t('backup.function.modal.placeholder'),
+      confirmText: t('backup.function.modal.confirmText'),
+      cancelText: t('backup.function.modal.cancelText'),
+      warning: t('backup.function.modal.warning'), // ← ADD THIS
+      warningClass: 'text-blue-500 text-sm mt-2' // ← ADD THIS for styling
+    });
+    
+    if (!omUserId) {
+      return; // User cancelled
+    }
+    
+    // Check if entered ID matches stored ID
+    const storedId = localStorage.getItem('omUserId');
+    if (!storedId || storedId !== omUserId) {
+      await showConfirmModal({
+        title: t('backup.function.wrongid.title'),
+        message: t('backup.function.wrongid.message'),
+        highlight: t('backup.function.wrongid.entered') + ': ' + omUserId,
+        details: t('backup.function.wrongid.details'),
+        confirmText: t('backup.function.wrongid.confirmText'),
+        cancelText: t('backup.function.wrongid.cancelText')
+      });
+      return; // Stop backup
+    }
+
+    // Collect data for backup
+    const backupData = {};
+    BACKUP_KEYS.forEach(key => {
+      const value = localStorage.getItem(key);
+      if (value !== null) {
+        try {
+          backupData[key] = JSON.parse(value);
+        } catch {
+          backupData[key] = value;
+        }
+      }
+    });
+
+    // Show loading state
+    const backupBtn = document.getElementById('backup-btn');
+    const originalText = backupBtn.innerHTML;
+    backupBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>' + t('backup.function.backingup');
+    backupBtn.disabled = true;
+
+    // Send to backend
+    const response = await fetch('https://trueyogi-backend-knkq.onrender.com/api/backup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        om_user_id: omUserId,
+        backup_data: backupData
+      })
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Update last backup time
+      localStorage.setItem('lastBackupTime', new Date().toISOString());
+      updateBackupUI();
+      showToast(t('backup.function.success'), 'success');
+    } else {
+      showToast(t('backup.function.error') + ' ' + result.error, 'error');
+    }
+
+  } catch (error) {
+    console.error('Backup error:', error);
+    showToast(t('backup.function.error') + ' ' + error.message, 'error');
+  } finally {
+    const backupBtn = document.getElementById('backup-btn');
+    backupBtn.innerHTML = '<i class="fas fa-cloud-upload-alt mr-2"></i>' + t('backup.button.backup');
+    backupBtn.disabled = false;
+  }
+}
+
+// Show restore modal
+function showRestoreModal() {
+  const modal = document.getElementById('restoreModal');
+  const input = document.getElementById('restoreOmUserId');
+  const errorDiv = document.getElementById('restoreError');
+  
+  // Don't pre-fill - use placeholder from translations
+  input.value = '';
+  input.placeholder = t('backup.function.modal.placeholder') || 'Enter your OM User ID';
+  
+  // Hide any previous errors
+  errorDiv.classList.add('hidden');
+  
+  // Show modal
+  modal.classList.remove('hidden');
+  
+  // Focus on input
+  setTimeout(() => input.focus(), 100);
+}
+
+// Close restore modal
+function closeRestoreModal() {
+  document.getElementById('restoreModal').classList.add('hidden');
+  document.getElementById('restoreError').classList.add('hidden');
+}
+
+// Perform restore with manual OM User ID
+async function performRestore() {
+  const input = document.getElementById('restoreOmUserId');
+  const omUserId = input.value.trim();
+  const errorDiv = document.getElementById('restoreError');
+  const errorMessage = document.getElementById('restoreErrorMessage');
+  
+  // Validate input
+  if (!omUserId) {
+    errorMessage.textContent = t('restore.function.error.empty');
+    errorDiv.classList.remove('hidden');
+    input.focus();
+    return;
+  }
+  
+  // Basic validation (UUID format or alphanumeric)
+  if (!/^[a-zA-Z0-9\-]{20,50}$/.test(omUserId)) {
+    errorMessage.textContent = t('restore.function.error.invalid');
+    errorDiv.classList.remove('hidden');
+    input.focus();
+    return;
+  }
+  
+	// Confirm with user using modal
+	const confirmed = await showConfirmModal({
+	  title: t('restore.function.confirmation.title'),
+	  message: t('restore.function.confirmation.message'),
+	  highlight: omUserId,
+	  details: t('restore.function.confirmation.details'),
+	  confirmText: t('restore.function.confirmation.confirmText'),
+	  cancelText: t('restore.function.confirmation.cancelText')
+	});
+
+	if (!confirmed) {
+	  return;
+	}
+  
+  // Close error if open
+  errorDiv.classList.add('hidden');
+  
+  // Show loading state
+  const confirmBtn = document.getElementById('restoreConfirmBtn');
+  const originalText = confirmBtn.innerHTML;
+  confirmBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>' + t('restore.function.restoring');
+  confirmBtn.disabled = true;
+
+  try {
+    // Fetch backup from backend
+    const response = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/backup/${encodeURIComponent(omUserId)}`);
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      // Store the OM User ID first (important!)
+      localStorage.setItem('omUserId', omUserId);
+      
+      // Restore each key
+      let restoredCount = 0;
+      BACKUP_KEYS.forEach(key => {
+        if (result.data[key] !== undefined) {
+          // Store as string
+          const value = typeof result.data[key] === 'object' 
+            ? JSON.stringify(result.data[key]) 
+            : result.data[key];
+          localStorage.setItem(key, value);
+          restoredCount++;
+        }
+      });
+
+      // Update UI
+      updateBackupUI();
+      closeRestoreModal();
+      showToast(t('restore.function.success') + restoredCount + t('restore.function.success.suffix'), 'success');
+      
+	// Ask to reload using modal
+	setTimeout(async () => {
+	  const reload = await showConfirmModal({
+		title: t('restore.function.complete.title'),
+		message: t('restore.function.complete.message'),
+		details: t('restore.function.complete.details'),
+		confirmText: t('restore.function.complete.confirmText'),
+		cancelText: t('restore.function.complete.cancelText')
+	  });
+	  
+	  if (reload) {
+		window.location.reload();
+	  }
+	}, 500);
+      
+    } else if (result.status === 404 || result.error === 'No backup found for this user') {
+      errorMessage.textContent = t('restore.function.error.notfound');
+      errorDiv.classList.remove('hidden');
+      input.focus();
+    } else {
+      showToast(t('restore.function.error.failed') + ' ' + result.error, 'error');
+    }
+
+  } catch (error) {
+    console.error('Restore error:', error);
+    
+    // Check if it's a network error
+    if (error.message.includes('Failed to fetch')) {
+      errorMessage.textContent = t('restore.function.error.network');
+    } else {
+      errorMessage.textContent = t('restore.function.error.failed') + ' ' + error.message;
+    }
+    errorDiv.classList.remove('hidden');
+    showToast(t('restore.function.error.failed'), 'error');
+    
+  } finally {
+    // Reset button
+    confirmBtn.innerHTML = originalText;
+    confirmBtn.disabled = false;
+  }
+}
+
+// Delete backup (updated to ask for OM User ID if missing)
+async function deleteBackup() {
+  try {
+    let omUserId = localStorage.getItem('omUserId');
+    
+	// If no OM User ID in localStorage, ask for it using modal
+	if (!omUserId) {
+	  const input = await showInputModal({
+		title: t('delete.function.modal.title'),
+		message: t('delete.function.modal.message'),
+		placeholder: t('delete.function.modal.placeholder'),
+		confirmText: t('delete.function.modal.confirmText'),
+		cancelText: t('delete.function.modal.cancelText')
+	  });
+	  
+	  if (!input) return;
+	  omUserId = input.trim();
+	}
+    
+    if (!omUserId) {
+      showToast(t('delete.function.error.noId'), 'error');
+      return;
+    }
+
+	const confirmed = await showConfirmModal({
+	  title: t('delete.function.confirmation.title'),
+	  message: t('delete.function.confirmation.message'),
+	  highlight: omUserId,
+	  details: t('delete.function.confirmation.details'),
+	  confirmText: t('delete.function.confirmation.confirmText'),
+	  cancelText: t('delete.function.confirmation.cancelText')
+	});
+
+	if (!confirmed) {
+	  return;
+	}
+
+    // Check if backup exists before deleting
+    if (!localStorage.getItem('lastBackupTime')) {
+      showToast(t('delete.function.error.notfound'), 'error');
+      return;
+    }
+
+    const response = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/backup/${encodeURIComponent(omUserId)}`, {
+      method: 'DELETE'
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Clear the backup time from localStorage
+      localStorage.removeItem('lastBackupTime');
+      showToast(t('delete.function.success'), 'info');
+      updateBackupUI();
+    } else {
+      showToast(t('delete.function.error.failed') + ' ' + result.error, 'error');
+    }
+  } catch (error) {
+    console.error('Delete backup error:', error);
+    showToast(t('delete.function.error.exception') + ' ' + error.message, 'error');
+  }
+}
+
+// Update UI with backup info
+function updateBackupUI() {
+  const lastBackupTime = localStorage.getItem('lastBackupTime');
+  const backupDateEl = document.getElementById('backup-date');
+  
+  if (lastBackupTime) {
+    const date = new Date(lastBackupTime);
+    backupDateEl.textContent = date.toLocaleString();
+  } else {
+    backupDateEl.textContent = t('update.function.never');
+  }
+
+  // Update backup status
+  updateBackupStatus();
+}
+
+// Update backup status - check if lastBackupTime exists
+function updateBackupStatus() {
+  const omUserId = localStorage.getItem('omUserId');
+  const lastBackupTime = localStorage.getItem('lastBackupTime');
+  const backupStatus = document.getElementById('backup-status');
+  
+  if (!omUserId) {
+    backupStatus.textContent = t('check.function.status.noUserId');
+    backupStatus.className = 'text-gray-400 text-xs';
+  } else if (lastBackupTime) {
+    // If lastBackupTime exists, backup is available
+    backupStatus.textContent = t('check.function.status.available');
+    backupStatus.className = 'text-green-400 text-xs';
+  } else {
+    backupStatus.textContent = t('check.function.status.notfound');
+    backupStatus.className = 'text-gray-400 text-xs';
+  }
+}
+
+// Toast notification helper (nice modal version)
+function showToast(message, type = 'info') {
+  // Create toast element directly
+  const toast = document.createElement('div');
+  toast.id = 'customToast';
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 999999;
+    animation: slideUp 0.3s ease-out;
+    max-width: 90%;
+    width: auto;
+  `;
+  
+  // Determine colors based on type
+  const colors = {
+    success: 'border-green-500',
+    error: 'border-red-500',
+    info: 'border-blue-500'
+  };
+  
+  const iconColors = {
+    success: 'text-green-400',
+    error: 'text-red-400',
+    info: 'text-blue-400'
+  };
+  
+  toast.innerHTML = `
+    <div class="bg-gray-900 border ${colors[type] || colors.info} rounded-xl px-6 py-3 shadow-2xl">
+      <div class="flex items-center gap-3">
+        <span class="text-white text-sm">${message}</span>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(toast);
+  
+  // Auto-remove after 3 seconds with fade
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transition = 'opacity 0.5s ease-out';
+    setTimeout(() => toast.remove(), 500);
+  }, 6000);
+}
+
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Close modal on escape key
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      closeRestoreModal();
+    }
+  });
+  
+  // Close modal on click outside
+  document.getElementById('restoreModal').addEventListener('click', function(e) {
+    if (e.target === this) {
+      closeRestoreModal();
+    }
+  });
+  
+  // Enter key on input triggers restore
+  document.getElementById('restoreOmUserId').addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      performRestore();
+    }
+  });
+  
+  // Just update local UI - no API calls
+  updateBackupUI();
+  updateOmUserIdDisplay();
+});
+
+// Copy OM User ID function
+function copyOmUserId() {
+  const omUserId = localStorage.getItem('omUserId');
+  if (!omUserId) {
+    showToast(t('copy.function.error.notfound'), 'error');
+    return;
+  }
+  
+  navigator.clipboard.writeText(omUserId).then(() => {
+    showToast(t('copy.function.success'), 'success');
+  }).catch(() => {
+    // Fallback
+    const textarea = document.createElement('textarea');
+    textarea.value = omUserId;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    showToast(t('copy.function.success'), 'success');
+  });
+}
+
+// Update OM User ID display
+function updateOmUserIdDisplay() {
+  const omUserId = localStorage.getItem('omUserId');
+  const display = document.getElementById('om-user-id-display');
+  if (omUserId) {
+    display.textContent = omUserId.substring(0, 12) + '...' + omUserId.substring(omUserId.length - 8);
+  } else {
+    display.textContent = 'Not logged in';
+  }
+}
+
+
+// ===== MODAL HELPERS =====
+
+// Show confirmation modal (returns Promise<boolean>)
+function showConfirmModal({ title, message, highlight, details, confirmText = 'Confirm', cancelText = 'Cancel' }) {
+  return new Promise((resolve) => {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'customConfirmModal';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      padding: 20px;
+      box-sizing: border-box;
+    `;
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      max-width: 28rem;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      z-index: 999999;
+    `;
+
+    modalContent.innerHTML = `
+      <h3 class="text-xl font-semibold mb-4 text-white">${title}</h3>
+      <div class="mb-4">
+        <p class="text-gray-300">${message}</p>
+        ${highlight ? `<p class="text-blue-400 font-mono text-sm bg-gray-800 p-2 rounded mt-2 break-all">${highlight}</p>` : ''}
+        ${details ? `<p class="text-gray-400 text-sm mt-2">${details}</p>` : ''}
+      </div>
+      <div style="display: flex; gap: 33px;">
+		<button id="confirmCancelBtn" class="mode-btn" style="flex: 1; background-color: #374151; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#4B5563'" onmouseout="this.style.backgroundColor='#374151'">
+		  ${cancelText}
+		</button>
+		<button id="confirmOkBtn" class="mode-btn" style="flex: 1; background-color: #2563EB; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#1D4ED8'" onmouseout="this.style.backgroundColor='#2563EB'">
+		  ${confirmText}
+		</button>
+      </div>
+    `;
+
+    overlay.appendChild(modalContent);
+    document.body.appendChild(overlay);
+
+    const modal = document.getElementById('customConfirmModal');
+    const cancelBtn = document.getElementById('confirmCancelBtn');
+    const okBtn = document.getElementById('confirmOkBtn');
+    
+    // Handle cancel
+    const handleCancel = () => {
+      modal.remove();
+      resolve(false);
+    };
+    
+    // Handle confirm
+    const handleConfirm = () => {
+      modal.remove();
+      resolve(true);
+    };
+    
+    cancelBtn.addEventListener('click', handleCancel);
+    okBtn.addEventListener('click', handleConfirm);
+    
+    // Close on escape
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        modal.remove();
+        resolve(false);
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    
+    // Close on click outside
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.remove();
+        resolve(false);
+        document.removeEventListener('keydown', handleEscape);
+      }
+    });
+  });
+}
+
+// Show input modal (returns Promise<string | null>)
+function showInputModal({ title, message, placeholder = '', confirmText = 'Confirm', cancelText = 'Cancel', warning = '', warningClass = 'text-blue-500 text-sm mt-2' }) {
+  return new Promise((resolve) => {
+    // Create overlay
+    const overlay = document.createElement('div');
+    overlay.id = 'customInputModal';
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 999999;
+      padding: 20px;
+      box-sizing: border-box;
+    `;
+
+    // Create modal content
+    const modalContent = document.createElement('div');
+    modalContent.style.cssText = `
+      background: #111827;
+      border: 1px solid #374151;
+      border-radius: 12px;
+      max-width: 28rem;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      position: relative;
+      z-index: 999999;
+    `;
+
+    // Create HTML content
+    let warningHTML = '';
+    if (warning) {
+      warningHTML = `<div style="color: #FDA4AF; font-size: 14px; margin-top: 8px;">${warning}</div>`;
+    }
+	
+    modalContent.innerHTML = `
+      <h3 class="text-xl font-semibold mb-4 text-white">${title}</h3>
+      <div class="mb-4">
+        <p class="text-gray-300 mb-3">${message}</p>
+        <input type="text" id="modalInput" 
+          class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-blue-500 transition"
+          placeholder="${placeholder}"
+          autocomplete="off"
+        />
+		${warningHTML}
+      </div>
+      <div style="display: flex; gap: 33px;">
+		<button id="inputCancelBtn" class="mode-btn" style="flex: 1; background-color: #374151; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#4B5563'" onmouseout="this.style.backgroundColor='#374151'">
+		  ${cancelText}
+		</button>
+		<button id="inputOkBtn" class="mode-btn" style="flex: 1; background-color: #2563EB; color: white; padding: 8px 16px; border-radius: 8px; font-weight: 500; border: none; cursor: pointer; transition: background-color 0.2s;" onmouseover="this.style.backgroundColor='#1D4ED8'" onmouseout="this.style.backgroundColor='#2563EB'">
+		  ${confirmText}
+		</button>
+      </div>
+    `;
+
+    overlay.appendChild(modalContent);
+    document.body.appendChild(overlay);
+
+    const modal = document.getElementById('customInputModal');
+    const input = document.getElementById('modalInput');
+    const cancelBtn = document.getElementById('inputCancelBtn');
+    const okBtn = document.getElementById('inputOkBtn');
+    
+    // Handle cancel
+    const handleCancel = () => {
+      modal.remove();
+      resolve(null);
+    };
+    
+    // Handle confirm
+    const handleConfirm = () => {
+      const val = input.value.trim();
+      modal.remove();
+      resolve(val || null);
+    };
+    
+    cancelBtn.addEventListener('click', handleCancel);
+    okBtn.addEventListener('click', handleConfirm);
+    
+    // Focus input
+    setTimeout(() => input.focus(), 100);
+    
+    // Enter key submits
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const val = this.value.trim();
+        modal.remove();
+        resolve(val || null);
+      }
+    });
+    
+    // Escape cancels
+    const handleEscape = (e) => {
+      if (e.key === 'Escape') {
+        modal.remove();
+        resolve(null);
+        document.removeEventListener('keydown', handleEscape);
+      }
+    };
+    document.addEventListener('keydown', handleEscape);
+    
+    // Click outside cancels
+    modal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        this.remove();
+        resolve(null);
+        document.removeEventListener('keydown', handleEscape);
+      }
+    });
+  });
+}
 
 
 // Magical sparkle effect on manifestation text
@@ -14824,6 +15639,7 @@ async function setLanguage(lang) {
   loadSacredLines();
   renderVideoList();
   renderPDFList();
+  updateBackupUI();
   await loadQuotes();
 }
 
@@ -15190,6 +16006,9 @@ document.getElementById('storage-faq-label-version').textContent = t('storage_fa
 document.getElementById('storage-faq-label-updated').textContent = t('storage_faq_label_updated');
 document.getElementById('storage-faq-note').textContent = t('storage_faq_note');
 
+document.getElementById('user-id-display').textContent = t('userId');
+
+
 document.getElementById('clear-modal-heading').textContent = t('clear_modal_heading');
 document.getElementById('clear-modal-description').textContent = t('clear_modal_description');
 document.getElementById('clear-modal-note').textContent = t('clear_modal_note');
@@ -15306,6 +16125,23 @@ document.getElementById('yogi-config-intention-desc').textContent = t('intention
 document.getElementById('yogi-config-intention-privacy').textContent = t('intention.privacy');
 document.getElementById('manifestation-input').placeholder = t('intention.placeholder');
 document.getElementById('yogi-progress-intention-label').textContent = t('intention.label2');
+  
+document.getElementById('backup-title').textContent = t('backup.title');
+document.getElementById('backup-description').textContent = t('backup.description');
+document.getElementById('backup-label-last').textContent = t('backup.label.last');
+document.getElementById('backup-label-status').textContent = t('backup.label.status');
+document.getElementById('backup-btn-text').textContent = t('backup.button.backup');
+document.getElementById('restore-btn-text').textContent = t('backup.button.restore');
+document.getElementById('delete-backup-btn-text').textContent = t('backup.button.delete');
+document.getElementById('backup-info-content').textContent = t('backup.info.encryption');
+ 
+document.getElementById('restore-modal-title-text').textContent = t('restore.modal.title');
+document.getElementById('restore-modal-description').textContent = t('restore.modal.description');
+document.getElementById('restore-modal-warning-text').textContent = t('restore.modal.warning');
+document.getElementById('restore-modal-label').textContent = t('restore.modal.label');
+document.getElementById('restore-modal-cancel-text').textContent = t('restore.modal.button.cancel');
+document.getElementById('restore-modal-restore-text').textContent = t('restore.modal.button.restore');
+document.getElementById('restoreErrorMessage').textContent = t('restore.modal.error');
   
 }
 
