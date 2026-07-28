@@ -474,7 +474,7 @@
 "backup.button.backup": "Copiar en la nube",
 "backup.button.restore": "Restaurar desde la nube",
 "backup.button.delete": "Eliminar copia de seguridad en la nube",
-"backup.info.encryption": "Los datos se cifran con tu ID de usuario. Solo tú puedes acceder a ellos.",
+"backup.info.encryption": "Tu copia de seguridad se almacena de forma segura y se restaura usando tu ID de usuario.",
 "restore.modal.title": "Restaurar desde la nube",
 "restore.modal.description": "Ingresa tu ID de usuario para restaurar tu copia de seguridad. Puedes encontrarlo en tu billetera o en tu inicio de sesión anterior.",
 "restore.modal.warning": "Tu ID de usuario es único para ti. Asegúrate de ingresar el ID correcto utilizado para tu copia de seguridad.",

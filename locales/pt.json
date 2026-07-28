@@ -474,7 +474,7 @@
 "backup.button.backup": "Fazer backup na nuvem",
 "backup.button.restore": "Restaurar da nuvem",
 "backup.button.delete": "Excluir backup na nuvem",
-"backup.info.encryption": "Os dados são criptografados com seu ID de usuário. Apenas você pode acessá-los.",
+"backup.info.encryption": "Seu backup é armazenado com segurança e restaurado usando seu ID de usuário.",
 "restore.modal.title": "Restaurar da nuvem",
 "restore.modal.description": "Digite seu ID de usuário para restaurar seu backup. Você pode encontrá-lo em sua carteira ou no login anterior.",
 "restore.modal.warning": "Seu ID de usuário é único para você. Certifique-se de inserir o ID correto usado para seu backup.",

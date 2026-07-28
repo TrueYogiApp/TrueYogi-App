@@ -475,7 +475,7 @@
 "backup.button.backup": "Esegui backup nel cloud",
 "backup.button.restore": "Ripristina dal cloud",
 "backup.button.delete": "Elimina backup cloud",
-"backup.info.encryption": "I dati sono crittografati con il tuo ID utente. Solo tu puoi accedervi.",
+"backup.info.encryption": "Il tuo backup è archiviato in modo sicuro e ripristinato utilizzando il tuo ID utente.",
 "restore.modal.title": "Ripristina dal cloud",
 "restore.modal.description": "Inserisci il tuo ID utente per ripristinare il tuo backup. Puoi trovarlo nel tuo portafoglio o nell'accesso precedente.",
 "restore.modal.warning": "Il tuo ID utente è univoco per te. Assicurati di inserire l'ID corretto utilizzato per il tuo backup.",

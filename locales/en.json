@@ -480,7 +480,7 @@
 "backup.button.backup": "Backup to Cloud",
 "backup.button.restore": "Restore from Cloud",
 "backup.button.delete": "Delete Cloud Backup",
-"backup.info.encryption": "Data is encrypted with your user ID. Only you can access it.",
+"backup.info.encryption": "Your backup is stored securely and restored using your User ID.",
 "restore.modal.title": "Restore from Cloud",
 "restore.modal.description": "Enter your User ID to restore your backup. You can find this in your wallet or previous login.",
 "restore.modal.warning": "Your User ID is unique to you. Make sure you enter the correct one used for your backup.",

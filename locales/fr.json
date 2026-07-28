@@ -479,7 +479,7 @@
 "backup.button.backup": "Sauvegarder dans le cloud",
 "backup.button.restore": "Restaurer à partir du cloud",
 "backup.button.delete": "Supprimer la sauvegarde cloud",
-"backup.info.encryption": "Les données sont cryptées avec votre ID utilisateur. Seul vous pouvez y accéder.",
+"backup.info.encryption": "Votre sauvegarde est stockée en toute sécurité et restaurée à l'aide de votre identifiant utilisateur.",
 "restore.modal.title": "Restaurer à partir du cloud",
 "restore.modal.description": "Entrez votre ID d'utilisateur pour restaurer votre sauvegarde. Vous pouvez le trouver dans votre portefeuille ou votre précédente connexion.",
 "restore.modal.warning": "Votre ID d'utilisateur vous est unique. Assurez-vous d'entrer le bon ID utilisé pour votre sauvegarde.",

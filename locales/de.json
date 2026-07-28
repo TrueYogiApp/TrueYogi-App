@@ -474,7 +474,7 @@
 "backup.button.backup": "In der Cloud sichern",
 "backup.button.restore": "Aus der Cloud wiederherstellen",
 "backup.button.delete": "Cloud-Sicherung löschen",
-"backup.info.encryption": "Daten werden mit Ihrer Benutzer-ID verschlüsselt. Nur Sie können darauf zugreifen.",
+"backup.info.encryption": "Ihr Backup wird sicher gespeichert und mit Ihrer Benutzer-ID wiederhergestellt.",
 "restore.modal.title": "Aus der Cloud wiederherstellen",
 "restore.modal.description": "Geben Sie Ihre Benutzer-ID ein, um Ihre Sicherung wiederherzustellen. Sie finden sie in Ihrer Brieftasche oder bei Ihrer vorherigen Anmeldung.",
 "restore.modal.warning": "Ihre Benutzer-ID ist nur für Sie eindeutig. Stellen Sie sicher, dass Sie die richtige ID eingeben, die für Ihre Sicherung verwendet wird.",

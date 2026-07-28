@@ -475,7 +475,7 @@
 "backup.button.backup": "备份到云端",
 "backup.button.restore": "从云端恢复",
 "backup.button.delete": "删除云备份",
-"backup.info.encryption": "数据已使用您的用户ID加密。只有您可以访问它。",
+"backup.info.encryption": "您的备份被安全存储，并使用您的用户ID进行恢复。",
 "restore.modal.title": "从云端恢复",
 "restore.modal.description": "输入您的用户ID以恢复您的备份。您可以在您的钱包或之前的登录中找到它。",
 "restore.modal.warning": "您的OM用户ID对您是唯一的。确保输入用于备份的正确ID。",

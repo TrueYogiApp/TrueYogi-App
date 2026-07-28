@@ -474,7 +474,7 @@
 "backup.button.backup": "クラウドにバックアップ",
 "backup.button.restore": "クラウドから復元",
 "backup.button.delete": "クラウドバックアップを削除",
-"backup.info.encryption": "データはユーザーIDで暗号化されます。あなただけがアクセスできます。",
+"backup.info.encryption": "バックアップは安全に保存され、ユーザーIDを使用して復元されます。",
 "restore.modal.title": "クラウドから復元",
 "restore.modal.description": "バックアップを復元するにはユーザーIDを入力してください。ウォレットまたは前回のログインで見つけることができます。",
 "restore.modal.warning": "あなたのユーザーIDはあなたに固有です。バックアップに使用した正しいIDを入力していることを確認してください。",
