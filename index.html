@@ -11664,7 +11664,7 @@ function enforceClaimBeforeProceeding() {
   }
 }
 
-function refreshPageIfStale(thresholdHours = 24) {
+function refreshPageIfStale(thresholdHours = 72) {
   // Check if offline
   if (!navigator.onLine) {
     console.log('Device is offline, skipping refresh');
@@ -23545,7 +23545,8 @@ function canSwipe() {
       (finalSection && !finalSection.classList.contains('hidden')))
     return false;
   // Block if any overlay/modal
-  const modalBlocks = ['mobile-wallet-modal','spaceship-modal','challenge-history-modal','wallet-required-modal','missed-session-modal','mobile-required-modal','reset-confirmation-modal','session-time-modal','next-session-modal','yogi-config-modal'];
+   const modalBlocks = ['customInputModal','customConfirmModal','restoreModal','clear-modal-backdrop','offline-modal-backdrop','clearCacheModal','full-reset-confirmation-modal','mobile-wallet-modal',
+  'spaceship-modal','challenge-history-modal','wallet-required-modal','missed-session-modal','mobile-required-modal','reset-confirmation-modal','session-time-modal','next-session-modal','yogi-config-modal'];
   for (let id of modalBlocks) {
     const m = document.getElementById(id);
     if (m && !m.classList.contains('hidden')) return false;
