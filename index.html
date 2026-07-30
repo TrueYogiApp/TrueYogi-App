@@ -19436,42 +19436,43 @@ async function showCountryUserListPopup(country, x, y) {
     return;
   }
 
-// Step 2: Fetch ALL sessions for these users (across all countries) for streak calculation
-  // Include started_at AND last_heartbeat
-  let { data: allUserSessions, error: sessionsError } = await supabase
-    .from('om_sessions')
-    .select('user_id, started_at, last_heartbeat')
-    .in('user_id', uniqueUserIds)
-    .order('started_at', { ascending: false });
+// Step 2: Fetch sessions for these users ONLY in this country
+// Include started_at AND last_heartbeat
+let { data: countryUserSessions, error: sessionsError } = await supabase
+  .from('om_sessions')
+  .select('user_id, started_at, last_heartbeat, country')
+  .in('user_id', uniqueUserIds)
+  .eq('country', country)  // Filter by the specific country
+  .order('started_at', { ascending: false });
 
-  if (sessionsError) {
-    console.error('Error fetching user sessions:', sessionsError);
-  }
+if (sessionsError) {
+  console.error('Error fetching user sessions:', sessionsError);
+}
 
-  // Group sessions by user for streak calculation
-  const userAllSessions = {};
-  const userAllHeartbeats = {};
-  if (allUserSessions) {
-    allUserSessions.forEach(session => {
-      if (!session.user_id) return;
-      
-      // Collect started_at timestamps
-      if (!userAllSessions[session.user_id]) {
-        userAllSessions[session.user_id] = [];
-      }
-      if (session.started_at) {
-        userAllSessions[session.user_id].push(session.started_at);
-      }
-      
-      // Collect last_heartbeat timestamps
-      if (!userAllHeartbeats[session.user_id]) {
-        userAllHeartbeats[session.user_id] = [];
-      }
-      if (session.last_heartbeat) {
-        userAllHeartbeats[session.user_id].push(session.last_heartbeat);
-      }
-    });
-  }
+// Group sessions by user for streak calculation (country-specific)
+const userCountrySessions = {};
+const userCountryHeartbeats = {};
+if (countryUserSessions) {
+  countryUserSessions.forEach(session => {
+    if (!session.user_id) return;
+    
+    // Collect started_at timestamps
+    if (!userCountrySessions[session.user_id]) {
+      userCountrySessions[session.user_id] = [];
+    }
+    if (session.started_at) {
+      userCountrySessions[session.user_id].push(session.started_at);
+    }
+    
+    // Collect last_heartbeat timestamps
+    if (!userCountryHeartbeats[session.user_id]) {
+      userCountryHeartbeats[session.user_id] = [];
+    }
+    if (session.last_heartbeat) {
+      userCountryHeartbeats[session.user_id].push(session.last_heartbeat);
+    }
+  });
+}
 
 // Calculate streak using BOTH started_at AND last_heartbeat
 const calculateUserStreak = (sessionTimestamps, userHeartbeats) => {
@@ -19633,7 +19634,9 @@ const hasYesterdayActivity = (sessionTimestamps, userHeartbeats) => {
   if (userIds.length === 0) {
     listPopup.innerHTML = "<i>No users found for this country.</i>";
   } else {
-    const liveIds = new Set(livePresenceRows.map(row => row.user_id));
+	// Filter live presence rows to only those in this country
+	const liveInCountry = livePresenceRows.filter(row => row.country === country);
+	const liveIds = new Set(liveInCountry.map(row => row.user_id));
     const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
       <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
     </svg>`;
@@ -19663,12 +19666,12 @@ const hasYesterdayActivity = (sessionTimestamps, userHeartbeats) => {
         const isLive = liveIds.has(id);
         const recentTime = formatRecentTime(userSessions[id].latestSession);
         // Get streak from ALL sessions, not just this country
-        const allUserTimestamps = userAllSessions[id] || [];
-		const allUserHeartbeatsList = userAllHeartbeats[id] || [];
-		const streak = calculateUserStreak(allUserTimestamps, allUserHeartbeatsList);
+		const userTimestamps = userCountrySessions[id] || [];
+		const userHeartbeatsList = userCountryHeartbeats[id] || [];
+		const streak = calculateUserStreak(userTimestamps, userHeartbeatsList);
 		const hasStreak = streak > 0;
-		const bestStreak = calculateBestStreak(allUserTimestamps, allUserHeartbeatsList);
-		const hasYesterday = hasYesterdayActivity(allUserTimestamps, allUserHeartbeatsList);
+		const bestStreak = calculateBestStreak(userTimestamps, userHeartbeatsList);
+		const hasYesterday = hasYesterdayActivity(userTimestamps, userHeartbeatsList);
 		const showGrayStreak = !hasStreak && hasYesterday && bestStreak > 0;
 		const showBestStreak = !hasStreak && !hasYesterday && bestStreak > 0;
         
