@@ -2986,6 +2986,11 @@ body.modal-open {
   animation: breathe 3s ease-in-out infinite;
 }
 
+/* Add this for the info button */
+.info-glow {
+  animation: breathe 3s ease-in-out infinite;
+}
+
 @keyframes modalBreathe {
   0%, 100% {
     transform: scale(1);
@@ -3540,7 +3545,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
       <span id="info-section-line3"> Ending early will mark the session as incomplete.</span><br>
       <span class="text-yellow-300" id="info-section-line4">During the session, remember: meditation continues even if life interrupts. As long as you gently return to your breath and awareness, your presence is the practice.</span>
     </div>
-    <div class="flex justify-center gap-4">
+    <div class="flex justify-center gap-4 mt-6">
       <button onclick="confirmStartMeditation()" class="mode-btn bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-4 py-2 rounded-lg font-medium cursor-pointer">
         Begin Stillness
       </button>
