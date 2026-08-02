@@ -6059,6 +6059,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   <div style="display:flex;gap:10px;justify-content:center;padding:12px 0 0 0;">
     <button id="tab-pdf" class="mode-btn dashboard-tab dashboard-tab-active">📚 PDFs</button>
     <button id="tab-video" class="mode-btn dashboard-tab">🎬 Videos</button>
+	<button id="tab-seeds" class="mode-btn dashboard-tab">🌱 Seeds</button>
 	<button id="tab-live" class="mode-btn dashboard-tab">
   <span class="live-dot"></span> Live
 </button>
@@ -6125,6 +6126,11 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 </div>
 
 <div id="live-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;"></div>
+
+<div id="seeds-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;">
+  <div id="seeds-container"></div>
+</div>
+
 
   <!-- PDF Viewer Overlay (same as before) -->
   <div id="pdf-viewer-overlay" style="
@@ -6417,25 +6423,33 @@ document.getElementById('tab-pdf').onclick = function() {
   document.getElementById('pdf-list').style.display = '';
   document.getElementById('video-list').style.display = 'none';
   document.getElementById('live-list').style.display = 'none';
+  document.getElementById('seeds-list').style.display = 'none';  // <-- ADD THIS
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-video').classList.remove('dashboard-tab-active');
   document.getElementById('tab-live').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-seeds').classList.remove('dashboard-tab-active');  // <-- ADD THIS
 };
+
 document.getElementById('tab-video').onclick = function() {
   document.getElementById('video-list').style.display = '';
   document.getElementById('pdf-list').style.display = 'none';
   document.getElementById('live-list').style.display = 'none';
+  document.getElementById('seeds-list').style.display = 'none';  // <-- ADD THIS
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
   document.getElementById('tab-live').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-seeds').classList.remove('dashboard-tab-active');  // <-- ADD THIS
 };
+
 document.getElementById('tab-live').onclick = function() {
   document.getElementById('live-list').style.display = '';
   document.getElementById('pdf-list').style.display = 'none';
   document.getElementById('video-list').style.display = 'none';
+  document.getElementById('seeds-list').style.display = 'none';  // <-- ADD THIS
   this.classList.add('dashboard-tab-active');
   document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
   document.getElementById('tab-video').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-seeds').classList.remove('dashboard-tab-active');  // <-- ADD THIS
 };
 
 function clearAllIdleTimeouts() {
@@ -6784,6 +6798,522 @@ function renderLiveList() {
     list.insertAdjacentHTML('beforeend', html);
   });
 }
+
+
+// === SEEDS ===
+let seedsData = [];
+let selectedFile = null;
+
+// Check if authorized based on challenge history
+function canPost() {
+  try {
+    // Get challenge history from localStorage
+    const historyData = localStorage.getItem('challengeHistory');
+    if (!historyData) return false;
+    
+    const history = JSON.parse(historyData);
+    
+    // Check if user has at least 1 completed challenge
+    // You can change this to 3 if you want
+    return history.length >= 1;
+  } catch (e) {
+    console.error('Error checking challenge history:', e);
+    return false;
+  }
+}
+
+// Fetch seeds
+async function loadSeeds() {
+  try {
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/api/seeds');
+    const data = await res.json();
+    if (data.success) {
+      seedsData = data.posts;
+      renderSeeds();
+    }
+  } catch (e) {
+    console.error('Error loading seeds:', e);
+  }
+}
+
+// Render seeds with delete button for authorized user
+function renderSeeds() {
+  const container = document.getElementById('seeds-container');
+  if (seedsData.length === 0) {
+    container.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:40px;">🌱 No seeds yet</div>';
+    return;
+  }
+  
+  const isAuthorized = canPost();
+  
+  // Helper function to truncate user ID
+  function truncateUserId(userId) {
+    if (!userId) return '';
+    if (userId.length <= 6) return userId;
+    return userId.substring(0, 3) + '...' + userId.substring(userId.length - 3);
+  }
+  
+  container.innerHTML = seedsData.map(post => `
+    <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;">
+        <span style="font-weight:600;color:#fef3c7;">${post.author || 'TrueYogi'}</span>
+        <span style="color:#64748b;font-size:12px;">${new Date(post.created_at).toLocaleDateString()}</span>
+        ${isAuthorized ? `
+          <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
+            margin-left:auto;
+            background:rgba(239,68,68,0.2);
+            border:1px solid rgba(239,68,68,0.3);
+            color:#fca5a5;
+            padding:4px 12px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:12px;
+          ">🗑️ Delete</button>
+        ` : ''}
+      </div>
+      ${post.om_user_id ? `
+        <div class="rainbow-number" style="font-size:13px;margin-bottom:10px;opacity:0.8;">
+          ${truncateUserId(post.om_user_id)}
+        </div>
+      ` : ''}
+      ${post.image_url ? `
+        <div style="margin:10px 0;border-radius:8px;overflow:hidden;">
+          <img src="${post.image_url}" style="max-width:100%;max-height:300px;border-radius:8px;" loading="lazy"/>
+        </div>
+      ` : ''}
+      ${post.video_url ? `
+        <div style="margin:10px 0;border-radius:8px;overflow:hidden;">
+          <video src="${post.video_url}" style="max-width:100%;max-height:300px;border-radius:8px;" controls/>
+        </div>
+      ` : ''}
+      <div style="color:#e2e8f0;line-height:1.6;white-space:pre-wrap;">${post.content}</div>
+    </div>
+  `).join('');
+}
+
+// Delete seed
+async function deleteSeed(postId) {
+  // Show confirmation modal
+  showConfirmModal1(
+    'Delete Seed',
+    'Are you sure you want to delete this seed? This action cannot be undone.',
+    async () => {
+      try {
+        const res = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/seeds/${postId}`, {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            om_user_id: localStorage.getItem('omUserId') || ''
+          })
+        });
+        const data = await res.json();
+        if (data.success) {
+          showNotification('✅ Seed deleted successfully!', 'success');
+          loadSeeds();
+        } else {
+          showNotification('❌ ' + data.error, 'error');
+        }
+      } catch (e) {
+        showNotification('❌ Error deleting', 'error');
+      }
+    }
+  );
+}
+
+// Confirmation Modal
+function showConfirmModal1(title, message, onConfirm) {
+  // Remove existing modal if any
+  const existing = document.getElementById('confirm-modal');
+  if (existing) existing.remove();
+  
+  const modal = document.createElement('div');
+  modal.id = 'confirm-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 20001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 350px;
+      width: 90%;
+    ">
+      <div style="text-align:center;margin-bottom:12px;">
+        <div style="font-size:40px;margin-bottom:4px;">🗑️</div>
+        <h3 style="color:#fef3c7;margin:0;font-size:18px;">${title}</h3>
+      </div>
+      
+      <p style="color:#cbd5e1;text-align:center;line-height:1.6;margin:8px 0 20px 0;font-size:14px;">
+        ${message}
+      </p>
+      
+      <div style="display:flex;gap:10px;">
+        <button onclick="closeConfirmModal()" class="mode-btn" style="
+          flex:1;
+          padding:10px;
+          border-radius:8px;
+          border:1px solid rgba(255,255,255,0.1);
+          background:transparent;
+          color:#94a3b8;
+          cursor:pointer;
+          font-size:14px;
+        ">Cancel</button>
+        
+        <button id="confirm-delete-btn" class="mode-btn" style="
+          flex:1;
+          padding:10px;
+          border-radius:8px;
+          border:none;
+          background:#ef4444;
+          color:#fff;
+          font-weight:bold;
+          cursor:pointer;
+          font-size:14px;
+        ">Confirm</button>
+      </div>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+  
+  // Handle confirm button
+  document.getElementById('confirm-delete-btn').onclick = function() {
+    closeConfirmModal();
+    if (onConfirm) onConfirm();
+  };
+  
+  // Close on outside click
+  modal.addEventListener('click', function(e) {
+    if (e.target === modal) {
+      closeConfirmModal();
+    }
+  });
+}
+
+// Close confirmation modal
+function closeConfirmModal() {
+  const modal = document.getElementById('confirm-modal');
+  if (modal) modal.remove();
+}
+
+// Show modal for posting
+function showPostModal() {
+  // Remove existing modal if any
+  const existing = document.getElementById('seed-modal');
+  if (existing) existing.remove();
+  
+  const modal = document.createElement('div');
+  modal.id = 'seed-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0; left: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0,0,0,0.7);
+    z-index: 20000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  `;
+  
+  modal.innerHTML = `
+    <div style="
+      background: #1a1a2e;
+      border-radius: 16px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+    ">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <h3 style="color:#fef3c7;margin:0;">Share Wisdom</h3>
+        <button onclick="closeModal()" style="
+          background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;
+        ">✕</button>
+      </div>
+      
+      <textarea id="modal-content" placeholder="What wisdom would you like to share?" rows="4" style="
+        width:100%;
+        padding:12px;
+        border-radius:8px;
+        border:1px solid rgba(255,255,255,0.1);
+        background:rgba(255,255,255,0.05);
+        color:#e2e8f0;
+        font-size:14px;
+        resize:vertical;
+        font-family:inherit;
+        box-sizing:border-box;
+      "></textarea>
+      
+      <div id="modal-preview" style="display:none;margin:12px 0;position:relative;">
+        <img id="modal-preview-img" src="" style="max-width:100%;max-height:200px;border-radius:8px;"/>
+        <video id="modal-preview-video" src="" style="max-width:100%;max-height:200px;border-radius:8px;" controls/>
+        <button onclick="removeModalMedia()" style="
+          position:absolute;top:4px;right:4px;
+          background:rgba(0,0,0,0.7);color:#fff;
+          border:none;border-radius:50%;width:28px;height:28px;
+          cursor:pointer;font-size:16px;
+        ">✕</button>
+      </div>
+      
+      <div style="display:flex;gap:12px;margin-top:12px;flex-wrap:wrap;">
+        <label for="modal-media-upload" style="
+          padding:8px 16px;
+          border-radius:20px;
+          border:1px solid rgba(255,255,255,0.1);
+          cursor:pointer;
+          color:#94a3b8;
+          font-size:13px;
+          display:inline-flex;
+          align-items:center;
+          gap:6px;
+        ">
+          📎 Add Media
+          <input id="modal-media-upload" type="file" accept="image/*,video/*" style="display:none;" onchange="handleModalMedia(event)"/>
+        </label>
+        <span id="modal-file-name" style="color:#64748b;font-size:12px;align-self:center;"></span>
+      </div>
+      
+      <button onclick="submitSeed()" class="mode-btn" style="
+        width:100%;
+        margin-top:16px;
+        padding:12px;
+        border:none;
+        border-radius:8px;
+        background:linear-gradient(135deg,#facc15,#f59e0b);
+        color:#1a1a2e;
+        font-weight:bold;
+        font-size:16px;
+        cursor:pointer;
+      ">🌱 Post Seed</button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+}
+
+// Close modal
+function closeModal() {
+  const modal = document.getElementById('seed-modal');
+  if (modal) modal.remove();
+  selectedFile = null;
+}
+
+// Handle modal media upload
+function handleModalMedia(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  
+  if (file.size > 10 * 1024 * 1024) {
+    alert('File too large. Maximum size is 10MB.');
+    event.target.value = '';
+    return;
+  }
+  
+  selectedFile = file;
+  document.getElementById('modal-file-name').textContent = file.name;
+  
+  const previewDiv = document.getElementById('modal-preview');
+  const previewImg = document.getElementById('modal-preview-img');
+  const previewVideo = document.getElementById('modal-preview-video');
+  
+  previewDiv.style.display = 'block';
+  
+  if (file.type.startsWith('image/')) {
+    previewImg.style.display = 'block';
+    previewVideo.style.display = 'none';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      previewImg.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  } else if (file.type.startsWith('video/')) {
+    previewImg.style.display = 'none';
+    previewVideo.style.display = 'block';
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      previewVideo.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+// Remove modal media
+function removeModalMedia() {
+  selectedFile = null;
+  document.getElementById('modal-media-upload').value = '';
+  document.getElementById('modal-file-name').textContent = '';
+  document.getElementById('modal-preview').style.display = 'none';
+  document.getElementById('modal-preview-img').src = '';
+  document.getElementById('modal-preview-video').src = '';
+}
+
+// Submit seed with media
+async function submitSeed() {
+  const content = document.getElementById('modal-content').value.trim();
+  if (!content) {
+    showNotification('📝 Please write something to share!', 'warning');
+    return;
+  }
+  
+  const button = document.querySelector('#seed-modal button:last-child');
+  const originalText = button.textContent;
+  button.textContent = 'Posting... 🌱';
+  button.disabled = true;
+  
+  try {
+    const formData = new FormData();
+    formData.append('content', content);
+    formData.append('om_user_id', localStorage.getItem('omUserId') || '');
+    
+    if (selectedFile) {
+      formData.append('media', selectedFile);
+    }
+    
+    const res = await fetch('https://trueyogi-backend-knkq.onrender.com/api/seeds', {
+      method: 'POST',
+      body: formData
+    });
+    
+    const data = await res.json();
+    if (data.success) {
+      showNotification('✅ Seed posted successfully! 🌱', 'success');
+      closeModal();
+      loadSeeds();
+    } else {
+      showNotification('❌ ' + data.error, 'error');
+    }
+  } catch (e) {
+    showNotification('❌ Error posting', 'error');
+  } finally {
+    button.textContent = originalText;
+    button.disabled = false;
+  }
+}
+
+// Notification function - creates a nice toast notification
+function showNotification(message, type = 'info') {
+  // Remove existing notification if any
+  const existing = document.getElementById('seed-notification');
+  if (existing) existing.remove();
+  
+  const colors = {
+    success: '#22c55e',
+    error: '#ef4444',
+    warning: '#facc15',
+    info: '#60a5fa'
+  };
+  
+  const bgColors = {
+    success: 'rgba(34,197,94,0.15)',
+    error: 'rgba(239,68,68,0.15)',
+    warning: 'rgba(250,204,21,0.15)',
+    info: 'rgba(96,165,250,0.15)'
+  };
+  
+  const notification = document.createElement('div');
+  notification.id = 'seed-notification';
+  notification.style.cssText = `
+    position: fixed;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999;
+    padding: 14px 24px;
+    border-radius: 12px;
+    background: #1a1a2e;
+    border: 1px solid ${colors[type]};
+    color: #e2e8f0;
+    font-size: 14px;
+    max-width: 90%;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    animation: slideDown 0.3s ease-out;
+    border-left: 4px solid ${colors[type]};
+  `;
+  
+  notification.innerHTML = message;
+  document.body.appendChild(notification);
+  
+  // Auto remove after 3 seconds
+  setTimeout(() => {
+    if (notification) {
+      notification.style.opacity = '0';
+      notification.style.transition = 'opacity 0.3s';
+      setTimeout(() => {
+        if (notification) notification.remove();
+      }, 300);
+    }
+  }, 3000);
+}
+
+// Add this CSS animation to your styles (or in a style tag)
+// If you don't have a style section, add this:
+// Add this CSS animation
+const styleElement = document.createElement('style');
+styleElement.textContent = `
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      transform: translateX(-50%) translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+  }
+`;
+document.head.appendChild(styleElement);
+document.head.appendChild(styleElement);
+
+// Tab click handler - updated
+document.getElementById('tab-seeds').onclick = function() {
+  document.getElementById('seeds-list').style.display = '';
+  document.getElementById('pdf-list').style.display = 'none';
+  document.getElementById('video-list').style.display = 'none';
+  document.getElementById('live-list').style.display = 'none';
+  
+  this.classList.add('dashboard-tab-active');
+  document.getElementById('tab-pdf').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-video').classList.remove('dashboard-tab-active');
+  document.getElementById('tab-live').classList.remove('dashboard-tab-active');
+  
+  if (seedsData.length === 0) loadSeeds();
+  
+  // Add post button if authorized
+  if (canPost()) {
+    const header = document.querySelector('#seeds-list');
+    if (!document.getElementById('post-seed-btn')) {
+      const btn = document.createElement('button');
+      btn.id = 'post-seed-btn';
+	  btn.className = 'mode-btn';
+      btn.textContent = '🌱 Post Seed';
+      btn.style.cssText = `
+        background: linear-gradient(135deg,#facc15,#f59e0b);
+        color: #1a1a2e;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-weight: bold;
+        cursor: pointer;
+        margin-bottom: 16px;
+        font-size: 15px;
+        width: 100%;
+      `;
+      btn.onclick = showPostModal;
+      header.prepend(btn);
+    }
+  }
+};
 
 </script>
 
