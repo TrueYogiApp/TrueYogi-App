@@ -6914,18 +6914,6 @@ function renderSeeds() {
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;">
         <span style="font-weight:600;color:#fef3c7;">${post.author || 'TrueYogi'}</span>
         <span style="color:#64748b;font-size:12px;">${formatDate(post.created_at)}</span>
-        ${canDelete ? `
-          <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
-            margin-left:auto;
-            background:rgba(239,68,68,0.2);
-            border:1px solid rgba(239,68,68,0.3);
-            color:#fca5a5;
-            padding:4px 12px;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:12px;
-          ">🗑️ Delete</button>
-        ` : ''}
       </div>
       ${post.om_user_id ? `
         <div class="rainbow-number" style="font-size:13px;margin-bottom:10px;opacity:0.8;">
@@ -6943,6 +6931,22 @@ function renderSeeds() {
         </div>
       ` : ''}
       <div style="color:#e2e8f0;line-height:1.6;white-space:pre-wrap;">${post.content}</div>
+      
+      <!-- Delete button at bottom right -->
+      ${canDelete ? `
+        <div style="display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);">
+          <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
+            background:rgba(239,68,68,0.2);
+            border:1px solid rgba(239,68,68,0.3);
+            color:#fca5a5;
+            padding:4px 14px;
+            border-radius:6px;
+            cursor:pointer;
+            font-size:12px;
+            transition:all 0.2s;
+          ">🗑️ Delete</button>
+        </div>
+      ` : ''}
     </div>
   `}).join('');
 }
