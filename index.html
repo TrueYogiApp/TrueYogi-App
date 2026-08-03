@@ -6868,6 +6868,27 @@ async function loadSeeds() {
   }
 }
 
+// Helper function to format date like Twitter/X
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  
+  // Get time in 12-hour format with AM/PM
+  const time = date.toLocaleTimeString('en-US', { 
+    hour: 'numeric', 
+    minute: '2-digit',
+    hour12: true 
+  });
+  
+  // Get date like "Aug 29, 2025"
+  const dateFormatted = date.toLocaleDateString('en-US', { 
+    month: 'short', 
+    day: 'numeric', 
+    year: 'numeric' 
+  });
+  
+  return `${time} · ${dateFormatted}`;
+}
+
 // Render seeds with delete button for authorized user
 function renderSeeds() {
   const container = document.getElementById('seeds-container');
@@ -6892,7 +6913,7 @@ function renderSeeds() {
     <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;">
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;">
         <span style="font-weight:600;color:#fef3c7;">${post.author || 'TrueYogi'}</span>
-        <span style="color:#64748b;font-size:12px;">${new Date(post.created_at).toLocaleDateString()}</span>
+        <span style="color:#64748b;font-size:12px;">${formatDate(post.created_at)}</span>
         ${canDelete ? `
           <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
             margin-left:auto;
