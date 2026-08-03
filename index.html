@@ -6894,7 +6894,7 @@ function renderSeeds() {
         <span style="font-weight:600;color:#fef3c7;">${post.author || 'TrueYogi'}</span>
         <span style="color:#64748b;font-size:12px;">${new Date(post.created_at).toLocaleDateString()}</span>
         ${canDelete ? `
-          <button onclick="deleteSeed('${post.id}')" style="
+          <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
             margin-left:auto;
             background:rgba(239,68,68,0.2);
             border:1px solid rgba(239,68,68,0.3);
@@ -7124,6 +7124,25 @@ function showPostModal() {
         box-sizing:border-box;
       "></textarea>
       
+      <!-- Character counter -->
+      <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;gap:8px;">
+        <span id="char-counter" style="color:#64748b;font-size:12px;">500</span>
+        <div id="char-circle" style="
+          width:20px;
+          height:20px;
+          border-radius:50%;
+          border:2px solid #64748b;
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          font-size:8px;
+          color:#64748b;
+          transition: all 0.2s;
+        ">
+          <span id="char-circle-text">500</span>
+        </div>
+      </div>
+      
       <div id="modal-preview" style="display:none;margin:12px 0;position:relative;">
         <img id="modal-preview-img" src="" style="max-width:100%;max-height:200px;border-radius:8px;"/>
         <video id="modal-preview-video" src="" style="max-width:100%;max-height:200px;border-radius:8px;" controls/>
@@ -7153,7 +7172,7 @@ function showPostModal() {
         <span id="modal-file-name" style="color:#64748b;font-size:12px;align-self:center;"></span>
       </div>
       
-      <button onclick="submitSeed()" class="mode-btn" style="
+      <button id="plant-seed-btn" onclick="submitSeed()" class="mode-btn" style="
         width:100%;
         margin-top:16px;
         padding:12px;
@@ -7164,11 +7183,69 @@ function showPostModal() {
         font-weight:bold;
         font-size:16px;
         cursor:pointer;
+        opacity:0.5;
+        pointer-events:none;
       ">🌱 Plant Seed</button>
     </div>
   `;
   
   document.body.appendChild(modal);
+  
+  // Add character counter logic
+  const textarea = document.getElementById('modal-content');
+  const charCounter = document.getElementById('char-counter');
+  const charCircle = document.getElementById('char-circle');
+  const charCircleText = document.getElementById('char-circle-text');
+  const plantBtn = document.getElementById('plant-seed-btn');
+  const MAX_CHARS = 500;
+  
+  textarea.addEventListener('input', function() {
+    const remaining = MAX_CHARS - this.value.length;
+    
+    // Update counter text
+    charCounter.textContent = remaining;
+    charCircleText.textContent = remaining;
+    
+    // Update colors based on remaining characters
+    if (remaining < 0) {
+      // Over limit
+      charCounter.style.color = '#ef4444';
+      charCircle.style.borderColor = '#ef4444';
+      charCircle.style.color = '#ef4444';
+      plantBtn.style.opacity = '0.3';
+      plantBtn.style.pointerEvents = 'none';
+    } else if (remaining <= 20) {
+      // Getting low
+      charCounter.style.color = '#facc15';
+      charCircle.style.borderColor = '#facc15';
+      charCircle.style.color = '#facc15';
+      plantBtn.style.opacity = '0.7';
+      plantBtn.style.pointerEvents = 'none';
+    } else if (remaining <= 50) {
+      // Getting low
+      charCounter.style.color = '#f59e0b';
+      charCircle.style.borderColor = '#f59e0b';
+      charCircle.style.color = '#f59e0b';
+      plantBtn.style.opacity = '0.7';
+      plantBtn.style.pointerEvents = 'none';
+    } else {
+      // Good
+      charCounter.style.color = '#64748b';
+      charCircle.style.borderColor = '#64748b';
+      charCircle.style.color = '#64748b';
+      plantBtn.style.opacity = '1';
+      plantBtn.style.pointerEvents = 'auto';
+    }
+    
+    // Enable/disable button based on content and limit
+    if (this.value.trim().length > 0 && remaining >= 0) {
+      plantBtn.style.opacity = '1';
+      plantBtn.style.pointerEvents = 'auto';
+    } else {
+      plantBtn.style.opacity = '0.5';
+      plantBtn.style.pointerEvents = 'none';
+    }
+  });
 }
 
 // Close modal
@@ -7230,15 +7307,23 @@ function removeModalMedia() {
 // Submit seed with media
 async function submitSeed() {
   const content = document.getElementById('modal-content').value.trim();
+  const MAX_CHARS = 500;
+  
   if (!content) {
     showNotification('📝 Please write something to share!', 'warning');
     return;
   }
   
-  const button = document.querySelector('#seed-modal button:last-child');
+  if (content.length > MAX_CHARS) {
+    showNotification(`📝 Please limit your post to ${MAX_CHARS} characters.`, 'warning');
+    return;
+  }
+  
+  const button = document.getElementById('plant-seed-btn');
   const originalText = button.textContent;
   button.textContent = 'Posting... 🌱';
   button.disabled = true;
+  button.style.opacity = '0.5';
   
   try {
     const formData = new FormData();
@@ -7267,6 +7352,7 @@ async function submitSeed() {
   } finally {
     button.textContent = originalText;
     button.disabled = false;
+    button.style.opacity = '1';
   }
 }
 
