@@ -6131,6 +6131,38 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   <div id="seeds-container"></div>
 </div>
 
+<!-- Image Viewer Modal -->
+<div id="image-viewer-modal" style="
+  display: none;
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(0,0,0,0.92);
+  z-index: 30000;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 40px 20px;
+  box-sizing: border-box;
+">
+  <div style="
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  ">
+    <img id="image-viewer-img" src="" alt="Full size image" style="
+      max-width: 100%;
+      max-height: 90vh;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.8);
+    "/>
+  </div>
+</div>
+
 
   <!-- PDF Viewer Overlay (same as before) -->
   <div id="pdf-viewer-overlay" style="
@@ -6844,7 +6876,7 @@ function renderSeeds() {
     return;
   }
   
-  const isAuthorized = canPost();
+  const currentUserId = localStorage.getItem('omUserId') || '';
   
   // Helper function to truncate user ID
   function truncateUserId(userId) {
@@ -6853,13 +6885,16 @@ function renderSeeds() {
     return userId.substring(0, 3) + '...' + userId.substring(userId.length - 3);
   }
   
-  container.innerHTML = seedsData.map(post => `
+  container.innerHTML = seedsData.map(post => {
+    const canDelete = canPost() && post.om_user_id === currentUserId;
+    
+    return `
     <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;">
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;">
         <span style="font-weight:600;color:#fef3c7;">${post.author || 'TrueYogi'}</span>
         <span style="color:#64748b;font-size:12px;">${new Date(post.created_at).toLocaleDateString()}</span>
-        ${isAuthorized ? `
-          <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
+        ${canDelete ? `
+          <button onclick="deleteSeed('${post.id}')" style="
             margin-left:auto;
             background:rgba(239,68,68,0.2);
             border:1px solid rgba(239,68,68,0.3);
@@ -6877,8 +6912,8 @@ function renderSeeds() {
         </div>
       ` : ''}
       ${post.image_url ? `
-        <div style="margin:10px 0;border-radius:8px;overflow:hidden;">
-          <img src="${post.image_url}" style="max-width:100%;max-height:300px;border-radius:8px;" loading="lazy"/>
+        <div style="margin:10px 0;border-radius:8px;overflow:hidden;cursor:pointer;" onclick="openImageViewer('${post.image_url}')">
+          <img src="${post.image_url}" style="max-width:100%;max-height:300px;border-radius:8px;display:block;" loading="lazy"/>
         </div>
       ` : ''}
       ${post.video_url ? `
@@ -6888,8 +6923,43 @@ function renderSeeds() {
       ` : ''}
       <div style="color:#e2e8f0;line-height:1.6;white-space:pre-wrap;">${post.content}</div>
     </div>
-  `).join('');
+  `}).join('');
 }
+
+// Open image viewer
+function openImageViewer(imageUrl) {
+  const modal = document.getElementById('image-viewer-modal');
+  const img = document.getElementById('image-viewer-img');
+  
+  img.src = imageUrl;
+  modal.style.display = 'flex';
+  
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+}
+
+// Close image viewer
+function closeImageViewer() {
+  const modal = document.getElementById('image-viewer-modal');
+  modal.style.display = 'none';
+  
+  // Restore body scroll
+  document.body.style.overflow = '';
+}
+
+// Close on ESC key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeImageViewer();
+  }
+});
+
+// Close on click anywhere on the modal background
+document.getElementById('image-viewer-modal').addEventListener('click', function(e) {
+  if (e.target === this) {
+    closeImageViewer();
+  }
+});
 
 // Delete seed
 async function deleteSeed(postId) {
@@ -7035,13 +7105,13 @@ function showPostModal() {
       overflow-y: auto;
     ">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-        <h3 style="color:#fef3c7;margin:0;">Share Wisdom</h3>
+        <h3 style="color:#fef3c7;margin:0;">Plant a Seed</h3>
         <button onclick="closeModal()" style="
           background:none;border:none;color:#94a3b8;font-size:24px;cursor:pointer;
         ">✕</button>
       </div>
       
-      <textarea id="modal-content" placeholder="What wisdom would you like to share?" rows="4" style="
+      <textarea id="modal-content" placeholder="What seed of wisdom would you like to plant today?" rows="4" style="
         width:100%;
         padding:12px;
         border-radius:8px;
@@ -7094,7 +7164,7 @@ function showPostModal() {
         font-weight:bold;
         font-size:16px;
         cursor:pointer;
-      ">🌱 Post Seed</button>
+      ">🌱 Plant Seed</button>
     </div>
   `;
   
@@ -7296,7 +7366,7 @@ document.getElementById('tab-seeds').onclick = function() {
       const btn = document.createElement('button');
       btn.id = 'post-seed-btn';
 	  btn.className = 'mode-btn';
-      btn.textContent = '🌱 Post Seed';
+      btn.textContent = '🌱 Plant a Seed';
       btn.style.cssText = `
         background: linear-gradient(135deg,#facc15,#f59e0b);
         color: #1a1a2e;
