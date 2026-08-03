@@ -540,6 +540,14 @@
 "update.function.never": "أبداً",
 "copy.function.error.notfound": "⚠️ لم يتم العثور على معرف المستخدم",
 "copy.function.success": "✅ تم نسخ معرف المستخدم إلى الحافظة!",
-"delete.function.error.notfound": "❌ لم يتم العثور على نسخة احتياطية لحذفها"
+"delete.function.error.notfound": "❌ لم يتم العثور على نسخة احتياطية لحذفها",
+
+"banner.plant.heading": "هل أنت مستعد لزراعة بذور الحكمة?",
+"banner.plant.description": "أكمل تحديًا لفتح المنشور! 👆",
+"encourage.modal.heading": "هل أنت مستعد لزراعة بذرة؟",
+"encourage.modal.message": "أكمل تحديًا مقدسًا واحدًا على الأقل لفتح القدرة على زراعة البذور.",
+"encourage.modal.why.title": "✨ لماذا تزرع البذور؟",
+"encourage.modal.why.description": "شارك لحظة من الحكمة من رحلتك. قد تلهم بذرة واحدة رحلة شخص آخر.",
+"encourage.modal.button": "متابعة الرحلة"
 
 }

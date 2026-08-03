@@ -545,7 +545,15 @@
 "update.function.never": "ఎప్పుడూ కాదు",
 "copy.function.error.notfound": "⚠️ యూజర్ ID కనుగొనబడలేదు",
 "copy.function.success": "✅ యూజర్ ID క్లిప్‌బోర్డ్‌కు కాపీ చేయబడింది!",
-"delete.function.error.notfound": "❌ తొలగించడానికి బ్యాకప్ కనుగొనబడలేదు"
+"delete.function.error.notfound": "❌ తొలగించడానికి బ్యాకప్ కనుగొనబడలేదు",
+
+"banner.plant.heading": "జ్ఞానం యొక్క విత్తనాలను నాటడానికి సిద్ధమైనారా?",
+"banner.plant.description": "పోస్టింగ్‌ను అన్‌లాక్ చేయడానికి ఒక సవాలను పూర్తి చేయండి! 👆",
+"encourage.modal.heading": "విత్తనం నాటడానికి సిద్ధమైనారా?",
+"encourage.modal.message": "విత్తనాలను నాటే సామర్థ్యాన్ని అన్‌లాక్ చేయడానికి కనీసం ఒక పవిత్ర సవాలును పూర్తి చేయండి.",
+"encourage.modal.why.title": "✨ విత్తనాలను ఎందుకు నాటాలి?",
+"encourage.modal.why.description": "మీ ప్రయాణం నుండి జ్ఞానం యొక్క క్షణాన్ని భాగస్వామ్యం చేయండి. ఒక విత్తనం వేరొకరి ప్రయాణానికి ప్రేరణ కావచ్చు.",
+"encourage.modal.button": "ఆత్మీయ ప్రయాణాన్ని కొనసాగించండి"
 
 
 }

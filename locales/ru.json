@@ -541,6 +541,14 @@
 "update.function.never": "Никогда",
 "copy.function.error.notfound": "⚠️ ID пользователя не найден",
 "copy.function.success": "✅ ID пользователя скопирован в буфер обмена!",
-"delete.function.error.notfound": "❌ Резервная копия для удаления не найдена"
+"delete.function.error.notfound": "❌ Резервная копия для удаления не найдена",
+
+"banner.plant.heading": "Готовы сеять семена мудрости?",
+"banner.plant.description": "Завершите испытание, чтобы разблокировать публикацию! 👆",
+"encourage.modal.heading": "Готовы посадить семя?",
+"encourage.modal.message": "Завершите хотя бы одно святое испытание, чтобы разблокировать возможность сажать семена.",
+"encourage.modal.why.title": "✨ Зачем сажать семена?",
+"encourage.modal.why.description": "Поделитесь моментом мудрости из вашего путешествия. Одно семя может вдохновить путешествие кого-то другого.",
+"encourage.modal.button": "Продолжить путешествие"
   
 }

@@ -545,7 +545,15 @@
 "update.function.never": "Jamais",
 "copy.function.error.notfound": "⚠️ Aucun ID d'utilisateur trouvé",
 "copy.function.success": "✅ ID d'utilisateur copié dans le presse-papiers!",
-"delete.function.error.notfound": "❌ Aucune sauvegarde trouvée à supprimer"
+"delete.function.error.notfound": "❌ Aucune sauvegarde trouvée à supprimer",
+
+"banner.plant.heading": "Prêt à planter des graines de sagesse?",
+"banner.plant.description": "Complétez un défi pour déverrouiller l'affichage! 👆",
+"encourage.modal.heading": "Prêt à planter une graine?",
+"encourage.modal.message": "Complétez au moins un défi sacré pour déverrouiller la capacité à planter des graines.",
+"encourage.modal.why.title": "✨ Pourquoi planter des graines?",
+"encourage.modal.why.description": "Partagez un moment de sagesse de votre voyage. Une seule graine peut inspirer le voyage de quelqu'un d'autre.",
+"encourage.modal.button": "Continuer le voyage"
   
 
 }

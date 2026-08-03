@@ -546,7 +546,15 @@
 "update.function.never": "Never",
 "copy.function.error.notfound": "⚠️ No User ID found",
 "copy.function.success": "✅ User ID copied to clipboard!",
-"delete.function.error.notfound": "❌ No backup found to delete"
+"delete.function.error.notfound": "❌ No backup found to delete",
+
+"banner.plant.heading": "Ready to plant wisdom seeds?",
+"banner.plant.description": "Complete a challenge to unlock posting! 👆",
+"encourage.modal.heading": "Ready to Plant a Seed?",
+"encourage.modal.message": "Complete at least one Sacred Challenge to unlock the ability to plant Seeds.",
+"encourage.modal.why.title": "✨ Why Plant Seeds?",
+"encourage.modal.why.description": "Share a moment of wisdom from your journey. A single seed may inspire someone else's.",
+"encourage.modal.button": "Continue Journey"
 
 
   

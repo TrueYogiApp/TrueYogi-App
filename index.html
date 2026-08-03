@@ -7513,9 +7513,14 @@ document.getElementById('tab-seeds').onclick = function() {
   
   if (seedsData.length === 0) loadSeeds();
   
+  const header = document.querySelector('#seeds-list');
+  
   // Add post button if authorized
   if (canPost()) {
-    const header = document.querySelector('#seeds-list');
+    // Remove banner if exists
+    const existingBanner = document.getElementById('encourage-banner');
+    if (existingBanner) existingBanner.remove();
+    
     if (!document.getElementById('post-seed-btn')) {
       const btn = document.createElement('button');
       btn.id = 'post-seed-btn';
@@ -7537,45 +7542,42 @@ document.getElementById('tab-seeds').onclick = function() {
       header.prepend(btn);
     }
   } else {
-    // Show encouragement message for users who can't post
-    const header = document.querySelector('#seeds-list');
-    
     // Remove existing button if any
     const existingBtn = document.getElementById('post-seed-btn');
     if (existingBtn) existingBtn.remove();
     
-    // Show encouragement banner if not already shown
-    if (!document.getElementById('encourage-banner')) {
-      const banner = document.createElement('div');
-      banner.id = 'encourage-banner';
-      banner.style.cssText = `
-        background: rgba(250,204,21,0.08);
-        border: 1px solid rgba(250,204,21,0.15);
-        border-radius: 12px;
-        padding: 16px 20px;
-        margin-bottom: 16px;
-        cursor: pointer;
-        transition: all 0.2s;
-      `;
-      banner.innerHTML = `
-        <div style="display:flex;align-items:center;gap:12px;">
-          <span style="font-size:24px;">🌱</span>
-          <div style="flex:1;">
-            <div style="color:#fef3c7;font-weight:600;font-size:14px;">Ready to plant wisdom seeds?</div>
-            <div style="color:#94a3b8;font-size:13px;">Complete a challenge to unlock posting! 👆</div>
-          </div>
-          <span style="color:#facc15;font-size:18px;">→</span>
+    // Always update banner (remove and recreate) - so language changes apply
+    const existingBanner = document.getElementById('encourage-banner');
+    if (existingBanner) existingBanner.remove();
+    
+    const banner = document.createElement('div');
+    banner.id = 'encourage-banner';
+    banner.style.cssText = `
+      background: rgba(250,204,21,0.08);
+      border: 1px solid rgba(250,204,21,0.15);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    banner.innerHTML = `
+      <div style="display:flex;align-items:center;gap:12px;">
+        <span style="font-size:24px;">🌱</span>
+        <div style="flex:1;">
+          <div style="color:#fef3c7;font-weight:600;font-size:14px;">${t('banner.plant.heading')}</div>
+          <div style="color:#94a3b8;font-size:13px;">${t('banner.plant.description')}</div>
         </div>
-      `;
-      banner.onclick = showEncouragementModal;
-      header.prepend(banner);
-    }
+        <span style="color:#facc15;font-size:18px;">→</span>
+      </div>
+    `;
+    banner.onclick = showEncouragementModal;
+    header.prepend(banner);
   }
 };
 
 // Show encouragement modal for users who can't post
 function showEncouragementModal() {
-  // Remove existing modal if any
   const existing = document.getElementById('encourage-modal');
   if (existing) existing.remove();
   
@@ -7608,11 +7610,11 @@ function showEncouragementModal() {
       <div style="font-size:64px;margin-bottom:12px;">🌱</div>
       
       <h3 style="color:#fef3c7;margin:0 0 8px 0;font-size:20px;">
-        Ready to Plant a Seed?
+        ${t('encourage.modal.heading')}
       </h3>
       
       <p style="color:#cbd5e1;font-size:14px;line-height:1.6;margin-bottom:20px;">
-        Complete at least one Sacred Challenge to unlock the ability to plant Seeds.
+        ${t('encourage.modal.message')}
       </p>
       
       <div style="
@@ -7622,10 +7624,9 @@ function showEncouragementModal() {
         padding:16px;
         margin-bottom:20px;
       ">
-        <div style="color:#facc15;font-size:14px;font-weight:600;">✨ Why Plant Seeds?</div>
+        <div style="color:#facc15;font-size:14px;font-weight:600;">${t('encourage.modal.why.title')}</div>
         <div style="color:#94a3b8;font-size:13px;line-height:1.5;margin-top:4px;">
-          Share a moment of wisdom from your journey.
-			A single seed may inspire someone else's.
+          ${t('encourage.modal.why.description')}
         </div>
       </div>
       
@@ -7641,21 +7642,19 @@ function showEncouragementModal() {
           font-size:14px;
           font-weight:500;
           transition:background 0.2s;
-        ">Continue Journey</button>
+        ">${t('encourage.modal.button')}</button>
       </div>
     </div>
   `;
   
   document.body.appendChild(modal);
   
-  // Trigger fade-in animation after a tiny delay
   setTimeout(() => {
     modal.style.opacity = '1';
     const content = modal.querySelector('div > div');
     if (content) content.style.transform = 'scale(1)';
   }, 50);
   
-  // Close on outside click
   modal.addEventListener('click', function(e) {
     if (e.target === modal) {
       closeEncouragementModal();

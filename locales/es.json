@@ -540,6 +540,14 @@
 "update.function.never": "Nunca",
 "copy.function.error.notfound": "⚠️ No se encontró ID de usuario",
 "copy.function.success": "✅ ¡ID de usuario copiado al portapapeles!",
-"delete.function.error.notfound": "❌ No se encontró copia de seguridad para eliminar"
+"delete.function.error.notfound": "❌ No se encontró copia de seguridad para eliminar",
+
+"banner.plant.heading": "¿Listo para plantar semillas de sabiduría?",
+"banner.plant.description": "¡Completa un desafío para desbloquear la publicación! 👆",
+"encourage.modal.heading": "¿Listo para plantar una semilla?",
+"encourage.modal.message": "Completa al menos un desafío sagrado para desbloquear la capacidad de plantar semillas.",
+"encourage.modal.why.title": "✨ ¿Por qué plantar semillas?",
+"encourage.modal.why.description": "Comparte un momento de sabiduría de tu viaje. Una sola semilla puede inspirar el viaje de alguien más.",
+"encourage.modal.button": "Continuar el viaje"
 
 }

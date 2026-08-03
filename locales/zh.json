@@ -541,6 +541,14 @@
 "update.function.never": "从不",
 "copy.function.error.notfound": "⚠️ 找不到用户ID",
 "copy.function.success": "✅ 用户ID已复制到剪贴板!",
-"delete.function.error.notfound": "❌ 找不到要删除的备份"
+"delete.function.error.notfound": "❌ 找不到要删除的备份",
+
+"banner.plant.heading": "准备好种植智慧之种了吗?",
+"banner.plant.description": "完成一项挑战以解锁发布! 👆",
+"encourage.modal.heading": "准备好种植一颗种子吗?",
+"encourage.modal.message": "完成至少一项圣神挑战以解锁种植种子的能力。",
+"encourage.modal.why.title": "✨ 为什么要种植种子?",
+"encourage.modal.why.description": "分享你旅程中的一个智慧时刻。一颗种子可能会激励他人的旅程。",
+"encourage.modal.button": "继续旅程"
 
 }

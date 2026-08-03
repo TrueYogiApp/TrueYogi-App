@@ -540,6 +540,14 @@
 "update.function.never": "Nunca",
 "copy.function.error.notfound": "⚠️ Nenhum ID de usuário encontrado",
 "copy.function.success": "✅ ID de usuário copiado para a área de transferência!",
-"delete.function.error.notfound": "❌ Nenhum backup encontrado para excluir"
+"delete.function.error.notfound": "❌ Nenhum backup encontrado para excluir",
+
+"banner.plant.heading": "Pronto para plantar sementes de sabedoria?",
+"banner.plant.description": "Complete um desafio para desbloquear o envio! 👆",
+"encourage.modal.heading": "Pronto para plantar uma semente?",
+"encourage.modal.message": "Complete pelo menos um desafio sagrado para desbloquear a capacidade de plantar sementes.",
+"encourage.modal.why.title": "✨ Por que plantar sementes?",
+"encourage.modal.why.description": "Compartilhe um momento de sabedoria de sua jornada. Uma única semente pode inspirar a jornada de outra pessoa.",
+"encourage.modal.button": "Continuar a jornada"
 
 }

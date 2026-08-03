@@ -541,7 +541,15 @@
 "update.function.never": "Mai",
 "copy.function.error.notfound": "⚠️ Nessun ID utente trovato",
 "copy.function.success": "✅ ID utente copiato negli appunti!",
-"delete.function.error.notfound": "❌ Nessun backup trovato da eliminare"
+"delete.function.error.notfound": "❌ Nessun backup trovato da eliminare",
+
+"banner.plant.heading": "Pronto a piantare semi di saggezza?",
+"banner.plant.description": "Completa una sfida per sbloccare l'invio! 👆",
+"encourage.modal.heading": "Pronto a piantare un seme?",
+"encourage.modal.message": "Completa almeno una sfida sacra per sbloccare la capacità di piantare semi.",
+"encourage.modal.why.title": "✨ Perché piantare semi?",
+"encourage.modal.why.description": "Condividi un momento di saggezza dal tuo viaggio. Un singolo seme potrebbe ispirare il viaggio di qualcun altro.",
+"encourage.modal.button": "Continua il viaggio"
   
   
 }

@@ -540,7 +540,15 @@
 "update.function.never": "कभी नहीं",
 "copy.function.error.notfound": "⚠️ कोई यूजर ID नहीं मिला",
 "copy.function.success": "✅ यूजर ID क्लिपबोर्ड में कॉपी किया गया!",
-"delete.function.error.notfound": "❌ तौलगाने के लिए कोई बैकअप नहीं मिला"
+"delete.function.error.notfound": "❌ तौलगाने के लिए कोई बैकअप नहीं मिला",
+
+"banner.plant.heading": "ज्ञान के बीज बोने के लिए तैयार हैं?",
+"banner.plant.description": "पोस्टिंग अनलॉक करने के लिए एक चुनौती पूरी करें! 👆",
+"encourage.modal.heading": "एक बीज बोने के लिए तैयार हैं?",
+"encourage.modal.message": "बीज बोने की क्षमता को अनलॉक करने के लिए कम से कम एक पवित्र चुनौती को पूरा करें।",
+"encourage.modal.why.title": "✨ बीज क्यों बोएं?",
+"encourage.modal.why.description": "अपनी यात्रा से ज्ञान का एक पल साझा करें। एक ही बीज किसी और की यात्रा को प्रेरित कर सकता है।",
+"encourage.modal.button": "यात्रा जारी रखें"
 
 
 }
