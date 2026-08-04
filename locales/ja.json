@@ -548,6 +548,9 @@
 "encourage.modal.message": "種を植える能力を解き放つために、少なくとも1つの神聖なチャレンジを完了してください。",
 "encourage.modal.why.title": "✨ なぜ種を植えるのか?",
 "encourage.modal.why.description": "あなたの旅から知恵のひとときを共有してください。1つの種が他の人の旅にインスピレーションを与えるかもしれません。",
-"encourage.modal.button": "旅を続ける"
+"encourage.modal.button": "旅を続ける",
+
+"seeds.empty.myseeds": "🌱 まだ何の種も植えていません",
+"seeds.empty.all": "🌱 まだ種がありません"
   
 }

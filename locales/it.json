@@ -549,7 +549,10 @@
 "encourage.modal.message": "Completa almeno una sfida sacra per sbloccare la capacità di piantare semi.",
 "encourage.modal.why.title": "✨ Perché piantare semi?",
 "encourage.modal.why.description": "Condividi un momento di saggezza dal tuo viaggio. Un singolo seme potrebbe ispirare il viaggio di qualcun altro.",
-"encourage.modal.button": "Continua il viaggio"
+"encourage.modal.button": "Continua il viaggio",
+
+"seeds.empty.myseeds": "🌱 Non hai ancora piantato alcun seme",
+"seeds.empty.all": "🌱 Nessun seme ancora"
   
   
 }

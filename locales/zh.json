@@ -549,6 +549,9 @@
 "encourage.modal.message": "完成至少一项圣神挑战以解锁种植种子的能力。",
 "encourage.modal.why.title": "✨ 为什么要种植种子?",
 "encourage.modal.why.description": "分享你旅程中的一个智慧时刻。一颗种子可能会激励他人的旅程。",
-"encourage.modal.button": "继续旅程"
+"encourage.modal.button": "继续旅程",
+
+"seeds.empty.myseeds": "🌱 您还没有种植任何种子",
+"seeds.empty.all": "🌱 还没有种子"
 
 }

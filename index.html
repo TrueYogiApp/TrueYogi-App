@@ -6928,7 +6928,7 @@ function renderSeedsWithFilter() {
   if (filteredData.length === 0) {
     container.innerHTML = `
       <div style="color:#94a3b8;text-align:center;padding:40px;">
-        ${showMySeedsOnly ? '🌱 You haven\'t planted any seeds yet' : '🌱 No seeds yet'}
+         ${showMySeedsOnly ? t('seeds.empty.myseeds') : t('seeds.empty.all')}
       </div>
     `;
     return;

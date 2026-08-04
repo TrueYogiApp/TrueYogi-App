@@ -554,7 +554,10 @@
 "encourage.modal.message": "Complete at least one Sacred Challenge to unlock the ability to plant Seeds.",
 "encourage.modal.why.title": "✨ Why Plant Seeds?",
 "encourage.modal.why.description": "Share a moment of wisdom from your journey. A single seed may inspire someone else's.",
-"encourage.modal.button": "Continue Journey"
+"encourage.modal.button": "Continue Journey",
+
+"seeds.empty.myseeds": "🌱 You haven't planted any seeds yet",
+"seeds.empty.all": "🌱 No seeds yet"
 
 
   

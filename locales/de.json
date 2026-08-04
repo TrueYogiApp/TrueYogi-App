@@ -548,6 +548,9 @@
 "encourage.modal.message": "Absolvieren Sie mindestens eine heilige Herausforderung, um die Fähigkeit zum Pflanzen von Samen freizuschalten.",
 "encourage.modal.why.title": "✨ Warum Samen pflanzen?",
 "encourage.modal.why.description": "Teilen Sie einen Moment der Weisheit aus Ihrer Reise. Ein einzelner Samen kann die Reise eines anderen inspirieren.",
-"encourage.modal.button": "Reise fortsetzen"
+"encourage.modal.button": "Reise fortsetzen",
+
+"seeds.empty.myseeds": "🌱 Du hast noch keine Samen gepflanzt",
+"seeds.empty.all": "🌱 Noch keine Samen"
 
 }

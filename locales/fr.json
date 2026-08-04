@@ -553,7 +553,10 @@
 "encourage.modal.message": "Complétez au moins un défi sacré pour déverrouiller la capacité à planter des graines.",
 "encourage.modal.why.title": "✨ Pourquoi planter des graines?",
 "encourage.modal.why.description": "Partagez un moment de sagesse de votre voyage. Une seule graine peut inspirer le voyage de quelqu'un d'autre.",
-"encourage.modal.button": "Continuer le voyage"
+"encourage.modal.button": "Continuer le voyage",
+
+"seeds.empty.myseeds": "🌱 Vous n'avez pas encore planté de graines",
+"seeds.empty.all": "🌱 Pas encore de graines"
   
 
 }

@@ -548,7 +548,10 @@
 "encourage.modal.message": "बीज बोने की क्षमता को अनलॉक करने के लिए कम से कम एक पवित्र चुनौती को पूरा करें।",
 "encourage.modal.why.title": "✨ बीज क्यों बोएं?",
 "encourage.modal.why.description": "अपनी यात्रा से ज्ञान का एक पल साझा करें। एक ही बीज किसी और की यात्रा को प्रेरित कर सकता है।",
-"encourage.modal.button": "यात्रा जारी रखें"
+"encourage.modal.button": "यात्रा जारी रखें",
+
+"seeds.empty.myseeds": "🌱 आपने अभी तक कोई बीज नहीं बोया है",
+"seeds.empty.all": "🌱 अभी तक कोई बीज नहीं"
 
 
 }

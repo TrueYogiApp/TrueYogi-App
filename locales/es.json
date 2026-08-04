@@ -548,6 +548,9 @@
 "encourage.modal.message": "Completa al menos un desafío sagrado para desbloquear la capacidad de plantar semillas.",
 "encourage.modal.why.title": "✨ ¿Por qué plantar semillas?",
 "encourage.modal.why.description": "Comparte un momento de sabiduría de tu viaje. Una sola semilla puede inspirar el viaje de alguien más.",
-"encourage.modal.button": "Continuar el viaje"
+"encourage.modal.button": "Continuar el viaje",
+
+"seeds.empty.myseeds": "🌱 Aún no has plantado ninguna semilla",
+"seeds.empty.all": "🌱 Sin semillas aún"
 
 }

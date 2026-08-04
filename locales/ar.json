@@ -548,6 +548,9 @@
 "encourage.modal.message": "أكمل تحديًا مقدسًا واحدًا على الأقل لفتح القدرة على زراعة البذور.",
 "encourage.modal.why.title": "✨ لماذا تزرع البذور؟",
 "encourage.modal.why.description": "شارك لحظة من الحكمة من رحلتك. قد تلهم بذرة واحدة رحلة شخص آخر.",
-"encourage.modal.button": "متابعة الرحلة"
+"encourage.modal.button": "متابعة الرحلة",
+
+"seeds.empty.myseeds": "🌱 لم تزرع أي بذور حتى الآن",
+"seeds.empty.all": "🌱 لا توجد بذور حتى الآن"
 
 }
