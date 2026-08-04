@@ -6861,7 +6861,7 @@ async function loadSeeds() {
     const data = await res.json();
     if (data.success) {
       seedsData = data.posts;
-      renderSeeds();
+      renderSeedsWithFilter(); // Changed from renderSeeds()
     }
   } catch (e) {
     console.error('Error loading seeds:', e);
@@ -6889,66 +6889,104 @@ function formatDate(dateString) {
   return `${time} · ${dateFormatted}`;
 }
 
-// Render seeds with delete button for authorized user
-function renderSeeds() {
+// Filter state
+let showMySeedsOnly = false;
+
+// Toggle between all seeds and my seeds
+function toggleMySeeds() {
+  showMySeedsOnly = !showMySeedsOnly;
+  const btn = document.getElementById('filter-my-seeds-btn');
+  const currentUserId = localStorage.getItem('omUserId') || '';
+  
+  if (showMySeedsOnly) {
+    btn.textContent = '🌱 All Seeds';
+    btn.style.background = 'rgba(250,204,21,0.15)';
+    btn.style.border = '1px solid rgba(250,204,21,0.3)';
+    btn.style.color = '#fef3c7';
+  } else {
+    btn.textContent = '🌱 My Seeds';
+    btn.style.background = 'rgba(255,255,255,0.05)';
+    btn.style.border = '1px solid rgba(255,255,255,0.1)';
+    btn.style.color = '#94a3b8';
+  }
+  
+  // Re-render with filter
+  renderSeedsWithFilter();
+}
+
+// Render seeds with filter
+function renderSeedsWithFilter() {
   const container = document.getElementById('seeds-container');
-  if (seedsData.length === 0) {
-    container.innerHTML = '<div style="color:#94a3b8;text-align:center;padding:40px;">🌱 No seeds yet</div>';
+  const currentUserId = localStorage.getItem('omUserId') || '';
+  
+  // Filter data
+  let filteredData = seedsData;
+  if (showMySeedsOnly && currentUserId) {
+    filteredData = seedsData.filter(post => post.om_user_id === currentUserId);
+  }
+  
+  if (filteredData.length === 0) {
+    container.innerHTML = `
+      <div style="color:#94a3b8;text-align:center;padding:40px;">
+        ${showMySeedsOnly ? '🌱 You haven\'t planted any seeds yet' : '🌱 No seeds yet'}
+      </div>
+    `;
     return;
   }
   
-  const currentUserId = localStorage.getItem('omUserId') || '';
+  // Reuse existing render logic
+  const currentUserIdForRender = currentUserId;
   
-  // Helper function to truncate user ID
   function truncateUserId(userId) {
     if (!userId) return '';
     if (userId.length <= 6) return userId;
     return userId.substring(0, 3) + '...' + userId.substring(userId.length - 3);
   }
   
-  container.innerHTML = seedsData.map(post => {
-    const canDelete = canPost() && post.om_user_id === currentUserId;
+  container.innerHTML = filteredData.map(post => {
+    const canDelete = canPost() && post.om_user_id === currentUserIdForRender;
     
     return `
-    <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;">
-      <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;">
-        <span style="font-weight:600;color:#fef3c7;">${post.author || 'TrueYogi'}</span>
-        <span style="color:#64748b;font-size:12px;">${formatDate(post.created_at)}</span>
+      <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;">
+        <div style="display:flex;gap:10px;align-items:center;margin-bottom:4px;">
+          <span style="font-weight:600;color:#fef3c7;">${post.author || 'TrueYogi'}</span>
+          <span style="color:#64748b;font-size:12px;">${formatDate(post.created_at)}</span>
+        </div>
+        ${post.om_user_id ? `
+          <div class="rainbow-number" style="font-size:13px;margin-bottom:10px;opacity:0.8;">
+            ${truncateUserId(post.om_user_id)}
+          </div>
+        ` : ''}
+        ${post.image_url ? `
+          <div style="margin:10px 0;border-radius:8px;overflow:hidden;cursor:pointer;" onclick="openImageViewer('${post.image_url}')">
+            <img src="${post.image_url}" style="max-width:100%;max-height:300px;border-radius:8px;display:block;" loading="lazy"/>
+          </div>
+        ` : ''}
+        ${post.video_url ? `
+          <div style="margin:10px 0;border-radius:8px;overflow:hidden;">
+            <video src="${post.video_url}" style="max-width:100%;max-height:300px;border-radius:8px;" controls/>
+          </div>
+        ` : ''}
+        <div style="color:#e2e8f0;line-height:1.6;white-space:pre-wrap;">${post.content}</div>
+        
+        <!-- Delete button at bottom right -->
+        ${canDelete ? `
+          <div style="display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);">
+            <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
+              background:rgba(239,68,68,0.2);
+              border:1px solid rgba(239,68,68,0.3);
+              color:#fca5a5;
+              padding:4px 14px;
+              border-radius:6px;
+              cursor:pointer;
+              font-size:12px;
+              transition:all 0.2s;
+            ">🗑️ Delete</button>
+          </div>
+        ` : ''}
       </div>
-      ${post.om_user_id ? `
-        <div class="rainbow-number" style="font-size:13px;margin-bottom:10px;opacity:0.8;">
-          ${truncateUserId(post.om_user_id)}
-        </div>
-      ` : ''}
-      ${post.image_url ? `
-        <div style="margin:10px 0;border-radius:8px;overflow:hidden;cursor:pointer;" onclick="openImageViewer('${post.image_url}')">
-          <img src="${post.image_url}" style="max-width:100%;max-height:300px;border-radius:8px;display:block;" loading="lazy"/>
-        </div>
-      ` : ''}
-      ${post.video_url ? `
-        <div style="margin:10px 0;border-radius:8px;overflow:hidden;">
-          <video src="${post.video_url}" style="max-width:100%;max-height:300px;border-radius:8px;" controls/>
-        </div>
-      ` : ''}
-      <div style="color:#e2e8f0;line-height:1.6;white-space:pre-wrap;">${post.content}</div>
-      
-      <!-- Delete button at bottom right -->
-      ${canDelete ? `
-        <div style="display:flex;justify-content:flex-end;margin-top:12px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.05);">
-          <button onclick="deleteSeed('${post.id}')" class="mode-btn" style="
-            background:rgba(239,68,68,0.2);
-            border:1px solid rgba(239,68,68,0.3);
-            color:#fca5a5;
-            padding:4px 14px;
-            border-radius:6px;
-            cursor:pointer;
-            font-size:12px;
-            transition:all 0.2s;
-          ">🗑️ Delete</button>
-        </div>
-      ` : ''}
-    </div>
-  `}).join('');
+    `;
+  }).join('');
 }
 
 // Open image viewer
@@ -7577,6 +7615,27 @@ document.getElementById('tab-seeds').onclick = function() {
     `;
     banner.onclick = showEncouragementModal;
     header.prepend(banner);
+  }
+    // Add filter toggle button
+  if (!document.getElementById('filter-my-seeds-btn')) {
+    const filterBtn = document.createElement('button');
+    filterBtn.id = 'filter-my-seeds-btn';
+    filterBtn.className = 'mode-btn';
+    filterBtn.textContent = '🌱 My Seeds';
+    filterBtn.style.cssText = `
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: #94a3b8;
+      padding: 8px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 16px;
+      font-size: 13px;
+      width: 100%;
+      transition: all 0.2s;
+    `;
+    filterBtn.onclick = toggleMySeeds;
+    header.prepend(filterBtn);
   }
 };
 
