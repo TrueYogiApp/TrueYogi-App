@@ -2547,6 +2547,18 @@ button[disabled] {
   pointer-events: none;
 }
 
+.blue-animate {
+  color: #60a5fa;
+  animation: blueShine 1.5s linear infinite, breathePulseBlue 3s ease-in-out infinite;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+@keyframes breathePulseBlue {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.08); }
+}
+
+
 .violet-animate {
   color: #8b5cf6;
   animation: violetShine 1.5s linear infinite, breathePulseViolet 3s ease-in-out infinite;
@@ -5422,6 +5434,10 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
       <p class="text-xs text-gray-400">Cancelled</p>
     </div>
   </div>
+  	  <!-- Best Streak Indicator - Full Width Centered -->
+	<div id="best-streak-container" class="text-center mt-1">
+	  <p id="best-streak-indicator" class="text-[10px] text-yellow-400" style="display:none;"></p>
+	</div>
 </div>
 
 
@@ -7786,6 +7802,69 @@ function closeEncouragementModal() {
       challengeStreak: 0 // Add this line
     };
 
+
+ // BEST FLOW STREAK
+function updateFlowStreakDisplay() {
+  // Only run this in Flow mode
+  if (currentMode !== 'flow') {
+    // Hide the indicator if it exists
+    const existingIndicator = document.getElementById('best-streak-indicator');
+    if (existingIndicator) {
+      existingIndicator.style.display = 'none';
+    }
+    return;
+  }
+  
+  const currentStreak = parseInt(document.getElementById('current-streak').textContent) || 0;
+  
+  // Get highest streak from localStorage
+  let highestStreak = parseInt(localStorage.getItem('highestFlowStreak')) || 0;
+  
+  // Update highest streak if current is higher
+  if (currentStreak > highestStreak && currentStreak > 0) {
+    highestStreak = currentStreak;
+    localStorage.setItem('highestFlowStreak', highestStreak.toString());
+    
+    // Add celebration effect
+    const streakElement = document.getElementById('current-streak');
+    streakElement.classList.add('text-yellow-400', 'scale-125', 'transition-all');
+    setTimeout(() => {
+      streakElement.classList.remove('text-yellow-400', 'scale-125');
+    }, 1500);
+  }
+  
+  // Create or update best streak indicator
+  const sharedStats = document.getElementById('shared-stats');
+  let bestIndicator = document.getElementById('best-streak-indicator');
+  
+  if (!bestIndicator) {
+    const row = document.createElement('div');
+    row.className = 'col-span-2 text-center mt-1';
+    row.id = 'best-streak-row';
+    sharedStats.appendChild(row);
+    
+    bestIndicator = document.createElement('p');
+    bestIndicator.id = 'best-streak-indicator';
+    row.appendChild(bestIndicator);
+  }
+  
+  // Show the star and number when current streak is LESS than highest streak
+  // Now shows even when currentStreak is 0
+  if (highestStreak > 0 && currentStreak < highestStreak) {
+    bestIndicator.textContent = `⭐ ${highestStreak}`;
+	bestIndicator.className = 'blue-animate';
+    bestIndicator.style.cssText = `
+      color: #60a5fa;
+      font-weight: 500;
+      font-size: 23px;
+      display: block;
+      margin: 0;
+      opacity: 0.7;
+    `;
+  } else {
+    bestIndicator.style.display = 'none';
+  }
+}
 
 // ===== BACKUP & RESTORE FUNCTIONS =====
 
@@ -15501,6 +15580,8 @@ function updateStats() {
   document.getElementById('current-streak').textContent = streak;
   document.getElementById('cancelled-sessions').textContent = cancelledSessions;
 
+  updateFlowStreakDisplay();
+  
   // If in Yogi mode, ensure progress is updated
   if (currentMode === 'yogi') {
     updateProgressDisplay();
