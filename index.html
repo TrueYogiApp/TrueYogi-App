@@ -7850,12 +7850,12 @@ function updateFlowStreakDisplay() {
   
   // Show when current streak is less than or equal to highest streak
 if (highestStreak > 0 && currentStreak <= highestStreak) {
-    bestIndicator.innerHTML = `<i class="fas fa-fire mr-1"></i> ${highestStreak}`;
+    bestIndicator.innerHTML = `<i class="fas fa-fire mr-1"></i>${highestStreak}`;
     bestIndicator.className = 'blue-animate';
     bestIndicator.style.cssText = `
       color: #60a5fa;
       font-weight: 800;
-      font-size: 26px;
+      font-size: 21px;
       display: block;
       margin: 0;
       opacity: 0.8;
@@ -28920,6 +28920,3 @@ window.addEventListener('online', () => {
             case 'back':
                 if (currentStep > 0) {
                     currentStep--;
-                    showStep(currentStep);
-                }
-           
