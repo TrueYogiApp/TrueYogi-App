@@ -7851,7 +7851,7 @@ function updateFlowStreakDisplay() {
   // Show the star and number when current streak is LESS than highest streak
   // Now shows even when currentStreak is 0
   if (highestStreak > 0 && currentStreak < highestStreak) {
-    bestIndicator.textContent = `⭐ ${highestStreak}`;
+    bestIndicator.innerHTML = `<i class="fas fa-fire mr-1"></i> ${highestStreak}`;
 	bestIndicator.className = 'blue-animate';
     bestIndicator.style.cssText = `
       color: #60a5fa;
