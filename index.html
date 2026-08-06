@@ -7827,7 +7827,7 @@ function updateFlowStreakDisplay() {
     
     // Add celebration effect
     const streakElement = document.getElementById('current-streak');
-    streakElement.classList.add('text-yellow-400', 'scale-125', 'transition-all');
+    streakElement.classList.add('scale-125', 'transition-all');
     setTimeout(() => {
       streakElement.classList.remove('text-yellow-400', 'scale-125');
     }, 1500);
@@ -7849,7 +7849,7 @@ function updateFlowStreakDisplay() {
   }
   
   // Show when current streak is less than or equal to highest streak
-if (highestStreak > 0 && currentStreak <= highestStreak) {
+if (highestStreak > 0 && currentStreak < highestStreak) {
     bestIndicator.innerHTML = `<i class="fas fa-fire mr-1"></i>${highestStreak}`;
     bestIndicator.className = 'blue-animate';
     bestIndicator.style.cssText = `
