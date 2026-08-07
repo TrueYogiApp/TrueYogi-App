@@ -28921,3 +28921,216 @@ window.addEventListener('online', () => {
             case 'back':
                 if (currentStep > 0) {
                     currentStep--;
+                    showStep(currentStep);
+                }
+                break;
+        }
+    }
+
+    function finishWalkthrough() {
+        if (!isActive) return;
+        isActive = false;
+        localStorage.setItem(STORAGE_KEY, 'true');
+        restoreFaqTabDisplay();
+        hideTooltip();
+        hideHighlight();
+        destroyOverlay();
+        destroyHighlight();
+        destroyTooltip();
+        window.removeEventListener('resize', onResize);
+        window.removeEventListener('scroll', onScroll, true);
+        document.removeEventListener('keydown', onKeydown);
+        if (startTimer) {
+            clearTimeout(startTimer);
+            startTimer = null;
+        }
+        isWaitingForModal = false;
+        if (window._resizeObserver) {
+            window._resizeObserver.disconnect();
+            window._resizeObserver = null;
+        }
+    }
+
+    function onResize() {
+        if (!isActive) return;
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+            if (isActive && currentStep < STEPS.length) {
+                const step = STEPS[currentStep];
+                if (step) {
+                    const target = getTargetElement(step.target);
+                    if (target && isElementReady(target)) {
+                        positionTooltip(getRect(target));
+                    }
+                }
+            }
+        }, 100);
+    }
+
+    function onScroll() {
+        if (!isActive) return;
+        
+        if (resizeTimer) {
+            clearTimeout(resizeTimer);
+            resizeTimer = null;
+        }
+        
+        if (currentStep < STEPS.length) {
+            const step = STEPS[currentStep];
+            if (step) {
+                const target = getTargetElement(step.target);
+                if (target && isElementReady(target)) {
+                    const rect = getRect(target);
+                    updateHighlight(rect);
+                    positionTooltip(rect);
+                }
+            }
+        }
+    }
+
+    function onKeydown(e) {
+        if (!isActive) return;
+        if (e.key === 'Escape') {
+            finishWalkthrough();
+            e.preventDefault();
+        }
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+            if (currentStep < STEPS.length - 1) {
+                currentStep++;
+                showStep(currentStep);
+                e.preventDefault();
+            } else {
+                finishWalkthrough();
+                e.preventDefault();
+            }
+        }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+            if (currentStep > 0) {
+                currentStep--;
+                showStep(currentStep);
+                e.preventDefault();
+            }
+        }
+    }
+
+    // ─── WALKTHROUGH START ──────────────────────────────────────────────────
+    function startWalkthrough() {
+        if (localStorage.getItem(STORAGE_KEY) === 'true') {
+            return;
+        }
+        
+        if (isActive) {
+            return;
+        }
+
+        if (isWelcomeModalVisible()) {
+            isWaitingForModal = true;
+            return;
+        }
+
+        if (!document.getElementById('tw-styles')) {
+            injectStyles();
+        }
+
+        isActive = true;
+        isWaitingForModal = false;
+        currentStep = 0;
+
+        createOverlay();
+        createHighlight();
+        createTooltip();
+
+        window.addEventListener('resize', onResize);
+        window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+        document.addEventListener('keydown', onKeydown);
+
+        setTimeout(() => {
+            if (isActive) showStep(0);
+        }, 500);
+    }
+
+    function scheduleWalkthrough() {
+        if (localStorage.getItem(STORAGE_KEY) === 'true') {
+            return;
+        }
+        
+        if (isWelcomeModalVisible()) {
+            isWaitingForModal = true;
+            return;
+        }
+
+        if (startTimer) {
+            clearTimeout(startTimer);
+            startTimer = null;
+        }
+        
+        startTimer = setTimeout(function() {
+            startWalkthrough();
+            startTimer = null;
+        }, DELAY_MS);
+    }
+
+    // ─── HOOK INTO YOUR EXISTING closeWelcomeMessage ──────────────────────
+    function hookIntoCloseWelcome() {
+        const originalClose = window.closeWelcomeMessage;
+
+        if (typeof originalClose === 'function') {
+            window.closeWelcomeMessage = function() {
+                originalClose.apply(this, arguments);
+                isWaitingForModal = false;
+                
+                setTimeout(function() {
+                    if (!localStorage.getItem(STORAGE_KEY)) {
+                        scheduleWalkthrough();
+                    }
+                }, 300);
+            };
+        }
+    }
+
+    // ─── INIT ────────────────────────────────────────────────────────────────
+    function init() {
+        if (localStorage.getItem(STORAGE_KEY) === 'true') {
+            return;
+        }
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(hookIntoCloseWelcome, 500);
+                
+                setTimeout(function() {
+                    if (!localStorage.getItem(STORAGE_KEY)) {
+                        if (isWelcomeModalVisible()) {
+                            isWaitingForModal = true;
+                        } else {
+                            scheduleWalkthrough();
+                        }
+                    }
+                }, 1000);
+            });
+        } else {
+            setTimeout(hookIntoCloseWelcome, 500);
+            
+            setTimeout(function() {
+                if (!localStorage.getItem(STORAGE_KEY)) {
+                    if (isWelcomeModalVisible()) {
+                        isWaitingForModal = true;
+                    } else {
+                        scheduleWalkthrough();
+                    }
+                }
+            }, 1000);
+        }
+    }
+
+    // ─── EXPOSE ──────────────────────────────────────────────────────────────
+    window.startWalkthrough = startWalkthrough;
+    window.scheduleWalkthrough = scheduleWalkthrough;
+
+    // Start
+    init();
+
+})();
+</script>
+</body>
+</html>
