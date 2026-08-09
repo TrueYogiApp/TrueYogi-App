@@ -3449,6 +3449,16 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   animation: slideUp 0.3s ease-out;
 }
 
+/* Hide elements when nebula is active */
+.nebula-active .nebula-hide {
+    opacity: 0 !important;
+    pointer-events: none !important;
+    transition: opacity 0.5s ease;
+}
+
+.nebula-active .nebula-hide-quick {
+    display: none !important;
+}
 
 </style>
   
@@ -4023,14 +4033,14 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     </p>
 
     <div class="space-y-4 mt-6">
-      <button id="flow-mode-btn-select" onclick="selectMode('flow')" class="mode-btn relative w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-start gap-4 cursor-pointer">
+      <button id="flow-mode-btn-select" onclick="selectMode('flow')" class="mode-btn relative w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-start gap-4 cursor-pointer nebula-hide">
         <i class="fa-solid fa-water fa-fade"></i>
         <div class="flex flex-col items-center text-center">
           <span class="text-base leading-tight">Flow</span>
           <span class="text-sm font-normal text-blue-200">Meditate Anytime Freely</span>
         </div>
       </button>
-      <button id="yogi-mode-btn-select" onclick="selectMode('yogi')" class="mode-btn relative w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-start gap-4 cursor-pointer">
+      <button id="yogi-mode-btn-select" onclick="selectMode('yogi')" class="mode-btn relative w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 px-6 py-4 rounded-xl font-semibold text-lg transition flex items-center justify-start gap-4 cursor-pointer nebula-hide">
   <i id="yogi-sun-icon" class="fa-solid fa-sun"></i> <!-- Removed fa-spin here -->
   <div class="flex flex-col items-center text-center">
     <span class="text-base leading-tight">TrueYogi</span>
@@ -4075,7 +4085,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 
 
     <!-- Auth Sections - Side by Side -->
-    <div class="auth-section-container">
+    <div class="auth-section-container nebula-hide">
      <div class="auth-card">
      <h3 class="auth-title">WEB3 SPACE</h3>
     
@@ -25767,6 +25777,10 @@ window.addEventListener('DOMContentLoaded', () => {
   const portal = new Image()
   const bgalaxy = new Image()
 
+  // 🆕 Load nebula image
+  const nebula = new Image()
+  nebula.src = 'assets/nebula.webp'
+  
   // 🧠 Use relative paths correctly
   neptune.src = 'assets/neptune.png'
   pluto.src = 'assets/pluto.png'
@@ -25775,6 +25789,13 @@ window.addEventListener('DOMContentLoaded', () => {
   portal.src = 'assets/portal.png'
   bgalaxy.src = 'assets/bgalaxy.png'
 
+  // 🆕 Nebula display variables
+  let showNebula = false
+  let nebulaTimer = 0
+  let nebulaScheduled = false
+  const NEBULA_DURATION = 30000 // 30 seconds
+  const NEBULA_INTERVAL = 180000 // 3 minutes
+  
   const planets = [
     { img: neptune, orbit: 100, size: 40, angle: Math.random(), speed: 0.0001, get cx() { return canvas.width * 0.2 }, get cy() { return canvas.height * 0.3 } },
     { img: galaxy, orbit: 220, size: 36, angle: Math.random(), speed: 0.0001, get cx() { return canvas.width * 0.3 }, get cy() { return canvas.height * 0.6 } },
@@ -26220,7 +26241,7 @@ const mothership = new Mothership();
 spaceships.push(mothership);
 
   // Wait for all images to load before starting animation
-  const images = [neptune, pluto, galaxy, saturn, portal, bgalaxy];
+  const images = [neptune, pluto, galaxy, saturn, portal, bgalaxy, nebula];
   let imagesLoaded = 0;
   function checkAllImagesLoaded() {
     imagesLoaded++;
@@ -26237,8 +26258,70 @@ spaceships.push(mothership);
     }
   });
 
+// 🆕 Function to handle nebula display timing
+function updateNebulaTiming() {
+  if (screensaverActive) {
+    // First appearance after screensaver has been active for 30 seconds
+    if (!showNebula && !nebulaScheduled) {
+      // Check if screensaver has been active for at least 30 seconds
+      const screensaverActiveTime = Date.now() - (window.screensaverStartTime || Date.now());
+      if (screensaverActiveTime > 30000) {
+        showNebula = true;
+        nebulaTimer = Date.now();
+        nebulaScheduled = false;
+		document.body.classList.add('nebula-active');
+      }
+    } else if (showNebula) {
+      // Check if nebula display duration is over (10 seconds)
+      if (Date.now() - nebulaTimer > NEBULA_DURATION) {
+        showNebula = false;
+        // Schedule next appearance in 5 minutes
+        nebulaScheduled = true;
+		document.body.classList.remove('nebula-active');
+        setTimeout(() => {
+          if (screensaverActive) {
+            showNebula = true;
+            nebulaTimer = Date.now();
+            nebulaScheduled = false;
+			document.body.classList.add('nebula-active');
+          }
+        }, NEBULA_INTERVAL);
+      }
+    }
+  }
+}
+
+  // 🆕 Override showScreensaver to track start time
+  const originalShowScreensaver = window.showScreensaver;
+  window.showScreensaver = function() {
+    if (originalShowScreensaver) originalShowScreensaver();
+    window.screensaverStartTime = Date.now();
+    // Reset nebula state when screensaver starts
+    showNebula = false;
+	nebulaScheduled = false;
+	document.body.classList.remove('nebula-active');
+  };
+
+  // 🆕 Override hideScreensaver to reset nebula state
+  const originalHideScreensaver = window.hideScreensaver;
+  window.hideScreensaver = function() {
+    if (originalHideScreensaver) originalHideScreensaver();
+    showNebula = false;
+	document.body.classList.remove('nebula-active');
+  };
+  
   function animate() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // 🆕 Update nebula timing
+    updateNebulaTiming();
+
+    // 🆕 Draw nebula first (as background) if visible
+    if (showNebula && nebula.complete && nebula.naturalWidth > 0) {
+      // Draw nebula full screen
+      ctx.drawImage(nebula, 0, 0, canvas.width, canvas.height);
+    }
+
 
     // ✨ Update and draw particles
     ctx.fillStyle = '#fde68a';
@@ -26281,7 +26364,7 @@ spaceships.push(mothership);
 </script>
 
 <script>
-let isModalOpen = false;  // Track if any modal is open
+let isModalOpen = false;
 
 let idleTimeout;
 let bellIdleTimeout;
@@ -26296,6 +26379,7 @@ let chimes33Timeout;
 let gong34Timeout;
 
 let screensaverActive = false;
+let screensaverStartTime = 0;
 
 const canvasEl = document.getElementById("particles-canvas");
 
@@ -26445,6 +26529,7 @@ function isHomeScreen() {
 function showScreensaver() {
   canvasEl.classList.remove("hidden");
   screensaverActive = true;
+  screensaverStartTime = Date.now();
 }
 
 function hideScreensaver() {
