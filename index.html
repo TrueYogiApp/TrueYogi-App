@@ -16454,7 +16454,7 @@ async function ensureAuthenticated() {
     return null;
   }
 
-  // STEP 3: Send signature to backend for verification
+  // STEP 3: Send signature to backend for verification.
   try {
     const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/auth', {
       method: 'POST',
