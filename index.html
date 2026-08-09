@@ -16468,7 +16468,11 @@ async function ensureAuthenticated() {
     if (result.success && result.token) {
       localStorage.setItem('jwtToken', result.token);  
 	  updateWalletUI();
+	  
 	   //await window.fetchYogiChallengeFromSupabase();
+	  if (window.walletPublicKey && typeof window.syncYogiChallengeToSupabase === "function") {
+		window.syncYogiChallengeToSupabase();
+	  }
       return result.token;
     } else {
       statusDiv.textContent = `Auth failed: ${result.error}`;
