@@ -11094,6 +11094,11 @@ async function confirmFullReset() {
 	
     // Initialize the app
       document.addEventListener('DOMContentLoaded', async () => {
+	 // ─── STEP 1: LOAD LANGUAGE FIRST ───
+    const lang = localStorage.getItem('lang') || 'en';
+    await setLanguage(lang); 
+	
+	// ─── STEP 2: EVERYTHING ELSE ───
 	  cleanUpLocalSessions();
 	  setupFAQTabs();
       document.addEventListener('click', initAudioContext, { once: true });
@@ -16718,10 +16723,6 @@ function t(key, opts = {}) {
   return str;
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-  const lang = localStorage.getItem('lang') || 'en';
-  await setLanguage(lang);
-});
 
 async function setLanguage(lang) {
   // 1. Get previous language before switching
