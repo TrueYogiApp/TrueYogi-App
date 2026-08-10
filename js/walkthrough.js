@@ -38,7 +38,7 @@
     const OVERLAY_ID = 'tw-overlay';
     const TOOLTIP_ID = 'tw-tooltip';
     const HIGHLIGHT_ID = 'tw-highlight';
-    const DELAY_MS = 3000; // 3 seconds
+    const DELAY_MS = 6000; // 6 seconds
 
     let currentStep = 0;
     let overlay = null;
