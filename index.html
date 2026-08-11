@@ -21557,7 +21557,7 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
 }
 
 		return `
-		  <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+		  <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:4px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
 			<span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
 			<span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
 			  ${isLive ? liveSvg : blankSvg}
@@ -21574,8 +21574,8 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
 			  ${astralIconHtml}			
 			  ${isDeepPresence ? deepPresenceSvg : ''}
 			  ${isUltimateStillness ? ultimateStillnessSvg : ''}
-			  ${callIcon}
-			  ${callbackBell}
+			  ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}
+			  ${!isCurrentUser && !canStartCall && amILive && isRowCallable ? `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>` : ''}
 			</span>
 		  </div>
 		`;
@@ -21583,67 +21583,106 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
   `;
 }
 
-// ADD THIS DIRECTLY AFTER listPopup.innerHTML IS ASSIGNED
-Array.from(listPopup.querySelectorAll('.call-icon')).forEach(el => {
-  el.onclick = function(e) {
-    e.stopPropagation();
-    const currentUserId = localStorage.getItem('omUserId'); // Top keeper (host)
-    const targetUserId = this.getAttribute('data-userid');  // Invited user
-    const targetUserName = this.getAttribute('data-username'); // optional, if you have from HTML
-	const shortId = getShortUserId(targetUserId);
+  // ADD THIS ENTIRE BLOCK HERE
+  // Add selection counter at top
+  const selectionCounter = document.createElement('div');
+  selectionCounter.id = 'selection-counter';
+   // selectionCounter.style.cssText = 'text-align:center;font-size:0.85em;color:#aaa;margin-bottom:8px;padding:4px;border-bottom:1px solid #333;';
+   // selectionCounter.textContent = '☐ Select users to call together';
+  listPopup.insertBefore(selectionCounter, listPopup.firstChild);
 
-    // Show custom confirmation dialog
-    showCallConfirm(shortId, targetUserName, async (result) => {
-      if (!result) return; // Cancelled
+  // Add group call button
+  const callButtonContainer = document.createElement('div');
+  callButtonContainer.id = 'call-button-container';
+  callButtonContainer.style.cssText = 'text-align:center;margin-top:8px;';
+  callButtonContainer.innerHTML = `
+    <button id="start-group-call-btn" style="display:none;padding:8px 24px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold;font-size:0.95rem;cursor:pointer;box-shadow:0 2px 10px #FFD70044;">
+      📞 Call Selected (<span id="selected-count">0</span>)
+    </button>
+  `;
+  listPopup.appendChild(callButtonContainer);
 
-      // Request a new Whereby room from your backend server
-      let resp;
-      try {
-        resp = await fetch('https://trueyogi-backend-knkq.onrender.com/create-whereby-room', {
-          method: 'POST', credentials: 'include',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            hostUserId: currentUserId,
-            targetUserId: targetUserId
-          })
+  // Handle checkbox changes
+  listPopup.addEventListener('change', function(e) {
+    if (e.target.classList.contains('call-checkbox')) {
+      const checked = listPopup.querySelectorAll('.call-checkbox:checked').length;
+      const counter = document.getElementById('selection-counter');
+      const btn = document.getElementById('start-group-call-btn');
+      const countSpan = document.getElementById('selected-count');
+      
+      if (checked > 0) {
+        counter.textContent = '✓ ' + checked + ' user(s) selected for call';
+        btn.style.display = 'inline-block';
+        countSpan.textContent = checked;
+        
+        listPopup.querySelectorAll('.call-checkbox').forEach(cb => {
+          const row = cb.closest('div');
+          if (row) {
+            row.style.background = cb.checked ? '#FFD70022' : '';
+            row.style.borderLeft = cb.checked ? '3px solid #FFD700' : '3px solid transparent';
+          }
         });
-      } catch (err) {
-        alert('Network error or backend is down.');
-        return;
+      } else {
+        counter.textContent = '☐ Select users to call together';
+        btn.style.display = 'none';
+        
+        listPopup.querySelectorAll('.call-checkbox').forEach(cb => {
+          const row = cb.closest('div');
+          if (row) {
+            row.style.background = '';
+            row.style.borderLeft = '3px solid transparent';
+          }
+        });
       }
-
-      if (!resp.ok) {
-        // Show error to user, log for debug
-        const text = await resp.text();
-        alert('Failed to create call: ' + text);
-        return;
-      }
-
-      let data;
-      try {
-        data = await resp.json();
-      } catch (err) {
-        alert('Backend did not return valid JSON.');
-        return;
-      }
-
-      if (!data.hostUrl) {
-        alert('Backend did not provide host link.');
-        return;
-      }
-      showWherebyHostDialog(data.hostUrl, data.callId);
-    });
-  };
+    }
+  });
+  
+// Group call button handler
+listPopup.querySelector('#start-group-call-btn')?.addEventListener('click', async function(e) {
+  e.stopPropagation();
+  
+  const selectedCheckboxes = listPopup.querySelectorAll('.call-checkbox:checked');
+  if (selectedCheckboxes.length === 0) return;
+  
+  const selectedUsers = Array.from(selectedCheckboxes).map(cb => cb.dataset.userid);
+  const currentUserId = localStorage.getItem('omUserId');
+  
+  // Show confirmation with count
+  const modal = document.getElementById('call-confirm-modal');
+  const msgElem = modal.querySelector('.modal-message');
+  const okBtn = document.getElementById('call-confirm-ok');
+  const cancelBtn = document.getElementById('call-confirm-cancel');
+  
+  msgElem.textContent = '📞 Are you sure you want to call ' + selectedUsers.length + ' selected user(s)?';
+  modal.classList.remove('hidden');
+  
+  function cleanup() {
+    modal.classList.add('hidden');
+    okBtn.removeEventListener('click', okHandler);
+    cancelBtn.removeEventListener('click', cancelHandler);
+  }
+  
+  function okHandler() {
+    cleanup();
+    stopAllAudio();
+    startCall(selectedUsers, currentUserId);
+  }
+  
+  function cancelHandler() {
+    cleanup();
+  }
+  
+  okBtn.addEventListener('click', okHandler);
+  cancelBtn.addEventListener('click', cancelHandler);
 });
 
+// Keep callback bell handler (unchanged)
 Array.from(listPopup.querySelectorAll('.callback-bell-icon')).forEach(el => {
   el.onclick = function(e) {
     e.stopPropagation();
     const toUserId = this.getAttribute('data-userid');
-    const fromUserId = localStorage.getItem('omUserId'); // current user
+    const fromUserId = localStorage.getItem('omUserId');
     if (!toUserId || !fromUserId || toUserId === fromUserId) return;
-
-    // Show custom confirmation modal instead of confirm()
     showCallbackConfirmModal(toUserId, fromUserId);
   }
 });
@@ -23363,6 +23402,48 @@ function togglePowerNodesGlow() {
   setTimeout(() => closeEarthGrid(), 3000000);
 }
 
+async function startCall(selectedUsers, currentUserId) {
+  let resp;
+  try {
+    resp = await fetch('https://trueyogi-backend-knkq.onrender.com/create-whereby-room', {
+      method: 'POST', 
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        hostUserId: currentUserId,
+        targetUserIds: selectedUsers  // SEND ARRAY
+      })
+    });
+  } catch (err) {
+    alert('Network error or backend is down.');
+    return;
+  }
+  
+  if (!resp.ok) {
+    const text = await resp.text();
+    alert('Failed to create call: ' + text);
+    return;
+  }
+  
+  let data;
+  try {
+    data = await resp.json();
+  } catch (err) {
+    alert('Backend did not return valid JSON.');
+    return;
+  }
+  
+  if (!data.hostUrl) {
+    alert('Backend did not provide host link.');
+    return;
+  }
+  
+  showWherebyHostDialog(data.hostUrl, data.callId);
+  
+  const list = document.getElementById('flame-keeper-list');
+  if (list) list.remove();
+}
+
 let participantCallChannel = null;
 
 function showWherebyParticipantDialog(participantUrl, callId) {
@@ -23486,36 +23567,6 @@ function showWherebyHostDialog(hostUrl, callId) {
   }
 }
 
-function showCallConfirm(userId, userName, onConfirm) {
-  const modal = document.getElementById('call-confirm-modal');
-  const msgElem = modal.querySelector('.modal-message');
-  const okBtn = document.getElementById('call-confirm-ok');
-  const cancelBtn = document.getElementById('call-confirm-cancel');
-
-  // Customize the message as you like
-  msgElem.textContent = userName
-    ? `Are you sure you want to call ${userName}?`
-    : `Are you sure you want to call user ${userId}?`;
-
-  modal.classList.remove('hidden');
-
-  function cleanup() {
-    modal.classList.add('hidden');
-    okBtn.removeEventListener('click', okHandler);
-    cancelBtn.removeEventListener('click', cancelHandler);
-  }
-  function okHandler() {
-    cleanup();
-    onConfirm(true);
-	stopAllAudio();
-  }
-  function cancelHandler() {
-    cleanup();
-    onConfirm(false);
-  }
-  okBtn.addEventListener('click', okHandler);
-  cancelBtn.addEventListener('click', cancelHandler);
-}
 
 // 🔇 ADD THIS FUNCTION TO STOP ALL AUDIO
 function stopAllAudio() {
