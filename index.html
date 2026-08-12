@@ -21587,8 +21587,6 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
   // Add selection counter at top
   const selectionCounter = document.createElement('div');
   selectionCounter.id = 'selection-counter';
-   // selectionCounter.style.cssText = 'text-align:center;font-size:0.85em;color:#aaa;margin-bottom:8px;padding:4px;border-bottom:1px solid #333;';
-   // selectionCounter.textContent = '☐ Select users to call together';
   listPopup.insertBefore(selectionCounter, listPopup.firstChild);
 
   // Add group call button
@@ -21611,7 +21609,6 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
       const countSpan = document.getElementById('selected-count');
       
       if (checked > 0) {
-        counter.textContent = '✓ ' + checked + ' user(s) selected for call';
         btn.style.display = 'inline-block';
         countSpan.textContent = checked;
         
@@ -21623,7 +21620,6 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
           }
         });
       } else {
-        counter.textContent = '☐ Select users to call together';
         btn.style.display = 'none';
         
         listPopup.querySelectorAll('.call-checkbox').forEach(cb => {
