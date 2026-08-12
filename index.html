@@ -8909,14 +8909,11 @@ updateDurationOptionsForMusic();
 });
 
 
-// User Avatar Upload, Select DOM elements
+// ===== AVATAR CODE - FIXED =====
+const API_BASE_URL = 'https://trueyogi-backend-knkq.onrender.com'; // Your backend URL
 const userId = localStorage.getItem('omUserId');
 const avatarImg = document.getElementById('user-avatar');
 const avatarInput = document.getElementById('avatar-upload');
-const avatarPath = `users/${userId}.png`;
-
-// Build user's avatar URL in Supabase
-const supabaseAvatarUrl = `${supabaseUrl}/storage/v1/object/public/avatars/${avatarPath}`;
 
 function toggleResetButton(show) {
   const resetBtn = document.querySelector('.reset-avatar-btn');
@@ -8925,55 +8922,135 @@ function toggleResetButton(show) {
   }
 }
 
-// Load user's avatar - Using Supabase API to check file existence
-if (userId) {
-  // First check if file exists using Supabase storage API
-  supabase.storage
-    .from('avatars')
-    .list('users/', {
-      limit: 100,
-      offset: 0,
-      sortBy: { column: 'name', order: 'asc' }
-    })
-    .then(({ data, error }) => {
-      // Check if our specific file exists in the list
-      const fileExists = data?.some(file => file.name === `${userId}.png`);
+// === LOAD USER AVATAR ===
+async function loadUserAvatar() {
+  if (!userId) {
+    console.warn('No userId found');
+    return;
+  }
+  
+  try {
+    // console.log('🔍 Loading avatar for user:', userId);
+    
+    // Try to get the avatar directly - use a HEAD request to check if exists
+    const avatarUrl = `${supabaseUrl}/storage/v1/object/public/avatars/users/${userId}.webp`;
+    
+    // Use fetch with HEAD to check if file exists
+    const response = await fetch(avatarUrl, { method: 'HEAD' });
+    
+    if (response.ok) {
+      // File exists - load it with cache busting
+      avatarImg.src = avatarUrl + '?t=' + Date.now();
+      toggleResetButton(true);
+      // console.log('✅ Avatar loaded from:', avatarUrl);
+    } else {
+      // Try PNG format as fallback
+      const pngUrl = `${supabaseUrl}/storage/v1/object/public/avatars/users/${userId}.png`;
+      const pngResponse = await fetch(pngUrl, { method: 'HEAD' });
       
-      if (fileExists) {
-        // File exists - load it
-        avatarImg.src = supabaseAvatarUrl + '?t=' + Date.now();
+      if (pngResponse.ok) {
+        avatarImg.src = pngUrl + '?t=' + Date.now();
         toggleResetButton(true);
+        // console.log('✅ Avatar loaded from (PNG):', pngUrl);
+        
+        // Convert PNG to WebP in background
+        convertPngToWebp();
       } else {
-        // File doesn't exist - use default
+        // No avatar found - use default
         avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
         toggleResetButton(false);
+        // console.log('🔄 No avatar found, using default');
       }
-    })
-    .catch(err => {
-      // On any error, use default
-      console.warn('Avatar check failed:', err);
-      avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
-      toggleResetButton(false);
-    });
+    }
+  } catch (err) {
+    console.warn('Avatar load error:', err);
+    avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
+    toggleResetButton(false);
+  }
 }
 
-// On upload, overwrite previous avatar and update src
+// === CONVERT PNG TO WEBP ===
+async function convertPngToWebp() {
+  try {
+    // console.log('🔄 Converting PNG to WebP...');
+    const pngUrl = `${supabaseUrl}/storage/v1/object/public/avatars/users/${userId}.png`;
+    const response = await fetch(pngUrl);
+    const blob = await response.blob();
+    const file = new File([blob], 'avatar.png', { type: 'image/png' });
+    
+    const formData = new FormData();
+    formData.append('om_user_id', userId);
+    formData.append('avatar', file);
+    
+    const apiResponse = await fetch(`${API_BASE_URL}/api/avatar`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await apiResponse.json();
+    
+    if (result.success) {
+      avatarImg.src = result.avatarUrl;
+      // console.log('✅ PNG converted to WebP successfully');
+    }
+  } catch (err) {
+    console.error('PNG conversion error:', err);
+  }
+}
+
+// === UPLOAD AVATAR ===
 avatarInput.addEventListener('change', async function(e) {
   const file = e.target.files[0];
-  if (!file || !userId) return;
+  if (!file || !userId) {
+    avatarInput.value = '';
+    return;
+  }
 
-  const { error } = await supabase.storage
-    .from('avatars')
-    .upload(avatarPath, file, { upsert: true, cacheControl: '3600' });
+  // Validate file size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Image is too large! Please choose an image under 5MB.');
+    avatarInput.value = '';
+    return;
+  }
 
-  if (!error) {
-    avatarImg.src = supabaseAvatarUrl + '?t=' + Date.now();
-    toggleResetButton(true);
-  } else {
-    alert('Upload failed! ' + error.message);
+  // Show loading state
+  avatarImg.style.opacity = '0.5';
+  
+  try {
+    // console.log('📤 Uploading avatar...');
+    
+    // Create FormData for the API
+    const formData = new FormData();
+    formData.append('om_user_id', userId);
+    formData.append('avatar', file);
+
+    // Upload through your backend
+    const response = await fetch(`${API_BASE_URL}/api/avatar`, {
+      method: 'POST',
+      body: formData
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      // Update avatar with compressed version
+      avatarImg.src = result.avatarUrl;
+      toggleResetButton(true);
+      // console.log('✅ Avatar uploaded successfully!');
+ 
+    } else {
+      alert('Upload failed! ' + (result.error || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('Upload error:', error);
+    alert('Upload failed! Please try again.');
+  } finally {
+    avatarImg.style.opacity = '1';
+    avatarInput.value = '';
   }
 });
 
+// === RESET AVATAR ===
 function confirmAndResetAvatar(event) {
   hideAllTooltips();
   document.getElementById('reset-confirm').style.display = 'block';
@@ -8990,7 +9067,7 @@ async function doResetAvatar() {
   hideAvatarActions();
 }
 
-// Hide the confirmation tooltip when clicking outside it or the reset button
+// Hide the confirmation tooltip when clicking outside
 document.addEventListener('mousedown', function(e) {
   const rc = document.getElementById('reset-confirm');
   if (
@@ -9006,16 +9083,40 @@ async function resetAvatar() {
   if (!userId) return;
   
   try {
-    await supabase.storage.from('avatars').remove([avatarPath]);
+    // console.log('🗑️ Resetting avatar...');
+    
+    // Call backend to delete avatar
+    const response = await fetch(`${API_BASE_URL}/api/avatar`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ om_user_id: userId })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
+      toggleResetButton(false);
+      // console.log('✅ Avatar reset successfully');
+ 
+    }
   } catch (err) {
-    // File might not exist, that's fine
-    console.log('No avatar to remove or removal failed');
+    console.error('Reset error:', err);
+    // Fallback: try direct Supabase delete
+    try {
+      await supabase.storage.from('avatars').remove([`users/${userId}.webp`, `users/${userId}.png`]);
+    } catch (e) {
+      // Ignore
+    }
+    avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
+    toggleResetButton(false);
   }
-  
-  avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
-  toggleResetButton(false);
 }
 
+
+// === AVATAR ACTIONS ===
 let avatarActionsTimeout = null;
 const avatarContainer = document.getElementById('avatar-container');
 const avatarActions = document.getElementById('avatar-actions');
@@ -9048,7 +9149,7 @@ document.addEventListener('mousedown', function(e) {
   }
 });
 
-// Optional: When an action button is clicked, briefly show its tooltip
+// Tooltips for action buttons
 document.querySelectorAll('.avatar-action-btn').forEach(btn => {
   btn.addEventListener('click', function(e) {
     hideAllTooltips();
@@ -9064,6 +9165,14 @@ document.querySelectorAll('.avatar-action-btn').forEach(btn => {
     e.stopPropagation();
   });
 });
+
+// === INITIALIZE ===
+// Load avatar when DOM is ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', loadUserAvatar);
+} else {
+  loadUserAvatar();
+}
 
 
 // Add click event to spaceship challenge count
