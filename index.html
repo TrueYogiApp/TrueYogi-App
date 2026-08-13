@@ -3461,6 +3461,17 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     display: none !important;
 }
 
+
+/* Remix button specific styling */
+.magic-avatar-btn {
+  top: 102px; /* Position below reset button */
+  right: 14px;
+  color: #ff6bff;
+  background: #1a1a2eec;
+  display: none; /* Hidden by default */
+}
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -5185,11 +5196,25 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 		  <i class="fas fa-undo-alt"></i>
 		  <span class="avatar-tooltip" id="reset-avatar-tooltip"></span>
 		</button>
+		<!-- Add this button inside #avatar-actions -->
+		<button class="avatar-action-btn magic-avatar-btn"
+		  id="magic-avatar-btn"
+		  onclick="confirmMagicEffect(event)"
+		  aria-label="Magic Effect" 
+		  type="button">
+		  <i class="fas fa-wand-magic-sparkles"></i>
+		</button>
 		<!-- Reset Confirmation Tooltip -->
 		<div id="reset-confirm" class="reset-confirm-tooltip" style="display:none;">
 		  <span id="reset-avatar-confirm-label"></span><br>
 		  <button onclick="doResetAvatar()" class="yes-btn" id="reset-avatar-yes-btn"></button>
 		  <button onclick="hideResetConfirm()" class="no-btn" id="reset-avatar-no-btn"></button>
+		</div>
+		<!-- Magic Confirmation Tooltip -->
+		<div id="magic-confirm" class="reset-confirm-tooltip" style="display:none;">
+		  <span id="magic-avatar-confirm-label">Apply Remix?</span><br>
+		  <button onclick="applyMagicEffect()" class="yes-btn" id="magic-avatar-yes-btn">Yes</button>
+		  <button onclick="hideMagicConfirm()" class="no-btn" id="magic-avatar-no-btn">No</button>
 		</div>
 	  </div>
 	</div>
@@ -8967,6 +8992,7 @@ async function loadUserAvatar() {
     avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
     toggleResetButton(false);
   }
+  checkMagicButton();
 }
 
 // === CONVERT PNG TO WEBP ===
@@ -9036,6 +9062,7 @@ avatarInput.addEventListener('change', async function(e) {
       // Update avatar with compressed version
       avatarImg.src = result.avatarUrl;
       toggleResetButton(true);
+	  checkMagicButton();
       // console.log('✅ Avatar uploaded successfully!');
  
     } else {
@@ -9100,7 +9127,10 @@ async function resetAvatar() {
       avatarImg.src = 'https://trueyogi.app/assets/yogi-avatar.gif';
       toggleResetButton(false);
       // console.log('✅ Avatar reset successfully');
- 
+       // 👇 CLEAR the magic flag when resetting
+      localStorage.removeItem(`remix_applied_${userId}`);
+	  localStorage.removeItem(`magic_msg_dismissed_${userId}`);
+	  checkMagicButton();
     }
   } catch (err) {
     console.error('Reset error:', err);
@@ -9172,6 +9202,231 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', loadUserAvatar);
 } else {
   loadUserAvatar();
+}
+
+// === MAGIC AVATAR - Replace with AI Remix ===
+// === MAGIC CONFIRMATION ===
+function confirmMagicEffect(event) {
+  hideAllTooltips();
+  document.getElementById('magic-confirm').style.display = 'block';
+  if(event) event.stopPropagation();
+}
+
+function hideMagicConfirm() {
+  document.getElementById('magic-confirm').style.display = 'none';
+}
+
+// Hide confirmation when clicking outside
+document.addEventListener('mousedown', function(e) {
+  const mc = document.getElementById('magic-confirm');
+  if (
+    mc.style.display === 'block' &&
+    !mc.contains(e.target) &&
+    !e.target.classList.contains('magic-avatar-btn')
+  ) {
+    hideMagicConfirm();
+  }
+});
+
+// === DO MAGIC EFFECT ===
+async function applyMagicEffect() {
+  hideMagicConfirm();
+  hideAvatarActions();
+  
+  if (!userId) {
+    alert('User ID not found');
+    return;
+  }
+  
+  try {
+    const remixUrl = `${supabaseUrl}/storage/v1/object/public/avatars/users/${userId}-remix.jpg?t=${Date.now()}`;
+    const response = await fetch(remixUrl, { method: 'HEAD' });
+    
+    if (!response.ok) {
+      alert('✨ Magic remix not available for this user yet.');
+      return;
+    }
+    
+    // Show loading state (blur)
+    avatarImg.style.opacity = '0.5';
+    avatarImg.style.filter = 'blur(3px)';
+    
+    const imageResponse = await fetch(`${remixUrl}&download=${Date.now()}`);
+    const blob = await imageResponse.blob();
+    
+    if (blob.size === 0) {
+      alert('✨ Magic remix not available. Please refresh and try again.');
+      return;
+    }
+    
+    const file = new File([blob], 'remix.jpg', { type: 'image/jpeg' });
+    
+    const formData = new FormData();
+    formData.append('om_user_id', userId);
+    formData.append('avatar', file);
+    
+    const uploadResponse = await fetch(`${API_BASE_URL}/api/avatar`, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await uploadResponse.json();
+    
+    if (result.success) {
+      avatarImg.src = result.avatarUrl;
+      toggleResetButton(true);
+      showToast('✨ Remix Applied!', 'success');
+      document.getElementById('magic-avatar-btn').style.display = 'none';
+      localStorage.setItem(`remix_applied_${userId}`, 'true');
+	  localStorage.removeItem(`magic_msg_dismissed_${userId}`);
+    } else {
+      alert('Failed to apply magic effect: ' + (result.error || 'Unknown error'));
+    }
+  } catch (error) {
+    console.error('Magic effect error:', error);
+    alert('Failed to apply magic effect. Please try again.');
+  } finally {
+    avatarImg.style.opacity = '1';
+    avatarImg.style.filter = 'none';
+  }
+}
+
+// === CHECK IF MAGIC BUTTON SHOULD SHOW ===
+async function checkMagicButton() {
+  if (!userId) return;
+  
+  try {
+    const magicApplied = localStorage.getItem(`remix_applied_${userId}`);
+    const magicBtn = document.getElementById('magic-avatar-btn');
+    const hasAvatar = avatarImg.src && !avatarImg.src.includes('yogi-avatar.gif');
+    
+    if (magicApplied === 'true') {
+      if (magicBtn) magicBtn.style.display = 'none';
+      showMagicMessage(false);
+      return;
+    }
+    
+    const remixUrl = `${supabaseUrl}/storage/v1/object/public/avatars/users/${userId}-remix.jpg?t=${Date.now()}`;
+    const response = await fetch(remixUrl, { method: 'HEAD' });
+    const remixExists = response.ok;
+    
+    if (magicBtn) {
+      magicBtn.style.display = remixExists ? 'flex' : 'none';
+    }
+    
+    // 👇 Show message if: user has avatar AND no remix AND magic not applied
+    if (hasAvatar && !remixExists && magicApplied !== 'true') {
+      showMagicMessage(true);
+    } else {
+      showMagicMessage(false);
+    }
+  } catch (err) {
+    const magicBtn = document.getElementById('magic-avatar-btn');
+    if (magicBtn) magicBtn.style.display = 'none';
+    showMagicMessage(false);
+  }
+}
+
+// === SHOW/HIDE MAGIC MESSAGE ===
+function showMagicMessage(show) {
+  let msg = document.getElementById('magic-message');
+  
+  if (show) {
+    // Check if user already dismissed it in this session
+    if (localStorage.getItem(`magic_msg_dismissed_${userId}`) === 'true') {
+      return;
+    }
+    
+    if (!msg) {
+      msg = document.createElement('div');
+      msg.id = 'magic-message';
+      msg.innerHTML = `
+        <div style="
+          background: linear-gradient(135deg, #fde047 0%, #f59e0b 100%);
+          padding: 14px 20px;
+          border-radius: 12px;
+          margin-top: 12px;
+          text-align: center;
+          font-family: sans-serif;
+          font-size: 14px;
+          font-weight: 500;
+          color: #1a1a2e;
+          box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+          animation: pulseGlow 2s ease-in-out infinite;
+          max-width: 280px;
+          margin-left: auto;
+          margin-right: auto;
+          position: relative;
+        ">
+          <button onclick="dismissMagicMessage()" style="
+            position: absolute;
+            top: 4px;
+            right: 8px;
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #1a1a2e;
+            opacity: 0.5;
+            padding: 0 4px;
+          ">✕</button>
+		<div style="margin-top: 4px;">
+		  <span style="font-size: 18px; margin-right: 8px;">✨</span>
+		  Your Yogi transformation is taking shape.
+		</div>
+		<span style="display: block; font-size: 12px; font-weight: 400; opacity: 0.8; margin-top: 4px;">
+		  Keep meditating 🧘‍♂️ Become aware. Come back later to see what emerges.
+		</span>
+          <button onclick="dismissMagicMessage()" style="
+            background: rgba(26, 26, 46, 0.15);
+            border: none;
+            padding: 6px 18px;
+            border-radius: 20px;
+            margin-top: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a1a2e;
+            cursor: pointer;
+            transition: background 0.2s;
+          " onmouseover="this.style.background='rgba(26,26,46,0.25)'" onmouseout="this.style.background='rgba(26,26,46,0.15)'">
+            Got it!
+          </button>
+        </div>
+      `;
+      
+      // Add animation style
+      if (!document.getElementById('magic-message-style')) {
+        const style = document.createElement('style');
+        style.id = 'magic-message-style';
+        style.textContent = `
+          @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+            50% { box-shadow: 0 4px 25px rgba(245, 158, 11, 0.6); }
+          }
+        `;
+        document.head.appendChild(style);
+      }
+      
+      avatarContainer.parentNode.insertBefore(msg, avatarContainer.nextSibling);
+    }
+    msg.style.display = 'block';
+  } else {
+    if (msg) {
+      msg.style.display = 'none';
+    }
+  }
+}
+
+// === DISMISS MAGIC MESSAGE ===
+function dismissMagicMessage() {
+  const msg = document.getElementById('magic-message');
+  if (msg) {
+    msg.style.display = 'none';
+  }
+  // Save to localStorage so it persists across refreshes
+  if (userId) {
+    localStorage.setItem(`magic_msg_dismissed_${userId}`, 'true');
+  }
 }
 
 
