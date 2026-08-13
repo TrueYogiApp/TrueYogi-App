@@ -551,6 +551,9 @@
 "encourage.modal.button": "متابعة الرحلة",
 
 "seeds.empty.myseeds": "🌱 لم تزرع أي بذور حتى الآن",
-"seeds.empty.all": "🌱 لا توجد بذور حتى الآن"
+"seeds.empty.all": "🌱 لا توجد بذور حتى الآن",
+"remixAvatarConfirm": "إعادة مزج الصورة الرمزية؟",
+"magic.message.title": "صورتك الرمزية اليوغي تتخذ شكلاً.",
+"magic.message.description": "ابقَ مخلصاً لممارستك. عد لاحقاً لتشهد تحولك."
 
 }

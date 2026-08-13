@@ -552,6 +552,9 @@
 "encourage.modal.button": "Продолжить путешествие",
 
 "seeds.empty.myseeds": "🌱 Вы еще не посадили ни одного семени",
-"seeds.empty.all": "🌱 Семян пока нет"
+"seeds.empty.all": "🌱 Семян пока нет",
+"remixAvatarConfirm": "Переделать аватар?",
+"magic.message.title": "Ваш аватар Йога принимает форму.",
+"magic.message.description": "Оставайтесь верны своей практике. Вернитесь позже, чтобы свидетельствовать вашу трансформацию."
   
 }

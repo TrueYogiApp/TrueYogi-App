@@ -551,6 +551,9 @@
 "encourage.modal.button": "旅を続ける",
 
 "seeds.empty.myseeds": "🌱 まだ何の種も植えていません",
-"seeds.empty.all": "🌱 まだ種がありません"
+"seeds.empty.all": "🌱 まだ種がありません",
+"remixAvatarConfirm": "アバターをリミックスしますか?",
+"magic.message.title": "あなたのヨギアバターが形を成しています。",
+"magic.message.description": "あなたの修行に献身し続けてください。後で戻ってあなたの変身を目撃してください。"
   
 }

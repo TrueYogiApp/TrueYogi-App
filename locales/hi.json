@@ -551,7 +551,10 @@
 "encourage.modal.button": "यात्रा जारी रखें",
 
 "seeds.empty.myseeds": "🌱 आपने अभी तक कोई बीज नहीं बोया है",
-"seeds.empty.all": "🌱 अभी तक कोई बीज नहीं"
+"seeds.empty.all": "🌱 अभी तक कोई बीज नहीं",
+"remixAvatarConfirm": "अवतार को रीमिक्स करें?",
+"magic.message.title": "आपका योगी अवतार आकार ले रहा है।",
+"magic.message.description": "अपने अभ्यास के प्रति समर्पित रहें। अपने रूपांतरण को देखने के लिए बाद में वापस आएं।"
 
 
 }

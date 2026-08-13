@@ -9372,10 +9372,10 @@ function showMagicMessage(show) {
           ">✕</button>
 		<div style="margin-top: 4px;">
 		  <span style="font-size: 18px; margin-right: 8px;"></span>
-		  Your Yogi Avatar is taking shape.
+		  ${t('magic.message.title')}
 		</div>
 		<span style="display: block; font-size: 12px; font-weight: 400; opacity: 0.8; margin-top: 4px;">
-		  Keep meditating & Become aware. Come back later to see what emerges.
+		  ${t('magic.message.description')}
 		</span>
           <button onclick="dismissMagicMessage()" style="
             background: rgba(26, 26, 46, 0.15);
@@ -17587,6 +17587,10 @@ document.getElementById('reset-avatar-btn').ariaLabel = t('resetAvatar');
 document.getElementById('reset-avatar-confirm-label').textContent = t('resetAvatarConfirm'); // eg "Reset Avatar?"
 document.getElementById('reset-avatar-yes-btn').textContent = t('yes');
 document.getElementById('reset-avatar-no-btn').textContent = t('no');
+
+document.getElementById('magic-avatar-confirm-label').textContent = t('remixAvatarConfirm'); // eg "remix Avatar?"
+document.getElementById('magic-avatar-yes-btn').textContent = t('yes');
+document.getElementById('magic-avatar-no-btn').textContent = t('no');
 
 document.getElementById('yogi-config-intention-label').textContent = t('intention.label');
 document.getElementById('yogi-config-intention-desc').textContent = t('intention.description');

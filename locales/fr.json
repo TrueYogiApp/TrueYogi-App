@@ -556,7 +556,10 @@
 "encourage.modal.button": "Continuer le voyage",
 
 "seeds.empty.myseeds": "🌱 Vous n'avez pas encore planté de graines",
-"seeds.empty.all": "🌱 Pas encore de graines"
+"seeds.empty.all": "🌱 Pas encore de graines",
+"remixAvatarConfirm": "Remixer l'Avatar?",
+"magic.message.title": "Votre Avatar Yogi prend forme.",
+"magic.message.description": "Restez dévoué à votre pratique. Revenez plus tard pour témoigner de votre transformation."
   
 
 }

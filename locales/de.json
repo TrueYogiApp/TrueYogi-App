@@ -551,6 +551,9 @@
 "encourage.modal.button": "Reise fortsetzen",
 
 "seeds.empty.myseeds": "🌱 Du hast noch keine Samen gepflanzt",
-"seeds.empty.all": "🌱 Noch keine Samen"
+"seeds.empty.all": "🌱 Noch keine Samen",
+"remixAvatarConfirm": "Avatar neu mischen?",
+"magic.message.title": "Dein Yogi-Avatar nimmt Gestalt an.",
+"magic.message.description": "Bleib deiner Praxis treu. Komm später zurück, um deine Transformation zu bezeugen."
 
 }
