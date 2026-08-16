@@ -9267,7 +9267,8 @@ async function applyMagicEffect() {
     
     const formData = new FormData();
     formData.append('om_user_id', userId);
-    formData.append('avatar', file);
+	formData.append('avatar', file);
+	formData.append('is_remix', 'true');
     
     const uploadResponse = await fetch(`${API_BASE_URL}/api/avatar`, {
       method: 'POST',
