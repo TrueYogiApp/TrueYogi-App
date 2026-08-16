@@ -554,6 +554,9 @@
 "seeds.empty.all": "🌱 まだ種がありません",
 "remixAvatarConfirm": "アバターをリミックスしますか?",
 "magic.message.title": "あなたのヨギアバターが形を成しています。",
-"magic.message.description": "あなたの修行に献身し続けてください。後で戻ってあなたの変身を目撃してください。"
+"magic.message.description": "あなたの修行に献身し続けてください。後で戻ってあなたの変身を目撃してください。",
+"toast.remix.applied": "✨ リミックスが適用されました!",
+"toast.avatar.uploading": "📤 アバターをアップロード中...",
+"toast.avatar.uploaded": "✅ アバターがアップロードされました!"
   
 }

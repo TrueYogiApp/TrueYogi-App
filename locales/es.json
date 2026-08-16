@@ -554,6 +554,9 @@
 "seeds.empty.all": "🌱 Sin semillas aún",
 "remixAvatarConfirm": "¿Remezclador Avatar?",
 "magic.message.title": "Tu Avatar Yogi está tomando forma.",
-"magic.message.description": "Mantente devoto a tu práctica. Vuelve más tarde para presenciar tu transformación."
+"magic.message.description": "Mantente devoto a tu práctica. Vuelve más tarde para presenciar tu transformación.",
+"toast.remix.applied": "✨ ¡Remix aplicado!",
+"toast.avatar.uploading": "📤 Cargando avatar...",
+"toast.avatar.uploaded": "✅ ¡Avatar cargado!"
 
 }

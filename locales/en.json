@@ -560,7 +560,10 @@
 "seeds.empty.all": "🌱 No seeds yet",
 "remixAvatarConfirm": "Remix Avatar?",
 "magic.message.title": "Your Yogi Avatar is taking shape.",
-"magic.message.description": "Stay devoted to your practice. Come back later to witness your transformation."
+"magic.message.description": "Stay devoted to your practice. Come back later to witness your transformation.",
+"toast.remix.applied": "✨ Remix Applied!",
+"toast.avatar.uploading": "📤 Uploading avatar...",
+"toast.avatar.uploaded": "✅ Avatar uploaded!"
 
   
 }

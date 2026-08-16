@@ -9040,18 +9040,16 @@ avatarInput.addEventListener('change', async function(e) {
     return;
   }
 
-  // Show loading state
+  // 👇 Show blur & loading toast
   avatarImg.style.opacity = '0.5';
+  avatarImg.style.filter = 'blur(3px)';
+  showToast(t('toast.avatar.uploading'), 'info');
   
   try {
-    // console.log('📤 Uploading avatar...');
-    
-    // Create FormData for the API
     const formData = new FormData();
     formData.append('om_user_id', userId);
     formData.append('avatar', file);
 
-    // Upload through your backend
     const response = await fetch(`${API_BASE_URL}/api/avatar`, {
       method: 'POST',
       body: formData
@@ -9060,20 +9058,25 @@ avatarInput.addEventListener('change', async function(e) {
     const result = await response.json();
 
     if (result.success) {
-      // Update avatar with compressed version
       avatarImg.src = result.avatarUrl;
       toggleResetButton(true);
-	  checkMagicButton();
-      // console.log('✅ Avatar uploaded successfully!');
- 
+      checkMagicButton();
+      
+      // 👇 Success toast & unblur
+      showToast(t('toast.avatar.uploaded'), 'success');
+      avatarImg.style.opacity = '1';
+      avatarImg.style.filter = 'none';
     } else {
+      avatarImg.style.opacity = '1';
+      avatarImg.style.filter = 'none';
       alert('Upload failed! ' + (result.error || 'Unknown error'));
     }
   } catch (error) {
     console.error('Upload error:', error);
+    avatarImg.style.opacity = '1';
+    avatarImg.style.filter = 'none';
     alert('Upload failed! Please try again.');
   } finally {
-    avatarImg.style.opacity = '1';
     avatarInput.value = '';
   }
 });
@@ -9276,7 +9279,7 @@ async function applyMagicEffect() {
     if (result.success) {
       avatarImg.src = result.avatarUrl;
       toggleResetButton(true);
-      showToast('✨ Remix Applied!', 'success');
+      showToast(t('toast.remix.applied'), 'success');
       document.getElementById('magic-avatar-btn').style.display = 'none';
       localStorage.setItem(`remix_applied_${userId}`, 'true');
 	  localStorage.removeItem(`magic_msg_dismissed_${userId}`);

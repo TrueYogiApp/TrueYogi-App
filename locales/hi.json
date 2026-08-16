@@ -554,7 +554,10 @@
 "seeds.empty.all": "🌱 अभी तक कोई बीज नहीं",
 "remixAvatarConfirm": "अवतार को रीमिक्स करें?",
 "magic.message.title": "आपका योगी अवतार आकार ले रहा है।",
-"magic.message.description": "अपने अभ्यास के प्रति समर्पित रहें। अपने रूपांतरण को देखने के लिए बाद में वापस आएं।"
+"magic.message.description": "अपने अभ्यास के प्रति समर्पित रहें। अपने रूपांतरण को देखने के लिए बाद में वापस आएं।",
+"toast.remix.applied": "✨ रीमिक्स लागू किया गया!",
+"toast.avatar.uploading": "📤 अवतार अपलोड किया जा रहा है...",
+"toast.avatar.uploaded": "✅ अवतार अपलोड हो गया!"
 
 
 }

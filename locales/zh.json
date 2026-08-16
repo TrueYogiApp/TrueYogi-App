@@ -555,6 +555,9 @@
 "seeds.empty.all": "🌱 还没有种子",
 "remixAvatarConfirm": "重新混音头像?",
 "magic.message.title": "你的瑜伽士头像正在成形。",
-"magic.message.description": "保持对你的修行的执着。稍后回来见证你的蜕变。"
+"magic.message.description": "保持对你的修行的执着。稍后回来见证你的蜕变。",
+"toast.remix.applied": "✨ 混音已应用!",
+"toast.avatar.uploading": "📤 正在上传头像...",
+"toast.avatar.uploaded": "✅ 头像已上传!"
 
 }

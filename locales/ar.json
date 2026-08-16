@@ -554,6 +554,9 @@
 "seeds.empty.all": "🌱 لا توجد بذور حتى الآن",
 "remixAvatarConfirm": "إعادة مزج الصورة الرمزية؟",
 "magic.message.title": "صورتك الرمزية اليوغي تتخذ شكلاً.",
-"magic.message.description": "ابقَ مخلصاً لممارستك. عد لاحقاً لتشهد تحولك."
+"magic.message.description": "ابقَ مخلصاً لممارستك. عد لاحقاً لتشهد تحولك.",
+"toast.remix.applied": "✨ تم تطبيق الريمكس!",
+"toast.avatar.uploading": "📤 جاري تحميل الصورة الرمزية...",
+"toast.avatar.uploaded": "✅ تم تحميل الصورة الرمزية!"
 
 }
