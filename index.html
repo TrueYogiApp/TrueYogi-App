@@ -5045,10 +5045,10 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     <div class="flex justify-center gap-4 mt-4">
       <button id="reset-confirm-button" onclick="confirmFullReset()" 
               disabled
-              class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
+              class="mode-btn bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-medium cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed">
         <i class="fas fa-trash-alt mr-1"></i> Reset Everything
       </button>
-      <button id="reset-confirm-cancel" onclick="closeFullResetConfirmation()" class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
+      <button id="reset-confirm-cancel" onclick="closeFullResetConfirmation()" class="mode-btn bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded-lg font-medium cursor-pointer">
         Cancel
       </button>
     </div>
@@ -5125,12 +5125,12 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
       </span>
     </div>
     <div class="mb-2">
-      <button id="clear-modal-confirm" style="padding:10px 26px;background:#B45309;color:#fff;border:none;border-radius:8px;font-weight:500;font-size:1.1em;box-shadow:0 2px 6px rgba(245,124,0,0.3);cursor:pointer;">
+      <button id="clear-modal-confirm" class="mode-btn" style="padding:10px 26px;background:#B45309;color:#fff;border:none;border-radius:8px;font-weight:500;font-size:1.1em;box-shadow:0 2px 6px rgba(245,124,0,0.3);cursor:pointer;">
         <span id="clear-modal-confirm-label">Clear Data</span>
       </button>
     </div>
     <div>
-      <button id="clear-modal-cancel" style="padding:8px 22px;background:#344459;color:#fff;border:none;border-radius:8px;font-size:1em;cursor:pointer;">
+      <button id="clear-modal-cancel" class="mode-btn" style="padding:8px 22px;background:#344459;color:#fff;border:none;border-radius:8px;font-size:1em;cursor:pointer;">
         <span id="clear-modal-cancel-label">Cancel</span>
       </button>
     </div>
