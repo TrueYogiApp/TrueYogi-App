@@ -557,7 +557,12 @@
 "magic.message.description": "अपने अभ्यास के प्रति समर्पित रहें। अपने रूपांतरण को देखने के लिए बाद में वापस आएं।",
 "toast.remix.applied": "✨ रीमिक्स लागू किया गया!",
 "toast.avatar.uploading": "📤 अवतार अपलोड किया जा रहा है...",
-"toast.avatar.uploaded": "✅ अवतार अपलोड हो गया!"
+"toast.avatar.uploaded": "✅ अवतार अपलोड हो गया!",
+"remix.popup.heading": "आपका योगी अवतार जाग गया है",
+"remix.popup.description": "आपकी नई अभिव्यक्ति तैयार है। ✨",
+"remix.popup.later": "बाद में",
+"remix.popup.apply": "✨ अभी लागू करें",
+"remix.popup.hint": "✨ आप इसे बाद में रीमिक्स बटन से भी लागू कर सकते हैं"
 
 
 }

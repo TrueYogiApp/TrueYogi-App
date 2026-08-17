@@ -563,7 +563,12 @@
 "magic.message.description": "Stay devoted to your practice. Come back later to witness your transformation.",
 "toast.remix.applied": "✨ Remix Applied!",
 "toast.avatar.uploading": "📤 Uploading avatar...",
-"toast.avatar.uploaded": "✅ Avatar uploaded!"
+"toast.avatar.uploaded": "✅ Avatar uploaded!",
+"remix.popup.heading": "Your Yogi Avatar Has Awakened",
+"remix.popup.description": "A new expression of you is ready. ✨",
+"remix.popup.later": "Later",
+"remix.popup.apply": "✨ Apply Now",
+"remix.popup.hint": "✨ You can also apply it later with the remix button"
 
   
 }

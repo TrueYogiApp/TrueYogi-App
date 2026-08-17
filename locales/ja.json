@@ -557,6 +557,11 @@
 "magic.message.description": "あなたの修行に献身し続けてください。後で戻ってあなたの変身を目撃してください。",
 "toast.remix.applied": "✨ リミックスが適用されました!",
 "toast.avatar.uploading": "📤 アバターをアップロード中...",
-"toast.avatar.uploaded": "✅ アバターがアップロードされました!"
+"toast.avatar.uploaded": "✅ アバターがアップロードされました!",
+"remix.popup.heading": "あなたのヨギアバターが目覚めました",
+"remix.popup.description": "あなたの新しい一面が準備できました。✨",
+"remix.popup.later": "後で",
+"remix.popup.apply": "✨ 今すぐ適用",
+"remix.popup.hint": "✨ 後でリミックスボタンからも適用できます"
   
 }

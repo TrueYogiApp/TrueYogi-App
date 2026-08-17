@@ -558,6 +558,11 @@
 "magic.message.description": "Оставайтесь верны своей практике. Вернитесь позже, чтобы свидетельствовать вашу трансформацию.",
 "toast.remix.applied": "✨ Ремикс применён!",
 "toast.avatar.uploading": "📤 Загрузка аватара...",
-"toast.avatar.uploaded": "✅ Аватар загружен!"
+"toast.avatar.uploaded": "✅ Аватар загружен!",
+"remix.popup.heading": "Ваш Йога-Аватар Пробудился",
+"remix.popup.description": "Новое выражение вас готово. ✨",
+"remix.popup.later": "Позже",
+"remix.popup.apply": "✨ Применить сейчас",
+"remix.popup.hint": "✨ Вы также можете применить это позже с помощью кнопки ремикса"
   
 }

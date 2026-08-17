@@ -557,6 +557,11 @@
 "magic.message.description": "ابقَ مخلصاً لممارستك. عد لاحقاً لتشهد تحولك.",
 "toast.remix.applied": "✨ تم تطبيق الريمكس!",
 "toast.avatar.uploading": "📤 جاري تحميل الصورة الرمزية...",
-"toast.avatar.uploaded": "✅ تم تحميل الصورة الرمزية!"
+"toast.avatar.uploaded": "✅ تم تحميل الصورة الرمزية!",
+"remix.popup.heading": "لقد استيقظ الأفاتار اليوغي الخاص بك",
+"remix.popup.description": "تعبير جديد عنك جاهز. ✨",
+"remix.popup.later": "لاحقاً",
+"remix.popup.apply": "✨ تطبيق الآن",
+"remix.popup.hint": "✨ يمكنك أيضاً تطبيقه لاحقاً عبر زر الريمكس"
 
 }

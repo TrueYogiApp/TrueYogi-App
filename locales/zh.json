@@ -558,6 +558,11 @@
 "magic.message.description": "保持对你的修行的执着。稍后回来见证你的蜕变。",
 "toast.remix.applied": "✨ 混音已应用!",
 "toast.avatar.uploading": "📤 正在上传头像...",
-"toast.avatar.uploaded": "✅ 头像已上传!"
+"toast.avatar.uploaded": "✅ 头像已上传!",
+"remix.popup.heading": "你的瑜伽化身已觉醒",
+"remix.popup.description": "你的新面貌已准备就绪。✨",
+"remix.popup.later": "稍后",
+"remix.popup.apply": "✨ 立即应用",
+"remix.popup.hint": "✨ 你也可以稍后通过混音按钮应用"
 
 }

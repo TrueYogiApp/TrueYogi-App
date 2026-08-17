@@ -562,7 +562,12 @@
 "magic.message.description": "మీ సాధనకు నిబద్ధంగా ఉండండి. మీ పరిణామాన్ని చూడటానికి తరువాత తిరిగి రండి.",
 "toast.remix.applied": "✨ రీమిక్స్ వర్తింపజేయబడింది!",
 "toast.avatar.uploading": "📤 అవతారాన్ని అప్‌లోడ్ చేస్తోంది...",
-"toast.avatar.uploaded": "✅ అవతారం అప్‌లోడ్ చేయబడింది!"
+"toast.avatar.uploaded": "✅ అవతారం అప్‌లోడ్ చేయబడింది!",
+"remix.popup.heading": "మీ యోగి అవతార్ మేల్కొంది",
+"remix.popup.description": "మీ కొత్త రూపం సిద్ధంగా ఉంది. ✨",
+"remix.popup.later": "తర్వాత",
+"remix.popup.apply": "✨ ఇప్పుడే వర్తించు",
+"remix.popup.hint": "✨ మీరు దీన్ని తర్వాత రీమిక్స్ బటన్ ద్వారా కూడా వర్తించవచ్చు"
 
 
 }
