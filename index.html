@@ -5353,26 +5353,29 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
           </div>
         </div>
 		
-		<div class="mb-4">
+<div class="mb-4">
   <label id="choose-background-music-label" for="music-choice" class="block text-sm text-gray-400 mb-2">
-  <i class="fas fa-music mr-2"></i>
-  <span id="choose-background-music-text"></span>
+    <i class="fas fa-music mr-2"></i>
+    <span id="choose-background-music-text"></span>
   </label>
   <div class="relative">
-  <select id="music-choice" class="w-full bg-gray-800 text-white px-4 py-3 rounded-xl appearance-none cursor-pointer border">
-    <option value="music1.m4a">Miracle cell regeneration</option>
-    <option value="music2.m4a">Soul of the earth</option>
-    <option value="music3.m4a">Krishna flute</option>
-    <option value="music4.m4a">Meditation relaxing</option> 
-    <option value="music5.m4a">Tibetian bowls</option>
-    <option value="music6.m4a">Ambient yoga</option>
-    <option value="music7.m4a">Gayatri mantra</option>
-	<option value="music8.m4a">Lalitha sahasranamam</option>
-  </select>
-  <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
+    <select id="music-choice" class="w-full bg-gray-800 text-white px-4 py-3 rounded-xl appearance-none cursor-pointer border">
+      <option value="music1.m4a">Miracle cell regeneration</option>
+      <option value="music2.m4a">Soul of the earth</option>
+      <option value="music3.m4a">Krishna flute</option>
+      <option value="music4.m4a">Meditation relaxing</option> 
+      <option value="music5.m4a">Tibetian bowls</option>
+      <option value="music6.m4a">Ambient yoga</option>
+      <option value="music7.m4a">Gayatri mantra</option>
+      <option value="music8.m4a">Lalitha sahasranamam</option>
+      <option value="__custom__">📁 Choose from Device</option>
+    </select>
+    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <i class="fas fa-chevron-down"></i>
     </div>
   </div>
+  <!-- Hidden file input - iOS friendly with multiple accept formats -->
+  <input type="file" id="custom-audio-input" accept=".mp3,.m4a,.wav,.aac,.flac,.ogg,.aiff" style="display: none;">
 </div>
 
         <div class="flex items-center justify-center mb-6">
@@ -7869,6 +7872,80 @@ function closeEncouragementModal() {
 	  resetCount: 0, // Add this line
       challengeStreak: 0 // Add this line
     };
+
+
+// Custom audio file storage
+window.customAudioFile = null;
+
+// Get the file input (same as avatar pattern)
+const customAudioInput = document.getElementById('custom-audio-input');
+
+// Handle file selection (updated validation)
+customAudioInput.addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  const musicSelect = document.getElementById('music-choice');
+  
+  if (file) {
+    // Check if it's an audio file by MIME type or extension
+    const validTypes = ['audio/mpeg', 'audio/mp3', 'audio/m4a', 'audio/wav', 'audio/aac', 'audio/flac', 'audio/ogg', 'audio/aiff'];
+    const validExtensions = ['.mp3', '.m4a', '.wav', '.aac', '.flac', '.ogg', '.aiff'];
+    
+    const isAudioByType = validTypes.includes(file.type);
+    const fileName = file.name.toLowerCase();
+    const isAudioByExtension = validExtensions.some(ext => fileName.endsWith(ext));
+    
+    if (isAudioByType || isAudioByExtension) {
+      window.customAudioFile = file;
+      const customOption = document.querySelector('option[value="__custom__"]');
+      if (customOption) {
+        const displayName = file.name.length > 25 ? file.name.substring(0, 22) + '...' : file.name;
+        customOption.textContent = `📁 ${displayName}`;
+      }
+      musicSelect.value = '__custom__';
+    } else {
+      alert('Please select a valid audio file (MP3, M4A, WAV, AAC, FLAC, OGG, AIFF)');
+      musicSelect.value = 'music1.m4a';
+      const customOption = document.querySelector('option[value="__custom__"]');
+      if (customOption) {
+        customOption.textContent = '📁 Choose from Device';
+      }
+    }
+  } else {
+    musicSelect.value = 'music1.m4a';
+  }
+  
+  // Reset the file input
+  this.value = '';
+});
+
+// Handle custom audio selection in dropdown
+document.getElementById('music-choice').addEventListener('change', function(e) {
+  if (this.value === '__custom__') {
+    // Use the same pattern as avatar upload - direct click on hidden input
+    const fileInput = document.getElementById('custom-audio-input');
+    fileInput.value = ''; // Reset to ensure change event fires
+    fileInput.click();
+    
+    // Reset the dropdown to previous value while file picker is open
+    // (optional - prevents the dropdown from staying on __custom__ if user cancels)
+  }
+});
+
+// Also handle when user clicks on the custom option directly (works better on iOS)
+document.getElementById('music-choice').addEventListener('click', function(e) {
+  // If custom is already selected and user clicks the dropdown again
+  if (this.value === '__custom__') {
+    // Don't prevent default - let the change event handle it
+    // But if change event doesn't fire on iOS, this will catch it
+    setTimeout(() => {
+      if (this.value === '__custom__') {
+        const fileInput = document.getElementById('custom-audio-input');
+        fileInput.value = '';
+        fileInput.click();
+      }
+    }, 100);
+  }
+});
 
 
 // BEST FLOW STREAK
@@ -11718,16 +11795,26 @@ async function confirmFullReset() {
         document.getElementById('music-toggle').checked = musicToggleState === 'true';
       }
 
-const musicChoiceEl = document.getElementById('music-choice');
-if (musicChoiceEl) {
-  // Restore previous choice
-  musicChoiceEl.value = selectedMusicFile;
-  updateDurationOptionsForMusic();
-  musicChoiceEl.addEventListener('change', function() {
-    selectedMusicFile = this.value;
-    localStorage.setItem('selectedMusicFile', selectedMusicFile);
-  });
-}
+	const musicChoiceEl = document.getElementById('music-choice');
+	if (musicChoiceEl) {
+	  // Restore previous choice - but only if it's NOT the custom option
+	  if (selectedMusicFile !== '__custom__') {
+		musicChoiceEl.value = selectedMusicFile;
+	  } else {
+		// If custom was saved, default to music4
+		musicChoiceEl.value = 'music4.m4a';
+		selectedMusicFile = 'music4.m4a';
+		localStorage.setItem('selectedMusicFile', 'music4.m4a');
+	  }
+	  updateDurationOptionsForMusic();
+	  musicChoiceEl.addEventListener('change', function() {
+		// Only save if it's NOT the custom option
+		if (this.value !== '__custom__') {
+		  selectedMusicFile = this.value;
+		  localStorage.setItem('selectedMusicFile', selectedMusicFile);
+		}
+	  });
+	}
 
       const savedChallenge = localStorage.getItem('yogiChallenge');
       if (savedChallenge) {
@@ -15148,7 +15235,12 @@ async function beginMeditationSession() {
 
 if (document.getElementById('music-toggle').checked) {
   const bgMusicPlayer = document.getElementById('bg-music-player');
-  bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
+	  // Check if custom audio is selected
+	if (document.getElementById('music-choice').value === '__custom__' && window.customAudioFile) {
+	  bgMusicPlayer.src = URL.createObjectURL(window.customAudioFile);
+	} else {
+	  bgMusicPlayer.src = 'https://assets.trueyogi.app/assets/' + selectedMusicFile;
+	}
   bgMusicPlayer.currentTime = 0;
   bgMusicPlayer.loop = true;
   bgMusicPlayer.volume = 0.5;
@@ -15209,6 +15301,16 @@ if (document.getElementById('music-toggle').checked) {
   // Start timer
   requestAnimationFrame(updateTimer);
   document.addEventListener('visibilitychange', handleVisibilityChange);
+}
+
+// Reset custom music option to default text
+function resetCustomMusicOption() {
+  const customOption = document.querySelector('option[value="__custom__"]');
+  if (customOption) {
+    customOption.textContent = '📁 Choose from Device';
+  }
+  // Reset the file reference too
+  window.customAudioFile = null;
 }
 
     function showEndMeditationModal() {
@@ -15292,6 +15394,15 @@ if (bgMusicPlayer) {
   bgMusicPlayer.pause();
   bgMusicPlayer.currentTime = 0;
   backgroundAudio = null;
+  
+  // Clean up custom audio URL if it exists
+  if (window.customAudioURL) {
+    URL.revokeObjectURL(window.customAudioURL);
+    window.customAudioURL = null;
+  }
+  
+  // Reset the custom option text
+  resetCustomMusicOption();
 }
 
   document.removeEventListener('visibilitychange', handleVisibilityChange);
@@ -15412,6 +15523,15 @@ function stopMeditationMusic() {
     bgMusicPlayer.pause();
     bgMusicPlayer.currentTime = 0;
     backgroundAudio = null;
+    
+    // Clean up custom audio URL if it exists
+    if (window.customAudioURL) {
+      URL.revokeObjectURL(window.customAudioURL);
+      window.customAudioURL = null;
+    }
+    
+    // Reset the custom option text
+    resetCustomMusicOption();
   }
   stopMeditationSelfHeal();
   
