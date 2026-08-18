@@ -7911,7 +7911,9 @@ customAudioInput.addEventListener('change', function(e) {
       }
     }
   } else {
-    musicSelect.value = 'music1.m4a';
+    // User cancelled - revert to previous or default
+    const savedMusic = localStorage.getItem('selectedMusicFile') || 'music1.m4a';
+    musicSelect.value = savedMusic;
   }
   
   // Reset the file input
@@ -7921,29 +7923,34 @@ customAudioInput.addEventListener('change', function(e) {
 // Handle custom audio selection in dropdown
 document.getElementById('music-choice').addEventListener('change', function(e) {
   if (this.value === '__custom__') {
-    // Use the same pattern as avatar upload - direct click on hidden input
     const fileInput = document.getElementById('custom-audio-input');
     fileInput.value = ''; // Reset to ensure change event fires
-    fileInput.click();
-    
-    // Reset the dropdown to previous value while file picker is open
-    // (optional - prevents the dropdown from staying on __custom__ if user cancels)
+    // Small delay helps on some mobile browsers
+    setTimeout(() => {
+      fileInput.click();
+    }, 50);
   }
 });
 
 // Also handle when user clicks on the custom option directly (works better on iOS)
 document.getElementById('music-choice').addEventListener('click', function(e) {
-  // If custom is already selected and user clicks the dropdown again
   if (this.value === '__custom__') {
-    // Don't prevent default - let the change event handle it
-    // But if change event doesn't fire on iOS, this will catch it
-    setTimeout(() => {
-      if (this.value === '__custom__') {
-        const fileInput = document.getElementById('custom-audio-input');
-        fileInput.value = '';
-        fileInput.click();
-      }
-    }, 100);
+    // Only trigger if not already in the process of opening
+    if (!this._opening) {
+      this._opening = true;
+      setTimeout(() => {
+        if (this.value === '__custom__') {
+          const fileInput = document.getElementById('custom-audio-input');
+          fileInput.value = '';
+          try {
+            fileInput.click();
+          } catch (err) {
+            // Silently fail - the change event will handle it
+          }
+        }
+        this._opening = false;
+      }, 100);
+    }
   }
 });
 
