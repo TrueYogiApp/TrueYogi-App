@@ -5368,7 +5368,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
       <option value="music6.m4a">Ambient yoga</option>
       <option value="music7.m4a">Gayatri mantra</option>
       <option value="music8.m4a">Lalitha sahasranamam</option>
-      <option value="__custom__">📁 Choose from Device</option>
+      <option id="music-choice-custom-option" value="__custom__">${t('music.choice.custom')}</option>
     </select>
     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-400">
       <i class="fas fa-chevron-down"></i>
@@ -7907,7 +7907,7 @@ customAudioInput.addEventListener('change', function(e) {
       musicSelect.value = 'music1.m4a';
       const customOption = document.querySelector('option[value="__custom__"]');
       if (customOption) {
-        customOption.textContent = '📁 Choose from Device';
+        customOption.textContent = t('music.choice.custom');
       }
     }
   } else {
@@ -15307,7 +15307,7 @@ if (document.getElementById('music-toggle').checked) {
 function resetCustomMusicOption() {
   const customOption = document.querySelector('option[value="__custom__"]');
   if (customOption) {
-    customOption.textContent = '📁 Choose from Device';
+    customOption.textContent = t('music.choice.custom');
   }
   // Reset the file reference too
   window.customAudioFile = null;
@@ -17640,6 +17640,7 @@ document.querySelector('#wallet-required-modal .bg-gray-700').innerHTML = `<i cl
   document.querySelector('#wallet-switch-block-modal .bg-gray-600').textContent = t('walletSwitchBlockButtonBack');
   document.getElementById('faq-heading').textContent = t('faqHeading');
   document.getElementById('choose-background-music-text').textContent = t('chooseBackgroundMusic');
+  document.getElementById('music-choice-custom-option').textContent = t('music.choice.custom');
   
   // Meditation steps translation
   const stepsList = document.getElementById('meditation-steps-list');
