@@ -3493,6 +3493,16 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   pointer-events: none;
 }
 
+/* For OM Counter Wrapper - smooth transition nebula fix */
+.om-counter-wrapper {
+  transition: opacity 0.3s ease;
+}
+
+.nebula-active .om-counter-wrapper {
+  opacity: 0;
+  pointer-events: none;
+}
+
 
 </style>
   
