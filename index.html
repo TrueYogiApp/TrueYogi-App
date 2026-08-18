@@ -7272,7 +7272,7 @@ function showPostModal() {
       
       <!-- Character counter -->
       <div style="display:flex;justify-content:flex-end;align-items:center;margin-top:6px;gap:8px;">
-        <span id="char-counter" style="color:#64748b;font-size:12px;">500</span>
+        <span id="char-counter" style="color:#64748b;font-size:12px;">1000</span>
         <div id="char-circle" style="
           width:22px;
           height:22px;
@@ -7386,7 +7386,7 @@ function showPostModal() {
   const charCircle = document.getElementById('char-circle');
   const charCircleText = document.getElementById('char-circle-text');
   const plantBtn = document.getElementById('plant-seed-btn');
-  const MAX_CHARS = 500;
+  const MAX_CHARS = 1000;
   
   textarea.addEventListener('input', function() {
     const used = this.value.length;
@@ -7501,7 +7501,7 @@ function removeModalMedia() {
 // Submit seed with media
 async function submitSeed() {
   const content = document.getElementById('modal-content').value.trim();
-  const MAX_CHARS = 500;
+  const MAX_CHARS = 1000;
   
   if (!content) {
     showNotification('📝 Please write something to share!', 'warning');
