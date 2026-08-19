@@ -6114,7 +6114,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   overflow: hidden;
 ">
   <!-- Simple Header -->
-  <div style="
+  <div id="dashboard-header" style="
     padding: 40px 20px 0 20px; /* Added top padding for phone notch */
     border-bottom: 1px solid rgba(255,255,255,0.1);
     text-align: center;
@@ -6126,18 +6126,19 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   </div>
 
   <!-- Tab bar -->
-  <div style="display:flex;gap:10px;justify-content:center;padding:12px 0 0 0;">
+  <div id="dashboard-tabs" style="display:flex;gap:10px;justify-content:center;padding:12px 0 0 0;">
     <button id="tab-pdf" class="mode-btn dashboard-tab dashboard-tab-active">📚 PDFs</button>
     <button id="tab-video" class="mode-btn dashboard-tab">🎬 Videos</button>
 	<button id="tab-seeds" class="mode-btn dashboard-tab">🌱 Seeds</button>
 	<button id="tab-live" class="mode-btn dashboard-tab">
   <span class="live-dot"></span> Live
 </button>
+
   </div>
 
   <!-- PDF List -->
   <div id="pdf-list" style="padding: 20px; overflow-y: auto; flex: 1;"></div>
-  <!-- Video List (initially hidden). -->
+  <!-- Video List (initially hidden) -->
   <!-- Video List with Filter Chips -->
 <div id="video-list" style="padding: 20px; display: none; overflow-y: auto; flex: 1;">
   <!-- Filter Chips - Horizontal Scroll -->
@@ -6174,17 +6175,6 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
       flex-shrink: 0;
     ">Bhagavad Gita</button>
     
-    <!-- Vasistha Gita Button
-    <button id="filter-vasistha-gita" class="filter-chip" style="
-      background: rgba(255,255,255,0.05);
-      border: 1px solid rgba(255,255,255,0.15);
-      color: #fef3c7;
-      padding: 8px 16px;
-      border-radius: 20px;
-      cursor: pointer;
-      font-size: 14px;
-      flex-shrink: 0;
-    ">Vasistha Gita</button>  -->
     
     <!-- You can add more filters here -->
     <!-- <button id="filter-upanishads" class="filter-chip" style="flex-shrink:0;">🕉️ Upanishads</button> -->
@@ -6232,7 +6222,6 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     "/>
   </div>
 </div>
-
 
   <!-- PDF Viewer Overlay (same as before) -->
   <div id="pdf-viewer-overlay" style="
@@ -6293,7 +6282,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   </div>
   
   <!-- Simple Footer -->
-  <div style="
+  <div id="dashboard-footer" style="
     padding: 15px;
     text-align: center;
     color: #64748b;
@@ -6302,10 +6291,254 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   ">
     Tap any teaching to open, or watch a video from the Videos tab.
   </div>
+  <!-- Scroll to Top Button -->
+<button id="scroll-to-top-btn" style="
+  display: none;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: rgba(255, 215, 0, 0.9);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  z-index: 9999;
+  transition: all 0.3s ease;
+  display: none;
+  align-items: center;
+  justify-content: center;
+">
+  ↑
+</button>
 </div>
 
+<style>
+/* Make dashboard use flex column and content fill space */
+#dashboard-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* Make all content containers expand to fill available space */
+#pdf-list, 
+#video-list, 
+#live-list, 
+#seeds-list {
+  flex: 1;
+  overflow-y: auto;
+  transition: flex 0.3s ease;
+}
+
+/* Ensure header, tabs, and footer don't shrink */
+#dashboard-header,
+#dashboard-tabs,
+#dashboard-footer {
+  flex-shrink: 0;
+}
+
+/* Scroll to top button styles */
+#scroll-to-top-btn {
+  display: none !important;
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  background: rgba(255, 215, 0, 0.9);
+  color: #1a1a2e;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 24px;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+  z-index: 9999;
+  transition: all 0.3s ease;
+  align-items: center;
+  justify-content: center;
+}
+
+#scroll-to-top-btn:hover {
+  transform: scale(1.1);
+  background: rgba(255, 215, 0, 1);
+  box-shadow: 0 6px 20px rgba(255, 215, 0, 0.5);
+}
+
+#scroll-to-top-btn:active {
+  transform: scale(0.9);
+}
+
+#scroll-to-top-btn.show {
+  display: flex !important;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+#scroll-to-top-btn.show {
+  display: flex !important;
+  animation: bounce 2s infinite;
+}
+</style>
 
 <script>
+
+// Auto-hide header, tabs, and footer on scroll with dynamic expansion
+const dashboardPanel = document.getElementById('dashboard-panel');
+let lastScrollTop = 0;
+
+// Get elements
+const header = document.getElementById('dashboard-header');
+const tabBar = document.getElementById('dashboard-tabs');
+const footer = document.getElementById('dashboard-footer');
+const contentContainers = [
+  document.getElementById('pdf-list'),
+  document.getElementById('video-list'),
+  document.getElementById('live-list'),
+  document.getElementById('seeds-list')
+];
+ 
+
+// Ensure content containers fill remaining space
+contentContainers.forEach(container => {
+  if (container) {
+    container.style.flex = '1';
+    container.style.transition = 'flex 0.3s ease';
+    container.style.overflow = 'auto';
+  }
+});
+
+// Add scroll listener
+contentContainers.forEach(container => {
+  if (container) {
+    container.addEventListener('scroll', function() {
+      const currentScroll = this.scrollTop;
+      
+      if (currentScroll > lastScrollTop && currentScroll > 30) {
+        hideHeaderAndFooter();
+      } else if (currentScroll < lastScrollTop) {
+        showHeaderAndFooter();
+      }
+      
+      lastScrollTop = currentScroll;
+      
+      if (currentScroll > 0) {
+        hideHeaderAndFooter();
+      } else {
+        showHeaderAndFooter();
+      }
+    }, { passive: true });
+  }
+});
+
+function hideHeaderAndFooter() {
+  // Hide header and tabs
+  header.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease';
+  tabBar.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease';
+  footer.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease';
+  
+  header.style.transform = 'translateY(-100%)';
+  header.style.opacity = '0';
+  header.style.height = '0';
+  header.style.margin = '0';
+  header.style.padding = '0';
+  header.style.overflow = 'hidden';
+  
+  tabBar.style.transform = 'translateY(-100%)';
+  tabBar.style.opacity = '0';
+  tabBar.style.height = '0';
+  tabBar.style.margin = '0';
+  tabBar.style.padding = '0';
+  tabBar.style.overflow = 'hidden';
+  
+  footer.style.transform = 'translateY(100%)';
+  footer.style.opacity = '0';
+  footer.style.height = '0';
+  footer.style.margin = '0';
+  footer.style.padding = '0';
+  footer.style.overflow = 'hidden';
+  
+  // Content will automatically expand to fill the space because of flex: 1
+}
+
+function showHeaderAndFooter() {
+  // Reset header with proper positioning
+  header.style.transform = 'translateY(0)';
+  header.style.opacity = '1';
+  header.style.height = ''; // Reset to auto
+  header.style.margin = '';
+  header.style.padding = '40px 20px 0 20px'; // Restore original padding
+  header.style.overflow = '';
+  header.style.position = ''; // Reset any position changes
+  
+  // Reset tab bar
+  tabBar.style.transform = 'translateY(0)';
+  tabBar.style.opacity = '1';
+  tabBar.style.height = '';
+  tabBar.style.margin = '';
+  tabBar.style.padding = '12px 0 0 0'; // Restore original padding
+  tabBar.style.overflow = '';
+  tabBar.style.position = '';
+  
+  // Reset footer
+  footer.style.transform = 'translateY(0)';
+  footer.style.opacity = '1';
+  footer.style.height = '';
+  footer.style.margin = '';
+  footer.style.padding = '15px'; // Restore original padding
+  footer.style.overflow = '';
+  footer.style.position = '';
+}
+
+
+// Scroll to Top Button
+const scrollToTopBtn = document.getElementById('scroll-to-top-btn');
+
+// Show/hide button based on scroll position
+contentContainers.forEach(container => {
+  if (container) {
+    container.addEventListener('scroll', function() {
+      const scrollPosition = this.scrollTop;
+      
+      // Show button when scrolled down more than 200px
+      if (scrollPosition > 200) {
+        scrollToTopBtn.classList.add('show');
+        scrollToTopBtn.style.display = 'flex';
+      } else {
+        scrollToTopBtn.classList.remove('show');
+        scrollToTopBtn.style.display = 'none';
+      }
+    }, { passive: true });
+  }
+});
+
+// Scroll to top when button is clicked
+scrollToTopBtn.addEventListener('click', function() {
+  // Find which content container is currently visible
+  const visibleContainer = contentContainers.find(container => {
+    return container && container.style.display !== 'none' && container.offsetParent !== null;
+  });
+  
+  if (visibleContainer) {
+    // Smooth scroll to top
+    visibleContainer.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  }
+  
+  // Also show header and footer after scrolling to top
+  setTimeout(() => {
+    showHeaderAndFooter();
+  }, 300);
+});
+
+
 // SIMPLE PDF FUNCTIONS
 let currentPDF = null;
 let currentPDFName = '';
