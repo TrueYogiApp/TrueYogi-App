@@ -3473,32 +3473,15 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 }
 
 
-/* For Web3 section nebula fix */
-.auth-section-container {
+/* ===== NEBULA FIX - Smooth transitions for all elements ===== */
+
+/* All elements with nebula-hide class will transition smoothly */
+.nebula-hide {
   transition: opacity 0.3s ease;
 }
 
-.nebula-active .auth-section-container {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* For Welcome Modal - same smooth transition nebula fix*/
-#welcome-message {
-  transition: opacity 0.3s ease;
-}
-
-.nebula-active #welcome-message {
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* For OM Counter Wrapper - smooth transition nebula fix */
-.om-counter-wrapper {
-  transition: opacity 0.3s ease;
-}
-
-.nebula-active .om-counter-wrapper {
+/* When nebula is active, hide all elements with nebula-hide class */
+.nebula-active .nebula-hide {
   opacity: 0;
   pointer-events: none;
 }
@@ -10355,6 +10338,7 @@ function renderSpaceshipOfflineInfoPopup() {
 
 const spaceshipPopup = document.createElement('div');
 spaceshipPopup.id = 'spaceship-popup';
+spaceshipPopup.className = 'nebula-hide';
 document.body.appendChild(spaceshipPopup);
 
 // --- Function to render the popup, always uses the latest language
