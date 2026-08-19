@@ -6310,6 +6310,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 let currentPDF = null;
 let currentPDFName = '';
 let pdfs = [];
+const cacheBuster = Date.now();
 
 // --- Color palette to rotate through for cards (add or edit as you like) ---
 const cardColors = [
@@ -6361,7 +6362,7 @@ function renderPDFList() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  fetch('https://assets.trueyogi.app/assets/Material/material.json')
+  fetch(`https://assets.trueyogi.app/assets/Material/material.json?t=${cacheBuster}`)
     .then(r => r.json())
     .then(data => {
       pdfs = data;
@@ -6508,7 +6509,7 @@ function updateFilterActiveState(activeFilter) {
 
 // Load videos
 document.addEventListener('DOMContentLoaded', function() {
-  fetch('https://assets.trueyogi.app/assets/Material/videos3.json')
+  fetch(`https://assets.trueyogi.app/assets/Material/videos3.json?t=${cacheBuster}`)
     .then(r => r.json())
     .then(data => {
       videos = data;
@@ -6855,7 +6856,7 @@ let liveStreams = [];
 
 // Fetch live content
 document.addEventListener('DOMContentLoaded', function() {
-  fetch('https://assets.trueyogi.app/assets/Material/live.json')
+  fetch(`https://assets.trueyogi.app/assets/Material/live.json?t=${cacheBuster}`)
     .then(r => r.json())
     .then(data => {
       liveStreams = data;
