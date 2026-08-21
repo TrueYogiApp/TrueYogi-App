@@ -18644,7 +18644,9 @@ document.addEventListener('DOMContentLoaded', function() {
           om.muted = false;
           om.currentTime = 0;
           om.volume = 0.7;
-          om.play();
+          setTimeout(() => {
+		  om.play();
+		}, 100);
           isPlaying = true;
           safeAddCount();
           startOmSelfHeal();
