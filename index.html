@@ -25805,7 +25805,7 @@ function closeDashboardPanel() {
 
 // Unlock both DOM <audio> and AudioContext on first tap/click/key
 function unlockMeditationAudio() {
-  ['sound-bell','sound-bowl','sound-chimes','sound-gong','om-sound'].forEach(id => {
+  ['sound-bell','sound-bowl','sound-chimes','sound-gong'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
       el.muted = true;    // ← Mute for real silence
