@@ -18620,6 +18620,8 @@ document.addEventListener('DOMContentLoaded', function() {
   function handleLogoTap(e) {
     e.preventDefault();
     e.stopPropagation();
+	
+	unlockMeditationAudio();
 
     const rect = logo.getBoundingClientRect();
     const centerX = rect.left + rect.width / 2;
