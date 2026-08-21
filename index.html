@@ -29048,4 +29048,274 @@ window.fetchSessionsFromSupabase = async function() {
       document.getElementById('fetch-indicator').style.display = 'none';
     }, 1111);
   } catch (err) {
-    // alert('Network error fetching sessions: ' + er
+    // alert('Network error fetching sessions: ' + err.message);
+  }
+};
+
+// Add after sessions sync/fetch logic
+
+// 1️⃣ Sync local yogi_config to Supabase (Local → Cloud)
+window.syncYogiConfigToSupabase = async function() {
+  // Ensure wallet is connected
+  if (!window.walletPublicKey) {
+    console.warn('Cannot sync Yogi Config: Wallet not connected.');
+    return;
+  }
+  
+  // Get local Yogi Config
+  const yogiConfig = JSON.parse(localStorage.getItem('yogiConfig') || '{}');
+  if (!yogiConfig || !yogiConfig.startDate) {
+    console.warn('Cannot sync Yogi Config: No local config found.');
+    return;
+  }
+
+  // Check if sync is needed (skip if already synced)
+  if (yogiConfig.sync_status === 'synced') {
+    console.log('Yogi Config already synced; skipping API call.');
+    return;
+  }
+
+  // Prepare the payload for the API
+  const configRow = {
+    ...yogiConfig,
+    user_id: window.walletPublicKey,
+    sync_status: 'synced',
+    local_updated_at: new Date().toISOString(),
+  };
+
+  try {
+    // Send the config to the Supabase backend
+    const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi_config', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('jwtToken'),
+      },
+      body: JSON.stringify({ yogi_config: configRow }),
+    });
+    const result = await resp.json();
+
+    if (result.success) {
+      console.info('Yogi Config synced successfully.');
+      // Update local status
+      yogiConfig.sync_status = 'synced';
+      yogiConfig.last_synced = new Date().toISOString();
+      localStorage.setItem('yogiConfig', JSON.stringify(yogiConfig));
+    } else {
+      console.warn('Backend returned an error while syncing Yogi Config:', result.error || 'Unknown error');
+    }
+  } catch (error) {
+    console.error('Network error syncing Yogi Config:', error.message);
+  }
+};
+
+// 2️⃣ Fetch yogi_config from Supabase (Cloud → Local)
+window.fetchYogiConfigFromSupabase = async function() {
+  if (!window.walletPublicKey) {
+    alert('Connect wallet first!');
+    return;
+  }
+  try {
+    const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi_config', {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+      }
+    });
+    const result = await resp.json();
+     if (!result.success) {
+      // Ignore error if it's "No yogi_config found for user" or similar
+      if (
+        result.error &&
+        (
+          /no yogi[_ ]config.*not found/i.test(result.error) ||
+          /no yogi[_ ]config found for user/i.test(result.error) ||
+          /no rows returned/i.test(result.error) ||
+          /not found/i.test(result.error)
+        )
+      ) {
+        // Do nothing, this is expected for new users
+        return;
+      }
+      if (!result.success) {
+  if (
+    result.error &&
+    /invalid|expired token|token/i.test(result.error)
+  ) {
+    showSyncAuthBanner(); // Show banner, not alert
+    return;
+  }
+  alert('Backend yogi_config fetch error: ' + (result.error || 'Unknown error'));
+  return;
+}
+    }
+    const data = result.yogi_config;
+    if (data) {
+      localStorage.setItem('yogiConfig', JSON.stringify(data));
+      // Optionally update UI/config in app
+    }
+  } catch (err) {
+   // alert('Network error fetching yogi config: ' + err.message);
+  }
+  // Optionally show UI fetch indicator
+};
+
+
+
+// --- Yogi Challenge Sync & Fetch ---
+// 1️⃣ Sync local yogiChallenge to Supabase (Local → Cloud)
+window.syncYogiChallengeToSupabase = async function() {
+  if (!window.walletPublicKey) {
+    // Optionally alert: alert('Connect wallet first!');
+    return;
+  }
+  const yogiChallenge = JSON.parse(localStorage.getItem('yogiChallenge') || '{}');
+  if (!yogiChallenge || !yogiChallenge.startDate) {
+    // Optionally alert: alert('No yogi challenge to sync!');
+    return;
+  }
+  // Compose backend row
+  const challengeRow = {
+    ...yogiChallenge,
+    user_id: window.walletPublicKey,
+    challengeId: yogiChallenge.challengeId || 'default_challenge',
+    sync_status: 'synced',
+    local_updated_at: new Date().toISOString()
+  };
+  try {
+    const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi_challenge', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+      },
+      body: JSON.stringify({ yogi_challenge: challengeRow }),
+    });
+    const result = await resp.json();
+    if (!result.success && result.error && result.error.toLowerCase().includes('token')) {
+  showSyncAuthBanner(); // <-- Show persistent banner if JWT is expired/invalid
+  return;
+}
+if (!result.success) {
+  if (result.error && !/no rows returned|not found/i.test(result.error)) {
+    alert('Backend yogi_challenge sync error: ' + (result.error || 'Unknown error'));
+  }
+}
+  } catch (err) {
+  //  alert('Network error syncing yogi challenge: ' + err.message);
+  }
+  // Optional: show UI sync indicator here if you wish
+};
+
+// 2️⃣ Fetch yogiChallenge from Supabase (Cloud → Local)
+window.fetchYogiChallengeFromSupabase = async function() {
+  if (!window.walletPublicKey) {
+    // Optionally alert: alert('Connect wallet first!');
+    return;
+  }
+  try {
+    const resp = await fetch('https://trueyogi-backend-knkq.onrender.com/api/yogi_challenge', {
+      headers: {
+        'Authorization': 'Bearer ' + localStorage.getItem('jwtToken')
+      }
+    });
+    const result = await resp.json();
+    if (!result.success) {
+  // Ignore error if it's "No yogi_challenge found for user" or similar
+  if (
+    result.error &&
+    (
+      /no yogi[_ ]challenge.*not found/i.test(result.error) ||
+      /no yogi[_ ]challenge found for user/i.test(result.error) ||
+      /no rows returned/i.test(result.error) ||
+      /not found/i.test(result.error)
+    )
+  ) {
+    // Do nothing, this is expected for new users
+    return;
+  }
+  if (!result.success) {
+  if (
+    result.error &&
+    /invalid|expired token|token/i.test(result.error)
+  ) {
+    showSyncAuthBanner();
+    return;
+  }
+  alert('Backend yogi_challenge fetch error: ' + (result.error || 'Unknown error'));
+  return;
+}
+}
+    const data = result.yogi_challenge;
+    if (data) {
+      localStorage.setItem('yogiChallenge', JSON.stringify(data));
+      // Optionally update UI/progress in app here
+    }
+  } catch (err) {
+   // alert('Network error fetching yogi challenge: ' + err.message);
+  }
+  // Optional: show fetch indicator
+};
+
+
+  // 3️⃣ Optional: Sync and fetch on wallet connect.
+  window.addEventListener('wallet-connected', async function() {
+	 fixUnknownSessionIds();
+	  await window.fetchSessionsFromSupabase();
+	 if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiChallengeToSupabase === "function") {
+	  //await window.fetchYogiConfigFromSupabase();
+      //await window.fetchYogiChallengeFromSupabase();
+      await window.syncYogiChallengeToSupabase();
+  }
+      // Sync the Yogi Config (new logic includes skip for already synced)
+  if (window.walletPublicKey && localStorage.getItem('jwtToken') && typeof window.syncYogiConfigToSupabase === "function") {
+    await window.syncYogiConfigToSupabase();
+  }
+  });
+
+// 4️⃣ Sync when coming online (add this!)
+window.addEventListener('online', () => {
+  if (window.walletPublicKey && !isJwtValid()) {
+    showSyncAuthBanner();
+    return;
+  }
+  if (window.walletPublicKey) {
+    fixUnknownSessionIds();
+    window.syncSessionsToSupabase();
+    // Challenge sync if on complete-section:
+    const completeSection = document.getElementById('complete-section');
+    if (
+      completeSection && 
+      !completeSection.classList.contains('hidden') &&
+      typeof window.syncYogiChallengeToSupabase === "function"
+    ) {
+      confirmCompletion();
+    }
+  }
+});
+
+  // 4️⃣ Manual triggers for testing (browser console)
+  // window.syncSessionsToSupabase();
+  // window.fetchSessionsFromSupabase();
+
+  // 5️⃣ Example: Expose utility function for direct use
+ // window.supabaseSync = {
+   // upload: window.syncSessionsToSupabase,
+   // download: window.fetchSessionsFromSupabase
+  // };
+
+  // 6️⃣ Usage:
+  // Call window.syncSessionsToSupabase() to upload local → Supabase
+  // Call window.fetchSessionsFromSupabase() to download Supabase → local
+  // You can hook these to UI events if needed!
+	
+  window.supabase = supabase;
+  window.authenticateWithWallet = authenticateWithWallet;
+  window.promptVerifyAndSync = promptVerifyAndSync;
+  window.updateWalletUI = updateWalletUI;
+  startCallPolling();
+  startCallbackPolling();
+  
+</script>
+
+</body>
+</html>
