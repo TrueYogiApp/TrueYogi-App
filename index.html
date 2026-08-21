@@ -18629,8 +18629,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
 
     if (dist < 33) {
-	// UNLOCK AUDIO (handles both DOM audio AND web audio context)
-	unlockMeditationAudio();
+      // Resume audio context if needed (usually for iOS)
+      if (!window.audioContextResumed && window.webkitAudioContext) {
+        const context = new (window.AudioContext || window.webkitAudioContext)();
+        context.resume();
+        window.audioContextResumed = true;
+      }
 
       if (!isPlaying) {
         try {
@@ -25800,34 +25804,30 @@ function closeDashboardPanel() {
 
 
 // Unlock both DOM <audio> and AudioContext on first tap/click/key
-// At the top level (outside DOMContentLoaded)
-let audioUnlocked = false;
-
 function unlockMeditationAudio() {
-  if (audioUnlocked) return;
-  audioUnlocked = true;
-  
   ['sound-bell','sound-bowl','sound-chimes','sound-gong','om-sound'].forEach(id => {
     const el = document.getElementById(id);
     if (el) {
-      el.muted = true;
+      el.muted = true;    // ← Mute for real silence
       el.volume = 0;
       el.play()
         .then(() => {
           setTimeout(() => {
             el.pause();
             el.currentTime = 0;
-            el.muted = false;
-            el.volume = 1;
+            el.muted = false; // ← Unmute for future!
+            el.volume = 1;    // Reset to normal loudness
           }, 50);
-        })
-        .catch(() => {});
+        });
     }
   });
   window.yogiAudioCtx = window.yogiAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
   window.yogiAudioCtx.resume && window.yogiAudioCtx.resume();
 }
 
+['touchstart', 'mousedown', 'keydown'].forEach(evt =>
+  document.addEventListener(evt, unlockMeditationAudio, {once:true})
+);
 
 // 2. Always use this function to play your meditation sounds
 function tryPlayZoneSound(zone) {
