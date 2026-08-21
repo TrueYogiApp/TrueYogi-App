@@ -18611,6 +18611,48 @@ window.addEventListener('focus', () => {
   if (sessionActive) requestWakeLock();
 });
 
+
+// --- DEDICATED OM UNLOCK (More Reliable) ---
+let omAudioUnlocked = false;
+
+function unlockOmAudio() {
+  if (omAudioUnlocked) return;
+  omAudioUnlocked = true;
+  
+  const el = document.getElementById('om-sound');
+  if (el) {
+    // Try multiple times to ensure unlock
+    const attemptUnlock = (attempt = 0) => {
+      el.muted = true;
+      el.volume = 0;
+      el.play()
+        .then(() => {
+          setTimeout(() => {
+            el.pause();
+            el.currentTime = 0;
+            el.muted = false;
+            el.volume = 0.7;
+          }, 50);
+        })
+        .catch(() => {
+          // Retry if failed (up to 3 times)
+          if (attempt < 3) {
+            setTimeout(() => attemptUnlock(attempt + 1), 100);
+          }
+        });
+    };
+    attemptUnlock();
+  }
+  
+  // Ensure audio context is resumed
+  if (!window.yogiAudioCtx) {
+    window.yogiAudioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  if (window.yogiAudioCtx.state === 'suspended') {
+    window.yogiAudioCtx.resume();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
   const counterEl = document.getElementById('om-counter');
   const logo = document.getElementById('logo-sacred');
@@ -18629,11 +18671,10 @@ document.addEventListener('DOMContentLoaded', function() {
     const dist = Math.sqrt(Math.pow(centerX - clickX, 2) + Math.pow(centerY - clickY, 2));
 
     if (dist < 33) {
-      // Resume audio context if needed (usually for iOS)
-      if (!window.audioContextResumed && window.webkitAudioContext) {
-        const context = new (window.AudioContext || window.webkitAudioContext)();
-        context.resume();
-        window.audioContextResumed = true;
+unlockOmAudio();
+      // Also ensure global audio context
+      if (window.yogiAudioCtx && window.yogiAudioCtx.state === 'suspended') {
+        window.yogiAudioCtx.resume();
       }
 
       if (!isPlaying) {
