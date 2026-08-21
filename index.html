@@ -25828,10 +25828,6 @@ function unlockMeditationAudio() {
   window.yogiAudioCtx.resume && window.yogiAudioCtx.resume();
 }
 
-// Global unlock (runs once)
-['touchstart', 'mousedown', 'keydown'].forEach(evt =>
-  document.addEventListener(evt, unlockMeditationAudio, {once: true})
-);
 
 // 2. Always use this function to play your meditation sounds
 function tryPlayZoneSound(zone) {
