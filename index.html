@@ -6892,7 +6892,7 @@ overlay.addEventListener('click', function(e) {
   // Load YouTube IFrame API if not already loaded
   if (!window.YT) {
     const tag = document.createElement('script');
-    tag.src = "https://www.youtube.com/iframe_api";
+    tag.src = "https://www.youtube-nocookie.com/iframe_api";
     const firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
   }
@@ -6908,7 +6908,7 @@ overlay.addEventListener('click', function(e) {
         'rel': 0,
         'modestbranding': 1,
         'showinfo': 0,
-		'origin': 'https://trueyogi.app'
+		'origin': window.location.origin
       },
       events: {
         'onReady': onPlayerReady,
