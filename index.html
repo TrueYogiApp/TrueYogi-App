@@ -27817,8 +27817,31 @@ const chakraColors = [
     {hue: 300, name: "Crown"}      // Violet (top)
 ];
 
-// Get user's current challenge day (from your app logic)
-const currentDay = challengeData.currentDay || 1;
+// Get user's current challenge day - try multiple sources
+let currentDay = 1;
+
+// First try localStorage (where the real data is)
+try {
+    const storedData = localStorage.getItem('yogiChallenge');
+    if (storedData) {
+        const parsedData = JSON.parse(storedData);
+        if (parsedData && parsedData.currentDay) {
+            currentDay = parsedData.currentDay;
+            //console.log('Found currentDay in localStorage:', currentDay);
+        }
+    }
+} catch(e) {
+    console.warn('Error reading from localStorage:', e);
+}
+
+// Fallback to challengeData if localStorage didn't work
+if (currentDay === 1 && challengeData && challengeData.currentDay) {
+    currentDay = challengeData.currentDay;
+    //console.log('Found currentDay in challengeData:', currentDay);
+}
+
+//console.log('Final currentDay used:', currentDay);
+
 const unlockedChakra = getUnlockedChakraIndex(currentDay);
 const chakraPetalCounts = [4, 6, 10, 12, 16, 2, 32]; // Petal counts for chakras
 
