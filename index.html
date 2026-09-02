@@ -7222,10 +7222,11 @@ function toggleMySeeds() {
 
 // Helper function to check if content contains a YouTube link and extract video ID
 function extractYouTubeUrl(content) {
-  // Match YouTube URLs (youtube.com/watch?v= or youtu.be/)
+  // Match YouTube URLs (youtube.com/watch?v=, youtu.be/, youtube.com/shorts/, youtube.com/embed/)
   const patterns = [
     /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
     /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,  // <-- ADD THIS LINE for Shorts
     /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/
   ];
   
@@ -7292,6 +7293,8 @@ function renderSeedsWithFilter() {
 	  displayContent = displayContent.replace(/https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[a-zA-Z0-9_-]{11}(?:&[^&\s]*)*/g, '');
 	  // Remove youtu.be/... with any query params
 	  displayContent = displayContent.replace(/https?:\/\/(?:www\.)?youtu\.be\/[a-zA-Z0-9_-]{11}(?:\?[^\s]*)?/g, '');
+	  // Remove youtube.com/shorts/... with any query params (NEW)
+	  displayContent = displayContent.replace(/https?:\/\/(?:www\.)?youtube\.com\/shorts\/[a-zA-Z0-9_-]{11}(?:\?[^\s]*)?/g, '');
 	  // Remove any remaining query strings that might be left
 	  displayContent = displayContent.replace(/\?si=[a-zA-Z0-9_-]+/g, '');
 	  displayContent = displayContent.trim();
