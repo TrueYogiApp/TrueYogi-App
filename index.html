@@ -7220,6 +7220,39 @@ function toggleMySeeds() {
   renderSeedsWithFilter();
 }
 
+// Helper function to check if content contains a YouTube link and extract video ID
+function extractYouTubeUrl(content) {
+  // Match YouTube URLs (youtube.com/watch?v= or youtu.be/)
+  const patterns = [
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+    /(?:https?:\/\/)?(?:www\.)?youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /(?:https?:\/\/)?(?:www\.)?youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/
+  ];
+  
+  for (const pattern of patterns) {
+    const match = content.match(pattern);
+    if (match) {
+      return match[1]; // Return the video ID
+    }
+  }
+  return null; // No YouTube link found
+}
+
+// Generate YouTube embed HTML
+function getYouTubeEmbed(videoId) {
+  return `
+    <div style="margin:10px 0;border-radius:8px;overflow:hidden;position:relative;padding-bottom:56.25%;height:0;">
+      <iframe 
+        src="https://www.youtube.com/embed/${videoId}" 
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;border-radius:8px;"
+        allowfullscreen
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      ></iframe>
+    </div>
+  `;
+}
+
 // Render seeds with filter
 function renderSeedsWithFilter() {
   const container = document.getElementById('seeds-container');
@@ -7234,13 +7267,12 @@ function renderSeedsWithFilter() {
   if (filteredData.length === 0) {
     container.innerHTML = `
       <div style="color:#94a3b8;text-align:center;padding:40px;">
-         ${showMySeedsOnly ? t('seeds.empty.myseeds') : t('seeds.empty.all')}
+        ${showMySeedsOnly ? t('seeds.empty.myseeds') : t('seeds.empty.all')}
       </div>
     `;
     return;
   }
   
-  // Reuse existing render logic
   const currentUserIdForRender = currentUserId;
   
   function truncateUserId(userId) {
@@ -7251,6 +7283,19 @@ function renderSeedsWithFilter() {
   
   container.innerHTML = filteredData.map(post => {
     const canDelete = canPost() && post.om_user_id === currentUserIdForRender;
+    const youtubeId = extractYouTubeUrl(post.content);
+    
+	// Clean content - remove YouTube URL from text (including all query parameters)
+	let displayContent = post.content;
+	if (youtubeId) {
+	  // Remove youtube.com/watch?v=... with any query params
+	  displayContent = displayContent.replace(/https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[a-zA-Z0-9_-]{11}(?:&[^&\s]*)*/g, '');
+	  // Remove youtu.be/... with any query params
+	  displayContent = displayContent.replace(/https?:\/\/(?:www\.)?youtu\.be\/[a-zA-Z0-9_-]{11}(?:\?[^\s]*)?/g, '');
+	  // Remove any remaining query strings that might be left
+	  displayContent = displayContent.replace(/\?si=[a-zA-Z0-9_-]+/g, '');
+	  displayContent = displayContent.trim();
+	}
     
     return `
       <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:16px;margin-bottom:16px;position:relative;">
@@ -7273,7 +7318,8 @@ function renderSeedsWithFilter() {
             <video src="${post.video_url}" style="max-width:100%;max-height:300px;border-radius:8px;" controls/>
           </div>
         ` : ''}
-        <div style="color:#e2e8f0;line-height:1.6;white-space:pre-wrap;">${post.content}</div>
+        ${youtubeId ? getYouTubeEmbed(youtubeId) : ''}
+        ${displayContent ? `<div style="color:#e2e8f0;line-height:1.6;white-space:pre-wrap;">${displayContent}</div>` : ''}
         
         <!-- Delete button at bottom right -->
         ${canDelete ? `
