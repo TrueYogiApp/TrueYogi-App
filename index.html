@@ -6389,10 +6389,9 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 
 <script>
 
-// Auto-hide header, tabs, and footer on scroll - SYNCHRONIZED WITH SCROLL
+// Auto-hide header, tabs, and footer on scroll with dynamic expansion
 const dashboardPanel = document.getElementById('dashboard-panel');
 let lastScrollTop = 0;
-let isHeaderHidden = false;
 
 // Get elements
 const header = document.getElementById('dashboard-header');
@@ -6404,128 +6403,39 @@ const contentContainers = [
   document.getElementById('live-list'),
   document.getElementById('seeds-list')
 ];
+ 
 
-// Get header heights for smooth translation
-function getHeaderHeight() {
-  const headerHeight = header.offsetHeight || 100;
-  const tabHeight = tabBar.offsetHeight || 50;
-  return headerHeight + tabHeight;
-}
+// Ensure content containers fill remaining space
+contentContainers.forEach(container => {
+  if (container) {
+    container.style.flex = '1';
+    container.style.transition = 'flex 0.3s ease';
+    container.style.overflow = 'auto';
+  }
+});
 
-// Add scroll listener with smooth following - IMPROVED TO PREVENT BLACK PATCHES
+// Add scroll listener
 contentContainers.forEach(container => {
   if (container) {
     container.addEventListener('scroll', function() {
       const currentScroll = this.scrollTop;
       
-      // Calculate scroll progress (0 to 1) - use 200px for full hide
-      const scrollProgress = Math.min(currentScroll / 200, 1);
-      
-      // Calculate total header height
-      const totalHeaderHeight = getHeaderHeight();
-      
-      // Smooth translate for header (moves up)
-      const translateY = -scrollProgress * totalHeaderHeight;
-      
-      // Apply to header and tabs with smooth transition
-      header.style.transition = 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease';
-      tabBar.style.transition = 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease';
-      footer.style.transition = 'transform 0.15s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.15s ease';
-      
-      header.style.transform = `translateY(${translateY}px)`;
-      tabBar.style.transform = `translateY(${translateY}px)`;
-      
-      // Footer slides down
-      const footerTranslate = scrollProgress * footer.offsetHeight;
-      footer.style.transform = `translateY(${footerTranslate}px)`;
-      
-      // Fade based on scroll - keep minimum opacity to avoid sudden disappearance
-      const opacity = 1 - scrollProgress;
-      header.style.opacity = Math.max(opacity, 0);
-      tabBar.style.opacity = Math.max(opacity, 0);
-      footer.style.opacity = Math.max(opacity, 0);
-      
-      // When fully hidden, collapse to remove black patches
-      if (scrollProgress >= 0.95) {
-        header.style.height = '0';
-        header.style.padding = '0';
-        header.style.margin = '0';
-        header.style.overflow = 'hidden';
-        header.style.borderBottom = 'none';
-        
-        tabBar.style.height = '0';
-        tabBar.style.padding = '0';
-        tabBar.style.margin = '0';
-        tabBar.style.overflow = 'hidden';
-        tabBar.style.borderBottom = 'none';
-        
-        footer.style.height = '0';
-        footer.style.padding = '0';
-        footer.style.margin = '0';
-        footer.style.overflow = 'hidden';
-        footer.style.borderTop = 'none';
-      } else {
-        // Restore when not fully hidden
-        header.style.height = '';
-        header.style.padding = '';
-        header.style.margin = '';
-        header.style.overflow = '';
-        header.style.borderBottom = '';
-        
-        tabBar.style.height = '';
-        tabBar.style.padding = '';
-        tabBar.style.margin = '';
-        tabBar.style.overflow = '';
-        tabBar.style.borderBottom = '';
-        
-        footer.style.height = '';
-        footer.style.padding = '';
-        footer.style.margin = '';
-        footer.style.overflow = '';
-        footer.style.borderTop = '';
+      if (currentScroll > lastScrollTop && currentScroll > 30) {
+        hideHeaderAndFooter();
+      } else if (currentScroll < lastScrollTop) {
+        showHeaderAndFooter();
       }
-      
-      // Track if fully hidden
-      isHeaderHidden = scrollProgress >= 0.95;
       
       lastScrollTop = currentScroll;
       
+      if (currentScroll > 0) {
+        hideHeaderAndFooter();
+      } else {
+        showHeaderAndFooter();
+      }
     }, { passive: true });
   }
 });
-
-// Ensure header reappears when scrolling to top
-function showHeaderAndFooterSmooth() {
-  header.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-  tabBar.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-  footer.style.transition = 'all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-  
-  header.style.transform = 'translateY(0)';
-  header.style.opacity = '1';
-  header.style.height = '';
-  header.style.padding = '';
-  header.style.margin = '';
-  header.style.overflow = '';
-  header.style.borderBottom = '';
-  
-  tabBar.style.transform = 'translateY(0)';
-  tabBar.style.opacity = '1';
-  tabBar.style.height = '';
-  tabBar.style.padding = '';
-  tabBar.style.margin = '';
-  tabBar.style.overflow = '';
-  tabBar.style.borderBottom = '';
-  
-  footer.style.transform = 'translateY(0)';
-  footer.style.opacity = '1';
-  footer.style.height = '';
-  footer.style.padding = '';
-  footer.style.margin = '';
-  footer.style.overflow = '';
-  footer.style.borderTop = '';
-  
-  isHeaderHidden = false;
-}
 
 function hideHeaderAndFooter() {
   // Hide header and tabs
@@ -6539,7 +6449,6 @@ function hideHeaderAndFooter() {
   header.style.margin = '0';
   header.style.padding = '0';
   header.style.overflow = 'hidden';
-  header.style.borderBottom = 'none';
   
   tabBar.style.transform = 'translateY(-100%)';
   tabBar.style.opacity = '0';
@@ -6547,7 +6456,6 @@ function hideHeaderAndFooter() {
   tabBar.style.margin = '0';
   tabBar.style.padding = '0';
   tabBar.style.overflow = 'hidden';
-  tabBar.style.borderBottom = 'none';
   
   footer.style.transform = 'translateY(100%)';
   footer.style.opacity = '0';
@@ -6555,7 +6463,8 @@ function hideHeaderAndFooter() {
   footer.style.margin = '0';
   footer.style.padding = '0';
   footer.style.overflow = 'hidden';
-  footer.style.borderTop = 'none';
+  
+  // Content will automatically expand to fill the space because of flex: 1
 }
 
 function showHeaderAndFooter() {
@@ -6566,8 +6475,7 @@ function showHeaderAndFooter() {
   header.style.margin = '';
   header.style.padding = '40px 20px 0 20px'; // Restore original padding
   header.style.overflow = '';
-  header.style.position = '';
-  header.style.borderBottom = '';
+  header.style.position = ''; // Reset any position changes
   
   // Reset tab bar
   tabBar.style.transform = 'translateY(0)';
@@ -6577,7 +6485,6 @@ function showHeaderAndFooter() {
   tabBar.style.padding = '12px 0 0 0'; // Restore original padding
   tabBar.style.overflow = '';
   tabBar.style.position = '';
-  tabBar.style.borderBottom = '';
   
   // Reset footer
   footer.style.transform = 'translateY(0)';
@@ -6587,7 +6494,6 @@ function showHeaderAndFooter() {
   footer.style.padding = '15px'; // Restore original padding
   footer.style.overflow = '';
   footer.style.position = '';
-  footer.style.borderTop = '';
 }
 
 
