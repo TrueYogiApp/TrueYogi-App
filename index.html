@@ -20910,6 +20910,166 @@ let gridChannel = null;
 let livePresenceRows = [];
 let renderDebounceTimer = null;
 
+// ============ LYRICS SYSTEM ============
+const awarenessLyrics = [
+  { time: 0,  text: "🎵 🎵 🎵" },
+  { time: 37, text: "In the silence of the waking dawn," },
+  { time: 45, text: "One flame rises, never gone." },
+  { time: 54, text: "A single breath, a single mind," },
+  { time: 61, text: "Across the Earth, our hearts align." },
+  { time: 67, text: "OM… the ancient light we share," },
+  { time: 75, text: "Flowing through the grid of air." },
+  { time: 84, text: "One soul awakens, all can rise," },
+  { time: 90, text: "We are the flame that never dies." },
+  { time: 105, text: "Golden threads from land to land," },
+  { time: 112, text: "Hold the world in open hands." },
+  { time: 118, text: "Where presence lives, the fire grows," },
+  { time: 125, text: "Through every heart, the current flows." },
+  { time: 133, text: "OM… the resonance divine," },
+  { time: 140.5, text: "A pulse beyond all space and time." },
+  { time: 147, text: "True Yogis wake, the stillness calls," },
+  { time: 156, text: "One breath unites the souls of all." },
+  { time: 165,  text: "🎵 🎵 🎵" },  
+  { time: 212, text: "Stay awake, hold the fire," },
+  { time: 223, text: "Lift the world a little higher." },
+  { time: 232, text: "As long as one remains aware," },
+  { time: 243, text: "The light stays burning everywhere." },
+  { time: 268,  text: "🎵 🎵 🎵" }
+];
+
+let lyricsInterval = null;
+let currentLyricIndex = -1;
+
+function showLyrics() {
+  const existing = document.getElementById('awareness-lyrics');
+  if (existing) {
+    existing.style.opacity = 1;
+    existing.style.display = 'block';
+    return existing;
+  }
+
+  const earthGridContainer = document.getElementById('earthGridContainer');
+  if (!earthGridContainer) {
+    console.log('Earth grid not open, skipping lyrics display');
+    return;
+  }
+
+  const lyricsContainer = document.createElement('div');
+  lyricsContainer.id = 'awareness-lyrics';
+  lyricsContainer.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99999;
+    text-align: center;
+    pointer-events: none;
+    max-width: 260px;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  `;
+
+  lyricsContainer.innerHTML = `
+    <div id="lyrics-text" style="
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.3rem;
+      font-weight: 500;
+      color: #FFD700;
+      text-shadow:
+        0 0 20px rgba(255, 215, 0, 0.8),
+        0 0 40px rgba(255, 165, 0, 0.5),
+        0 0 3px #ffffff;
+      line-height: 1.6;
+      letter-spacing: 0.5px;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      opacity: 0;
+      transform: translateY(10px);
+    "></div>
+  `;
+
+  document.body.appendChild(lyricsContainer);
+  // console.log('✅ Lyrics container appended');
+
+  requestAnimationFrame(() => {
+    lyricsContainer.style.opacity = 1;
+  });
+
+  return lyricsContainer;
+}
+
+function updateLyrics(currentTime) {
+  const lyricsText = document.getElementById('lyrics-text');
+  if (!lyricsText) return;
+
+  let newIndex = -1;
+  for (let i = awarenessLyrics.length - 1; i >= 0; i--) {
+    if (currentTime >= awarenessLyrics[i].time) {
+      newIndex = i;
+      break;
+    }
+  }
+
+if (newIndex !== currentLyricIndex && newIndex >= 0) {
+    currentLyricIndex = newIndex;
+
+    // Fade out + scale down (shrink into center)
+    lyricsText.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+    lyricsText.style.opacity = 0;
+    lyricsText.style.transform = 'scale(0.6)';
+
+    setTimeout(() => {
+      lyricsText.textContent = awarenessLyrics[newIndex].text;
+
+      // Start small + invisible at center
+      lyricsText.style.transition = 'none';
+      lyricsText.style.transform = 'scale(0.4)';
+      lyricsText.style.opacity = 0;
+
+      // Force browser to apply
+      void lyricsText.offsetWidth;
+
+      // Animate: grow outward + fade in
+      lyricsText.style.transition = 'opacity 0.9s ease, transform 0.9s cubic-bezier(0.22, 1, 0.36, 1)';
+      lyricsText.style.transform = 'scale(1)';
+      lyricsText.style.opacity = 1;
+    }, 500);
+  }
+}
+
+function startLyricsSync() {
+  const awAudio = document.getElementById('awareness-sound');
+  if (!awAudio) return;
+
+  stopLyricsSync();
+  currentLyricIndex = -1;
+
+  const timeUpdateHandler = () => {
+    updateLyrics(awAudio.currentTime);
+  };
+
+  awAudio.addEventListener('timeupdate', timeUpdateHandler);
+  awAudio._lyricsTimeUpdateHandler = timeUpdateHandler;
+}
+
+function stopLyricsSync() {
+  const awAudio = document.getElementById('awareness-sound');
+  if (awAudio && awAudio._lyricsTimeUpdateHandler) {
+    awAudio.removeEventListener('timeupdate', awAudio._lyricsTimeUpdateHandler);
+    awAudio._lyricsTimeUpdateHandler = null;
+  }
+  currentLyricIndex = -1;
+
+  // Hide lyrics (only if audio is truly paused/stopped)
+  const a = document.getElementById('awareness-sound');
+  if (a && a.paused) {
+    const lyricsContainer = document.getElementById('awareness-lyrics');
+    if (lyricsContainer) lyricsContainer.style.opacity = 0;
+  }
+}
+ 
+// ============ END LYRICS SYSTEM ============
+
 // ADD THESE 3 LINES FOR CACHING - Add them right here
 let cachedCountries = null;
 let lastCountryFetch = 0;
@@ -22341,7 +22501,7 @@ document.addEventListener('click', function(e) {
     
     document.body.appendChild(awarenessTooltip);
     
-	awarenessTooltip.addEventListener('click', function(e) {
+awarenessTooltip.addEventListener('click', function(e) {
   const awAudio = document.getElementById('awareness-sound');
   if (awAudio) {
     if (awAudio.paused) {
@@ -22349,13 +22509,18 @@ document.addEventListener('click', function(e) {
       awAudio.currentTime = 0;
       awAudio.muted = false;
       awAudio.volume = 0.75;
-      awAudio.play().catch(err => {
+      awAudio.play().then(() => {
+        // Start lyrics display and sync when playback begins
+        showLyrics();
+        startLyricsSync();
+      }).catch(err => {
         console.log('Audio play failed:', err);
       });
     } else {
       // If playing, pause
       awAudio.pause();
       awAudio.currentTime = 0;
+      stopLyricsSync();
     }
   } else {
     console.log('Audio element not found!');
@@ -25111,6 +25276,10 @@ function showCallbackNotification(fromUserId) {
 function closeEarthGrid() {
   earthGridOpen = false;
 
+  const lyricsEl = document.getElementById('awareness-lyrics');
+  if (lyricsEl) lyricsEl.remove();
+  stopLyricsSync();
+  
   // Clear animation intervals
   if (flameTimerInterval) {
     clearInterval(flameTimerInterval);
