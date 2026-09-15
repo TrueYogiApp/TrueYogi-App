@@ -6682,7 +6682,11 @@ function renderVideoList() {
         <div style="flex:1;">
           <div style="font-weight:bold;font-size:1.08rem;">${vid.title}</div>
           <div style="color:#adbbef;font-size:0.95rem;">${vid.author || ''}</div>
-          <button onclick="openVideoPlayer('${vid.youtubeId}','${vid.title.replace(/'/g,'\\\'')}')" class="mode-btn" style="margin-top:7px;padding:5px 14px;background:#ffe85a;color:#2c1d00;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">Watch</button>
+          <button onclick="openVideoPlayer('${vid.youtubeId}','${vid.title.replace(/'/g,'\\\'')}','video',${vid.multiAudio ? 'true' : 'false'})"
+        class="mode-btn"
+        style="margin-top:7px;padding:5px 14px;background:#ffe85a;color:#2c1d00;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">
+        Watch
+		</button>
         </div>
       </div>`;
     container.insertAdjacentHTML('beforeend', html);
@@ -6807,7 +6811,7 @@ let videoWakeLock = null;
 let isVideoFullscreen = false;
 window.isVideoOverlayActive = false;
 
-function openVideoPlayer(youtubeId, title) {
+function openVideoPlayer(youtubeId, title, type, multiAudio) {
 window.isVideoOverlayActive = true;
   // PAUSE intervals and animations (as before)
   if (window.mainInterval) { clearInterval(window.mainInterval); window.mainInterval = null; }
@@ -6832,19 +6836,34 @@ window.isVideoOverlayActive = true;
     background:rgba(12,10,30,0.88);
   `;
   
+// Get current language and build audio hint
+const currentLang = localStorage.getItem('lang') || 'en';
+const audioHints = {
+  'ar': 'لسماع الصوت بالعربية:<br>اضغط على ⚙️ الإعدادات ← مسار الصوت ← اختر العربية',
+  'ja': '日本語音声で聞くには：<br>⚙️ 設定 → 音声トラック → 日本語を選択',
+  'te': 'తెలుగులో ఆడియో వినడానికి:<br>⚙️ సెట్టింగ్‌లు → ఆడియో ట్రాక్ → తెలుగు',
+  'fr': 'Pour l\'audio en français :<br>⚙️ Paramètres → Piste audio → Français',
+  'de': 'Für deutschen Ton:<br>⚙️ Einstellungen → Audiospur → Deutsch',
+  'pt': 'Para áudio em português:<br>⚙️ Configurações → Faixa de áudio → Português',
+  'it': 'Per l\'audio in italiano:<br>⚙️ Impostazioni → Traccia audio → Italiano',
+  'zh': '要收听中文音频：<br>⚙️ 设置 → 音轨 → 选择中文',
+};
+const hintText = (type === 'live' || !multiAudio) ? '' : (audioHints[currentLang] || '');
+
 overlay.innerHTML = `
   <div class="video-outer-container" style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;position:relative;">
     <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
     <div class="video-frame" style="border-radius:10px;overflow:hidden;margin:0 auto 24px auto;background:#211f3c;transition:background 0.6s;">
       <div id="${playerId}" style="width:350px;height:210px;"></div>
     </div>
+    ${hintText ? `<div class="audio-hint" style="color:#adbbef;font-size:0.85rem;margin:0 0 14px 0;padding:6px 12px;background:rgba(0,0,0,0.2);border-radius:8px;line-height:1.5;">${hintText}</div>` : ''}
     <div class="video-controls" style="transition:opacity .4s;opacity:1;pointer-events:auto;">
       <button onclick="closeVideoPlayer()" class="mode-btn" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
     </div>
   </div>
 `;
   
-  document.body.appendChild(overlay);
+document.body.appendChild(overlay);
 
 function hideVideoFrame() {
   const outer = overlay.querySelector('.video-outer-container');
@@ -6865,21 +6884,36 @@ function showVideoFrame() {
   
 let controls = overlay.querySelector('.video-controls');
 let titleEl = overlay.querySelector('.video-title');
+let hintEl = overlay.querySelector('.audio-hint');   // independent
 let hideControlsTimer = null;
+let hintTimer = null;
+
+// Hint lives on its own clock — 30 seconds from when the popup opens
+if (hintEl) {
+  hintTimer = setTimeout(() => {
+    hintEl.style.transition = 'opacity 0.6s';
+    hintEl.style.opacity = '0';
+    setTimeout(() => { hintEl.style.display = 'none'; }, 600);
+  }, 30000);
+  overlay._hintTimer = hintTimer;
+}
 
 function hideControls() {
   controls.style.opacity = '0';
   controls.style.pointerEvents = 'none';
-  controls.style.visibility = 'hidden';   // <-- add this
+  controls.style.visibility = 'hidden';
   titleEl.style.opacity = '0';
-  titleEl.style.visibility = 'hidden';    // <-- add this
+  titleEl.style.visibility = 'hidden';
+  // hint is NOT touched here — it has its own 30s timer
 }
+
 function showControls(autoHide) {
   controls.style.opacity = '1';
   controls.style.pointerEvents = 'auto';
-  controls.style.visibility = 'visible';  // <-- add this
+  controls.style.visibility = 'visible';
   titleEl.style.opacity = '1';
-  titleEl.style.visibility = 'visible';   // <-- add this
+  titleEl.style.visibility = 'visible';
+  // hint is NOT touched here — it stays until its own timer fires
   clearTimeout(hideControlsTimer);
   if (autoHide) {
     hideControlsTimer = setTimeout(hideControls, 2500);
@@ -6909,7 +6943,9 @@ overlay.addEventListener('click', function(e) {
         'rel': 0,
         'modestbranding': 1,
         'showinfo': 0,
-		'origin': window.location.origin
+		'origin': window.location.origin,
+		'hl': currentLang,           // e.g. 'ar', 'ja', 'te'
+        'cc_lang_pref': currentLang  // e.g. 'ar', 'ja', 'te'
       },
       events: {
         'onReady': onPlayerReady,
@@ -7056,6 +7092,11 @@ function closeVideoPlayer() {
   // Release wake lock
   releaseVideoWakeLock();
   
+  // Clear hint timer
+if (window.currentVideoOverlay && window.currentVideoOverlay._hintTimer) {
+  clearTimeout(window.currentVideoOverlay._hintTimer);
+}
+
   // Remove visibility listener
   document.removeEventListener('visibilitychange', handleVisibilityChange);
   
@@ -7126,7 +7167,7 @@ function renderLiveList() {
 		<div style="flex:1;">
 		  <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${live.title}</div>
 		  <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
-	<button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}')"
+	<button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}','live',false)"
 			class="mode-btn"
 			style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
 			Tune In
