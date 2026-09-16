@@ -564,7 +564,69 @@
 "remix.popup.later": "Più tardi",
 "remix.popup.apply": "✨ Applica ora",
 "remix.popup.hint": "✨ Puoi anche applicarlo più tardi con il pulsante remix",
-"music.choice.custom": "📁 Scegli dal dispositivo"
+"music.choice.custom": "📁 Scegli dal dispositivo",
+
+"chakra.0.name": "Chakra della Radice",
+"chakra.0.sanskrit": "Muladhara",
+"chakra.0.color": "Rosso",
+"chakra.0.meaning": "Radicamento, sopravvivenza, stabilità, sicurezza",
+"chakra.0.affirmation": "Sono al sicuro e stabile",
+"chakra.0.element": "Terra",
+"chakra.0.benefits": "Sicurezza mentale, salute fisica, stabilità finanziaria",
+
+"chakra.1.name": "Chakra Sacrale",
+"chakra.1.sanskrit": "Svadhisthana",
+"chakra.1.color": "Arancione",
+"chakra.1.meaning": "Creatività, sessualità, emozioni, piacere",
+"chakra.1.affirmation": "Abbraccio la mia energia creativa",
+"chakra.1.element": "Acqua",
+"chakra.1.benefits": "Equilibrio emotivo, creatività, relazioni sane",
+
+"chakra.2.name": "Chakra del Plesso Solare",
+"chakra.2.sanskrit": "Manipura",
+"chakra.2.color": "Giallo",
+"chakra.2.meaning": "Potere personale, volontà, autostima, fiducia",
+"chakra.2.affirmation": "Sono potente e fiducioso",
+"chakra.2.element": "Fuoco",
+"chakra.2.benefits": "Fiducia in sé, forza di volontà, potere personale",
+
+"chakra.3.name": "Chakra del Cuore",
+"chakra.3.sanskrit": "Anahata",
+"chakra.3.color": "Verde",
+"chakra.3.meaning": "Amore, compassione, perdono, equilibrio",
+"chakra.3.affirmation": "Do e ricevo amore liberamente",
+"chakra.3.element": "Aria",
+"chakra.3.benefits": "Pace interiore, compassione, relazioni sane",
+
+"chakra.4.name": "Chakra della Gola",
+"chakra.4.sanskrit": "Vishuddha",
+"chakra.4.color": "Blu",
+"chakra.4.meaning": "Comunicazione, verità, espressione di sé",
+"chakra.4.affirmation": "Esprimo la mia verità con chiarezza",
+"chakra.4.element": "Etere/Spazio",
+"chakra.4.benefits": "Comunicazione chiara, verità, creatività",
+
+"chakra.5.name": "Terzo Occhio",
+"chakra.5.sanskrit": "Ajna",
+"chakra.5.color": "Indaco",
+"chakra.5.meaning": "Intuizione, perspicacia, saggezza, visualizzazione",
+"chakra.5.affirmation": "Confido nella mia saggezza interiore",
+"chakra.5.element": "Luce",
+"chakra.5.benefits": "Intuizione, chiarezza, consapevolezza spirituale",
+
+"chakra.6.name": "Chakra della Corona",
+"chakra.6.sanskrit": "Sahasrara",
+"chakra.6.color": "Viola",
+"chakra.6.meaning": "Connessione spirituale, illuminazione, coscienza",
+"chakra.6.affirmation": "Sono connesso al divino",
+"chakra.6.element": "Pensiero",
+"chakra.6.benefits": "Illuminazione, connessione spirituale, pace",
+
+"chakra.status.unlocked": "✅ Sbloccato",
+"chakra.label.meaning": "Significato",
+"chakra.label.affirmation": "Affermazione",
+"chakra.label.element": "Elemento",
+"chakra.label.benefits": "Benefici"
   
   
 }

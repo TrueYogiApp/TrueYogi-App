@@ -568,7 +568,69 @@
 "remix.popup.later": "తర్వాత",
 "remix.popup.apply": "✨ ఇప్పుడే వర్తించు",
 "remix.popup.hint": "✨ మీరు దీన్ని తర్వాత రీమిక్స్ బటన్ ద్వారా కూడా వర్తించవచ్చు",
-"music.choice.custom": "📁 పరికరం నుండి ఎంచుకోండి"
+"music.choice.custom": "📁 పరికరం నుండి ఎంచుకోండి",
+
+"chakra.0.name": "మూలాధార చక్రం",
+"chakra.0.sanskrit": "మూలాధార",
+"chakra.0.color": "ఎరుపు",
+"chakra.0.meaning": "స్థిరత్వం, జీవనాధారం, భద్రత, రక్షణ",
+"chakra.0.affirmation": "నేను సురక్షితంగా మరియు స్థిరంగా ఉన్నాను",
+"chakra.0.element": "పృథ్వి",
+"chakra.0.benefits": "మానసిక భద్రత, శారీరక ఆరోగ్యం, ఆర్థిక స్థిరత్వం",
+
+"chakra.1.name": "స్వాధిష్ఠాన చక్రం",
+"chakra.1.sanskrit": "స్వాధిష్ఠాన",
+"chakra.1.color": "నారింజ",
+"chakra.1.meaning": "సృజనాత్మకత, భావోద్వేగాలు, ఆనందం, కామం",
+"chakra.1.affirmation": "నేను నా సృజనాత్మక శక్తిని స్వీకరిస్తున్నాను",
+"chakra.1.element": "జలం",
+"chakra.1.benefits": "భావోద్వేగ సమతుల్యత, సృజనాత్మకత, ఆరోగ్యకరమైన సంబంధాలు",
+
+"chakra.2.name": "మణిపూర చక్రం",
+"chakra.2.sanskrit": "మణిపూర",
+"chakra.2.color": "పసుపు",
+"chakra.2.meaning": "వ్యక్తిగత శక్తి, సంకల్పం, ఆత్మగౌరవం, ఆత్మవిశ్వాసం",
+"chakra.2.affirmation": "నేను శక్తివంతుడిని మరియు ఆత్మవిశ్వాసం కలవాడిని",
+"chakra.2.element": "అగ్ని",
+"chakra.2.benefits": "ఆత్మవిశ్వాసం, సంకల్ప శక్తి, వ్యక్తిగత బలం",
+
+"chakra.3.name": "అనాహత చక్రం",
+"chakra.3.sanskrit": "అనాహత",
+"chakra.3.color": "ఆకుపచ్చ",
+"chakra.3.meaning": "ప్రేమ, కరుణ, క్షమ, సమతుల్యత",
+"chakra.3.affirmation": "నేను ప్రేమను స్వేచ్ఛగా ఇస్తాను మరియు స్వీకరిస్తాను",
+"chakra.3.element": "వాయువు",
+"chakra.3.benefits": "అంతర్గత శాంతి, కరుణ, ఆరోగ్యకరమైన సంబంధాలు",
+
+"chakra.4.name": "విశుద్ధ చక్రం",
+"chakra.4.sanskrit": "విశుద్ధ",
+"chakra.4.color": "నీలం",
+"chakra.4.meaning": "సంభాషణ, సత్యం, ఆత్మ వ్యక్తీకరణ",
+"chakra.4.affirmation": "నేను నా సత్యాన్ని స్పష్టంగా వ్యక్తపరుస్తాను",
+"chakra.4.element": "ఆకాశం",
+"chakra.4.benefits": "స్పష్టమైన సంభాషణ, సత్యం, సృజనాత్మకత",
+
+"chakra.5.name": "ఆజ్ఞా చక్రం",
+"chakra.5.sanskrit": "ఆజ్ఞా",
+"chakra.5.color": "నీలిమందు",
+"chakra.5.meaning": "అంతర్జ్ఞానం, అంతర్దృష్టి, జ్ఞానం, దృశ్యీకరణ",
+"chakra.5.affirmation": "నేను నా అంతర్గత జ్ఞానాన్ని విశ్వసిస్తాను",
+"chakra.5.element": "కాంతి",
+"chakra.5.benefits": "అంతర్జ్ఞానం, స్పష్టత, ఆధ్యాత్మిక అవగాహన",
+
+"chakra.6.name": "సహస్రార చక్రం",
+"chakra.6.sanskrit": "సహస్రార",
+"chakra.6.color": "ఊదా",
+"chakra.6.meaning": "ఆధ్యాత్మిక సంబంధం, జ్ఞానోదయం, చైతన్యం",
+"chakra.6.affirmation": "నేను దివ్యత్వంతో అనుసంధానించబడి ఉన్నాను",
+"chakra.6.element": "ఆలోచన",
+"chakra.6.benefits": "జ్ఞానోదయం, ఆధ్యాత్మిక సంబంధం, శాంతి",
+
+"chakra.status.unlocked": "✅ అన్‌లాక్ చేయబడింది",
+"chakra.label.meaning": "అర్థం",
+"chakra.label.affirmation": "సానుకూల ప్రకటన",
+"chakra.label.element": "మూలకం",
+"chakra.label.benefits": "ప్రయోజనాలు"
 
 
 }

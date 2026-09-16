@@ -568,7 +568,69 @@
 "remix.popup.later": "Plus tard",
 "remix.popup.apply": "✨ Appliquer maintenant",
 "remix.popup.hint": "✨ Vous pouvez aussi l'appliquer plus tard avec le bouton remix",
-"music.choice.custom": "📁 Choisir sur l'appareil"
+"music.choice.custom": "📁 Choisir sur l'appareil",
+
+"chakra.0.name": "Chakra Racine",
+"chakra.0.sanskrit": "Muladhara",
+"chakra.0.color": "Rouge",
+"chakra.0.meaning": "Ancrage, survie, stabilité, sécurité",
+"chakra.0.affirmation": "Je suis en sécurité et stable",
+"chakra.0.element": "Terre",
+"chakra.0.benefits": "Sécurité mentale, santé physique, stabilité financière",
+
+"chakra.1.name": "Chakra Sacré",
+"chakra.1.sanskrit": "Svadhisthana",
+"chakra.1.color": "Orange",
+"chakra.1.meaning": "Créativité, sexualité, émotions, plaisir",
+"chakra.1.affirmation": "J'embrasse mon énergie créatrice",
+"chakra.1.element": "Eau",
+"chakra.1.benefits": "Équilibre émotionnel, créativité, relations saines",
+
+"chakra.2.name": "Chakra du Plexus Solaire",
+"chakra.2.sanskrit": "Manipura",
+"chakra.2.color": "Jaune",
+"chakra.2.meaning": "Pouvoir personnel, volonté, estime de soi, confiance",
+"chakra.2.affirmation": "Je suis puissant et confiant",
+"chakra.2.element": "Feu",
+"chakra.2.benefits": "Confiance en soi, force de volonté, puissance personnelle",
+
+"chakra.3.name": "Chakra du Cœur",
+"chakra.3.sanskrit": "Anahata",
+"chakra.3.color": "Vert",
+"chakra.3.meaning": "Amour, compassion, pardon, équilibre",
+"chakra.3.affirmation": "Je donne et reçois l'amour librement",
+"chakra.3.element": "Air",
+"chakra.3.benefits": "Paix intérieure, compassion, relations saines",
+
+"chakra.4.name": "Chakra de la Gorge",
+"chakra.4.sanskrit": "Vishuddha",
+"chakra.4.color": "Bleu",
+"chakra.4.meaning": "Communication, vérité, expression de soi",
+"chakra.4.affirmation": "J'exprime ma vérité clairement",
+"chakra.4.element": "Éther/Espace",
+"chakra.4.benefits": "Communication claire, vérité, créativité",
+
+"chakra.5.name": "Troisième Œil",
+"chakra.5.sanskrit": "Ajna",
+"chakra.5.color": "Indigo",
+"chakra.5.meaning": "Intuition, perspicacité, sagesse, visualisation",
+"chakra.5.affirmation": "Je fais confiance à ma sagesse intérieure",
+"chakra.5.element": "Lumière",
+"chakra.5.benefits": "Intuition, clarté, conscience spirituelle",
+
+"chakra.6.name": "Chakra Couronne",
+"chakra.6.sanskrit": "Sahasrara",
+"chakra.6.color": "Violet",
+"chakra.6.meaning": "Connexion spirituelle, illumination, conscience",
+"chakra.6.affirmation": "Je suis connecté au divin",
+"chakra.6.element": "Pensée",
+"chakra.6.benefits": "Illumination, connexion spirituelle, paix",
+
+"chakra.status.unlocked": "✅ Débloqué",
+"chakra.label.meaning": "Signification",
+"chakra.label.affirmation": "Affirmation",
+"chakra.label.element": "Élément",
+"chakra.label.benefits": "Bienfaits"
   
 
 }

@@ -563,7 +563,69 @@
 "remix.popup.later": "बाद में",
 "remix.popup.apply": "✨ अभी लागू करें",
 "remix.popup.hint": "✨ आप इसे बाद में रीमिक्स बटन से भी लागू कर सकते हैं",
-"music.choice.custom": "📁 डिवाइस से चुनें"
+"music.choice.custom": "📁 डिवाइस से चुनें",
+
+"chakra.0.name": "मूलाधार चक्र",
+"chakra.0.sanskrit": "मूलाधार",
+"chakra.0.color": "लाल",
+"chakra.0.meaning": "जमीनीकरण, अस्तित्व, स्थिरता, सुरक्षा",
+"chakra.0.affirmation": "मैं सुरक्षित और स्थिर हूँ",
+"chakra.0.element": "पृथ्वी",
+"chakra.0.benefits": "मानसिक सुरक्षा, शारीरिक स्वास्थ्य, आर्थिक स्थिरता",
+
+"chakra.1.name": "स्वाधिष्ठान चक्र",
+"chakra.1.sanskrit": "स्वाधिष्ठान",
+"chakra.1.color": "नारंगी",
+"chakra.1.meaning": "रचनात्मकता, कामुकता, भावनाएँ, आनंद",
+"chakra.1.affirmation": "मैं अपनी रचनात्मक ऊर्जा को अपनाता हूँ",
+"chakra.1.element": "जल",
+"chakra.1.benefits": "भावनात्मक संतुलन, रचनात्मकता, स्वस्थ संबंध",
+
+"chakra.2.name": "मणिपूर चक्र",
+"chakra.2.sanskrit": "मणिपूर",
+"chakra.2.color": "पीला",
+"chakra.2.meaning": "व्यक्तिगत शक्ति, इच्छाशक्ति, आत्मसम्मान, आत्मविश्वास",
+"chakra.2.affirmation": "मैं शक्तिशाली और आत्मविश्वासी हूँ",
+"chakra.2.element": "अग्नि",
+"chakra.2.benefits": "आत्मविश्वास, इच्छाशक्ति, व्यक्तिगत शक्ति",
+
+"chakra.3.name": "अनाहत चक्र",
+"chakra.3.sanskrit": "अनाहत",
+"chakra.3.color": "हरा",
+"chakra.3.meaning": "प्रेम, करुणा, क्षमा, संतुलन",
+"chakra.3.affirmation": "मैं प्रेम स्वतंत्र रूप से देता और पाता हूँ",
+"chakra.3.element": "वायु",
+"chakra.3.benefits": "आंतरिक शांति, करुणा, स्वस्थ संबंध",
+
+"chakra.4.name": "विशुद्ध चक्र",
+"chakra.4.sanskrit": "विशुद्ध",
+"chakra.4.color": "नीला",
+"chakra.4.meaning": "संचार, सत्य, आत्म-अभिव्यक्ति",
+"chakra.4.affirmation": "मैं अपना सत्य स्पष्ट रूप से व्यक्त करता हूँ",
+"chakra.4.element": "आकाश",
+"chakra.4.benefits": "स्पष्ट संचार, सत्य, रचनात्मकता",
+
+"chakra.5.name": "आज्ञा चक्र",
+"chakra.5.sanskrit": "आज्ञा",
+"chakra.5.color": "जामुनी",
+"chakra.5.meaning": "अंतर्ज्ञान, अंतर्दृष्टि, ज्ञान, कल्पना",
+"chakra.5.affirmation": "मैं अपने आंतरिक ज्ञान पर विश्वास करता हूँ",
+"chakra.5.element": "प्रकाश",
+"chakra.5.benefits": "अंतर्ज्ञान, स्पष्टता, आध्यात्मिक जागरूकता",
+
+"chakra.6.name": "सहस्रार चक्र",
+"chakra.6.sanskrit": "सहस्रार",
+"chakra.6.color": "बैंगनी",
+"chakra.6.meaning": "आध्यात्मिक संबंध, ज्ञानोदय, चेतना",
+"chakra.6.affirmation": "मैं दिव्य से जुड़ा हुआ हूँ",
+"chakra.6.element": "विचार",
+"chakra.6.benefits": "ज्ञानोदय, आध्यात्मिक संबंध, शांति",
+
+"chakra.status.unlocked": "✅ अनलॉक",
+"chakra.label.meaning": "अर्थ",
+"chakra.label.affirmation": "सकारात्मक कथन",
+"chakra.label.element": "तत्व",
+"chakra.label.benefits": "लाभ"
 
 
 }

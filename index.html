@@ -6104,6 +6104,34 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   <i class="fas fa-arrow-right"></i>
 </div>
 
+<!--CHAKRA TOOLTIP -->
+<div id="chakra-tooltip" style="
+    position: fixed;
+    display: none;
+    background: rgba(10, 10, 30, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 12px;
+    padding: 16px 20px;
+    max-width: 280px;
+    color: white;
+    font-family: system-ui, -apple-system, sans-serif;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    z-index: 10000;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+">
+    <div id="chakra-tooltip-title" style="font-size: 18px; font-weight: 600; margin-bottom: 6px;"></div>
+    <div id="chakra-tooltip-sanskrit" style="font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px;"></div>
+    <div id="chakra-tooltip-body" style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.85);">
+        <div><span id="label-meaning" style="color: rgba(255,255,255,0.5);">Meaning:</span> <span id="chakra-meaning"></span></div>
+        <div style="margin-top: 4px;"><span id="label-affirmation" style="color: rgba(255,255,255,0.5);">Affirmation:</span> <span id="chakra-affirmation"></span></div>
+        <div style="margin-top: 4px;"><span id="label-element" style="color: rgba(255,255,255,0.5);">Element:</span> <span id="chakra-element"></span></div>
+        <div style="margin-top: 4px;"><span id="label-benefits" style="color: rgba(255,255,255,0.5);">Benefits:</span> <span id="chakra-benefits"></span></div>
+        <div style="margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.4);" id="chakra-status"></div>
+    </div>
+</div>
+
 <div id="dashboard-panel" style="
   display: none;
   position: fixed; left: 0; top: 0;
@@ -28103,6 +28131,145 @@ const chakraColors = [
     {hue: 270, name: "Third Eye"}, // Indigo
     {hue: 300, name: "Crown"}      // Violet (top)
 ];
+
+	// ===== CHAKRA TOOLTIP CODE =====
+
+	// Show tooltip - CENTERED
+function showChakraTooltip(chakraIndex, x, y) {
+    const tooltip = document.getElementById('chakra-tooltip');
+    if (!tooltip) return;
+    
+    const i = chakraIndex; // Short alias
+	const t = window.t || ((key) => key); 
+    
+    // Get translated values using your t() function
+    const name = t(`chakra.${i}.name`);
+    const sanskrit = t(`chakra.${i}.sanskrit`);
+    const color = t(`chakra.${i}.color`);
+    const meaning = t(`chakra.${i}.meaning`);
+    const affirmation = t(`chakra.${i}.affirmation`);
+    const element = t(`chakra.${i}.element`);
+    const benefits = t(`chakra.${i}.benefits`);
+    
+    // Fill in the tooltip
+    document.getElementById('chakra-tooltip-title').textContent = name;
+    document.getElementById('chakra-tooltip-sanskrit').textContent = `${sanskrit} • ${color}`;
+    
+    // Update labels
+    document.getElementById('label-meaning').textContent = t('chakra.label.meaning') + ':';
+    document.getElementById('label-affirmation').textContent = t('chakra.label.affirmation') + ':';
+    document.getElementById('label-element').textContent = t('chakra.label.element') + ':';
+    document.getElementById('label-benefits').textContent = t('chakra.label.benefits') + ':';
+    
+    // Update values
+    document.getElementById('chakra-meaning').textContent = meaning;
+    document.getElementById('chakra-affirmation').textContent = `"${affirmation}"`;
+    document.getElementById('chakra-element').textContent = element;
+    document.getElementById('chakra-benefits').textContent = benefits;
+    document.getElementById('chakra-status').textContent = t('chakra.status.unlocked');
+    
+    // Center on screen
+    const tooltipWidth = 280;
+    const tooltipHeight = 230;
+    let left = (window.innerWidth - tooltipWidth) / 2;
+    let top = (window.innerHeight - tooltipHeight) / 2;
+    
+    if (left < 10) left = 10;
+    if (top < 10) top = 10;
+    if (left + tooltipWidth > window.innerWidth - 10) left = window.innerWidth - tooltipWidth - 10;
+    if (top + tooltipHeight > window.innerHeight - 10) top = window.innerHeight - tooltipHeight - 10;
+    
+    tooltip.style.left = left + 'px';
+    tooltip.style.top = top + 'px';
+    tooltip.style.display = 'block';
+    tooltip.style.opacity = '1';
+}
+
+	// Hide tooltip
+function hideTooltip() {
+    const tooltip = document.getElementById('chakra-tooltip');
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
+}
+
+// Auto-hide tooltip when session ends
+let __lastSessionActive = typeof sessionActive !== 'undefined' ? sessionActive : false;
+
+setInterval(() => {
+    const currentSessionActive = typeof sessionActive !== 'undefined' ? sessionActive : false;
+    
+    if (__lastSessionActive && !currentSessionActive) {
+        hideTooltip();
+    }
+    
+    __lastSessionActive = currentSessionActive;
+}, 500);
+
+ 
+// Click handler using document click
+document.addEventListener('click', function(e) {
+    // ONLY show tooltip during active meditation session
+    if (typeof sessionActive === "undefined" || !sessionActive) {
+        return;
+    }
+    if (typeof currentMode === "undefined" || currentMode !== "yogi") {
+        return;
+    }
+    
+    // IGNORE clicks on UI elements (avatar, buttons, etc.)
+    if (e.target.closest('.avatar-container') ||
+        e.target.closest('#logo-sacred') ||
+        e.target.closest('button') ||
+        e.target.closest('#timer-section') ||
+        e.target.closest('#mode-selection') ||
+        e.target.closest('#chakra-tooltip') ||
+        e.target.closest('#proof-of-stillness-heading') ||
+        e.target.closest('#proof-of-stillness-subtitle') ||
+        e.target.closest('#yogi-quote')) {
+        return; // Let the UI element handle the click
+    }
+    
+    const canvas = document.getElementById('meditation-canvas');
+    if (!canvas) return;
+    
+    // Also check the canvas isn't hidden
+    if (canvas.classList.contains('hidden')) {
+        return;
+    }
+    
+    const rect = canvas.getBoundingClientRect();
+    const x = e.clientX;
+    const y = e.clientY;
+    
+    // Check if click is inside canvas
+    if (x < rect.left || x > rect.right || y < rect.top || y > rect.bottom) {
+        hideTooltip();
+        return;
+    }
+    
+    // Convert to canvas coordinates
+    const mouseX = x - rect.left;
+    const mouseY = y - rect.top;
+    const centerX = canvas.width / 2;
+    const bottomOffset = 80;
+    const topOffset = 80;
+    const availableHeight = canvas.height - bottomOffset - topOffset;
+    
+    // Check each unlocked chakra
+    for (let chakra = 0; chakra <= unlockedChakra; chakra++) {
+        const chakraY = canvas.height - bottomOffset - (availableHeight * (chakra / 6));
+        const chakraSize = 25 + chakra * 4;
+        const distance = Math.hypot(mouseX - centerX, mouseY - chakraY);
+        
+        if (distance < chakraSize + 25) {
+            showChakraTooltip(chakra, e.clientX, e.clientY);
+            return;
+        }
+    }
+    
+    hideTooltip();
+});
 
 // Get user's current challenge day - try multiple sources
 let currentDay = 1;
