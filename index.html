@@ -6125,9 +6125,14 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
     <div id="chakra-tooltip-sanskrit" style="font-size: 14px; color: rgba(255,255,255,0.6); margin-bottom: 8px;"></div>
     <div id="chakra-tooltip-body" style="font-size: 13px; line-height: 1.5; color: rgba(255,255,255,0.85);">
         <div><span id="label-meaning" style="color: rgba(255,255,255,0.5);">Meaning:</span> <span id="chakra-meaning"></span></div>
+		<div style="margin-top: 4px;"><span id="label-mantra" style="color: rgba(255,255,255,0.5);">Mantra:</span> <span id="chakra-mantra"></span></div>
+		<div style="margin-top: 4px;"><span id="label-frequency" style="color: rgba(255,255,255,0.5);">Frequency:</span> <span id="chakra-frequency"></span></div>
+		<div style="margin-top: 4px;"><span id="label-gland" style="color: rgba(255,255,255,0.5);">Gland:</span> <span id="chakra-gland"></span></div>
         <div style="margin-top: 4px;"><span id="label-affirmation" style="color: rgba(255,255,255,0.5);">Affirmation:</span> <span id="chakra-affirmation"></span></div>
         <div style="margin-top: 4px;"><span id="label-element" style="color: rgba(255,255,255,0.5);">Element:</span> <span id="chakra-element"></span></div>
         <div style="margin-top: 4px;"><span id="label-benefits" style="color: rgba(255,255,255,0.5);">Benefits:</span> <span id="chakra-benefits"></span></div>
+		<div style="margin-top: 4px;"><span id="label-balanced" style="color: rgba(255,255,255,0.5);">Balanced:</span> <span id="chakra-balanced"></span></div>
+		<div style="margin-top: 4px;"><span id="label-unbalanced" style="color: rgba(255,255,255,0.5);">Unbalanced:</span> <span id="chakra-unbalanced"></span></div>
         <div style="margin-top: 6px; font-size: 11px; color: rgba(255,255,255,0.4);" id="chakra-status"></div>
     </div>
 </div>
@@ -28147,30 +28152,46 @@ function showChakraTooltip(chakraIndex, x, y) {
     const sanskrit = t(`chakra.${i}.sanskrit`);
     const color = t(`chakra.${i}.color`);
     const meaning = t(`chakra.${i}.meaning`);
+	const petals = t(`chakra.${i}.petals`); 
+	const mantra = t(`chakra.${i}.mantra`); 
+	const frequency = t(`chakra.${i}.frequency`); 
+	const gland = t(`chakra.${i}.gland`);
     const affirmation = t(`chakra.${i}.affirmation`);
     const element = t(`chakra.${i}.element`);
     const benefits = t(`chakra.${i}.benefits`);
+	const balanced = t(`chakra.${i}.balanced`);
+	const unbalanced = t(`chakra.${i}.unbalanced`);
     
     // Fill in the tooltip
     document.getElementById('chakra-tooltip-title').textContent = name;
-    document.getElementById('chakra-tooltip-sanskrit').textContent = `${sanskrit} • ${color}`;
+    document.getElementById('chakra-tooltip-sanskrit').textContent = `${sanskrit} • ${color} • ${petals} ${t('chakra.label.petals')}`;
     
     // Update labels
     document.getElementById('label-meaning').textContent = t('chakra.label.meaning') + ':';
+ 	document.getElementById('label-mantra').textContent = t('chakra.label.mantra') + ':'; 
+	document.getElementById('label-frequency').textContent = t('chakra.label.frequency') + ':'; 
+	document.getElementById('label-gland').textContent = t('chakra.label.gland') + ':'; 
     document.getElementById('label-affirmation').textContent = t('chakra.label.affirmation') + ':';
     document.getElementById('label-element').textContent = t('chakra.label.element') + ':';
     document.getElementById('label-benefits').textContent = t('chakra.label.benefits') + ':';
+	document.getElementById('label-balanced').textContent = t('chakra.label.balanced') + ':';
+	document.getElementById('label-unbalanced').textContent = t('chakra.label.unbalanced') + ':';	
     
     // Update values
     document.getElementById('chakra-meaning').textContent = meaning;
+ 	document.getElementById('chakra-mantra').textContent = mantra;
+	document.getElementById('chakra-frequency').textContent = frequency;
+	document.getElementById('chakra-gland').textContent = gland;
     document.getElementById('chakra-affirmation').textContent = `"${affirmation}"`;
     document.getElementById('chakra-element').textContent = element;
     document.getElementById('chakra-benefits').textContent = benefits;
+	document.getElementById('chakra-balanced').textContent = balanced;
+	document.getElementById('chakra-unbalanced').textContent = unbalanced;	
     document.getElementById('chakra-status').textContent = t('chakra.status.unlocked');
     
     // Center on screen
     const tooltipWidth = 280;
-    const tooltipHeight = 230;
+    const tooltipHeight = 420;
     let left = (window.innerWidth - tooltipWidth) / 2;
     let top = (window.innerHeight - tooltipHeight) / 2;
     
