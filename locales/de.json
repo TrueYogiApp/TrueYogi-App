@@ -667,5 +667,37 @@
   "chakra.label.frequency": "Frequenz",
   "chakra.label.gland": "Drüse",
   "chakra.label.balanced": "Wenn im Gleichgewicht",
-  "chakra.label.unbalanced": "Wenn blockiert"
+  "chakra.label.unbalanced": "Wenn blockiert",
+  
+  "chakra.0.lesson": "Vertrauen • Sicherheit • Zugehörigkeit",
+"chakra.0.question": "Wovor habe ich Angst zu verlieren?",
+"chakra.0.practice": "Spüre die Unterstützung unter deinem Körper. Atme. Werde dir bewusst.",
+
+"chakra.1.lesson": "Fluss • Gefühl • Kreativität",
+"chakra.1.question": "Woran halte ich fest, das fließen möchte?",
+"chakra.1.practice": "Bringe Achtsamkeit in den Unterbauch. Spüre deinen Atem sanft durch den Körper fließen. Erlaube dir, weich zu werden.",
+
+"chakra.2.lesson": "Wille • Selbstvertrauen • Transformation",
+"chakra.2.question": "Wo gebe ich meine Kraft ab?",
+"chakra.2.practice": "Bringe Achtsamkeit in den Bereich um den Nabel. Spüre die Wärme deines Atems. Stehe in deiner inneren Kraft.",
+
+"chakra.3.lesson": "Liebe • Mitgefühl • Akzeptanz",
+"chakra.3.question": "Was kann ich lieben, ohne festzuhalten?",
+"chakra.3.practice": "Bringe Achtsamkeit in die Mitte deiner Brust. Atme in den Herzraum. Lass jeden Atemzug dich weich machen.",
+
+"chakra.4.lesson": "Wahrheit • Ausdruck • Authentizität",
+"chakra.4.question": "Welche Wahrheit in mir wartet darauf, ausgedrückt zu werden?",
+"chakra.4.practice": "Bringe Achtsamkeit in deinen Hals. Bemerke die Bewegung jedes Atems. Höre nach innen, bevor du sprichst.",
+
+"chakra.5.lesson": "Klarheit • Intuition • Bewusstsein",
+"chakra.5.question": "Was sehe ich nicht klar?",
+"chakra.5.practice": "Bringe sanfte Achtsamkeit zwischen die Augenbrauen. Lass Gedanken kommen und gehen. Beobachte ohne zu urteilen.",
+
+"chakra.6.lesson": "Präsenz • Einheit • Hingabe",
+"chakra.6.question": "Wer bin ich, wenn ich alles loslasse, was ich zu sein glaube?",
+"chakra.6.practice": "Bringe Achtsamkeit zur Krone deines Kopfes. Lass den Atem natürlich werden. Sei still. Sei einfach achtsam.",
+
+"chakra.label.lesson": "Lektion",
+"chakra.label.question": "Innere Frage",
+"chakra.label.practice": "Achtsamkeitsübung"
 }

@@ -667,5 +667,37 @@
   "chakra.label.frequency": "周波数",
   "chakra.label.gland": "腺",
   "chakra.label.balanced": "バランス時",
-  "chakra.label.unbalanced": "ブロック時"
+  "chakra.label.unbalanced": "ブロック時",
+  
+  "chakra.0.lesson": "信頼 • 安全 • 帰属",
+"chakra.0.question": "私は何を失うことを恐れているのか？",
+"chakra.0.practice": "身体の下の支えを感じてください。呼吸してください。気づきを持ってください。",
+
+"chakra.1.lesson": "流れ • 感情 • 創造性",
+"chakra.1.question": "流れたいのに、私が手放せないものは何か？",
+"chakra.1.practice": "下腹部に意識を向けてください。呼吸が身体を通して優しく動くのを感じてください。自分を緩めてください。",
+
+"chakra.2.lesson": "意志 • 自信 • 変容",
+"chakra.2.question": "私はどこで自分の力を手放しているのか？",
+"chakra.2.practice": "へその周りに意識を向けてください。呼吸の温かさを感じてください。自分の内なる強さの中に立ってください。",
+
+"chakra.3.lesson": "愛 • 慈悲 • 受容",
+"chakra.3.question": "執着せずに愛することができるものは何か？",
+"chakra.3.practice": "胸の中心に意識を向けてください。心の空間に呼吸してください。毎回の呼吸があなたを柔らかくするのを許してください。",
+
+"chakra.4.lesson": "真実 • 表現 • 真正さ",
+"chakra.4.question": "私の中のどんな真実が表現されるのを待っているのか？",
+"chakra.4.practice": "喉に意識を向けてください。毎回の呼吸の動きに気づいてください。話す前に内側に耳を傾けてください。",
+
+"chakra.5.lesson": "明晰さ • 直感 • 気づき",
+"chakra.5.question": "私は何をはっきりと見ていないのか？",
+"chakra.5.practice": "眉間の間に優しい気づきを向けてください。思考が来て去るのを許してください。判断せずに観察してください。",
+
+"chakra.6.lesson": "臨在 • 一体性 • 明け渡し",
+"chakra.6.question": "自分だと思うものを全て手放したとき、私は誰か？",
+"chakra.6.practice": "頭頂に意識を向けてください。呼吸を自然に任せてください。静かに。ただ気づいているだけ。",
+
+"chakra.label.lesson": "学び",
+"chakra.label.question": "内なる問い",
+"chakra.label.practice": "気づきの実践"
 }

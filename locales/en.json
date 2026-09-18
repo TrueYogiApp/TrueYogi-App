@@ -679,7 +679,39 @@
 "chakra.label.frequency": "Frequency",
 "chakra.label.gland": "Gland",
 "chakra.label.balanced": "When Balanced",
-"chakra.label.unbalanced": "When Blocked"
+"chakra.label.unbalanced": "When Blocked",
+
+"chakra.0.lesson": "Trust • Safety • Belonging",
+"chakra.0.question": "What am I afraid of losing?",
+"chakra.0.practice": "Feel the support beneath your body. Breathe. Become aware.",
+
+"chakra.1.lesson": "Flow • Feeling • Creativity",
+"chakra.1.question": "What am I holding onto that wants to flow?",
+"chakra.1.practice": "Bring awareness to the lower abdomen. Feel your breath moving gently through the body. Allow yourself to soften.",
+
+"chakra.2.lesson": "Will • Confidence • Transformation",
+"chakra.2.question": "Where am I giving my power away?",
+"chakra.2.practice": "Bring awareness to the area around your navel. Feel the warmth of your breath. Stand within your own inner strength.",
+
+"chakra.3.lesson": "Love • Compassion • Acceptance",
+"chakra.3.question": "What can I allow myself to love without holding on?",
+"chakra.3.practice": "Bring awareness to the center of your chest. Breathe into the heart space. Let each breath soften you.",
+
+"chakra.4.lesson": "Truth • Expression • Authenticity",
+"chakra.4.question": "What truth within me is waiting to be expressed?",
+"chakra.4.practice": "Bring awareness to your throat. Notice the movement of each breath. Listen within before you speak.",
+
+"chakra.5.lesson": "Clarity • Intuition • Awareness",
+"chakra.5.question": "What am I not seeing clearly?",
+"chakra.5.practice": "Bring gentle awareness between the eyebrows. Let thoughts come and go. Observe without judging.",
+
+"chakra.6.lesson": "Presence • Unity • Surrender",
+"chakra.6.question": "Who am I when I let go of everything I think I am?",
+"chakra.6.practice": "Bring awareness to the crown of your head. Let the breath become natural. Be still. Simply be aware.",
+
+"chakra.label.lesson": "Lesson",
+"chakra.label.question": "Inner Question",
+"chakra.label.practice": "Awareness Practice"
 
   
 }

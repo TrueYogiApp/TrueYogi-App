@@ -671,5 +671,37 @@
   "chakra.label.frequency": "Fréquence",
   "chakra.label.gland": "Glande",
   "chakra.label.balanced": "Quand il est équilibré",
-  "chakra.label.unbalanced": "Quand il est bloqué"
+  "chakra.label.unbalanced": "Quand il est bloqué",
+  
+  "chakra.0.lesson": "Confiance • Sécurité • Appartenance",
+"chakra.0.question": "De quoi ai-je peur de perdre ?",
+"chakra.0.practice": "Ressentez le soutien sous votre corps. Respirez. Prenez conscience.",
+
+"chakra.1.lesson": "Fluidité • Sensation • Créativité",
+"chakra.1.question": "À quoi suis-je accroché qui veut couler ?",
+"chakra.1.practice": "Portez votre attention sur le bas-ventre. Sentez votre souffle circuler doucement dans le corps. Laissez-vous vous adoucir.",
+
+"chakra.2.lesson": "Volonté • Confiance • Transformation",
+"chakra.2.question": "Où est-ce que je donne mon pouvoir ?",
+"chakra.2.practice": "Portez votre attention autour du nombril. Sentez la chaleur de votre souffle. Tenez-vous dans votre force intérieure.",
+
+"chakra.3.lesson": "Amour • Compassion • Acceptation",
+"chakra.3.question": "Que puis-je aimer sans m'y attacher ?",
+"chakra.3.practice": "Portez votre attention au centre de la poitrine. Respirez dans l'espace du cœur. Laissez chaque souffle vous adoucir.",
+
+"chakra.4.lesson": "Vérité • Expression • Authenticité",
+"chakra.4.question": "Quelle vérité en moi attend d'être exprimée ?",
+"chakra.4.practice": "Portez votre attention sur votre gorge. Remarquez le mouvement de chaque souffle. Écoutez à l'intérieur avant de parler.",
+
+"chakra.5.lesson": "Clarté • Intuition • Conscience",
+"chakra.5.question": "Que ne vois-je pas clairement ?",
+"chakra.5.practice": "Portez une douce attention entre les sourcils. Laissez les pensées aller et venir. Observez sans juger.",
+
+"chakra.6.lesson": "Présence • Unité • Lâcher-prise",
+"chakra.6.question": "Qui suis-je quand je lâche tout ce que je crois être ?",
+"chakra.6.practice": "Portez votre attention au sommet de votre tête. Laissez le souffle devenir naturel. Restez immobile. Soyez simplement conscient.",
+
+"chakra.label.lesson": "Leçon",
+"chakra.label.question": "Question Intérieure",
+"chakra.label.practice": "Pratique de Conscience"
 }

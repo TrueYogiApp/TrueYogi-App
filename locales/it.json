@@ -667,5 +667,37 @@
   "chakra.label.frequency": "Frequenza",
   "chakra.label.gland": "Ghiandola",
   "chakra.label.balanced": "Quando è in equilibrio",
-  "chakra.label.unbalanced": "Quando è bloccato"
+  "chakra.label.unbalanced": "Quando è bloccato",
+  
+  "chakra.0.lesson": "Fiducia • Sicurezza • Appartenenza",
+"chakra.0.question": "Di cosa ho paura di perdere?",
+"chakra.0.practice": "Senti il supporto sotto il tuo corpo. Respira. Prendi consapevolezza.",
+
+"chakra.1.lesson": "Flusso • Sentimento • Creatività",
+"chakra.1.question": "A cosa mi sto aggrappando che vuole fluire?",
+"chakra.1.practice": "Porta l'attenzione al basso ventre. Senti il respiro muoversi dolcemente nel corpo. Permettiti di ammorbidirti.",
+
+"chakra.2.lesson": "Volontà • Fiducia • Trasformazione",
+"chakra.2.question": "Dove sto cedendo il mio potere?",
+"chakra.2.practice": "Porta l'attenzione all'area intorno all'ombelico. Senti il calore del respiro. Stai nella tua forza interiore.",
+
+"chakra.3.lesson": "Amore • Compassione • Accettazione",
+"chakra.3.question": "Cosa posso amare senza attaccarmi?",
+"chakra.3.practice": "Porta l'attenzione al centro del petto. Respira nello spazio del cuore. Lascia che ogni respiro ti ammorbidisca.",
+
+"chakra.4.lesson": "Verità • Espressione • Autenticità",
+"chakra.4.question": "Quale verità dentro di me attende di essere espressa?",
+"chakra.4.practice": "Porta l'attenzione alla gola. Nota il movimento di ogni respiro. Ascolta dentro prima di parlare.",
+
+"chakra.5.lesson": "Chiarezza • Intuizione • Consapevolezza",
+"chakra.5.question": "Cosa non sto vedendo chiaramente?",
+"chakra.5.practice": "Porta una gentile consapevolezza tra le sopracciglia. Lascia che i pensieri vadano e vengano. Osserva senza giudicare.",
+
+"chakra.6.lesson": "Presenza • Unità • Abbandono",
+"chakra.6.question": "Chi sono quando lascio andare tutto ciò che penso di essere?",
+"chakra.6.practice": "Porta l'attenzione alla sommità della testa. Lascia che il respiro diventi naturale. Stai immobile. Sii semplicemente consapevole.",
+
+"chakra.label.lesson": "Lezione",
+"chakra.label.question": "Domanda Interiore",
+"chakra.label.practice": "Pratica di Consapevolezza"
 }

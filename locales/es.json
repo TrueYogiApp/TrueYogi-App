@@ -667,5 +667,37 @@
   "chakra.label.frequency": "Frecuencia",
   "chakra.label.gland": "Glándula",
   "chakra.label.balanced": "Cuando está equilibrado",
-  "chakra.label.unbalanced": "Cuando está bloqueado"
+  "chakra.label.unbalanced": "Cuando está bloqueado",
+  
+  "chakra.0.lesson": "Confianza • Seguridad • Pertenencia",
+"chakra.0.question": "¿Qué temo perder?",
+"chakra.0.practice": "Siente el apoyo bajo tu cuerpo. Respira. Toma conciencia.",
+
+"chakra.1.lesson": "Fluidez • Sentimiento • Creatividad",
+"chakra.1.question": "¿A qué me estoy aferrando que quiere fluir?",
+"chakra.1.practice": "Lleva la conciencia al bajo vientre. Siente tu respiración moverse suavemente por el cuerpo. Permítete suavizarte.",
+
+"chakra.2.lesson": "Voluntad • Confianza • Transformación",
+"chakra.2.question": "¿Dónde estoy entregando mi poder?",
+"chakra.2.practice": "Lleva la conciencia al área alrededor del ombligo. Siente el calor de tu respiración. Mantente en tu propia fuerza interior.",
+
+"chakra.3.lesson": "Amor • Compasión • Aceptación",
+"chakra.3.question": "¿Qué puedo amar sin aferrarme?",
+"chakra.3.practice": "Lleva la conciencia al centro del pecho. Respira en el espacio del corazón. Deja que cada respiración te suavice.",
+
+"chakra.4.lesson": "Verdad • Expresión • Autenticidad",
+"chakra.4.question": "¿Qué verdad dentro de mí espera ser expresada?",
+"chakra.4.practice": "Lleva la conciencia a tu garganta. Observa el movimiento de cada respiración. Escucha hacia adentro antes de hablar.",
+
+"chakra.5.lesson": "Claridad • Intuición • Conciencia",
+"chakra.5.question": "¿Qué no estoy viendo con claridad?",
+"chakra.5.practice": "Lleva una conciencia suave entre las cejas. Deja que los pensamientos vengan y vayan. Observa sin juzgar.",
+
+"chakra.6.lesson": "Presencia • Unidad • Entrega",
+"chakra.6.question": "¿Quién soy cuando suelto todo lo que creo que soy?",
+"chakra.6.practice": "Lleva la conciencia a la coronilla de tu cabeza. Deja que la respiración se vuelva natural. Quédate quieto. Simplemente sé consciente.",
+
+"chakra.label.lesson": "Lección",
+"chakra.label.question": "Pregunta Interior",
+"chakra.label.practice": "Práctica de Conciencia"
 }

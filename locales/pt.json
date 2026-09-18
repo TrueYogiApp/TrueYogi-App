@@ -667,5 +667,37 @@
   "chakra.label.frequency": "Frequência",
   "chakra.label.gland": "Glândula",
   "chakra.label.balanced": "Quando equilibrado",
-  "chakra.label.unbalanced": "Quando bloqueado"
+  "chakra.label.unbalanced": "Quando bloqueado",
+  
+  "chakra.0.lesson": "Confiança • Segurança • Pertencimento",
+"chakra.0.question": "Do que tenho medo de perder?",
+"chakra.0.practice": "Sinta o apoio sob o seu corpo. Respire. Tome consciência.",
+
+"chakra.1.lesson": "Fluidez • Sentimento • Criatividade",
+"chakra.1.question": "A que estou me agarrando que quer fluir?",
+"chakra.1.practice": "Traga consciência para o baixo ventre. Sinta sua respiração se movendo suavemente pelo corpo. Permita-se amolecer.",
+
+"chakra.2.lesson": "Vontade • Confiança • Transformação",
+"chakra.2.question": "Onde estou entregando meu poder?",
+"chakra.2.practice": "Traga consciência para a área ao redor do umbigo. Sinta o calor da sua respiração. Fique na sua força interior.",
+
+"chakra.3.lesson": "Amor • Compaixão • Aceitação",
+"chakra.3.question": "O que posso amar sem me apegar?",
+"chakra.3.practice": "Traga consciência ao centro do peito. Respire no espaço do coração. Deixe cada respiração te suavizar.",
+
+"chakra.4.lesson": "Verdade • Expressão • Autenticidade",
+"chakra.4.question": "Que verdade dentro de mim espera ser expressa?",
+"chakra.4.practice": "Traga consciência para a garganta. Note o movimento de cada respiração. Escute por dentro antes de falar.",
+
+"chakra.5.lesson": "Clareza • Intuição • Consciência",
+"chakra.5.question": "O que não estou vendo com clareza?",
+"chakra.5.practice": "Traga uma consciência gentil entre as sobrancelhas. Deixe os pensamentos irem e virem. Observe sem julgar.",
+
+"chakra.6.lesson": "Presença • Unidade • Entrega",
+"chakra.6.question": "Quem sou eu quando solto tudo o que penso ser?",
+"chakra.6.practice": "Traga consciência ao topo da cabeça. Deixe a respiração se tornar natural. Fique imóvel. Simplesmente esteja consciente.",
+
+"chakra.label.lesson": "Lição",
+"chakra.label.question": "Pergunta Interior",
+"chakra.label.practice": "Prática de Consciência"
 }

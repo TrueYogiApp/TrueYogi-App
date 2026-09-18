@@ -668,5 +668,37 @@
   "chakra.label.frequency": "频率",
   "chakra.label.gland": "腺体",
   "chakra.label.balanced": "平衡时",
-  "chakra.label.unbalanced": "受阻时"
+  "chakra.label.unbalanced": "受阻时",
+  
+  "chakra.0.lesson": "信任 • 安全 • 归属",
+"chakra.0.question": "我害怕失去什么？",
+"chakra.0.practice": "感受身体下方的支撑。呼吸。觉察当下。",
+
+"chakra.1.lesson": "流动 • 感受 • 创造力",
+"chakra.1.question": "我执着于什么，而它想要流动？",
+"chakra.1.practice": "将觉察带到下腹部。感受呼吸在身体中轻柔流动。允许自己柔软下来。",
+
+"chakra.2.lesson": "意志 • 自信 • 转变",
+"chakra.2.question": "我在哪里放弃了自己的力量？",
+"chakra.2.practice": "将觉察带到肚脐周围。感受呼吸的温暖。安住在你内在的力量中。",
+
+"chakra.3.lesson": "爱 • 慈悲 • 接纳",
+"chakra.3.question": "我可以不执着地爱什么？",
+"chakra.3.practice": "将觉察带到胸口中央。呼吸进入心的空间。让每一次呼吸使你柔软。",
+
+"chakra.4.lesson": "真理 • 表达 • 真实",
+"chakra.4.question": "我内在有什么真理等待被表达？",
+"chakra.4.practice": "将觉察带到喉咙。注意每一次呼吸的流动。说话之前先向内倾听。",
+
+"chakra.5.lesson": "清晰 • 直觉 • 觉知",
+"chakra.5.question": "我有什么没有看清？",
+"chakra.5.practice": "将温柔的觉察带到眉心之间。让念头来去。不加评判地观察。",
+
+"chakra.6.lesson": "临在 • 合一 • 臣服",
+"chakra.6.question": "当我放下一切我所认为的我，我是谁？",
+"chakra.6.practice": "将觉察带到头顶。让呼吸回归自然。静止。只是觉察。",
+
+"chakra.label.lesson": "课题",
+"chakra.label.question": "内在提问",
+"chakra.label.practice": "觉察练习"
 }
