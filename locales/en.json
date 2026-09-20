@@ -69,11 +69,20 @@
   "endSession": "End Session",
   "continueMeditation": "Continue Meditation",
   "howToMeditate": "How to Meditate?",
-  "meditationStep1": "Take any comfortable sitting position on chair or mat.",
-  "meditationStep2": "Practice Anulom Vilom (alternate nostril breathing) for a few minutes: Gently close your right nostril with your thumb and inhale slowly through your left nostril, then close your left nostril with ring finger and exhale through your right. Inhale through your right nostril, then switch and exhale through your left. Continue this cycle smoothly and naturally, focusing on your breath.",
-  "meditationStep3": "After breathing exercise close your eyes, join your hands and cross your legs. Observe your natural Breath.",
-  "meditationStep4": "If any thoughts arise bring your awareness back to your Breath.",
-  "meditationStep5": "After finishing, gently place your hands over your eyes. Open your eyes slowly with a smile and feel gratitude.",
+"meditationStep1Heading": "Find Your Seat",
+"meditationStep1": "Take any comfortable sitting position on chair or mat.",
+
+"meditationStep2Heading": "Clear Your Breath",
+"meditationStep2": "Practice Anulom Vilom (alternate nostril breathing) for a few minutes: Gently close your right nostril with your thumb and inhale slowly through your left nostril, then close your left nostril with ring finger and exhale through your right. Inhale through your right nostril, then switch and exhale through your left. Continue this cycle smoothly and naturally, focusing on your breath.",
+
+"meditationStep3Heading": "Settle Inward",
+"meditationStep3": "After breathing exercise close your eyes, join your hands, cross your legs and observe your natural Breath.",
+
+"meditationStep4Heading": "Return to Breath",
+"meditationStep4": "If any thoughts arise bring your awareness back to your Breath.",
+
+"meditationStep5Heading": "Close with Gratitude",
+"meditationStep5": "After finishing, gently place your hands over your eyes. Open your eyes slowly with a smile and feel gratitude.",
   "endMeditationButton": "End Meditation",
   "flowModem": "Flow",
   "yogiModem": "TrueYogi",
