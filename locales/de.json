@@ -58,6 +58,7 @@
   "sacredSessionDuration": "Diese heilige Sitzung dauert",
   "flowSessionDuration": "Diese Flusssitzung dauert",
   "meditationInstructions": "Lies die Anleitung, finde einen ruhigen Ort, setze dich mit Anmut und kehre sanft zum Atem in dir zurück.",
+  "meditationInstructionsLink": "Lies die <span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">Anleitung</span>, finde einen ruhigen Ort, setze dich mit Anmut und kehre sanft zum Atem in dir zurück.",
   "welcomeHeadingFirst": "Willkommen, Suchende(r)",
   "welcomeHeadingReturn": "Willkommen zurück, Suchende(r)",
   "welcomeButtonFirst": "Heiligen Raum betreten",

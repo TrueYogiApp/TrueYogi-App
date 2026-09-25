@@ -14932,9 +14932,8 @@ function showStartMeditationModal() {
     const durationText = durationSelect.options[durationSelect.selectedIndex].text;
     message += ` ${t('flowSessionDuration')} ${durationText}. `;
   }
-  message += t('meditationInstructions');
-  
-  textElement.textContent = message;
+message += t('meditationInstructionsLink');
+textElement.innerHTML = message;
   modal.classList.remove('hidden');
   const firstButton = modal.querySelector('button, [tabindex="0"]');
   if (firstButton) firstButton.focus();

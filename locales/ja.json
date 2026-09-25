@@ -58,6 +58,7 @@
   "sacredSessionDuration": "この神聖なセッションは続きます",
   "flowSessionDuration": "このフロータイムは続きます",
   "meditationInstructions": "ガイダンスを読み、静かな場所を見つけ、優雅に座り、そして優しく内の呼吸に戻りなさい。",
+  "meditationInstructionsLink": "<span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">ガイダンス</span>を読み、静かな場所を見つけ、優雅に座り、そして優しく内の呼吸に戻りなさい。",
   "welcomeHeadingFirst": "ようこそ、求道者",
   "welcomeHeadingReturn": "ようこそ、求道者",
   "welcomeButtonFirst": "神聖な空間に入る",

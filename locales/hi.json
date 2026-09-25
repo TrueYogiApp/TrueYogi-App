@@ -58,6 +58,7 @@
   "sacredSessionDuration": "यह पवित्र सत्र चलेगा",
   "flowSessionDuration": "यह प्रवाह सत्र चलेगा",
   "meditationInstructions": "मार्गदर्शन पढ़ें, शांत स्थान खोजें, सहज बैठें, और धीरे-धीरे भीतर की सांस में लौटें।",
+  "meditationInstructionsLink": "<span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">मार्गदर्शन</span> पढ़ें, शांत स्थान खोजें, गरिमा के साथ बैठें और धीरे से भीतर की श्वास पर लौट आएँ।",
   "welcomeHeadingFirst": "स्वागत है, साधक",
   "welcomeHeadingReturn": "फिर से स्वागत है, साधक",
   "welcomeButtonFirst": "पवित्र स्थान में प्रवेश करें",

@@ -58,6 +58,7 @@
   "sacredSessionDuration": "Esta sesión sagrada durará",
   "flowSessionDuration": "Esta sesión de flujo durará",
   "meditationInstructions": "Lee la guía, encuentra un lugar tranquilo, siéntate con gracia y regresa suavemente a la Respiración interior.",
+  "meditationInstructionsLink": "Lee la <span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">guía</span>, encuentra un lugar tranquilo, siéntate con gracia y regresa suavemente a la Respiración interior.",
   "welcomeHeadingFirst": "Bienvenido, Buscador",
   "welcomeHeadingReturn": "Bienvenido de nuevo, Buscador",
   "welcomeButtonFirst": "Entrar en Espacio Sagrado",

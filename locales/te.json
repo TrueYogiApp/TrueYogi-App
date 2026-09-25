@@ -58,6 +58,7 @@
   "sacredSessionDuration": "ఈ పవిత్ర సెషన్ కొనసాగుతుంది",
   "flowSessionDuration": "ఈ ఫ్లో సెషన్ కొనసాగుతుంది",
   "meditationInstructions": "సూచనలను చదవండి, ప్రశాంతమైన ప్రదేశాన్ని కనుగొనండి, దయతో కూర్చోండి, మరియు మృదువుగా మీ లోపలి శ్వాసపై దృష్టి పెట్టండి.",
+  "meditationInstructionsLink": "<span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">సూచనలను</span> చదవండి, ప్రశాంతమైన ప్రదేశాన్ని కనుగొనండి, గౌరవంగా కూర్చోండి మరియు లోపలి శ్వాసకు సున్నితంగా తిరిగి రండి.",
   "welcomeHeadingFirst": "స్వాగతం, అన్వేషకులారా",
   "welcomeHeadingReturn": "తిరిగి స్వాగతం, అన్వేషకా",
   "welcomeButtonFirst": "పవిత్ర స్థలంలోకి ప్రవేశించండి",

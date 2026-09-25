@@ -58,6 +58,7 @@
   "sacredSessionDuration": "ستستمر هذه الجلسة المقدسة",
   "flowSessionDuration": "ستستمر جلسة التدفق هذه",
   "meditationInstructions": "اقرئي التوجيه، ابحثي عن مكان هادئ، اجلسي بنعمة، وعودي برفق إلى النفس بداخلك.",
+  "meditationInstructionsLink": "اقرأ <span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">الإرشادات</span>، وابحث عن مكان هادئ، واجلس بوقار، وعُد بلطف إلى النفس الداخلي.",
   "welcomeHeadingFirst": "أهلاً بك، الباحثة",
   "welcomeHeadingReturn": "أهلاً بك من جديد، الباحثة",
   "welcomeButtonFirst": "ادخلي المساحة المقدسة",

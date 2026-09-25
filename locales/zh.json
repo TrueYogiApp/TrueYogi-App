@@ -58,6 +58,7 @@
   "sacredSessionDuration": "本次神圣冥想将持续",
   "flowSessionDuration": "本次流动冥想将持续",
   "meditationInstructions": "请阅读指引，找安静的地方，优雅静坐，温柔地回归内在呼吸。",
+  "meditationInstructionsLink": "请阅读<span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">指引</span>，找安静的地方，优雅静坐，温柔地回归内在呼吸。",
   "welcomeHeadingFirst": "欢迎，探索者",
   "welcomeHeadingReturn": "欢迎回来，探索者",
   "welcomeButtonFirst": "进入神圣空间",

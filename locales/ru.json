@@ -58,6 +58,7 @@
   "sacredSessionDuration": "Эта священная сессия продлится",
   "flowSessionDuration": "Эта потоковая сессия продлится",
   "meditationInstructions": "Следуйте инструкции: найдите тихое место, сядьте с достоинством и мягко возвращайтесь к дыханию.",
+  "meditationInstructionsLink": "Следуйте <span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">инструкции</span>: найдите тихое место, сядьте с достоинством и мягко возвращайтесь к дыханию.",
   "welcomeHeadingFirst": "Добро пожаловать, искатель",
   "welcomeHeadingReturn": "С возвращением, искатель",
   "welcomeButtonFirst": "Войти в священное пространство",

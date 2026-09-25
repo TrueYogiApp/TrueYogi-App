@@ -58,6 +58,7 @@
   "sacredSessionDuration": "This sacred session will last",
   "flowSessionDuration": "This flow session will last",
   "meditationInstructions": "Read the guidance, find quiet place, sit with grace, and gently return to the Breath within.",
+  "meditationInstructionsLink": "Read the <span class=\"text-blue-400 underline cursor-pointer\" onclick=\"toggleMeditationGuide()\">guidance</span>, find quiet place, sit with grace, and gently return to the Breath within.",
   "welcomeHeadingFirst": "Welcome, Seeker",
   "welcomeHeadingReturn": "Welcome Back, Seeker",
   "welcomeButtonFirst": "Enter Sacred Space",
