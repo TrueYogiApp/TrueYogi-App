@@ -13804,8 +13804,9 @@ function refreshPageIfStale(thresholdHours = 72) {
     currentMode === 'yogi' &&
     todayStr >= endDate &&
     challengeData.currentDay >= 41 &&
-    challengeData.streakDays >= 41
-  ) {
+    challengeData.streakDays >= 41 &&
+    challengeData.sessionsCompleted.length >= (41 * (challengeData.requiredSessions || 1))
+  )  {
     const finalSection = document.getElementById('final-section');
     const journeyCompleteSection = document.getElementById('journey-complete-section');
     if (finalSection) finalSection.classList.add('hidden');
