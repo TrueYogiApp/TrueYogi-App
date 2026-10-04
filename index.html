@@ -14605,8 +14605,14 @@ const isChallengeEnded = now >= endDatePlusOne;
       completed => completed.time === session.time && completed.date === today
     );
     
-	// If challenge ended but streak is less than 40, show as missed
-	if (isChallengeEnded && challengeData.streakDays < 40) {
+ 	// If challenge ended but not all sessions done (or streak < 41), show as missed
+	if (
+	  isChallengeEnded &&
+	  (
+	    challengeData.streakDays < 41 ||
+	    challengeData.sessionsCompleted.length < (41 * (challengeData.requiredSessions || 1))
+	  )
+	) {
 	  const badge = document.createElement('span');
 	  badge.className = 'session-time-badge px-2 py-1 rounded-full text-xs font-medium missed';
 	  badge.textContent = `${formatTime(session.time)} (${formatDuration(session.duration)})`;
@@ -15168,8 +15174,11 @@ async function startMeditation() {
       if (challengeData.endDate) {
         const endDate = new Date(challengeData.endDate + "T23:59:59");
         if (now > endDate) {
-          // Only show completed modal if streak days >= 40
-          if (challengeData.streakDays >= 40) {
+          // Only show completed modal if streak >= 41 AND all sessions done
+          if (
+            challengeData.streakDays >= 41 &&
+            challengeData.sessionsCompleted.length >= (41 * (challengeData.requiredSessions || 1))
+          ) {
             showChallengeCompletedModal();
           } else {
             showMissedSessionModal();
