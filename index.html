@@ -12897,7 +12897,7 @@ try {
   const omUserId = localStorage.getItem('omUserId');
   const challengeId = challenge.challengeId;
 
-  if (challenge.startDate && challenge.currentDay >= 21 && !onChainJourney) {
+    if (challenge.startDate && challenge.currentDay >= 21 && challenge.sessionsCompleted.length >= (21 * (challenge.requiredSessions || 1)) && !onChainJourney) {
     const mode = challenge.savedMode || 
                (completedPureOffline ? 'spaceship' : (!onChainJourney ? 'offline' : 'online'));
     
@@ -12956,7 +12956,7 @@ try {
 	});
     }
     
-  } else if (challenge.startDate && challenge.currentDay >= 41 && onChainJourney) {
+  } else if (challenge.startDate && challenge.currentDay >= 41 && challenge.sessionsCompleted.length >= (41 * (challenge.requiredSessions || 1)) && onChainJourney) {
     const mode = 'online';
     
 	  // Calculate the actual end date for 41-day challenge: start date + 40 days
@@ -13377,6 +13377,7 @@ async function confirmResetChallenge() {
     if (
       challenge.startDate &&
       challenge.currentDay >= 21 &&  // Note: you changed this from 21 to 1
+	  challenge.sessionsCompleted.length >= (21 * (challenge.requiredSessions || 1)) && 
       !onChainJourney
     ) {
       // Determine if this is actually a 21-day challenge or just early reset
@@ -13438,6 +13439,7 @@ async function confirmResetChallenge() {
     } else if (
       challenge.startDate &&
       challenge.currentDay >= 41 &&
+	  challenge.sessionsCompleted.length >= (41 * (challenge.requiredSessions || 1)) &&
       onChainJourney
     ) {
       const endDate = calculateEndDate(challenge.startDate, 41);
