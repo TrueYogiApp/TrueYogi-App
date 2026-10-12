@@ -21725,12 +21725,17 @@ async function showCountryUserListPopup(country, x, y) {
   // Remove any old user list popup
   const oldList = document.getElementById('country-user-list-popup');
   if (oldList) oldList.remove();
+  
+    // Reverse lookup: display name → DB name
+  const dbCountryName = livePresenceRows.find(r => 
+    getDisplayCountryName(r.country) === country
+  )?.country || country;
 
   // Step 1: Get all users for this country (latest session per user)
   let { data: countryUsers, error: countryError } = await supabase
     .from('om_sessions')
     .select('user_id, country, duration_seconds, started_at')
-    .eq('country', country)
+    .eq('country', dbCountryName)
     .order('started_at', { ascending: false });
 
   if (countryError || !countryUsers) {
@@ -21761,7 +21766,7 @@ let { data: countryUserSessions, error: sessionsError } = await supabase
   .from('om_sessions')
   .select('user_id, started_at, last_heartbeat, country')
   .in('user_id', uniqueUserIds)
-  .eq('country', country)  // Filter by the specific country
+  .eq('country', dbCountryName)  // Filter by the specific country
   .order('started_at', { ascending: false });
 
 if (sessionsError) {
@@ -28871,4 +28876,4 @@ if (heightRatio < 0.15) {
         particle.size * 0.5,
         0, Math.PI * 2
       );
-      ctx.fillStyle = `hsla(${particle.hue + 20}, 100%, 90
+      c
