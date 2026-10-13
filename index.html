@@ -21760,7 +21760,7 @@ async function showCountryUserListPopup(country, x, y) {
     return;
   }
 
-// Step 2: Fetch sessions for these users ONLY in this country
+// Step 2: Fetch sessions for these users ONLY in this country.
 // Include started_at AND last_heartbeat
 let { data: countryUserSessions, error: sessionsError } = await supabase
   .from('om_sessions')
