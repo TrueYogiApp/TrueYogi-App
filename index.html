@@ -21770,15 +21770,14 @@ async function showCountryUserListPopup(country, x, y) {
     setTimeout(() => { listPopup.remove(); }, 9000);
     return;
   }
-
+  
 // Step 2: Fetch sessions for these users ONLY in this country
 // Include started_at AND last_heartbeat
 let { data: countryUserSessions, error: sessionsError } = await supabase
   .from('om_sessions')
-  .select('user_id, started_at, last_heartbeat, country')
+  .select('user_id, started_at, last_heartbeat')
   .in('user_id', uniqueUserIds)
-  .eq('country', dbCountry)
-  .order('started_at', { ascending: false });
+  .order('started_at', { ascending: false });  
 
 if (sessionsError) {
   console.error('Error fetching user sessions:', sessionsError);
