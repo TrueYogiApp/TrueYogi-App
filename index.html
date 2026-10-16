@@ -21347,9 +21347,9 @@ async function showCountryStatsOnEarthGrid() {
   });
 
   // Inject CSS + drag handlers once
-if (!document.getElementById('country-scroll-ticker-style-v2')) {
-  const style = document.createElement('style');
-  style.id = 'country-scroll-ticker-style-v2';
+  if (!document.getElementById('country-scroll-ticker-style')) {
+    const style = document.createElement('style');
+    style.id = 'country-scroll-ticker-style';
     style.textContent = `
       #gridStatsLabel {
         overflow-x: auto;
@@ -21372,9 +21372,9 @@ if (!document.getElementById('country-scroll-ticker-style-v2')) {
         animation-play-state: paused;
       }
       @keyframes scrollTicker {
-        0%   { transform: translateX(-50%); }
-        100% { transform: translateX(0); }
-      }
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
     `;
     document.head.appendChild(style);
 
