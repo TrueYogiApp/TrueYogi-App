@@ -21567,44 +21567,99 @@ async function showUserTravelBar() {
     document.getElementById('earthGridContainer').appendChild(bar);
   }
 
-if (stats.length === 0) {
-  // Get user's country info
-  const userInfo = await getUserCountryInfo();
-  const code = userInfo.countryCode ? userInfo.countryCode.toLowerCase() : "un";
-  bar.innerHTML = `
-    <span class="user-scroll-flag" data-country="${userInfo.country}" style="display:inline-flex;align-items:center;margin:0 14px;">
-      <img src="https://flagcdn.com/w40/${code}.png"
-           style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
-      <span style="font-weight:bold;font-size:1em;padding-left:7px;">
-        0 min
+  if (stats.length === 0) {
+    const userInfo = await getUserCountryInfo();
+    console.log(userInfo);
+    const code = userInfo.countryCode ? userInfo.countryCode.toLowerCase() : "un";
+    bar.innerHTML = `
+      <span class="user-scroll-flag" data-country="${userInfo.country}" style="display:inline-flex;align-items:center;margin:0 14px;">
+        <img src="https://flagcdn.com/w40/${code}.png"
+             style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
+        <span style="font-weight:bold;font-size:1em;padding-left:7px;">
+          0 min
+        </span>
       </span>
-    </span>
-  `;
+    `;
 
-  // Optional: attach popup for country name (if you want)
-bar.querySelectorAll('.user-scroll-flag').forEach(el => {
-  el.onclick = function(e) {
-    showFlagPopup(el.getAttribute('data-country'), e, false);
-  };
-  el.ontouchstart = function(e) {
-    showFlagPopup(el.getAttribute('data-country'), e, false);
-  };
-});
+    bar.querySelectorAll('.user-scroll-flag').forEach(el => {
+      el.onclick = function(e) {
+        showFlagPopup(el.getAttribute('data-country'), e, false);
+      };
+      el.ontouchstart = function(e) {
+        showFlagPopup(el.getAttribute('data-country'), e, false);
+      };
+    });
 
-  return;
-}
+    return;
+  }
 
-  // Add keyframes for scrolling animation (only once)
-  if (!document.getElementById('user-scroll-ticker-style')) {
+  // Inject CSS + drag handlers once
+  if (!document.getElementById('user-scroll-ticker-style-v2')) {
     const style = document.createElement('style');
-    style.id = 'user-scroll-ticker-style';
+    style.id = 'user-scroll-ticker-style-v2';
     style.textContent = `
       @keyframes userScrollTicker {
-        0% { transform: translateX(100%); }
+        0%   { transform: translateX(100%); }
         100% { transform: translateX(-100%); }
       }
+      #userTravelBar {
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        cursor: grab;
+        user-select: none;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        touch-action: pan-x;
+      }
+      #userTravelBar::-webkit-scrollbar { display: none; }
+      #userTravelBar.dragging { cursor: grabbing; }
+      #userTravelBar.dragging #userTravelScroll { animation-play-state: paused; }
     `;
     document.head.appendChild(style);
+
+    // Drag-to-scroll
+    let isDown = false, startX = 0, startScroll = 0, dragged = false;
+
+    bar.addEventListener('mousedown', (e) => {
+      isDown = true; dragged = false;
+      startX = e.pageX;
+      startScroll = bar.scrollLeft;
+      bar.classList.add('dragging');
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      const dx = e.pageX - startX;
+      if (Math.abs(dx) > 5) dragged = true;
+      bar.scrollLeft = startScroll - dx;
+    });
+    window.addEventListener('mouseup', () => {
+      if (!isDown) return;
+      isDown = false;
+      bar.classList.remove('dragging');
+      bar.dataset.dragging = dragged ? 'true' : 'false';
+      setTimeout(() => { bar.dataset.dragging = 'false'; }, 50);
+    });
+
+    bar.addEventListener('touchstart', (e) => {
+      isDown = true; dragged = false;
+      startX = e.touches[0].pageX;
+      startScroll = bar.scrollLeft;
+      bar.classList.add('dragging');
+    }, { passive: true });
+
+    bar.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      const dx = e.touches[0].pageX - startX;
+      if (Math.abs(dx) > 5) dragged = true;
+      bar.scrollLeft = startScroll - dx;
+    }, { passive: true });
+
+    bar.addEventListener('touchend', () => {
+      isDown = false;
+      bar.classList.remove('dragging');
+      bar.dataset.dragging = dragged ? 'true' : 'false';
+      setTimeout(() => { bar.dataset.dragging = 'false'; }, 50);
+    });
   }
 
   let content = stats.map(stat => {
@@ -21626,16 +21681,18 @@ bar.querySelectorAll('.user-scroll-flag').forEach(el => {
     </div>
   `;
 
-  // Attach popup handlers for desktop and mobile
+  // Attach popup handlers (skip if user was dragging)
   const scrollDiv = bar.querySelector('#userTravelScroll');
   if (scrollDiv) {
     scrollDiv.querySelectorAll('.user-scroll-flag').forEach(el => {
-el.onclick = function(e) {
-  showFlagPopup(el.getAttribute('data-country'), e, false);  // Added false
-};
-el.ontouchstart = function(e) {
-  showFlagPopup(el.getAttribute('data-country'), e, false);  // Added false
-};
+      el.onclick = function(e) {
+        if (bar.dataset.dragging === 'true') return;
+        showFlagPopup(el.getAttribute('data-country'), e, false);
+      };
+      el.ontouchstart = function(e) {
+        if (bar.dataset.dragging === 'true') return;
+        showFlagPopup(el.getAttribute('data-country'), e, false);
+      };
     });
   }
 }
