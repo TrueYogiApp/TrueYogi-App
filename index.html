@@ -21325,8 +21325,8 @@ async function showCountryStatsOnEarthGrid() {
     const code = stat.countryCode ? stat.countryCode.toLowerCase() : "un";
     return `
       <span class="scroll-flag" data-country="${correctedCountryName}" style="display:inline-flex;align-items:center;margin:0 15px;">
-       <img src="https://flagcdn.com/w40/${code}.png"
-           style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
+        <img src="https://flagcdn.com/w40/${code}.png"
+             style="width:34px;height:24px;border-radius:3px;box-shadow:0 0 2px #000;">
         <span style="font-weight:bold;font-size:0.9em;padding-left:6px;">
           ${stat.souls} ${stat.souls === 1 ? 'Soul' : 'Souls'} · ${formatDurationGrid(stat.total_seconds)}
         </span>
@@ -21334,29 +21334,94 @@ async function showCountryStatsOnEarthGrid() {
     `;
   }).join('');
 
-  statsLabel.innerHTML = `<div style="display:inline-block;animation: scrollTicker 30s linear infinite;">${content}</div>`;
+  statsLabel.innerHTML = `
+    <div class="ticker-track">${content}</div>
+  `;
 
   // Attach handlers for popups
   statsLabel.querySelectorAll('.scroll-flag').forEach(el => {
     el.onclick = function(e) {
-      showFlagPopup(el.getAttribute('data-country'), e, true);
-    };
-    el.ontouchstart = function(e) {
+      if (statsLabel.dataset.dragging === 'true') return;
       showFlagPopup(el.getAttribute('data-country'), e, true);
     };
   });
 
-  // Add CSS for scrolling animation (once)
-  if (!document.getElementById('country-scroll-ticker-style')) {
-    const style = document.createElement('style');
-    style.id = 'country-scroll-ticker-style';
+  // Inject CSS + drag handlers once
+if (!document.getElementById('country-scroll-ticker-style-v2')) {
+  const style = document.createElement('style');
+  style.id = 'country-scroll-ticker-style-v2';
     style.textContent = `
+      #gridStatsLabel {
+        overflow-x: auto;
+        overflow-y: hidden;
+        cursor: grab;
+        user-select: none;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        white-space: nowrap;
+      }
+      #gridStatsLabel::-webkit-scrollbar { display: none; }
+      #gridStatsLabel.dragging { cursor: grabbing; }
+
+      #gridStatsLabel .ticker-track {
+        display: inline-block;
+        animation: scrollTicker 30s linear infinite;
+        will-change: transform;
+      }
+      #gridStatsLabel.dragging .ticker-track {
+        animation-play-state: paused;
+      }
       @keyframes scrollTicker {
-        0% { transform: translateX(-100%); }
-        100% { transform: translateX(100%); }
+        0%   { transform: translateX(-50%); }
+        100% { transform: translateX(0); }
       }
     `;
     document.head.appendChild(style);
+
+    // Drag-to-scroll
+    let isDown = false, startX = 0, startScroll = 0, dragged = false;
+
+    statsLabel.addEventListener('mousedown', (e) => {
+      isDown = true; dragged = false;
+      startX = e.pageX;
+      startScroll = statsLabel.scrollLeft;
+      statsLabel.classList.add('dragging');
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      const dx = e.pageX - startX;
+      if (Math.abs(dx) > 5) dragged = true;
+      statsLabel.scrollLeft = startScroll - dx;
+    });
+    window.addEventListener('mouseup', () => {
+      if (!isDown) return;
+      isDown = false;
+      statsLabel.classList.remove('dragging');
+      statsLabel.dataset.dragging = dragged ? 'true' : 'false';
+      setTimeout(() => { statsLabel.dataset.dragging = 'false'; }, 50);
+    });
+
+    // Touch
+    statsLabel.addEventListener('touchstart', (e) => {
+      isDown = true; dragged = false;
+      startX = e.touches[0].pageX;
+      startScroll = statsLabel.scrollLeft;
+      statsLabel.classList.add('dragging');
+    }, { passive: true });
+
+    statsLabel.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      const dx = e.touches[0].pageX - startX;
+      if (Math.abs(dx) > 5) dragged = true;
+      statsLabel.scrollLeft = startScroll - dx;
+    }, { passive: true });
+
+    statsLabel.addEventListener('touchend', () => {
+      isDown = false;
+      statsLabel.classList.remove('dragging');
+      statsLabel.dataset.dragging = dragged ? 'true' : 'false';
+      setTimeout(() => { statsLabel.dataset.dragging = 'false'; }, 50);
+    });
   }
 }
 
