@@ -6716,8 +6716,8 @@ function renderVideoList() {
     // We create a safe version of the title specifically for the onclick attribute.
     // This replaces newlines with spaces and escapes backslashes and quotes.
     const safeTitle = vid.title
-      .replace(/\\/g, '\\\\')  // Escape backslashes first
-      .replace(/\n/g, ' ')     // Replace newlines with spaces (prevents breaking the onclick)
+      .replace(/\\/g, '\\\\')  // Escape backslashes
+      .replace(/\n/g, '\\n')   // <--- CRITICAL FIX: Escape the newline so it survives the onclick attribute
       .replace(/'/g, "\\'");   // Escape single quotes
 
     // --- OPTIONAL: If you want the title to visually show the newline on the UI ---
@@ -6902,7 +6902,7 @@ const hintText = (type === 'live' || !multiAudio) ? '' : (audioHints[currentLang
 
 overlay.innerHTML = `
   <div class="video-outer-container" style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;position:relative;">
-    <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
+        <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title.replace(/\n/g, '<br>')}</div>
     <div class="video-frame" style="border-radius:10px;overflow:hidden;margin:0 auto 24px auto;background:#211f3c;transition:background 0.6s;">
       <div id="${playerId}" style="width:350px;height:210px;"></div>
     </div>
