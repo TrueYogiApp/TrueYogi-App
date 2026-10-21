@@ -6712,15 +6712,27 @@ function renderVideoList() {
   }
 
   filteredVideos.forEach((vid, i) => {
+    // --- FIX IS HERE ---
+    // We create a safe version of the title specifically for the onclick attribute.
+    // This replaces newlines with spaces and escapes backslashes and quotes.
+    const safeTitle = vid.title
+      .replace(/\\/g, '\\\\')  // Escape backslashes first
+      .replace(/\n/g, ' ')     // Replace newlines with spaces (prevents breaking the onclick)
+      .replace(/'/g, "\\'");   // Escape single quotes
+
+    // --- OPTIONAL: If you want the title to visually show the newline on the UI ---
+    // We can replace the \n with a <br> tag for the visual display part.
+    const displayTitle = vid.title.replace(/\n/g, '<br>');
+
     const html = `
       <div style="background:rgba(40,38,70,0.5);border-radius:12px;padding:12px 18px 18px 18px;margin-bottom:18px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(50,50,80,0.11);">
         <img src="${vid.thumb || 'https://img.youtube.com/vi/' + vid.youtubeId + '/hqdefault.jpg'}"
            alt="video thumbnail"
            style="width:75px;height:52px;border-radius:8px;object-fit:cover;box-shadow:0 1px 6px 0 #241c0022;">
         <div style="flex:1;">
-          <div style="font-weight:bold;font-size:1.08rem;">${vid.title}</div>
+          <div style="font-weight:bold;font-size:1.08rem;">${displayTitle}</div>
           <div style="color:#adbbef;font-size:0.95rem;">${vid.author || ''}</div>
-          <button onclick="openVideoPlayer('${vid.youtubeId}','${vid.title.replace(/'/g,'\\\'')}','video',${vid.multiAudio ? 'true' : 'false'})"
+          <button onclick="openVideoPlayer('${vid.youtubeId}','${safeTitle}','video',${vid.multiAudio ? 'true' : 'false'})"
         class="mode-btn"
         style="margin-top:7px;padding:5px 14px;background:#ffe85a;color:#2c1d00;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;">
         Watch
