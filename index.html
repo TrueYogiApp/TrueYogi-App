@@ -22040,23 +22040,49 @@ const hasYesterdayActivity = (sessions) => {
   // Prepare popup
   const listPopup = document.createElement('div');
   listPopup.id = 'country-user-list-popup';
+
+  // --- Compute clamped position so popup stays fully on-screen ---
+  const isMobile = window.innerWidth <= 480;
+  const margin = 12;
+  const popupWidth = Math.min(isMobile ? 280 : 320, window.innerWidth - margin * 2);
+  const popupMaxHeight = isMobile
+    ? Math.min(360, window.innerHeight - 100)
+    : Math.min(360, window.innerHeight - 80);
+
+  // Clamp X (popup is centered on `left`, so keep half-width within viewport)
+  let clampedX = x;
+  const halfW = popupWidth / 2;
+  if (clampedX - halfW < margin) clampedX = halfW + margin;
+  if (clampedX + halfW > window.innerWidth - margin) clampedX = window.innerWidth - margin - halfW;
+
+  // Clamp / flip Y
+  let clampedY = y + (isMobile ? 28 : 32);
+  if (clampedY + popupMaxHeight > window.innerHeight - margin) {
+    clampedY = Math.max(margin, y - popupMaxHeight - 8);
+  }
+
   listPopup.style.cssText = `
     position: fixed;
-    left: ${x}px; top: ${y + 32}px;
+    left: ${clampedX}px;
+    top: ${clampedY}px;
     transform: translate(-50%, 0);
     background: rgba(0,0,0,0.97);
     color: #fde68a;
-    font-size: 0.96rem;
-    padding: 9px 18px;
+    font-size: ${isMobile ? '0.8rem' : '0.96rem'};
+    padding: ${isMobile ? '8px 12px' : '9px 18px'};
     border-radius: 10px;
     box-shadow: 0 0 14px #fde68a66;
     z-index: 10004;
-    min-width: 220px;
-    max-height: 360px;
+    min-width: ${isMobile ? '200px' : '220px'};
+    max-width: ${popupWidth}px;
+    width: 100%;
+    max-height: ${popupMaxHeight}px;
     overflow-y: auto;
+    overflow-x: hidden;
     text-align: left;
     scrollbar-width: thin;
     scrollbar-color: #fde68a #000000;
+    box-sizing: border-box;
   `;
   
   const userIds = userOrder;
@@ -25238,7 +25264,7 @@ async function showUserListPopup(users, parentPopup, x, y) {
               width:${isMobile ? '20px' : '24px'};
               height:${isMobile ? '20px' : '24px'};
             ">
-              <img src="assets/astral-silence.svg" 
+              <img src="assets/astral-silence1.svg" 
                    class="astral-active" 
                    style="
                      width:${iconSize}; 
