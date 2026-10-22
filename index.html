@@ -21879,7 +21879,7 @@ async function showCountryUserListPopup(country, x, y) {
   // Step 1: Get all users for this country (latest session per user)
   let { data: countryUsers, error: countryError } = await supabase
     .from('om_sessions')
-    .select('user_id, country, duration_seconds, started_at')
+    .select('user_id, country, countryCode, duration_seconds, started_at')
     .eq('country', dbCountry)
     .order('started_at', { ascending: false });
 
@@ -22094,6 +22094,17 @@ const hasYesterdayActivity = (sessions) => {
     // Filter live presence rows to only those in this country
 	const liveInCountry = livePresenceRows.filter(row => row.country === country);
 	const liveIds = new Set(liveInCountry.map(row => row.user_id));
+	
+	// Map every live user -> { country name, country code } straight from presence
+const liveCountryById = {};
+const liveCountryCodeById = {};
+livePresenceRows.forEach(row => {
+  if (row.user_id) {
+    liveCountryById[row.user_id] = row.country;
+    liveCountryCodeById[row.user_id] = (row.countryCode || '').toLowerCase();
+  }
+});
+
     const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
       <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
     </svg>`;
@@ -22121,6 +22132,9 @@ const hasYesterdayActivity = (sessions) => {
       ${userIds.map((id, index) => {
         const isCurrentUser = id === currentUserId;
         const isLive = liveIds.has(id);
+		const liveCountry = liveCountryById[id];
+		const showForeignFlag = liveCountry && liveCountry !== country;
+		const flagCode = liveCountryCodeById[id] || 'un';
         const recentTime = formatRecentTime(userSessions[id].latestSession);
 		const userSessionsList = userCountrySessions[id] || [];
 		const streak = calculateUserStreak(userSessionsList);
@@ -22136,9 +22150,14 @@ const hasYesterdayActivity = (sessions) => {
             <span style="display:inline-block;">
               ${isLive ? liveSvg : blankSvg}
             </span>
-            <span style="font-family:monospace;font-size:0.85rem;color:${isCurrentUser ? '#fff' : '#ffd700'};">
-              ${getShortUserId(id)}
-            </span>
+			<span style="font-family:monospace;font-size:0.85rem;color:${isCurrentUser ? '#fff' : '#ffd700'};display:inline-flex;align-items:center;gap:4px;">
+			  ${showForeignFlag ? `
+				<img src="https://flagcdn.com/w20/${flagCode}.png"
+					 style="width:16px;height:11px;border-radius:2px;box-shadow:0 0 1px #000;"
+					 title="${liveCountry.replace(/_/g,' ')}">
+			  ` : ''}
+			  ${getShortUserId(id)}
+			</span>
             <img src="assets/clock.svg" style="width:14px; height:14px;">
             <span style="font-size:0.8rem;color:${isCurrentUser ? '#fff' : '#ffd700'};">
               ${formatDurationGrid(userSessions[id].totalDuration)}
