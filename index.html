@@ -21825,17 +21825,45 @@ async function showUserCountrySessions(userId, country, x, y) {
 
   const popup = document.createElement('div');
   popup.id = 'user-country-sessions';
+
+  const popupIsMobile = window.innerWidth <= 480;
+  const popupMargin = 12;
+  const popupWidth = Math.min(popupIsMobile ? 260 : 300, window.innerWidth - popupMargin * 2);
+  const popupMaxHeight = Math.min(360, window.innerHeight - 80);
+
+  // Clamp X — popup is centered on `left`
+  let clampedX = x;
+  const halfW = popupWidth / 2;
+  if (clampedX - halfW < popupMargin) clampedX = halfW + popupMargin;
+  if (clampedX + halfW > window.innerWidth - popupMargin) clampedX = window.innerWidth - popupMargin - halfW;
+
+  // Popup opens above the click point; clamp so it doesn't go off the top.
+  // If it would, flip below.
+  let clampedY = y - 50;
+  const approxHeight = Math.min(60 + sessions.length * 45, popupMaxHeight);
+  if (clampedY - approxHeight < popupMargin) {
+    clampedY = y + 40;
+    popup.style.transform = 'translate(-50%, 0)';
+  }
+
   popup.style.cssText = `
     position: fixed;
-    left: ${x}px; top: ${y - 50}px;
-    transform: translate(-50%, -100%);
+    left: ${clampedX}px;
+    top: ${clampedY}px;
+    transform: ${popup.style.transform || 'translate(-50%, -100%)'};
     background: rgba(0,0,0,0.95);
     color: #fde68a;
     padding: 12px;
     border-radius: 12px;
-    min-width: 260px;
+    min-width: ${popupIsMobile ? '220px' : '260px'};
+    max-width: ${popupWidth}px;
+    width: 100%;
+    max-height: ${popupMaxHeight}px;
+    overflow-y: auto;
+    overflow-x: hidden;
     z-index: 10005;
     box-shadow: 0 0 12px rgba(253,230,138,0.3);
+    box-sizing: border-box;
   `;
 
 	popup.innerHTML = `
