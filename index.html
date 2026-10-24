@@ -7191,56 +7191,39 @@ document.addEventListener('DOMContentLoaded', function() {
     .catch(e => {
       document.getElementById('live-list').innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">Failed to load live events.</div>';
     });
-
-  // 👇 ADD IT HERE — after the fetch chain, still inside DOMContentLoaded
-  setInterval(() => {
-    const el = document.getElementById('live-list');
-    if (el && el.style.display !== 'none') renderLiveList();
-  }, 180000); // 3 min
 });
 
-const BACKEND_URL = 'https://trueyogi-backend-knkq.onrender.com'; // adjust if different
-
-async function fetchLiveFromBackend() {
-  try {
-    const r = await fetch(`${BACKEND_URL}/api/live?t=${cacheBuster}`);
-    if (!r.ok) return [];
-    const json = await r.json();
-    return Array.isArray(json.live) ? json.live : [];
-  } catch (e) {
-    console.error('Live fetch failed:', e);
-    return [];
-  }
-}
-
-async function renderLiveList() {
+function renderLiveList() {
   const list = document.getElementById('live-list');
-  list.innerHTML = '';
+  list.innerHTML = "";
 
-  const dynamicLive = await fetchLiveFromBackend();
-  const allStreams = [...dynamicLive, ...liveStreams];
+  // Get current language (from localStorage or global)
+  const currentLang = localStorage.getItem('lang') || 'en';
 
-  if (allStreams.length === 0) {
-    list.innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">No live streams right now.</div>';
+  // Filter live streams
+  const filteredLive = liveStreams;
+
+  if (filteredLive.length === 0) {
+    list.innerHTML = '<div style="color:#f87171;padding:24px;text-align:center;">No live streams for this language.</div>';
     return;
   }
 
-  allStreams.forEach((live) => {
-    const html = `
-      <div style="background:#232136;border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(0,0,0,0.10);">
-        <img src="${live.thumb || 'https://img.youtube.com/vi/' + live.youtubeId + '/hqdefault.jpg'}"
-          alt="live thumbnail"
-          style="width:75px;height:52px;border-radius:8px;object-fit:cover;">
-        <div style="flex:1;">
-          <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${live.title}</div>
-          <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
-          <button onclick="openVideoPlayer('${live.youtubeId}','${(live.title || '').replace(/'/g,'\\\'')}','live',false)"
-            class="mode-btn"
-            style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
-            Tune In
-          </button>
-        </div>
-      </div>`;
+  filteredLive.forEach((live) => {
+	const html = `
+	  <div style="background:#232136;border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(0,0,0,0.10);">
+		<img src="${live.thumb || 'https://img.youtube.com/vi/' + live.youtubeId + '/hqdefault.jpg'}"
+		  alt="live thumbnail"
+		  style="width:75px;height:52px;border-radius:8px;object-fit:cover;">
+		<div style="flex:1;">
+		  <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${live.title}</div>
+		  <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
+	<button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}','live',false)"
+			class="mode-btn"
+			style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
+			Tune In
+	</button>
+		</div>
+	  </div>`;
     list.insertAdjacentHTML('beforeend', html);
   });
 }
