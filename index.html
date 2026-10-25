@@ -21188,6 +21188,8 @@ window.astralStatusCache = {};
 window.astralCacheTimestamp = null;
 const ASTRAL_CACHE_DURATION = 30000; // 30 secs
 
+window.usernameCache = {};
+
 // ADD THIS FUNCTION RIGHT HERE
 function getCountryData() {
   const now = Date.now();
@@ -21933,6 +21935,47 @@ async function showCountryUserListPopup(country, x, y) {
     return;
   }
   
+  // ===== BATCH FETCH PREFERENCES (USERNAME, X HANDLE, ASTRAL) =====
+  const userIds = uniqueUserIds; // Alias for clarity
+  let astralStatuses = {};
+  
+  // Ensure our global caches exist
+  if (!window.usernameCache) window.usernameCache = {};
+  if (!window.twitterHandleCache) window.twitterHandleCache = {};
+  if (!window.astralStatusCache) window.astralStatusCache = {};
+
+  const now = Date.now();
+  const cacheValid = window.astralCacheTimestamp && 
+                     (now - window.astralCacheTimestamp) < 60000 && // 1 min cache
+                     Object.keys(window.astralStatusCache).length > 0;
+  
+  if (cacheValid) {
+    astralStatuses = window.astralStatusCache;
+  } else {
+    try {
+      const { data, error } = await supabase
+        .from('user_preferences')
+        .select('user_id, astral_silence, username, twitter_handle')
+        .in('user_id', uniqueUserIds);
+      
+      if (!error && data) {
+        data.forEach(row => {
+          astralStatuses[row.user_id] = row.astral_silence || false;
+          window.astralStatusCache[row.user_id] = row.astral_silence || false;
+          
+          // Cache the new fields!
+          window.usernameCache[row.user_id] = row.username || null;
+          window.twitterHandleCache[row.user_id] = row.twitter_handle || null;
+        });
+        window.astralCacheTimestamp = now;
+      }
+    } catch (err) {
+      console.error('Error fetching user preferences:', err);
+    }
+  }
+  // ===============================================================
+ 
+  
 // Step 2: Fetch sessions for these users ONLY in this country
 // Include started_at AND last_heartbeat
 let { data: countryUserSessions, error: sessionsError } = await supabase
@@ -22113,7 +22156,6 @@ const hasYesterdayActivity = (sessions) => {
     box-sizing: border-box;
   `;
   
-  const userIds = userOrder;
   const currentUserId = localStorage.getItem('omUserId');
 
   if (userIds.length === 0) {
@@ -22184,7 +22226,14 @@ livePresenceRows.forEach(row => {
 					 style="width:16px;height:11px;border-radius:2px;box-shadow:0 0 1px #000;"
 					 title="${liveCountry.replace(/_/g,' ')}">
 			  ` : ''}
-			  ${getShortUserId(id)}
+			  
+			  <!-- Show Username if exists, otherwise show Grid ID -->
+			  ${(window.usernameCache && window.usernameCache[id]) ? `
+				<span style="color:${isCurrentUser ? '#fff' : '#29D884'}; font-weight:bold; letter-spacing:1px;">${window.usernameCache[id]}</span>
+				<span style="font-size:0.7em; opacity:0.5;"></span>
+			  ` : `
+				${getShortUserId(id)}
+			  `}
 			</span>
             <img src="assets/clock.svg" style="width:14px; height:14px;">
             <span style="font-size:0.8rem;color:${isCurrentUser ? '#fff' : '#ffd700'};">
@@ -24222,6 +24271,22 @@ userIdDisplay.style.cursor = 'pointer'; // Show it's clickable
 
 userIdDisplay.onclick = async function(e) {
   const userId = localStorage.getItem('omUserId');
+  
+  // Fetch this user's current X handle and Username from prefs
+ 
+  let userUsername = '';
+  try {
+    const { data: prefData } = await supabase
+      .from('user_preferences')
+      .select('username') // Added username
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (prefData?.twitter_handle) userTwitterHandle = prefData.twitter_handle;
+    if (prefData?.username) userUsername = prefData.username;
+  } catch (err) {
+    console.warn('Could not load prefs:', err);
+  }
+  
   const userRow = livePresenceRows.find(row => row.user_id === userId);
   if (!userRow) {
     // Show a friendly message instead
@@ -24345,7 +24410,7 @@ popup.innerHTML = `
       <span style="font-size:0.95em;color:${missedHeartbeat?'#ff9944':'#29D884'};font-weight:600;">
         ${missedHeartbeat?'Resonance interrupted!':'Resonance active'}
       </span>
-	    ${canBroadcast ? `
+  ${canBroadcast ? `
     <div style="margin-top:8px; margin-bottom:8px;">
       <label style="display:flex;align-items:center;gap:6px;font-size:0.93em;color:#ffeb99;cursor:pointer;">
         <input type="checkbox" id="broadcast-toggle" style="accent-color:#ffd700; width:1.1em; height:1.1em;" ${broadcastMode ? 'checked' : ''} />
@@ -24366,6 +24431,23 @@ popup.innerHTML = `
                 background:rgba(255,215,0,0.1);padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.2);">
     ${nextCountdownText}
   </div>
+  
+  <!-- USERNAME SECTION -->
+  <div id="username-container" style="margin:8px 0; display:flex; align-items:center; justify-content:center; gap:6px; min-height: 28px;">
+    <!-- Saved State -->
+    <div id="name-saved-state" style="display: ${userUsername ? 'inline-flex' : 'none'}; align-items:center; gap:6px;">
+      <span style="color:#ffd700; font-weight:bold; font-family:monospace; letter-spacing:1px;">${userUsername}</span>
+      <span id="name-edit-trigger" style="font-size:0.7em; color:#888; cursor:pointer; text-decoration:underline;">edit</span>
+    </div>
+    <!-- Edit State -->
+    <div id="name-edit-state" style="display: ${userUsername ? 'none' : 'flex'}; align-items:center; gap:6px;">
+      <input type="text" id="username-input" placeholder="Name" maxlength="12"
+             value="${userUsername || ''}" 
+             style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,215,0,0.3);color:#fff;border-radius:4px;padding:4px 8px;font-size:0.8rem;width:100px;outline:none;text-transform:uppercase;">
+      <button id="save-username" style="background:#ffd700;color:#000;border:none;border-radius:4px;padding:4px 8px;font-size:0.8rem;cursor:pointer;font-weight:bold;">Save</button>
+    </div>
+  </div>
+  <!-- END USERNAME SECTION -->
 </span>
   </div>
 ${missedHeartbeat 
@@ -24403,6 +24485,67 @@ if (broadcastToggle) {
     broadcastMode = e.target.checked;
     // You may optionally persist this in localStorage if you wish
   });
+}
+
+// USERNAME TOGGLE & SAVE LOGIC
+const nameSavedState = popup.querySelector('#name-saved-state');
+const nameEditState = popup.querySelector('#name-edit-state');
+const nameEditTrigger = popup.querySelector('#name-edit-trigger');
+const saveNameBtn = popup.querySelector('#save-username');
+
+if (nameEditTrigger) {
+  nameEditTrigger.onclick = (e) => {
+    e.preventDefault();
+    nameSavedState.style.display = 'none';
+    nameEditState.style.display = 'flex';
+    popup.querySelector('#username-input').focus();
+  };
+}
+
+if (saveNameBtn) {
+  saveNameBtn.onclick = async () => {
+    const input = popup.querySelector('#username-input');
+    // Rules: Only letters, force uppercase, max 12 chars
+    let name = input.value.trim().toUpperCase().replace(/[^A-Z]/g, '').substring(0, 12);
+    
+    if (name.length > 0 && name.length < 3) {
+       saveNameBtn.innerText = 'Too short';
+       saveNameBtn.style.background = '#ff4444';
+       setTimeout(() => { saveNameBtn.innerText = 'Save'; saveNameBtn.style.background = '#ffd700'; }, 1500);
+       return;
+    }
+
+    const { error } = await supabase
+      .from('user_preferences')
+      .upsert(
+        { user_id: userId, username: name || null },
+        { onConflict: 'user_id' }
+      );
+
+    if (error) {
+      console.error('Save username failed:', error);
+      saveNameBtn.innerText = 'Error';
+      saveNameBtn.style.background = '#ff4444';
+      setTimeout(() => { saveNameBtn.innerText = 'Save'; saveNameBtn.style.background = '#ffd700'; }, 1500);
+    } else {
+      userUsername = name;
+      saveNameBtn.innerText = 'Saved!';
+      saveNameBtn.style.background = '#29D884';
+      
+      // Update the display text
+      nameSavedState.querySelector('span').innerText = name;
+      
+      setTimeout(() => {
+        saveNameBtn.innerText = 'Save';
+        saveNameBtn.style.background = '#ffd700';
+        
+        if (userUsername) {
+          nameEditState.style.display = 'none';
+          nameSavedState.style.display = 'inline-flex';
+        }
+      }, 1000);
+    }
+  };
 }
 
 // --- Live countdown update for heartbeat ---
@@ -25209,12 +25352,13 @@ async function showUserListPopup(users, parentPopup, x, y) {
     try {
       const { data, error } = await supabase
         .from('user_preferences')
-        .select('user_id, astral_silence')
+        .select('user_id, astral_silence, username')
         .in('user_id', userIds);
       
       if (!error && data) {
         data.forEach(row => {
           astralStatuses[row.user_id] = row.astral_silence || false;
+		   window.usernameCache[row.user_id] = row.username || null;
         });
         window.astralStatusCache = { ...astralStatuses };
         window.astralCacheTimestamp = now;
