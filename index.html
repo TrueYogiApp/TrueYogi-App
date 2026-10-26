@@ -22985,13 +22985,26 @@ const permissionsResponse = await fetch('https://trueyogi-backend-knkq.onrender.
 });
 const permissions = (await permissionsResponse.json()).userPermissions || {};
 
-// ----- ADD THIS: Fetch Astral Silence status for all users at once -----
+// ----- FAST BATCH FETCH FOR ASTRAL & USERNAMES -----
 const astralSilenceStatuses = {};
-for (const userId of userIds) {
-  const status = await getAstralSilenceStatus(userId);
-  astralSilenceStatuses[userId] = status;
+if (!window.usernameCache) window.usernameCache = {};
+
+try {
+  const { data: prefs, error: prefErr } = await supabase
+    .from('user_preferences')
+    .select('user_id, astral_silence, username')
+    .in('user_id', userIds);
+
+  if (!prefErr && prefs) {
+    prefs.forEach(p => {
+      astralSilenceStatuses[p.user_id] = p.astral_silence || false;
+      window.usernameCache[p.user_id] = p.username || null;
+    });
+  }
+} catch (err) {
+  console.error('Error batch fetching prefs:', err);
 }
-// ----------------------------------------------------------------
+// -------------------------------------------------
 
 if (userIds.length === 0) {
   listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
