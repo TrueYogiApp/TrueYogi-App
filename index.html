@@ -23069,7 +23069,7 @@ if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or simila
 			</span>
 			<img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
 			<span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-			  ${getShortUserId(id)}
+			  ${(window.usernameCache && window.usernameCache[id]) ? window.usernameCache[id] : getShortUserId(id)}
 			</span>
 			<img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
 			<span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
