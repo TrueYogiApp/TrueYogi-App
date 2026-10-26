@@ -23737,7 +23737,9 @@ window.showAstralSilencePopup = function(userId) {
       overflow-y: auto;
     `;
     
-    const shortId = getShortUserId(userId);
+    const displayName = (window.usernameCache && window.usernameCache[userId]) 
+                        ? window.usernameCache[userId] 
+                        : getShortUserId(userId);
     
     if (isCurrentUser) {
       const statusText = status ? '🟣 ACTIVE' : '⚪ OFF';
@@ -23945,7 +23947,7 @@ window.showAstralSilencePopup = function(userId) {
         <div style="font-size: 2.4rem; margin-bottom: 12px;">🌙</div>
         <h3 style="margin: 8px 0 4px; color: #fff; font-size: 1.4rem;">Astral Silence</h3>
         <p style="margin: 4px 0 8px; font-size: 1rem;">
-          ${shortId} is <span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
+          <span style="color: #ffd700; font-weight: bold; font-family: monospace; letter-spacing: 1px;">${displayName}</span><span style="color: ${statusColor}; font-weight: bold;">${statusText}</span>
         </p>
         ${statusMessageHtml}
         <button onclick="document.getElementById('astral-silence-popup').remove()" class="mode-btn" style="
