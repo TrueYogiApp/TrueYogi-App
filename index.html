@@ -21935,43 +21935,31 @@ async function showCountryUserListPopup(country, x, y) {
     return;
   }
   
-  // ===== BATCH FETCH PREFERENCES (USERNAME, X HANDLE, ASTRAL) =====
+  // ===== BATCH FETCH PREFERENCES (USERNAME, ASTRAL) =====
   const userIds = uniqueUserIds; // Alias for clarity
   let astralStatuses = {};
   
   // Ensure our global caches exist
   if (!window.usernameCache) window.usernameCache = {};
-  if (!window.twitterHandleCache) window.twitterHandleCache = {};
   if (!window.astralStatusCache) window.astralStatusCache = {};
 
-  const now = Date.now();
-  const cacheValid = window.astralCacheTimestamp && 
-                     (now - window.astralCacheTimestamp) < 60000 && // 1 min cache
-                     Object.keys(window.astralStatusCache).length > 0;
-  
-  if (cacheValid) {
-    astralStatuses = window.astralStatusCache;
-  } else {
-    try {
-      const { data, error } = await supabase
-        .from('user_preferences')
-        .select('user_id, astral_silence, username, twitter_handle')
-        .in('user_id', uniqueUserIds);
-      
-      if (!error && data) {
-        data.forEach(row => {
-          astralStatuses[row.user_id] = row.astral_silence || false;
-          window.astralStatusCache[row.user_id] = row.astral_silence || false;
-          
-          // Cache the new fields!
-          window.usernameCache[row.user_id] = row.username || null;
-          window.twitterHandleCache[row.user_id] = row.twitter_handle || null;
-        });
-        window.astralCacheTimestamp = now;
-      }
-    } catch (err) {
-      console.error('Error fetching user preferences:', err);
+  try {
+    const { data, error } = await supabase
+      .from('user_preferences')
+      .select('user_id, astral_silence, username')
+      .in('user_id', uniqueUserIds);
+    
+    if (!error && data) {
+      data.forEach(row => {
+        astralStatuses[row.user_id] = row.astral_silence || false;
+        window.astralStatusCache[row.user_id] = row.astral_silence || false;
+        
+        // Force cache update for usernames
+        window.usernameCache[row.user_id] = row.username || null;
+      });
     }
+  } catch (err) {
+    console.error('Error fetching user preferences:', err);
   }
   // ===============================================================
  
