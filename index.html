@@ -22576,8 +22576,9 @@ window.updateLiveOmTicker = function(count) {
   }
   
   // Only dot blinks, text stays solid
+  const soulWord = count === 1 ? 'Soul' : 'Souls';
   textEl.innerHTML = `
-    <span class="live-dot"></span>${count} Yogis Live now
+    <span class="live-dot"></span>${count} ${soulWord} Live now
   `;
 }
 
