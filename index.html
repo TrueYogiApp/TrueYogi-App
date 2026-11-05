@@ -25408,10 +25408,32 @@ popup.innerHTML = `
   }
 </div>
 `;
+  // --- Compute clamped position so popup stays fully on-screen ---
+  const isMobile = window.innerWidth <= 480;
+  const margin = 12;
+  // Since this popup is white-space: nowrap, we estimate its width or allow it to shrink
+  const estimatedWidth = isMobile ? Math.min(280, window.innerWidth - margin * 2) : 320;
+  
+  // Clamp X
+  let clampedX = x;
+  const halfW = estimatedWidth / 2;
+  if (clampedX - halfW < margin) clampedX = halfW + margin;
+  if (clampedX + halfW > window.innerWidth - margin) clampedX = window.innerWidth - margin - halfW;
+
+  // Clamp Y (since this popup opens above the point using -120% translate)
+  let clampedY = y;
+  // If the user clicks too close to the top, we can't translate it up, so we flip it below
+  let translateY = '-120%';
+  if (clampedY - 80 < margin) { 
+    clampedY = y + 20; 
+    translateY = '0%'; 
+  }
+
   popup.style.cssText = `
     position: fixed;
-    left: ${x}px; top: ${y}px;
-    transform: translate(-50%, -120%);
+    left: ${clampedX}px; 
+    top: ${clampedY}px;
+    transform: translate(-50%, ${translateY});
     background: rgba(0,0,0,0.75);
     color: #fde68a;
     font-size: 0.85rem;
@@ -25423,6 +25445,9 @@ popup.innerHTML = `
     transition: opacity 0.4s ease;
     z-index: 10000;
     white-space: nowrap;
+    max-width: calc(100vw - 24px);
+    overflow: hidden;
+    box-sizing: border-box;
   `;
   document.body.appendChild(popup);
   
