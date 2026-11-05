@@ -22505,6 +22505,121 @@ statsLabel.style.cssText = `
   container.appendChild(statsLabel);
 }
 
+
+// ===== NEW: Live OM Count Scrolling Ticker =====
+let liveOmTicker = document.getElementById('liveOmTicker');
+if (!liveOmTicker) {
+  liveOmTicker = document.createElement('div');
+  liveOmTicker.id = 'liveOmTicker';
+  liveOmTicker.style.cssText = `
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    color: #4ade80;
+    z-index: 10001;
+    width: 90%;
+    max-width: 320px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-align: center;
+  `;
+  
+  // Inner scrolling text
+liveOmTicker.innerHTML = `
+  <div id="liveOmScrollInner" style="
+    display: inline-block;
+    padding-left: 100%;
+    animation: omScrollLeft 12s linear infinite;
+    white-space: nowrap;
+  ">
+    <span id="liveOmText"></span>
+  </div>
+`;
+  
+  // Add scroll animation if not exists
+  if (!document.getElementById('om-scroll-style')) {
+    const style = document.createElement('style');
+    style.id = 'om-scroll-style';
+    style.textContent = `
+      @keyframes omScrollLeft {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+      }
+      #liveOmTicker:hover #liveOmScrollInner {
+        animation-play-state: paused;
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  container.appendChild(liveOmTicker);
+}
+
+// Function to update live count text - reads from real count
+window.updateLiveOmTicker = function(count) {
+  const textEl = document.getElementById('liveOmText');
+  const wrapper = document.getElementById('liveOmScrollInner');
+  if (!textEl) return;
+  
+  if (typeof count !== 'number') {
+    count = window.livePresenceRows ? window.livePresenceRows.length : 0;
+  }
+  
+  if (wrapper) {
+    wrapper.style.animation = 'none';
+    wrapper.style.paddingLeft = '0';
+  }
+  
+  // Only dot blinks, text stays solid
+  textEl.innerHTML = `
+    <span class="live-dot"></span>${count} Yogis Live now
+  `;
+}
+
+// Add blinking dot style once
+if (!document.getElementById('live-dot-style')) {
+  const s = document.createElement('style');
+  s.id = 'live-dot-style';
+  s.textContent = `
+    .live-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background: #4ade80;
+      border-radius: 50%;
+      margin-right: 8px;
+      vertical-align: middle;
+      animation: dotBlink 1.8s ease-in-out infinite;
+      box-shadow: 0 0 8px #4ade80;
+    }
+    @keyframes dotBlink {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.2; transform: scale(0.8); }
+    }
+  `;
+  document.head.appendChild(s);
+}
+ 
+
+// Auto-sync every 3 seconds with main counter
+if (!window.liveOmTickerInterval) {
+  window.liveOmTickerInterval = setInterval(() => {
+    const counterEl = document.getElementById('om-counter');
+    const omNum = counterEl?.querySelector('.om-number');
+    if (omNum) {
+      const realCount = parseInt(omNum.textContent) || 0;
+      window.updateLiveOmTicker(realCount);
+    } else if (window.livePresenceRows) {
+      window.updateLiveOmTicker(window.livePresenceRows.length);
+    }
+  }, 3000);
+}
+
 // Create NEW heading for Global Resonance Field at top center
 let globalHeading = document.getElementById('globalHeading');
 if (!globalHeading) {
