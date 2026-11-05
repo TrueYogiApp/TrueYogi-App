@@ -22513,7 +22513,7 @@ if (!liveOmTicker) {
   liveOmTicker.id = 'liveOmTicker';
   liveOmTicker.style.cssText = `
     position: absolute;
-    top: 33%;
+    top: 35%;
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Poppins', sans-serif;
@@ -22576,9 +22576,9 @@ window.updateLiveOmTicker = function(count) {
   }
   
   // Only dot blinks, text stays solid
-  const soulWord = count === 1 ? 'Soul' : 'Souls';
+  const soulWord = count === 1 ? 'Yogi' : 'Yogis';
   textEl.innerHTML = `
-    <span class="live-dot"></span>${count} ${soulWord} Live now
+    <span class="live-dot"></span>${count} ${soulWord} in Resonance
   `;
 }
 
