@@ -22506,7 +22506,7 @@ statsLabel.style.cssText = `
 }
 
 
-// ===== COMBINED: Global Resonance Field + Live Count Inside =====
+// ===== COMBINED: Global Resonance Field + Live Count Inside (REAL-TIME FIX) =====
 let globalHeading = document.getElementById('globalHeading');
 if (!globalHeading) {
   globalHeading = document.createElement('div');
@@ -22532,6 +22532,17 @@ if (!globalHeading) {
     max-width: calc(100vw - 16px);
     text-align: center;
   `;
+  // Get REAL count immediately, not hardcoded 1
+  const getRealCount = () => {
+    if (window.livePresenceRows && window.livePresenceRows.length > 0) {
+      return window.livePresenceRows.length;
+    }
+    const omNum = document.querySelector('#om-counter .om-number');
+    return omNum ? parseInt(omNum.textContent) || 0 : 0;
+  };
+  const initialCount = getRealCount();
+  const initialWord = initialCount === 1 ? 'Soul' : 'Souls';
+  
   globalHeading.innerHTML = `
     <div style="font-size:1.1rem; letter-spacing:1.5px; font-weight:600; white-space:nowrap; display:flex; align-items:center; justify-content:center;">
       <img src="assets/global.svg" style="width:22px;height:22px;vertical-align:middle; margin-right:7px;">
@@ -22539,7 +22550,7 @@ if (!globalHeading) {
     </div>
     <div style="margin-top:5px; display:flex; align-items:center; justify-content:center; gap:6px; font-size:0.88rem; font-weight:600; color:#4ade80; letter-spacing:0.8px;">
       <span class="live-dot"></span>
-      <span id="globalLiveText">1 Soul in Resonance</span>
+      <span id="globalLiveText">${initialCount} ${initialWord} in Resonance</span>
     </div>
   `;
   container.appendChild(globalHeading);
@@ -22563,11 +22574,17 @@ if (!document.getElementById('live-dot-style')) {
       0%,100% { opacity:1; transform:scale(1); }
       50% { opacity:0.2; transform:scale(0.75); }
     }
+    @keyframes countPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.25); color: #86efac; text-shadow: 0 0 15px #4ade80; }
+      100% { transform: scale(1); }
+    }
   `;
   document.head.appendChild(s);
 }
 
-// This updates the count INSIDE heading - same function name so your auto-sync still works
+if (typeof window.lastLiveCount === 'undefined') window.lastLiveCount = null;
+
 window.updateLiveOmTicker = function(count) {
   const textEl = document.getElementById('globalLiveText');
   if (!textEl) return;
@@ -22575,21 +22592,32 @@ window.updateLiveOmTicker = function(count) {
     count = window.livePresenceRows ? window.livePresenceRows.length : 0;
   }
   const soulWord = count === 1 ? 'Soul' : 'Souls';
-  textEl.textContent = `${count} ${soulWord} in Resonance`;
+  const newText = `${count} ${soulWord} in Resonance`;
+  
+  if (window.lastLiveCount !== null && window.lastLiveCount !== count) {
+    textEl.style.animation = 'none';
+    void textEl.offsetWidth;
+    textEl.style.animation = 'countPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)';
+    textEl.textContent = newText;
+    setTimeout(() => { textEl.style.animation = ''; }, 600);
+  } else {
+    textEl.textContent = newText;
+  }
+  window.lastLiveCount = count;
 }
 
-// Auto-sync every 3 seconds
+// Auto-sync + IMMEDIATE sync on open
 if (!window.liveOmTickerInterval) {
   window.liveOmTickerInterval = setInterval(() => {
-    const counterEl = document.getElementById('om-counter');
-    const omNum = counterEl?.querySelector('.om-number');
+    const omNum = document.querySelector('#om-counter .om-number');
     if (omNum) {
       window.updateLiveOmTicker(parseInt(omNum.textContent) || 0);
     } else if (window.livePresenceRows) {
       window.updateLiveOmTicker(window.livePresenceRows.length);
     }
-  }, 3000);
+  }, 2000);
 }
+ 
 
 // --- OM Flame Timer below Global Heading / with fire SVG ---
 let flameTimer = document.getElementById('om-flame-timer');
