@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#1e293b">
   <title>TrueYogi</title>
   <meta name="description" content="TrueYogi(YOGI) draws from Bhagavad Gita wisdom: 'A Yogi excels the monk, scholar, and ritualist. Strive to be a Yogi.' Anchoring a cosmic grid of awakened souls devoted to meditation and truth. Earn YOGI tokens through stillness practice and wisdom engagement.">
@@ -30,14 +30,12 @@
 
   <style>
 	body {
-	  min-height: 100dvh;
+	  min-height: 100dvh; /* preferred for modern devices */
+	  /* fallback for older browsers:. */
 	  min-height: 100vh;
 	  font-family: 'Lexend', sans-serif;
 	  background: linear-gradient(135deg, #0f172a, #1e293b);
-	  background-color: #0f172a;
-	  margin: 0;
-		padding-top: calc(env(safe-area-inset-top, 0px) + 16px) !important;
-	  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
+	  padding-bottom: env(safe-area-inset-bottom, 0px);
 	  box-sizing: border-box;
 	}
 	/* Base Styles for all Buttons */
