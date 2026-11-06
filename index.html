@@ -26665,7 +26665,7 @@ function tryPlayZoneSound(zone) {
 }
 
 
-// Start in the same clean state as after a session
+// Start in the same clean state as after a session.
 setTimeout(() => {
   if (typeof stopMeditationBackground === 'function') stopMeditationBackground();
   if (typeof cleanupAfterSessionEnd === 'function') cleanupAfterSessionEnd();
