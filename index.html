@@ -4,12 +4,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1e293b">
+  <meta name="theme-color" content="#0f172a">
   <title>TrueYogi</title>
   <meta name="description" content="TrueYogi(YOGI) draws from Bhagavad Gita wisdom: 'A Yogi excels the monk, scholar, and ritualist. Strive to be a Yogi.' Anchoring a cosmic grid of awakened souls devoted to meditation and truth. Earn YOGI tokens through stillness practice and wisdom engagement.">
   <link rel="icon" type="image/png" href="/assets/favicon.ico" />
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="TrueYogi">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
@@ -26,9 +26,12 @@
   <script src="/js/serviceworker.js"></script>
   <script src="/js/particles.js"></script>
   <script src="/js/meditationcanvas.js"></script>
-  <script type="module" src="/js/meditationguide.js"></script> 
+  <script type="module" src="/js/meditationguide.js"></script>
 
   <style>
+	  html {
+	  background: #0f172a;
+	}
 	body {
 	  min-height: 100dvh; /* preferred for modern devices */
 	  /* fallback for older browsers:. */
@@ -18573,32 +18576,37 @@ window.beginMeditationSession = async function(...args) {
 };
 
 function cleanupAfterSessionEnd() {
-  // Reset `uiHiddenForMeditation` and session flags
+  // Was completion ALREADY shown by updateTimer? If yes, keep it.
+  const completeEl = document.getElementById('complete-section');
+  const wasCompleteVisible = completeEl && !completeEl.classList.contains('hidden');
+
   uiHiddenForMeditation = 0;
   sessionActive = false;
   
-    // Reset all children visibility
   const appInterfaceChildren = appInterface.children;
   for (let child of appInterfaceChildren) {
     child.style.visibility = '';
     child.style.opacity = '';
   }
 
-  // Restore all UI elements and default states
-  hideBtn.style.display = 'none'; // Hide the toggle button
-  appInterface.classList.remove('hidden-by-meditation'); // Ensure app interface is visible
-  meditationCanvas.style.visibility = 'hidden';         // Hide meditation visuals
+  hideBtn.style.display = 'none';
+  appInterface.classList.remove('hidden-by-meditation');
+  meditationCanvas.style.visibility = 'hidden';
 
-  // Trigger the completion section and stats
-  document.getElementById('timer-section').classList.add('hidden');
-  document.getElementById('complete-section').classList.remove('hidden'); // Show completion section
-  document.getElementById('session-stats').classList.remove('hidden');   // Show stats
+  // Show completion ONLY if updateTimer already showed it
+  // Otherwise (startup / entering a mode) hide it
+  if (wasCompleteVisible) {
+    document.getElementById('timer-section').classList.add('hidden');
+    document.getElementById('complete-section').classList.remove('hidden');
+    document.getElementById('session-stats').classList.remove('hidden');
+    showCompletionStats();
+  } else {
+    document.getElementById('complete-section').classList.add('hidden');
+  }
 
-  // Stop visuals and finalize session cleanup
-  stopMeditationBackground(); // Stop ongoing visuals in the canvas
-  showCompletionStats();      // Display stats and any additional logic
+  stopMeditationBackground();
+  if (typeof setAuraColor === 'function') setAuraColor();
 
-  // Handle audio reset
   const bell = document.getElementById('bell');
   if (bell) {
     bell.muted = false;
@@ -18615,8 +18623,6 @@ function cleanupAfterSessionEnd() {
     clearTimeout(meditationEndTimeout);
     meditationEndTimeout = null;
   }
-  
-  // Cleanup event listeners
   document.removeEventListener('visibilitychange', handleVisibilityChange);
 }
 
@@ -26657,6 +26663,14 @@ function tryPlayZoneSound(zone) {
     });
   }
 }
+
+
+// Start in the same clean state as after a session
+setTimeout(() => {
+  if (typeof stopMeditationBackground === 'function') stopMeditationBackground();
+  if (typeof cleanupAfterSessionEnd === 'function') cleanupAfterSessionEnd();
+  if (typeof setAuraColor === 'function') setAuraColor();
+}, 500);
 
 </script>
 	
