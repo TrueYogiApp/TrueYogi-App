@@ -4,12 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <meta name="theme-color" content="#1e293b">
+  <meta name="theme-color" content="#0f172a">
   <title>TrueYogi</title>
   <meta name="description" content="TrueYogi(YOGI) draws from Bhagavad Gita wisdom: 'A Yogi excels the monk, scholar, and ritualist. Strive to be a Yogi.' Anchoring a cosmic grid of awakened souls devoted to meditation and truth. Earn YOGI tokens through stillness practice and wisdom engagement.">
   <link rel="icon" type="image/png" href="/assets/favicon.ico" />
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="TrueYogi">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
@@ -26,16 +27,18 @@
   <script src="/js/serviceworker.js"></script>
   <script src="/js/particles.js"></script>
   <script src="/js/meditationcanvas.js"></script>
-  <script type="module" src="/js/meditationguide.js"></script> 
+  <script type="module" src="/js/meditationguide.js"></script>
 
   <style>
 	body {
-	  min-height: 100dvh; /* preferred for modern devices */
-	  /* fallback for older browsers:. */
+	  min-height: 100dvh;
 	  min-height: 100vh;
 	  font-family: 'Lexend', sans-serif;
 	  background: linear-gradient(135deg, #0f172a, #1e293b);
-	  padding-bottom: env(safe-area-inset-bottom, 0px);
+	  background-color: #0f172a;
+	  margin: 0;
+		padding-top: calc(env(safe-area-inset-top, 0px) + 16px) !important;
+	  padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 16px) !important;
 	  box-sizing: border-box;
 	}
 	/* Base Styles for all Buttons */
