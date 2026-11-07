@@ -67,7 +67,11 @@ const PERMANENT_ASSETS = [
   '/assets/spaceship.mode.svg',
   '/assets/intention.svg',  
   '/assets/intention2.svg',
-  '/assets/nebula.webp'  
+  '/assets/nebula.webp',
+  '/js/walkthrough.js',  
+  '/js/serviceworker.js',  
+  '/js/particles.js',  
+  '/js/meditationguide.js'    
 ];
 
 // App files that change more often
