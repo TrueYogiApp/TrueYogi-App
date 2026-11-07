@@ -1094,6 +1094,7 @@ for (let i = 0; i < 3; i++) {
 
   // Function to start session background
   window.startMeditationBackground = function() {
+    canvas.style.display = 'block';
     canvas.classList.remove('hidden');
     // Reset DNA animation for new session
     showDNA = true;
@@ -1103,6 +1104,7 @@ for (let i = 0; i < 3; i++) {
 
   // Function to hide session background
   window.stopMeditationBackground = function() {
+    canvas.style.display = 'none';
     canvas.classList.add('hidden');
   };
 });
