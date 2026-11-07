@@ -3494,13 +3494,14 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   pointer-events: none;
 }
 
-
 /* ios 27 FIX */
 #mode-selection {
   position: relative;
   z-index: 1;
   margin-top: 12px;
 }
+
+
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -24362,386 +24363,243 @@ if (!userIdDisplay) {
 }
 
 // --- Set the text ---
+// --- Set the text — show Soul Name if exists, else Grid ID ---
 const userId = localStorage.getItem('omUserId');
-userIdDisplay.innerHTML = `Grid ID: <span style="font-family:monospace;font-size:1.05em;">${getShortUserId(userId)}</span>`;
+userIdDisplay.style.cursor = 'pointer';
 
-userIdDisplay.style.cursor = 'pointer'; // Show it's clickable
+async function refreshGridIdDisplay() {
+  let displayName = '';
+  try {
+    const { data } = await supabase
+      .from('user_preferences')
+      .select('username')
+      .eq('user_id', userId)
+      .maybeSingle();
+    if (data?.username) displayName = data.username;
+  } catch(e) {}
+
+  if (displayName) {
+    // User has name — show name, Grid ID as small subtitle on tap is still in popup
+    userIdDisplay.innerHTML = `<span style="font-weight:700; letter-spacing:1px;">${displayName}</span>`;
+  } else {
+    // No name yet — show Grid ID as before
+    userIdDisplay.innerHTML = `Grid ID: <span style="font-family:monospace;font-size:1.05em;">${getShortUserId(userId)}</span>`;
+  }
+}
+refreshGridIdDisplay();
+
+// Refresh after user saves/generates a new name — call this from popup save
+window.refreshGridIdDisplay = refreshGridIdDisplay;
 
 userIdDisplay.onclick = async function(e) {
   const userId = localStorage.getItem('omUserId');
-  
-  // Fetch this user's current X handle and Username from prefs
- 
   let userUsername = '';
   try {
     const { data: prefData } = await supabase
       .from('user_preferences')
-      .select('username') // Added username
+      .select('username')
       .eq('user_id', userId)
       .maybeSingle();
     if (prefData?.twitter_handle) userTwitterHandle = prefData.twitter_handle;
     if (prefData?.username) userUsername = prefData.username;
-  } catch (err) {
-    console.warn('Could not load prefs:', err);
-  }
-  
-  const userRow = livePresenceRows.find(row => row.user_id === userId);
-  if (!userRow) {
-    // Show a friendly message instead
-    const rect = userIdDisplay.getBoundingClientRect();
-    const x = rect.left + rect.width / 2;
-    const y = rect.top - 10;
-    
-    // Remove any existing popup
-    const oldPopup = document.getElementById('current-user-mins-popup');
-    if (oldPopup) oldPopup.remove();
-    
-    const popup = document.createElement('div');
-    popup.id = 'current-user-mins-popup';
-    popup.innerHTML = `
-      <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin:4px 0;">
-        <span style="font-size:1.15em;font-weight:600;color:#ffd700;"> Connect to the OM Field</span>
-      </div>
-      <div style="font-size:0.85em;color:#ffeb99;opacity:0.7;margin-top:2px;">
-        Tap the sacred symbol to enter the resonance
-      </div>
-    `;
-    popup.style.cssText = `
-      position: fixed;
-      left: ${x}px; top: ${y}px;
-      transform: translate(-50%, -100%);
-      background: rgba(0,0,0,0.94);
-      color: #ffd700;
-      font-family: 'Poppins', sans-serif;
-      font-size: 1.02rem;
-      padding: 14px 22px;
-      border-radius: 12px;
-      box-shadow: 0 0 20px #ffd70044, 0 0 60px #ffd70022;
-      z-index: 10020;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.18s;
-      text-align: center;
-      border: 1px solid rgba(255,215,0,0.15);
-    `;
-    document.body.appendChild(popup);
-    setTimeout(() => popup.style.opacity = 1, 10);
-    
-    // Auto-hide after 4 seconds
-    setTimeout(() => {
-      popup.style.opacity = 0;
-      setTimeout(() => popup.remove(), 400);
-    }, 9000);
-    
-    return; // Exit early
-  }
+  } catch (err) { console.warn('Could not load prefs:', err); }
 
-  // Calculate duration for current user
+  const userRow = livePresenceRows.find(row => row.user_id === userId);
+  document.getElementById('current-user-mins-popup')?.remove();
+  document.getElementById('om-modal-backdrop')?.remove();
+
   let duration = "";
-  if (userRow.joined_at) {
+  if (userRow?.joined_at) {
     const secs = Math.floor((Date.now() - new Date(userRow.joined_at)) / 1000);
     duration = formatDurationGrid(secs);
   }
-
-  // --- HEARTBEAT WARNING LOGIC ---
-  let heartbeatStyle = "color:#ffd700"; // normal gold
-  let lastHeartbeatStr = "";
   let nextHeartbeatStr = "";
   let missedHeartbeat = false;
   let nextCountdownText = "";
   let nextHeartbeatDate = null;
-  if (userRow.last_heartbeat) {
+  if (userRow?.last_heartbeat) {
     const lastHeartbeatDate = new Date(userRow.last_heartbeat);
-    lastHeartbeatStr = lastHeartbeatDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-    // 30min + custom grace (change graceMins for your threshold)
     const graceMins = 30;
     const now = Date.now();
     const lastMs = lastHeartbeatDate.getTime();
     missedHeartbeat = (now - lastMs) > (graceMins * 60 * 1000);
-
-    if (missedHeartbeat) {
-      heartbeatStyle = "color:#ffa366;font-weight:bold;text-shadow:0 0 8px #ff9944"; // warning orange
-    }
     nextHeartbeatDate = new Date(lastMs + 30 * 60 * 1000);
     nextHeartbeatStr = nextHeartbeatDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-    // -- Countdown until next heartbeat
     const timeLeftMs = nextHeartbeatDate - now;
-    if (timeLeftMs < 0) {
-      nextCountdownText = "Due now!";
-    } else {
+    if (timeLeftMs < 0) nextCountdownText = "Due now!";
+    else {
       const minsLeft = Math.floor(timeLeftMs / 60000);
       const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
       nextCountdownText = `${minsLeft} min${minsLeft !== 1 ? 's' : ''} ${secsLeft}s left`;
     }
   }
+  const canBroadcast = await canUserBroadcast();
 
-  // Get position (show near the Grid ID bar)
-  const rect = userIdDisplay.getBoundingClientRect();
-  const x = rect.left + rect.width / 2;
-  const y = rect.top - 10;
-
-  // Remove any existing popup
-  const oldPopup = document.getElementById('current-user-mins-popup');
-  if (oldPopup) oldPopup.remove();
-
-// Check broadcast permission BEFORE creating popup
-const canBroadcast = await canUserBroadcast();
-
-  // Build your popup with heartbeat warning color and countdown
   const popup = document.createElement('div');
   popup.id = 'current-user-mins-popup';
-popup.innerHTML = `
-  <div style="font-size:1.2em;font-weight:800;color:#ffd700;margin-bottom:5px;letter-spacing:1px;text-align:center;">
-    ${duration} <span style="font-size:0.7em;font-weight:normal;opacity:0.9;">connected</span>
-  </div>
-  <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px;">
-    <span style="width:26px;height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
-      background: radial-gradient(circle at 50% 50%, ${missedHeartbeat?'#f72b29':'#29D884'} 0%, #2a2525 90%);
-      box-shadow: 0 0 12px ${missedHeartbeat?'#f72b29':'#29D884'}, inset 0 1px 1px rgba(255,255,255,0.2);">
-      <svg viewBox="0 0 20 20" fill="none" style="width:16px;height:16px;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.3));">
-        <path d="M4 11 L7 7 L10 13 L13 10 L16 13" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/>
-      </svg>
-    </span>
-    <span style="font-size:1.05em;color:#ffe066;">
-      <span style="font-size:0.95em;color:${missedHeartbeat?'#ff9944':'#29D884'};font-weight:600;">
-        ${missedHeartbeat?'Resonance interrupted!':'Resonance active'}
-      </span>
-  ${canBroadcast ? `
-    <div style="margin-top:8px; margin-bottom:8px;">
-      <label style="display:flex;align-items:center;gap:6px;font-size:0.93em;color:#ffeb99;cursor:pointer;">
-        <input type="checkbox" id="broadcast-toggle" style="accent-color:#ffd700; width:1.1em; height:1.1em;" ${broadcastMode ? 'checked' : ''} />
-        <span style="user-select:none;">Broadcast Mode</span>
-      </label>
-    </div>
-  ` : ''}
-    </span>
-  </div>
-  <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
-  <div style="display:flex;align-items:center;justify-content:center;gap:8px;text-align:center;">
-<span style="font-size:1em;color:#ffe066;line-height:1.4;text-align:center;">
-  <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:4px;">
-    <span style="font-weight:600;opacity:0.9;color:#ffeb99;">Next pulse:</span>
-    <b style="color:#ffd700;text-shadow:0 0 6px rgba(255,215,0,0.4);">${nextHeartbeatStr || 'Unknown'}</b>
-  </div>
-  <div id="hb-countdown" style="font-size:0.95em;color:#ffd700;font-weight:700;letter-spacing:0.5px;
-                background:rgba(255,215,0,0.1);padding:4px 8px;border-radius:4px;border:1px solid rgba(255,215,0,0.2);">
-    ${nextCountdownText}
-  </div>
-  
-  <!-- USERNAME SECTION -->
-  <div id="username-container" style="margin:8px 0; display:flex; align-items:center; justify-content:center; gap:6px; min-height: 28px;">
-    <!-- Saved State -->
-    <div id="name-saved-state" style="display: ${userUsername ? 'inline-flex' : 'none'}; align-items:center; gap:6px;">
-      <span style="color:#ffd700; font-weight:bold; font-family:monospace; letter-spacing:1px;">${userUsername}</span>
-      <span id="name-edit-trigger" style="font-size:0.7em; color:#888; cursor:pointer; text-decoration:underline;">edit</span>
-    </div>
-    <!-- Edit State -->
-    <div id="name-edit-state" style="display: ${userUsername ? 'none' : 'flex'}; align-items:center; gap:6px;">
-      <input type="text" id="username-input" placeholder="Name" maxlength="12"
-             value="${userUsername || ''}" 
-             style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,215,0,0.3);color:#fff;border-radius:4px;padding:4px 8px;font-size:0.8rem;width:100px;outline:none;text-transform:uppercase;">
-      <button id="save-username" style="background:#ffd700;color:#000;border:none;border-radius:4px;padding:4px 8px;font-size:0.8rem;cursor:pointer;font-weight:bold;">Save</button>
-    </div>
-  </div>
-  <!-- END USERNAME SECTION -->
-</span>
-  </div>
-${missedHeartbeat 
-  ? `<div style="margin-top:14px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:6px;font-size:1.02em;color:#ff6b6b;font-weight:bold;text-align:center;border:1px solid rgba(255,68,68,0.3);">
-        Pulse missed! 
-        <span style="color:#ffd700;font-weight:bold;text-shadow:0 0 8px #ffd700;animation:om-glow 2s infinite alternate;">OM</span> again.
-     </div>`
-  : ''
-}
-`;
   popup.style.cssText = `
-    position: fixed;
-    left: ${x}px; top: ${y}px;
-    transform: translate(-50%, -100%);
-    background: rgba(0,0,0,0.94);
-    color: #ffd700;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.02rem;
-    padding: 11px 18px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px #ffd70066;
-    z-index: 10020;
-    white-space: nowrap;
-    opacity: 0;
-    transition: opacity 0.18s;
-    text-align: center;
+    position: fixed; top: 50%; left: 50%;
+    transform: translate(-50%, -50%) scale(0.96);
+    background: linear-gradient(180deg, rgba(18,16,8,0.98) 0%, rgba(0,0,0,0.98) 100%);
+    color: #ffd700; font-family: 'Poppins', sans-serif;
+    padding: 24px 24px 18px; border-radius: 20px;
+    box-shadow: 0 0 24px #ffd70055, 0 0 80px #ffd70022;
+    border: 1px solid rgba(255,215,0,0.22);
+    z-index: 10020; width: min(92vw, 340px); max-height: 85vh; overflow-y: auto;
+    opacity: 0; transition: opacity 0.2s, transform 0.2s; text-align: center;
   `;
+
+  if (!userRow) {
+    popup.innerHTML = `
+      <button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
+      <div style="font-size:1.15em;font-weight:600;color:#ffd700;margin:18px 0 6px;">Connect to the OM Field</div>
+      <div style="font-size:0.88em;color:#ffeb99;opacity:0.75;margin-bottom:8px;line-height:1.45;">Tap the sacred symbol to enter the resonance</div>
+    `;
+  } else {
+    popup.innerHTML = `
+      <button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
+
+      <!-- ===== NAME — WITH GENERATE ===== -->
+      <div style="margin:8px 0 16px;">
+        <div style="font-size:1.1rem; margin-bottom:2px;"></div>
+        <div id="name-saved-state" style="display:${userUsername ? 'block' : 'none'};">
+          <div id="saved-name-text" style="font-size:1.65em; font-weight:800; letter-spacing:2.5px; color:#fde68a; text-shadow:0 0 14px rgba(255,215,0,0.35); line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${userUsername || ''}</div>
+          <span id="name-edit-trigger" style="font-size:0.72em; color:#8a8a8a; cursor:pointer;">tap to edit name</span>
+        </div>
+        <div id="name-edit-state" style="display:${userUsername ? 'none' : 'block'};">
+          <div style="font-size:0.8em; color:#9a8a4a; margin-bottom:8px; letter-spacing:0.5px;">Choose your Name <span style="color:#666;">(optional)</span></div>
+          <div style="display:flex; gap:6px; justify-content:center;">
+            <input type="text" id="username-input" placeholder="NAME" maxlength="12" value="${userUsername || ''}"
+              style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,215,0,0.35);color:#fff;border-radius:10px;padding:9px 10px;font-size:0.95rem;width:150px;outline:none;text-transform:uppercase;letter-spacing:1.5px;text-align:center;">
+            <button id="save-username" style="background:#fde68a;color:#000;border:none;border-radius:10px;padding:9px 16px;font-size:0.85rem;cursor:pointer;font-weight:700;">Save</button>
+          </div>
+          <div style="margin-top:10px; display:flex; gap:14px; justify-content:center; align-items:center;">
+            <span id="generate-name" style="font-size:0.78em; color:#fde68a; cursor:pointer; text-decoration:underline;">Generate Name</span>
+            ${userUsername ? `<span id="name-cancel" style="font-size:0.78em;color:#8a8a8a;cursor:pointer;">cancel</span>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STATUS ===== -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
+        <span style="width:9px;height:9px;border-radius:50%;background:${missedHeartbeat?'#f72b29':'#4ade80'};box-shadow:0 0 8px ${missedHeartbeat?'#f72b29':'#4ade80'};animation:resBlink 1.8s infinite;"></span>
+        <span style="font-size:0.95em;color:${missedHeartbeat?'#ff9944':'#4ade80'};font-weight:600;letter-spacing:0.3px;">${missedHeartbeat?'Resonance interrupted':'Resonance active'}</span>
+      </div>
+
+      <!-- ===== DURATION ===== -->
+      <div style="font-size:2.1em;font-weight:800;color:#fde68a;letter-spacing:1px;line-height:1;">${duration}</div>
+      <div style="font-size:0.75em;opacity:0.6;color:#ffe066;margin:4px 0 14px;">connected</div>
+      <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
+
+      <!-- ===== HEARTBEAT ===== -->
+      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+        <span style="opacity:0.7;color:#ffeb99;font-size:0.88em;">Next pulse:</span>
+        <b style="color:#fde68a;font-size:0.95em;">${nextHeartbeatStr || 'Unknown'}</b>
+      </div>
+      <div id="hb-countdown" style="font-size:0.88em;color:#fde68a;font-weight:600;letter-spacing:0.4px;background:rgba(255,215,0,0.06);padding:7px 14px;border-radius:20px;border:1px solid rgba(255,215,0,0.22);display:inline-block;margin-bottom:12px;">${nextCountdownText}</div>
+
+      ${missedHeartbeat ? `<div style="margin-top:6px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:8px;font-size:0.92em;color:#ff6b6b;font-weight:bold;border:1px solid rgba(255,68,68,0.3);">Pulse missed! <span style="color:#ffd700;">OM</span> again.</div>` : ''}
+      ${canBroadcast ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,215,0,0.12);"><label style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.88em;color:#ffeb99;cursor:pointer;"><input type="checkbox" id="broadcast-toggle" style="accent-color:#ffd700;width:1.1em;height:1.1em;" ${broadcastMode ? 'checked' : ''} /><span>Broadcast Mode</span></label></div>` : ''}
+    `;
+  }
+
+  const backdrop = document.createElement('div');
+  backdrop.id = 'om-modal-backdrop';
+  backdrop.style.cssText = `position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 10019; opacity: 0; transition: opacity 0.18s;`;
+  document.body.appendChild(backdrop);
   document.body.appendChild(popup);
-  setTimeout(() => popup.style.opacity = 1, 10);
+  function closeModal(){ popup.style.opacity=0; popup.style.transform='translate(-50%, -50%) scale(0.96)'; backdrop.style.opacity=0; setTimeout(()=>{popup.remove(); backdrop.remove();},220); }
+  backdrop.onclick = closeModal;
+  popup.querySelector('#om-modal-close').onclick = closeModal;
+  requestAnimationFrame(()=>{ backdrop.style.opacity=1; popup.style.opacity=1; popup.style.transform='translate(-50%, -50%) scale(1)'; });
+  if (!userRow) return;
 
-const broadcastToggle = popup.querySelector('#broadcast-toggle');
-if (broadcastToggle) {
-  broadcastToggle.checked = broadcastMode; // initial state
-  broadcastToggle.addEventListener('change', function(e) {
-    broadcastMode = e.target.checked;
-    // You may optionally persist this in localStorage if you wish
-  });
-}
+  const broadcastToggle = popup.querySelector('#broadcast-toggle');
+  if (broadcastToggle) broadcastToggle.addEventListener('change', e => { broadcastMode = e.target.checked; });
 
-// USERNAME TOGGLE & SAVE LOGIC
-const nameSavedState = popup.querySelector('#name-saved-state');
-const nameEditState = popup.querySelector('#name-edit-state');
-const nameEditTrigger = popup.querySelector('#name-edit-trigger');
-const saveNameBtn = popup.querySelector('#save-username');
+  const nameSavedState = popup.querySelector('#name-saved-state');
+  const nameEditState = popup.querySelector('#name-edit-state');
+  const nameEditTrigger = popup.querySelector('#name-edit-trigger');
+  const saveNameBtn = popup.querySelector('#save-username');
+  const cancelBtn = popup.querySelector('#name-cancel');
+  const generateBtn = popup.querySelector('#generate-name');
 
-if (nameEditTrigger) {
-  nameEditTrigger.onclick = (e) => {
-    e.preventDefault();
-    nameSavedState.style.display = 'none';
-    nameEditState.style.display = 'flex';
-    popup.querySelector('#username-input').focus();
-  };
-}
+  if (nameEditTrigger) nameEditTrigger.onclick = (e) => { e.preventDefault(); nameSavedState.style.display='none'; nameEditState.style.display='block'; popup.querySelector('#username-input').focus(); };
+  if (cancelBtn) cancelBtn.onclick = () => { nameEditState.style.display='none'; nameSavedState.style.display='block'; };
 
-if (saveNameBtn) {
-  saveNameBtn.onclick = async () => {
-    const input = popup.querySelector('#username-input');
-    // Rules: Only letters, force uppercase, max 12 chars
-    let name = input.value.trim().toUpperCase().replace(/[^A-Z]/g, '').substring(0, 12);
-    
-    if (name.length > 0 && name.length < 3) {
-       saveNameBtn.innerText = 'Too short';
-       saveNameBtn.style.background = '#ff4444';
-       setTimeout(() => { saveNameBtn.innerText = 'Save'; saveNameBtn.style.background = '#ffd700'; }, 1500);
-       return;
-    }
+  // GENERATE SOUL NAME — TRUEYOGI + NUMBER
+  if (generateBtn) {
+    generateBtn.onclick = async () => {
+      generateBtn.textContent = 'Generating...';
+      let randomName = '';
+      let tries = 0;
+      while (tries < 5) {
+        const num = Math.floor(100 + Math.random() * 900);
+        randomName = `TRUEYOGI ${num}`;
+        const { data } = await supabase.from('user_preferences').select('username').eq('username', randomName).maybeSingle();
+        if (!data) break;
+        tries++;
+      }
+      const { error } = await supabase.from('user_preferences').upsert({ user_id: userId, username: randomName }, { onConflict: 'user_id' });
+      if (error) { generateBtn.textContent = 'Generate Name'; return; }
+      userUsername = randomName;
+	  if (window.refreshGridIdDisplay) window.refreshGridIdDisplay();
+      nameEditState.style.display = 'none';
+      nameSavedState.style.display = 'block';
+      const savedText = popup.querySelector('#saved-name-text');
+      if (savedText) { savedText.innerText = randomName; savedText.style.fontSize = '1.5em'; savedText.style.letterSpacing = '1.5px'; }
+      const input = popup.querySelector('#username-input');
+      if (input) input.value = randomName;
+      generateBtn.textContent = 'Generate Name';
+    };
+  }
 
-    const { error } = await supabase
-      .from('user_preferences')
-      .upsert(
-        { user_id: userId, username: name || null },
-        { onConflict: 'user_id' }
-      );
+  if (saveNameBtn) {
+    saveNameBtn.onclick = async () => {
+      const input = popup.querySelector('#username-input');
+      let name = input.value.trim().toUpperCase().replace(/[^A-Z0-9 ]/g, '').substring(0,12);
+      if (name.length > 0 && name.length < 3) { saveNameBtn.innerText='Too short'; saveNameBtn.style.background='#ff4444'; setTimeout(()=>{saveNameBtn.innerText='Save'; saveNameBtn.style.background='#fde68a';},1500); return; }
+      const { error } = await supabase.from('user_preferences').upsert({ user_id: userId, username: name || null }, { onConflict: 'user_id' });
+      if (error) { saveNameBtn.innerText='Error'; saveNameBtn.style.background='#ff4444'; setTimeout(()=>{saveNameBtn.innerText='Save'; saveNameBtn.style.background='#fde68a';},1500); }
+      else {
+        userUsername = name;
+		if (window.refreshGridIdDisplay) window.refreshGridIdDisplay();
+        saveNameBtn.innerText='Saved!'; saveNameBtn.style.background='#29D884';
+        const savedText = popup.querySelector('#saved-name-text');
+        if (savedText) { savedText.innerText = name || ''; savedText.style.fontSize='1.65em'; savedText.style.letterSpacing='2.5px'; }
+        setTimeout(()=>{ saveNameBtn.innerText='Save'; saveNameBtn.style.background='#fde68a'; if (nameEditState && nameSavedState) { nameEditState.style.display='none'; nameSavedState.style.display='block'; } },1000);
+      }
+    };
+  }
 
-    if (error) {
-      console.error('Save username failed:', error);
-      saveNameBtn.innerText = 'Error';
-      saveNameBtn.style.background = '#ff4444';
-      setTimeout(() => { saveNameBtn.innerText = 'Save'; saveNameBtn.style.background = '#ffd700'; }, 1500);
-    } else {
-      userUsername = name;
-      saveNameBtn.innerText = 'Saved!';
-      saveNameBtn.style.background = '#29D884';
-      
-      // Update the display text
-      nameSavedState.querySelector('span').innerText = name;
-      
-      setTimeout(() => {
-        saveNameBtn.innerText = 'Save';
-        saveNameBtn.style.background = '#ffd700';
-        
-        if (userUsername) {
-          nameEditState.style.display = 'none';
-          nameSavedState.style.display = 'inline-flex';
-        }
-      }, 1000);
-    }
-  };
-}
-
-// --- Live countdown update for heartbeat ---
-if (nextHeartbeatDate) {
-  function updateCountdown() {
-    const countdownEl = document.getElementById("hb-countdown");
-    if (!countdownEl) return;
-    const timeLeftMs = nextHeartbeatDate - Date.now();
-    
-    // Check if heartbeat was received while popup is open
-    const currentUserId = localStorage.getItem('omUserId');
-    const currentUserRow = livePresenceRows.find(row => row.user_id === currentUserId);
-    
-    if (currentUserRow && currentUserRow.last_heartbeat) {
-      const lastHeartbeatMs = new Date(currentUserRow.last_heartbeat).getTime();
-      // If we have a newer heartbeat than when we opened the popup
-      if (lastHeartbeatMs > new Date(userRow.last_heartbeat).getTime()) {
-        countdownEl.textContent = "Pulse received!";
-        countdownEl.style.cssText = `
-          font-size: 0.95em;
-          color: #29D884;
-          font-weight: 700;
-          letter-spacing: 0.5px;
-          background: rgba(41, 216, 132, 0.1);
-          padding: 4px 8px;
-          border-radius: 4px;
-          border: 1px solid rgba(41, 216, 132, 0.2);
-          animation: pulse-flash 6s infinite;
-        `;
+  if (nextHeartbeatDate) {
+    function updateCountdown(){
+      const countdownEl = document.getElementById("hb-countdown"); if(!countdownEl) return;
+      const timeLeftMs = nextHeartbeatDate - Date.now();
+      const currentUserRow = livePresenceRows.find(row => row.user_id === localStorage.getItem('omUserId'));
+      if (currentUserRow?.last_heartbeat && new Date(currentUserRow.last_heartbeat).getTime() > new Date(userRow.last_heartbeat).getTime()) {
+        countdownEl.textContent = "Pulse received!"; countdownEl.style.cssText = `font-size:0.9em;color:#29D884;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid rgba(41,216,132,0.25);background:rgba(41,216,132,0.08);display:inline-block;margin-bottom:12px;`; return;
+      }
+      if (timeLeftMs < 0) {
+        countdownEl.innerHTML = `<button id="sendPulseBtn" style="background:#222413;border:1px solid #ffd700;color:#ffd700;font-weight:700;border-radius:7px;padding:8px 26px;font-size:1.02em;cursor:pointer;">OM now!</button>`;
+        const btn = document.getElementById("sendPulseBtn");
+        if (btn) btn.onclick = async function(){ this.disabled=true; this.textContent="Sending..."; await sendHeartbeat(); startHeartbeat(); const om=document.getElementById('om-sound'); if(om){ om.muted=false; om.currentTime=0; om.volume=0.7; om.play().catch(()=>{}); isPlaying=true; } countdownEl.innerHTML=`<span style="color:#29D884;font-weight:700;">Pulse received!</span>`; clearInterval(intervalId); };
         return;
       }
+      const minsLeft = Math.floor(timeLeftMs/60000); const secsLeft = Math.floor((timeLeftMs%60000)/1000);
+      countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
     }
-    
-if (timeLeftMs < 0) {
-  countdownEl.innerHTML = `
-    <button id="sendPulseBtn"
-      style="
-        background:#222413;
-        border:1px solid #ffd700;
-        color:#ffd700;
-        font-weight:700;
-        border-radius:7px;
-        padding:7px 28px;
-        font-size:1.07em;
-        box-shadow:0 0 7px #ffd70055;
-        cursor:pointer;
-        margin-top:2px;
-        margin-bottom:2px;
-        outline:none;">
-      OM now!
-    </button>
-  `;
-  // Attach handler RIGHT after rendering
-  const btn = document.getElementById("sendPulseBtn");
-  if (btn) {
-btn.onclick = async function() {
-  this.disabled = true;
-  this.textContent = "Sending...";
-  await sendHeartbeat();
-  startHeartbeat();
-
-  // Activate OM sound as well
-  const om = document.getElementById('om-sound');
-  if (om) {
-    om.muted = false;
-    om.currentTime = 0;
-    om.volume = 0.7;
-    om.play().catch(()=>{});
-    isPlaying = true;
+    const intervalId = setInterval(updateCountdown,1000); updateCountdown();
+    const observer = new MutationObserver(()=>{ if(!document.getElementById('current-user-mins-popup')){ clearInterval(intervalId); observer.disconnect(); } });
+    observer.observe(document.body,{childList:true});
   }
-
-  countdownEl.innerHTML = `<span style="color:#29D884;font-weight:700;">Pulse received!</span>`;
-  clearInterval(intervalId);
-  setTimeout(() => {
-    if (popup) {
-      popup.style.opacity = 0;
-      setTimeout(() => popup.remove(), 400);
-    }
-  }, 1100);
 };
-  }
-  return;
-}
-    const minsLeft = Math.floor(timeLeftMs / 60000);
-    const secsLeft = Math.floor((timeLeftMs % 60000) / 1000);
-    countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
-  }
-  
-  const intervalId = setInterval(updateCountdown, 1000);
-  updateCountdown();
-  setTimeout(() => clearInterval(intervalId), 12000);
-}
 
-setTimeout(() => {
-  popup.style.opacity = 0;
-  setTimeout(() => popup.remove(), 400);
-}, 12000);
-};
+if (!document.getElementById('res-pulse-style')) {
+  const s = document.createElement('style'); s.id='res-pulse-style';
+  s.textContent = `@keyframes resBlink { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.8)} }`;
+  document.head.appendChild(s);
+}
 
 // Auto-show grid id popup after 60 seconds idle (ONCE)
 let idleTimer;
