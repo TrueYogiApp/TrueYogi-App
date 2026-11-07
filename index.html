@@ -3496,11 +3496,8 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 
 /* Mode card must never get stuck invisible */
 #mode-selection {
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-#mode-selection.hidden {
-  display: none !important;
+  position: relative;
+  z-index: 1;
 }
 
 </style>
