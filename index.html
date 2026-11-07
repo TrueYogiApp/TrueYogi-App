@@ -24362,7 +24362,6 @@ if (!userIdDisplay) {
   container.appendChild(userIdDisplay);
 }
 
-// --- Set the text ---
 // --- Set the text — show Soul Name if exists, else Grid ID ---
 const userId = localStorage.getItem('omUserId');
 userIdDisplay.style.cursor = 'pointer';
@@ -24379,10 +24378,10 @@ async function refreshGridIdDisplay() {
   } catch(e) {}
 
   if (displayName) {
-    // User has name — show name, Grid ID as small subtitle on tap is still in popup
-    userIdDisplay.innerHTML = `<span style="font-weight:700; letter-spacing:1px;">${displayName}</span>`;
+    // Has Soul Name — Grid ID IS their name now
+    userIdDisplay.innerHTML = `Grid ID: <span style="font-weight:700; letter-spacing:1px;">${displayName}</span>`;
   } else {
-    // No name yet — show Grid ID as before
+    // No name yet — fallback to short ID
     userIdDisplay.innerHTML = `Grid ID: <span style="font-family:monospace;font-size:1.05em;">${getShortUserId(userId)}</span>`;
   }
 }
