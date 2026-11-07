@@ -9,7 +9,7 @@
   <meta name="description" content="TrueYogi(YOGI) draws from Bhagavad Gita wisdom: 'A Yogi excels the monk, scholar, and ritualist. Strive to be a Yogi.' Anchoring a cosmic grid of awakened souls devoted to meditation and truth. Earn YOGI tokens through stillness practice and wisdom engagement.">
   <link rel="icon" type="image/png" href="/assets/favicon.ico" />
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="TrueYogi">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
@@ -26,15 +26,18 @@
   <script src="/js/serviceworker.js"></script>
   <script src="/js/particles.js"></script>
   <script src="/js/meditationcanvas.js"></script>
-  <script type="module" src="/js/meditationguide.js"></script> 
+  <script type="module" src="/js/meditationguide.js"></script>
 
   <style>
+	  html {
+	  background: #0f172a;
+	}
 	body {
 	  min-height: 100dvh; /* preferred for modern devices */
-	  /* fallback for older browsers:. */
-	  min-height: 100vh;
+	  min-height: 100vh; /* fallback for older browsers: */
 	  font-family: 'Lexend', sans-serif;
 	  background: linear-gradient(135deg, #0f172a, #1e293b);
+	  padding-top: env(safe-area-inset-top, 0px);
 	  padding-bottom: env(safe-area-inset-bottom, 0px);
 	  box-sizing: border-box;
 	}
@@ -1026,7 +1029,7 @@
   left: 0;
   width: 100vw;
   height: calc(100vh + env(safe-area-inset-bottom, 0px));
-  z-index: -1;
+  z-index: 0;
   background: radial-gradient(ellipse at center, #0d1b2a 0%, #000 100%);
   /* Optional: overflow hidden to prevent extra scroll */
   overflow: hidden;
@@ -3492,6 +3495,12 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 }
 
 
+/* ios 27 FIX */
+#mode-selection {
+  position: relative;
+  z-index: 1;
+  margin-top: 12px;
+}
 </style>
   
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.86.2/dist/umd/supabase.min.js"></script>
@@ -3513,7 +3522,7 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body class="text-white flex items-center justify-center min-h-screen px-4 py-8">
-<canvas id="particles-canvas" class="hidden fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-10"></canvas>
+<canvas id="particles-canvas" class="hidden fixed top-0 left-0 w-full h-full pointer-events-none opacity-20" style="z-index: 2;"></canvas>
 <canvas id="meditation-canvas" class="hidden"></canvas>
 <canvas id="spiritual-canvas" class="hidden fixed top-0 left-0 w-full h-full z-20" style="pointer-events:none;"></canvas>
 
