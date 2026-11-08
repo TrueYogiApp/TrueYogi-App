@@ -24243,8 +24243,8 @@ userIdDisplay.onclick = async function(e) {
       </div>
 
 	<!-- ===== STATUS — CSS HEARTBEAT, ALWAYS WHITE ===== -->
-	<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;">
-	  <span style="width:26px;height:26px;min-width:26px;min-height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+	<div id="res-status-row" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;">
+	  <span id="res-status-dot" style="width:26px;height:26px;min-width:26px;min-height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
 		background:${missedHeartbeat?'#f72b29':'#29D884'};
 		box-shadow:0 0 14px ${missedHeartbeat?'#f72b29':'#29D884'};">
 		<span style="display:block; width:18px; height:12px; background:#fff; clip-path: polygon(0 45%, 20% 45%, 32% 0%, 45% 100%, 58% 20%, 72% 45%, 100% 45%, 100% 75%, 72% 75%, 58% 55%, 45% 100%, 32% 30%, 20% 75%, 0 75%);"></span>
@@ -24266,7 +24266,7 @@ userIdDisplay.onclick = async function(e) {
       </div>
       <div id="hb-countdown" style="font-size:0.88em;color:#fde68a;font-weight:600;letter-spacing:0.4px;background:rgba(255,215,0,0.06);padding:7px 14px;border-radius:20px;border:1px solid rgba(255,215,0,0.22);display:inline-block;margin-bottom:12px;">${nextCountdownText}</div>
 
-      ${missedHeartbeat ? `<div style="margin-top:6px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:8px;font-size:0.92em;color:#ff6b6b;font-weight:bold;border:1px solid rgba(255,68,68,0.3);">Pulse missed! <span style="color:#ffd700;">OM</span> again.</div>` : ''}
+      ${missedHeartbeat ? `<div id="pulse-missed-box" style="margin-top:6px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:8px;font-size:0.92em;color:#ff6b6b;font-weight:bold;border:1px solid rgba(255,68,68,0.3);">Pulse missed! <span style="color:#ffd700;">OM</span> again.</div>` : ''}
       ${canBroadcast ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,215,0,0.12);"><label style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.88em;color:#ffeb99;cursor:pointer;"><input type="checkbox" id="broadcast-toggle" style="accent-color:#ffd700;width:1.1em;height:1.1em;" ${broadcastMode ? 'checked' : ''} /><span>Broadcast Mode</span></label></div>` : ''}
     `;
   }
@@ -24340,18 +24340,39 @@ userIdDisplay.onclick = async function(e) {
     };
   }
 
+	function clearMissedState() {
+	  // Dot — by ID, or fallback
+	  const dot = popup.querySelector('#res-status-dot');
+	  if (dot) { dot.style.background = '#29D884'; dot.style.boxShadow = '0 0 14px #29D884'; }
+
+	  // Text — find by ID first, if not found find by text content
+	  let txt = popup.querySelector('#res-status-text');
+	  if (!txt) {
+		// Fallback: find span that says Resonance interrupted
+		const allSpans = popup.querySelectorAll('span');
+		allSpans.forEach(s => { if (s.textContent.includes('Resonance interrupted')) txt = s; });
+	  }
+	  if (txt) { txt.textContent = 'Resonance active'; txt.style.color = '#29D884'; }
+
+	  const missedBox = popup.querySelector('#pulse-missed-box');
+	  if (missedBox) missedBox.remove();
+	  // Also fallback: remove any div with Pulse missed text
+	  popup.querySelectorAll('div').forEach(d => { if (d.textContent.includes('Pulse missed!')) d.remove(); });
+	}
+	
   if (nextHeartbeatDate) {
     function updateCountdown(){
       const countdownEl = document.getElementById("hb-countdown"); if(!countdownEl) return;
       const timeLeftMs = nextHeartbeatDate - Date.now();
       const currentUserRow = livePresenceRows.find(row => row.user_id === localStorage.getItem('omUserId'));
       if (currentUserRow?.last_heartbeat && new Date(currentUserRow.last_heartbeat).getTime() > new Date(userRow.last_heartbeat).getTime()) {
+	  clearMissedState();
         countdownEl.textContent = "Pulse received!"; countdownEl.style.cssText = `font-size:0.9em;color:#29D884;font-weight:700;padding:6px 12px;border-radius:20px;border:1px solid rgba(41,216,132,0.25);background:rgba(41,216,132,0.08);display:inline-block;margin-bottom:12px;`; return;
       }
       if (timeLeftMs < 0) {
         countdownEl.innerHTML = `<button id="sendPulseBtn" style="background:#222413;border:1px solid #ffd700;color:#ffd700;font-weight:700;border-radius:7px;padding:8px 26px;font-size:1.02em;cursor:pointer;">OM now!</button>`;
         const btn = document.getElementById("sendPulseBtn");
-        if (btn) btn.onclick = async function(){ this.disabled=true; this.textContent="Sending..."; await sendHeartbeat(); startHeartbeat(); const om=document.getElementById('om-sound'); if(om){ om.muted=false; om.currentTime=0; om.volume=0.7; om.play().catch(()=>{}); isPlaying=true; } countdownEl.innerHTML=`<span style="color:#29D884;font-weight:700;">Pulse received!</span>`; clearInterval(intervalId); };
+        if (btn) btn.onclick = async function(){ this.disabled=true; this.textContent="Sending..."; await sendHeartbeat(); clearMissedState(); startHeartbeat(); const om=document.getElementById('om-sound'); if(om){ om.muted=false; om.currentTime=0; om.volume=0.7; om.play().catch(()=>{}); isPlaying=true; } countdownEl.innerHTML=`<span style="color:#29D884;font-weight:700;">Pulse received!</span>`; clearInterval(intervalId); };
         return;
       }
       const minsLeft = Math.floor(timeLeftMs/60000); const secsLeft = Math.floor((timeLeftMs%60000)/1000);
