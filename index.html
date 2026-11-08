@@ -22641,7 +22641,7 @@ if (!window.liveOmTickerInterval) {
 })();
  
 
-// --- OM Flame Timer below Global Heading / with fire SVG ---
+// --- OM Flame Timer — PREMIUM ---
 let flameTimer = document.getElementById('om-flame-timer');
 if (!flameTimer) {
   flameTimer = document.createElement('div');
@@ -22669,523 +22669,303 @@ if (!flameTimer) {
 }
 
 flameTimer.onclick = async function(e) {
-  const oldTooltip = document.getElementById('flame-tooltip');
-  if (oldTooltip) oldTooltip.remove();
+  document.getElementById('flame-tooltip')?.remove();
+  document.getElementById('flame-backdrop')?.remove();
 
   const flameTimeEl = document.getElementById('om-flame-time');
   const rect = flameTimeEl.getBoundingClientRect();
-  let starterUserShortId = lastStarterUserId ? `${getShortUserId(lastStarterUserId)}` : 'Unknown';
 
-  // 1. Fetch the longest completed flame
-  let longestFlame = null;
-  let maxDuration = 0; // in ms
+  // 1. Starter name — show Soul Name if exists, else short ID (same as Grid ID fix)
+  let starterDisplay = lastStarterUserId ? getShortUserId(lastStarterUserId) : 'Unknown';
   try {
-    const { data: flames, error } = await supabase
-      .from("om_flame")
-      .select("starter_user_id, started_at, ended_at")
-      .eq("active", false)
-      .not("ended_at", "is", null);
-
-    if (flames && flames.length) {
-      flames.forEach(f => {
-        if (f.started_at && f.ended_at) {
-          const dur = new Date(f.ended_at) - new Date(f.started_at);
-          if (dur > maxDuration) {
-            maxDuration = dur;
-            longestFlame = f;
-          }
-        }
-      });
-    }
-  } catch (err) {
-    // ignore, just don't show Longest Flame if error
-  }
-
-  // 2. Get current session duration (in ms)
-  // You can get this in various ways, here we use the formatted time in the counter if that's all you have:
-  // It's safer to use a direct duration if you have started_at/live
-  let currentFlameDuration = 0;
-  try {
-    // If you track lastFlameStarted:
-    if (lastFlameStarted) {
-      currentFlameDuration = Date.now() - new Date(lastFlameStarted);
+    if (lastStarterUserId) {
+      const { data: pref } = await supabase.from('user_preferences').select('username').eq('user_id', lastStarterUserId).maybeSingle();
+      if (pref?.username) starterDisplay = pref.username;
     }
   } catch {}
 
-  // 3. Only show "Longest Flame" if the current one is NOT beating the record.
+  // 2. Longest flame
+  let longestFlame = null;
+  let maxDuration = 0;
+  try {
+    const { data: flames } = await supabase.from("om_flame").select("starter_user_id, started_at, ended_at").eq("active", false).not("ended_at", "is", null);
+    if (flames?.length) {
+      flames.forEach(f => {
+        if (f.started_at && f.ended_at) {
+          const dur = new Date(f.ended_at) - new Date(f.started_at);
+          if (dur > maxDuration) { maxDuration = dur; longestFlame = f; }
+        }
+      });
+    }
+  } catch {}
+
+  // 3. Current duration
+  let currentFlameDuration = 0;
+  try { if (lastFlameStarted) currentFlameDuration = Date.now() - new Date(lastFlameStarted); } catch {}
   let showLongestLine = true;
   if (currentFlameDuration > maxDuration && maxDuration > 0) showLongestLine = false;
 
-  // 4. Generate Longest Flame HTML only if needed
-const longestFlameHTML =
-  longestFlame && showLongestLine
-  ? `
-<div style="margin:6px 0 3px 0;font-size:0.95em;">
-  <span style="color:#FFD700;text-shadow:0 0 6px #FFD700CC;font-weight:600;letter-spacing:0.4px;padding:2px 8px;">LONGEST FLAME:</span>
-  <a href="#" id="longest-flame-keepers-link" style="
-    color:#29D884;
-    font-weight:700;
-    text-decoration:underline;
-    margin-left:8px;
-    cursor:pointer;
-    font-size:1.02em;
-    text-shadow:0 0 10px #29D884AA;
-    background:linear-gradient(45deg, #29D88422, #29D88411);
-    padding:2px 8px;
-    border-radius:4px;
-    border:1px solid #29D88433;
-    transition:all 0.3s ease;
-  " onmouseover="this.style.textShadow='0 0 15px #29D884CC';this.style.background='linear-gradient(45deg, #29D88433, #29D88422)';"
-     onmouseout="this.style.textShadow='0 0 10px #29D884AA';this.style.background='linear-gradient(45deg, #29D88422, #29D88411)';">
-    ${formatFlameDuration(Math.floor(maxDuration / 1000))}
-  </a>
-</div>
-  `
-  : '';
+  // 4. Longest flame — premium card, not caps pill
+  const longestFlameHTML = longestFlame && showLongestLine ? `
+    <div style="margin-top:14px; padding:10px 12px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.18); border-radius:12px;">
+      <div style="font-size:0.68em; letter-spacing:1.8px; color:#9a8a4a; text-transform:uppercase; margin-bottom:4px;">Longest Flame Ever</div>
+      <a href="#" id="longest-flame-keepers-link" style="color:#fde68a; font-weight:800; font-size:1.15em; text-decoration:none; letter-spacing:0.5px; text-shadow:0 0 12px rgba(255,215,0,0.35);">${formatFlameDuration(Math.floor(maxDuration / 1000))}</a>
+      <div style="font-size:0.7em; color:#888; margin-top:2px;">Tap to see keepers of that flame</div>
+    </div>
+  ` : '';
+
+  // 5. Backdrop + centered premium tooltip (no more off-screen)
+  const backdrop = document.createElement('div');
+  backdrop.id = 'flame-backdrop';
+  backdrop.style.cssText = `position:fixed; inset:0; background:rgba(0,0,0,0.6); backdrop-filter:blur(3px); z-index:10039; opacity:0; transition:opacity 0.2s;`;
+  document.body.appendChild(backdrop);
+  setTimeout(()=> backdrop.style.opacity = 1, 10);
+  backdrop.onclick = () => { tooltip.remove(); backdrop.remove(); };
 
   const tooltip = document.createElement('div');
   tooltip.id = 'flame-tooltip';
   tooltip.innerHTML = `
-    <div style="font-size:1.01rem;">
-      <div class="om-flame-heading-container" style="text-align:center;">
-        <img src="/assets/flame1.svg"
-             alt="Flame"
-             style="height:1.6em; margin-bottom:-6px; filter:drop-shadow(0 0 9px #FF8800); display:block; margin-left:auto; margin-right:auto; cursor:pointer;">
-        <b class="om-flame-heading-gradient">OM Flame</b>
-      </div>
-      <span style="color:#ffd700;">
-        This flame was first lit by 
-        <b style="color:#fff; text-shadow:0 0 8px #fff8;">${starterUserShortId}</b><br>
-        <span>
-          <span class="chakra-glow">Unified</span> for 
-          <span style="color:#29D884; font-weight:600; text-shadow:0 0 8px #29D88477;">${flameTimeEl.textContent}</span>
-        </span><br>  
-        <a href="#" id="flame-keepers-link" style="color:#FF8800;font-size:0.97rem;font-weight:bold;display:inline-block;text-decoration:underline;margin-top:6px;cursor:pointer;">Show all keepers</a>
-        ${longestFlameHTML}
-	  </span>
-    </div>
+	<button id="flame-close" style="position:absolute; top:10px; right:10px; width:28px; height:28px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; cursor:pointer;">×</button>
+	<div style="text-align:center;">
+	  <!-- FIX 1 + 2: back to old wrapper + old class -->
+	  <div class="om-flame-heading-container" style="text-align:center;">
+		<img src="/assets/flame1.svg" alt="Flame" style="height:1.6em; margin-bottom:-6px; filter:drop-shadow(0 0 9px #FF8800); display:block; margin-left:auto; margin-right:auto; cursor:pointer;">
+		<b class="om-flame-heading-gradient">OM Flame</b>
+	  </div>
+
+	  <div style="height:1px; background:linear-gradient(90deg,transparent,rgba(255,215,0,0.3),transparent); margin:0 0 12px;"></div>
+	  <div style="color:#ffd700;">
+		This flame was first lit by<br>
+		<b style="color:#fff; font-size:1.1em; letter-spacing:0.8px; text-shadow:0 0 10px rgba(255,255,255,0.4);">${starterDisplay}</b><br>
+		<span class="chakra-glow">Unified</span> for <b style="color:#4ade80; font-size:1.15em;">${flameTimeEl.textContent}</b>
+	  </div>
+	  <a href="#" id="flame-keepers-link" style="display:inline-block; margin-top:12px; padding:7px 18px; background:rgba(255,136,0,0.12); border:1px solid rgba(255,136,0,0.35); border-radius:20px; color:#FFAA55; font-size:0.85em; font-weight:600; text-decoration:none;">Show all keepers →</a>
+	  ${longestFlameHTML}
+	</div>
   `;
   tooltip.style.cssText = `
-    position: fixed;
-    left: ${rect.left + rect.width/2}px; 
-    top: ${rect.top - 32}px;
-    transform: translate(-50%, -100%);
-    background: rgba(0,0,0,0.94);
-    color: #ffd700;
-    font-family: 'Poppins', sans-serif;
-    font-size: 1.01rem;
-    padding: 7px 19px;
-    border-radius: 11px;
-    box-shadow: 0 0 12px #ffd700bb;
-    white-space: nowrap;
-    z-index: 10040;
-    opacity: 0;
-    transition: opacity 0.16s;
-    pointer-events:auto;
-    text-align:center;
+    position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%) scale(0.96);
+    background: linear-gradient(180deg, rgba(22,16,8,0.98), rgba(0,0,0,0.98));
+    color: #ffd700; font-family: 'Poppins', sans-serif;
+    padding: 22px 22px 18px; border-radius: 20px;
+    box-shadow: 0 0 30px rgba(255,136,0,0.25), 0 0 80px rgba(255,215,0,0.12);
+    border: 1px solid rgba(255,215,0,0.22);
+    z-index: 10040; width: min(92vw, 340px); text-align:center;
+    opacity: 0; transition: opacity 0.2s, transform 0.2s;
   `;
-
   document.body.appendChild(tooltip);
-  setTimeout(() => tooltip.style.opacity = 1, 10);
+  requestAnimationFrame(()=>{ tooltip.style.opacity = 1; tooltip.style.transform = 'translate(-50%, -50%) scale(1)'; });
 
-  // Add handler for keepers link
-  tooltip.querySelector('#flame-keepers-link').onclick = function(ev) {
-    ev.preventDefault();
-    showAllFlameKeepers(rect.left + rect.width/2, rect.top); // Show at same position
-  };
+  tooltip.querySelector('#flame-close').onclick = () => { tooltip.remove(); backdrop.remove(); };
+  tooltip.querySelector('#flame-keepers-link').onclick = function(ev){ ev.preventDefault(); tooltip.remove(); backdrop.remove(); showAllFlameKeepers(rect.left + rect.width/2, rect.top); };
+  const longestLink = tooltip.querySelector('#longest-flame-keepers-link');
+  if (longestLink) longestLink.onclick = function(ev){ ev.preventDefault(); tooltip.remove(); backdrop.remove(); showAllFlameKeepersForPeriod(longestFlame.started_at, longestFlame.ended_at, longestFlame.starter_user_id, rect.left + rect.width/2, rect.top); };
 
-// Only add handler for longestFlame link if present:
-const longestFlameLink = tooltip.querySelector('#longest-flame-keepers-link');
-if (longestFlameLink) {
-  longestFlameLink.onclick = function(ev) {
-    ev.preventDefault();
-    showAllFlameKeepersForPeriod(
-      longestFlame.started_at,
-      longestFlame.ended_at,
-      longestFlame.starter_user_id,
-      rect.left + rect.width/2,
-      rect.top
-    );
-  };
-}
-
-  setTimeout(() => {
-    tooltip.style.opacity = 0;
-    setTimeout(() => tooltip.remove(), 400);
-  }, 30000);
+  // Auto-close after 30s
+  setTimeout(()=>{ tooltip.style.opacity = 0; backdrop.style.opacity = 0; setTimeout(()=>{ tooltip.remove(); backdrop.remove(); }, 300); }, 30000);
 };
 
-// Add breathing animation styles for flame and tooltip
+// Breathing + awareness — UNCHANGED LOGIC, only styles kept
 const breathingStyles = document.createElement('style');
 breathingStyles.textContent = `
-  /* Flame breathing animation */
-  @keyframes flameBreathe {
-    0% {
-      transform: scale(1);
-      filter: drop-shadow(0 0 9px #FF8800);
-    }
-    50% {
-      transform: scale(1.1);
-      filter: drop-shadow(0 0 18px #FF5500) drop-shadow(0 0 5px #FFAA00);
-    }
-    100% {
-      transform: scale(1);
-      filter: drop-shadow(0 0 9px #FF8800);
-    }
-  }
-  
-  /* Apply to your flame SVG */
-  .om-flame-heading-container img {
-    animation: flameBreathe 2.5s ease-in-out infinite;
-    cursor: pointer;
-  }
-  
-  /* Tooltip breathing animation */
-  @keyframes tooltipBreathe {
-    0% {
-      transform: scale(1);
-      opacity: 0.9;
-    }
-    50% {
-      transform: scale(1.05);
-      opacity: 1;
-    }
-    100% {
-      transform: scale(1);
-      opacity: 0.9;
-    }
-  }
-  
-  .breathing-tooltip-content {
-    animation: tooltipBreathe 2.5s ease-in-out infinite;
-    transform-origin: center;
-  }
+  @keyframes flameBreathe { 0%{transform:scale(1); filter:drop-shadow(0 0 9px #FF8800);} 50%{transform:scale(1.1); filter:drop-shadow(0 0 18px #FF5500) drop-shadow(0 0 5px #FFAA00);} 100%{transform:scale(1); filter:drop-shadow(0 0 9px #FF8800);} }
+  .om-flame-heading-container img { animation: flameBreathe 2.5s ease-in-out infinite; cursor:pointer; }
+  @keyframes tooltipBreathe { 0%{transform:scale(1); opacity:0.9;} 50%{transform:scale(1.05); opacity:1;} 100%{transform:scale(1); opacity:0.9;} }
+  .breathing-tooltip-content { animation: tooltipBreathe 2.5s ease-in-out infinite; transform-origin:center; }
+  .om-flame-fire { animation: flameBreathe 2.5s ease-in-out infinite; }
 `;
-document.head.appendChild(breathingStyles);
-// === END OF ADDED CODE ===.
+if (!document.getElementById('flame-breathe-style')) { breathingStyles.id = 'flame-breathe-style'; document.head.appendChild(breathingStyles); }
 
-// Add click handler for the flame SVG in the tooltip
 document.addEventListener('click', function(e) {
-  // Check if the clicked element is the flame SVG inside the tooltip
   if (e.target.closest('#flame-tooltip img[src*="flame1.svg"]')) {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Remove any existing awareness tooltip
-    const oldAwarenessTooltip = document.getElementById('awareness-tooltip');
-    if (oldAwarenessTooltip) oldAwarenessTooltip.remove();
-    
-    // Get position from the clicked flame
+    e.preventDefault(); e.stopPropagation();
+    document.getElementById('awareness-tooltip')?.remove();
     const flameRect = e.target.getBoundingClientRect();
-    
-    // Create the awareness tooltip
     const awarenessTooltip = document.createElement('div');
     awarenessTooltip.id = 'awareness-tooltip';
     awarenessTooltip.innerHTML = `
-<div class="breathing-tooltip-content" style="text-align: center; max-width: 220px;">
-  <div style="font-size: 1.2rem; font-weight: 700; color: #FFD700; margin-bottom: 10px; text-shadow: 0 0 12px #FFD700, 0 0 20px #FFA50088; letter-spacing: 0.5px;">
-    Living Fire of Awareness
-  </div>
-  <div style="font-size: 0.95rem; color: #ffffff; text-shadow: 0 0 10px #FFD700cc, 0 0 3px #ffffff; line-height: 1.5; font-weight: 400;">
-    When at least one holds, the flame endures.
-  </div>
-</div>
+      <div class="breathing-tooltip-content" style="text-align:center; max-width:230px;">
+        <div style="font-size:1.2rem; font-weight:700; color:#FFD700; margin-bottom:10px; text-shadow:0 0 12px #FFD700;">Living Fire of Awareness</div>
+        <div style="font-size:0.95rem; color:#fff; line-height:1.5;">When at least one holds, the flame endures.</div>
+        <div style="font-size:0.72em; color:#aaa; margin-top:8px;">Tap to play</div>
+      </div>
     `;
-    
-    awarenessTooltip.style.cssText = `
-      position: fixed;
-      left: ${flameRect.left + flameRect.width/2}px;
-      top: ${flameRect.top - 10}px;
-      transform: translate(-50%, -100%);
-      background: rgba(0, 0, 0, 0.95);
-      color: white;
-      font-family: 'Poppins', sans-serif;
-      padding: 12px 16px;
-      border-radius: 12px;
-      border: 1px solid #FFD700;
-      box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-      z-index: 10050;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-      pointer-events: auto;
-    `;
-    
+    awarenessTooltip.style.cssText = `position:fixed; left:${flameRect.left + flameRect.width/2}px; top:${flameRect.top - 10}px; transform:translate(-50%, -100%); background:rgba(0,0,0,0.95); color:#fff; font-family:'Poppins',sans-serif; padding:14px 16px; border-radius:14px; border:1px solid #FFD700; box-shadow:0 0 20px rgba(255,215,0,0.4); z-index:10050; opacity:0; transition:opacity 0.2s; pointer-events:auto; cursor:pointer;`;
     document.body.appendChild(awarenessTooltip);
-    
-awarenessTooltip.addEventListener('click', function(e) {
-  const awAudio = document.getElementById('awareness-sound');
-  if (awAudio) {
-    if (awAudio.paused) {
-      awAudio.currentTime = 0;
-      awAudio.muted = false;
-      awAudio.volume = 0.75;
-      awAudio.play().then(() => {
-        // Close the flame tooltip
-        const flameTooltip = document.getElementById('flame-tooltip');
-        if (flameTooltip) flameTooltip.remove();
-
-        showLyrics();
-        startLyricsSync();
-
-        awAudio.onended = () => {
-          const lyricsContainer = document.getElementById('awareness-lyrics');
-          if (lyricsContainer) lyricsContainer.remove();
-          currentLyricIndex = -1;
-        };
-      }).catch(err => {
-        console.log('Audio play failed:', err);
-      });
-    } else {
-      awAudio.pause();
-      awAudio.currentTime = 0;
-      stopLyricsSync();
-    }
-  } else {
-    console.log('Audio element not found!');
-  }
-});
-
-    // Fade in
-    setTimeout(() => awarenessTooltip.style.opacity = 1, 10);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-      awarenessTooltip.style.opacity = 0;
-      setTimeout(() => awarenessTooltip.remove(), 300);
-    }, 9000);
+    awarenessTooltip.addEventListener('click', function() {
+      const awAudio = document.getElementById('awareness-sound');
+      if (awAudio) {
+        if (awAudio.paused) {
+          awAudio.currentTime = 0; awAudio.muted = false; awAudio.volume = 0.75;
+          awAudio.play().then(()=>{ document.getElementById('flame-tooltip')?.remove(); document.getElementById('flame-backdrop')?.remove(); showLyrics(); startLyricsSync(); awAudio.onended = ()=>{ document.getElementById('awareness-lyrics')?.remove(); currentLyricIndex = -1; }; }).catch(err=>console.log('Audio play failed:', err));
+        } else { awAudio.pause(); awAudio.currentTime = 0; stopLyricsSync(); }
+      }
+    });
+    setTimeout(()=> awarenessTooltip.style.opacity = 1, 10);
+    setTimeout(()=>{ awarenessTooltip.style.opacity = 0; setTimeout(()=> awarenessTooltip.remove(), 300); }, 9000);
   }
 });
 
 
 async function showAllFlameKeepers(x, y) {
-  // Store coordinates for refresh
   window.lastFlameX = x;
   window.lastFlameY = y;
-await fetchCallPermission();
-  // Remove if already open
-  const oldList = document.getElementById('flame-keeper-list');
-  if (oldList) oldList.remove();
+  await fetchCallPermission();
+  document.getElementById('flame-keeper-list')?.remove();
 
-  // Fetch sessions during this flame period 
   let { data, error } = await supabase
     .from('om_sessions')
     .select('user_id, country, countryCode, duration_seconds, started_at, ended_at, deep_presence, ultimate_stillness')
     .gte('started_at', lastFlameStarted.toISOString());
 
-  if (error || !data) {
-    // fallback UI
-    // ... same fallback as before ...
-    return;
-  }
+  if (error || !data) return;
 
-  // Group and sum durations by user
-  const userDurations = {}; // user_id => total seconds
-  const userRows = {};      // user_id => store country/countryCode from any row
-  const userDeepPresence = {}; // <-- NEW: user_id => true if ANY session has deep_presence
+  const userDurations = {};
+  const userRows = {};
+  const userDeepPresence = {};
   const userUltimateStillness = {};
-  
-	data.forEach(row => {
-	  if (!row.user_id) return;
-	  let duration = 0;
+  data.forEach(row => {
+    if (!row.user_id) return;
+    let duration = 0;
+    if (row.ended_at) duration = row.duration_seconds || Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000);
+    else duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
+    userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
+    if (!userRows[row.user_id]) userRows[row.user_id] = row;
+    if (row.deep_presence) userDeepPresence[row.user_id] = true;
+    if (row.ultimate_stillness) userUltimateStillness[row.user_id] = true;
+  });
 
-	  if (row.ended_at) {
-		duration = row.duration_seconds || (
-		  Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000)
-		);
-	  } else {
-		duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
-	  }
-
-	  userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
-
-	  if (!userRows[row.user_id]) userRows[row.user_id] = row;
-
-	  // Track deep presence: if ANY session is deep, mark the user as deep
-	  if (row.deep_presence) {
-		userDeepPresence[row.user_id] = true;
-	  }
-	  if (row.ultimate_stillness) {
-		userUltimateStillness[row.user_id] = true;
-	  }
-	});
-
-  // Display list of users with flag, shortUserId, SUMMED duration
+  // ----- POPUP — TRANSPARENT LIKE ORIGINAL, NOT SOLID -----
   const listPopup = document.createElement('div');
   listPopup.id = 'flame-keeper-list';
   listPopup.style.cssText = `
     position: fixed;
     left: ${x}px; top: ${y + 32}px;
     transform: translate(-50%, 0);
-    background: rgba(0,0,0,0.96);
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     color: #ffd700;
     font-size: 0.98rem;
-    padding: 9px 18px;
-    border-radius: 11px;
-    box-shadow: 0 0 14px #ffd70066;
+    padding: 12px 14px 10px;
+    border-radius: 16px;
+    border: 1px solid rgba(255,215,0,0.25);
+    box-shadow: 0 0 20px rgba(255,215,0,0.15), 0 10px 30px rgba(0,0,0,0.5);
     z-index: 10050;
-    min-width: 0;
-    max-width: 320px;
-    width: 100%;
-    max-height: 240px;
+    max-width: 330px;
+    width: min(92vw, 330px);
+    max-height: 320px;
     box-sizing: border-box;
     overflow-y: auto;
     overflow-x: hidden;
+	overscroll-behavior: contain;
+    touch-action: pan-y;
     text-align: left;
-    /* Scrollbar styling */
     scrollbar-width: thin;
-    scrollbar-color: #fde68a #000000;
+    scrollbar-color: #fde68a transparent;
   `;
+ 
 
-  // Add this to prevent scroll propagation
-  listPopup.addEventListener('wheel', (e) => {
-    e.stopPropagation();
-  });
-
-// Add this RIGHT AFTER that:
-listPopup.addEventListener('click', async (e) => {
-  const astralIcon = e.target.closest('.astral-silence-icon');
-  if (astralIcon) {
-    const userId = astralIcon.dataset.userid;
-    const currentUserId = localStorage.getItem('omUserId');
-    
-    // Show popup when clicked
-    showAstralSilencePopup(userId);
-  }
-});
-
-  // Add touch event prevention for mobile
-  listPopup.addEventListener('touchmove', (e) => {
-    e.stopPropagation();
-  });
-
-  // Sort user IDs: longest duration first
-const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
-const currentUserId = localStorage.getItem('omUserId');
-const liveIds = new Set(livePresenceRows.map(row => row.user_id));
-const liveSvg = `<svg width="16" height="16" style="vertical-align:middle;">
-  <circle cx="8" cy="8" r="6" fill="#29D884" stroke="#fff" stroke-width="1"/>
-</svg>`;
-const blankSvg = `<svg width="16" height="16" style="vertical-align:middle;">
-  <circle cx="8" cy="8" r="6" fill="transparent" stroke="transparent" stroke-width="1"/>
-</svg>`;
-
-// const longestDurationUserId = userIds[0]; // top flame keeper
-//const longestDurationUserId = await fetchUserWithHighestDuration();
-const deepPresenceSvg = `<img src="assets/deep.presence.svg" class="lotus-glow deep-presence-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:3px; transform:translateY(-2px); cursor:pointer;">`;
-const ultimateStillnessSvg = `<img src="assets/deep.presence.svg" class="lotus-glow ultimate-stillness-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:3px; transform:translateY(-2px); cursor:pointer;">`;
-
-
-// After getting userIds array
-const permissionsResponse = await fetch('https://trueyogi-backend-knkq.onrender.com/api/permissions/batch', {
-  method: 'POST',
-  headers: {'Content-Type': 'application/json'},
-  credentials: 'include',
-  body: JSON.stringify({ userIds })
-});
-const permissions = (await permissionsResponse.json()).userPermissions || {};
-
-// ----- FAST BATCH FETCH FOR ASTRAL & USERNAMES -----
-const astralSilenceStatuses = {};
-if (!window.usernameCache) window.usernameCache = {};
-
-try {
-  const { data: prefs, error: prefErr } = await supabase
-    .from('user_preferences')
-    .select('user_id, astral_silence, username')
-    .in('user_id', userIds);
-
-  if (!prefErr && prefs) {
-    prefs.forEach(p => {
-      astralSilenceStatuses[p.user_id] = p.astral_silence || false;
-      window.usernameCache[p.user_id] = p.username || null;
-    });
-  }
-} catch (err) {
-  console.error('Error batch fetching prefs:', err);
-}
-// -------------------------------------------------
-
-if (userIds.length === 0) {
-  listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
-} else {
-  listPopup.innerHTML = `
-  <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-    <strong>Flame Keepers</strong>
-	<div id="my-notifications" style="margin-top:5px;"></div>
-  </div>
-	${userIds.map((id, index) => {
-	  const isCurrentUser = id === currentUserId;
-	  const isLive = liveIds.has(id);
-	  const isDeepPresence = userDeepPresence[id]; // <-- CHECK THIS
-	  const isUltimateStillness = userUltimateStillness[id];
-	  const row = userRows[id];
-	  const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
-
-		// ----- Astral Silence Icon - Only for current user or active users -----
-		const isAstralSilenceActive = astralSilenceStatuses[id] || false;
-
-		let astralIconHtml = '';
-		if (isCurrentUser) {
-		  // Show for current user with toggle capability
-		  astralIconHtml = isAstralSilenceActive ? 
-			`<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Active)">
-			  ${astralSilenceActiveSvg}
-			</span>` :
-			`<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Inactive)">
-			  ${astralSilenceInactiveSvg}
-			</span>`;
-		} else if (isAstralSilenceActive) {
-		  // Show for other users ONLY if they are actively in Astral Silence
-		  astralIconHtml = `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Active)">
-			${astralSilenceActiveSvg}
-		  </span>`;
-		}
-		// If not current user and not active, show nothing
-		// ----------------------------------------------------------------
-	
-	  let callIcon = '';
-	  if (
-		canStartCall &&
-		!isCurrentUser &&
-		isLive
-	  ) {
-		callIcon = `<span class="call-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Start call">☎️</span>`;
+	// NEW — use this in BOTH showAllFlameKeepers and showAllFlameKeepersForPeriod:
+	listPopup.addEventListener('wheel', (e) => {
+	  e.stopPropagation();
+	  // If popup can still scroll, don't let background scroll
+	  const canScrollUp = listPopup.scrollTop > 0;
+	  const canScrollDown = listPopup.scrollTop + listPopup.clientHeight < listPopup.scrollHeight;
+	  if ((e.deltaY < 0 && canScrollUp) || (e.deltaY > 0 && canScrollDown)) {
+		e.preventDefault();
 	  }
+	}, { passive: false });
 
-// To each keeper row, add bell icon for main user (to_user_id), visible to others (from_user_id)
-const isRowCallable = permissions[id]?.canStartCall;
-const amILive = liveIds.has(currentUserId);
-let callbackBell = '';
-if (!isCurrentUser && !canStartCall && amILive && isRowCallable) {  // Or similar logic for eligible main users
-  callbackBell = `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>`;
-}
+	listPopup.addEventListener('touchmove', (e) => {
+	  e.stopPropagation();
+	}, { passive: false });
 
-		return `
-		  <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:4px;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
-			<span style="color:#888;font-size:0.95em;min-width:18px;">${index + 1}</span>
-			<span style="margin:0 1.5px;display:inline-block;vertical-align:middle;">
-			  ${isLive ? liveSvg : blankSvg}
-			</span>
-			<img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
-			<span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-			  ${(window.usernameCache && window.usernameCache[id]) ? window.usernameCache[id] : getShortUserId(id)}
-			</span>
-			<img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
-			<span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-			  ${formatDurationGrid(userDurations[id])}
-			</span>
-			<span class="flame-keeper-icons">
-			  ${astralIconHtml}			
-			  ${isDeepPresence ? deepPresenceSvg : ''}
-			  ${isUltimateStillness ? ultimateStillnessSvg : ''}
-			  ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}
-			  ${!isCurrentUser && !canStartCall && amILive && isRowCallable ? `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>` : ''}
-			</span>
-		  </div>
-		`;
-	}).join('')}
-  `;
-}
+ 	listPopup.querySelector('#keepers-close')?.addEventListener('click', unlockScroll);
+	// Also unlock on auto-close
+	setTimeout(() => { listPopup.remove(); unlockScroll(); }, 12000);
+
+  listPopup.addEventListener('click', async (e) => {
+    const astralIcon = e.target.closest('.astral-silence-icon');
+    if (astralIcon) showAstralSilencePopup(astralIcon.dataset.userid);
+  });
+
+  const userIds = Object.keys(userDurations).sort((a, b) => userDurations[b] - userDurations[a]);
+  const currentUserId = localStorage.getItem('omUserId');
+  const liveIds = new Set(livePresenceRows.map(row => row.user_id));
+  // LIVE DOT — same green dot, no SVG change
+  const liveSvg = `<span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#29D884; box-shadow:0 0 6px #29D884; vertical-align:middle;"></span>`;
+  const blankSvg = `<span style="display:inline-block; width:8px; height:8px; vertical-align:middle;"></span>`;
+
+  const deepPresenceSvg = `<img src="assets/deep.presence.svg" class="lotus-glow deep-presence-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:3px; transform:translateY(-2px); cursor:pointer;">`;
+  const ultimateStillnessSvg = `<img src="assets/deep.presence.svg" class="lotus-glow ultimate-stillness-icon" style="width:27px; height:27px; vertical-align:middle; margin-left:3px; transform:translateY(-2px); cursor:pointer;">`;
+
+  const permissionsResponse = await fetch('https://trueyogi-backend-knkq.onrender.com/api/permissions/batch', {
+    method: 'POST', headers: {'Content-Type': 'application/json'}, credentials: 'include',
+    body: JSON.stringify({ userIds })
+  });
+  const permissions = (await permissionsResponse.json()).userPermissions || {};
+
+  const astralSilenceStatuses = {};
+  if (!window.usernameCache) window.usernameCache = {};
+  try {
+    const { data: prefs, error: prefErr } = await supabase.from('user_preferences').select('user_id, astral_silence, username').in('user_id', userIds);
+    if (!prefErr && prefs) prefs.forEach(p => { astralSilenceStatuses[p.user_id] = p.astral_silence || false; window.usernameCache[p.user_id] = p.username || null; });
+  } catch (err) { console.error('Error batch fetching prefs:', err); }
+
+  if (userIds.length === 0) {
+    listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
+  } else {
+    listPopup.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; padding-bottom:8px; margin-bottom:6px; border-bottom:1px solid rgba(255,215,0,0.25);">
+      <div style="text-align:left;">
+        <div style="font-weight:800; letter-spacing:1px; font-size:1.02em;">Flame Keepers</div>
+        <div style="font-size:0.72em; color:#aaa;">${userIds.length} souls holding this flame</div>
+      </div>
+      <button id="keepers-close" onclick="document.getElementById('flame-keeper-list')?.remove()" style="width:26px; height:26px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; cursor:pointer; font-size:0.95em;">×</button>
+    </div>
+    <div id="my-notifications"></div>
+    ${userIds.map((id, index) => {
+      const isCurrentUser = id === currentUserId;
+      const isLive = liveIds.has(id);
+      const isDeepPresence = userDeepPresence[id];
+      const isUltimateStillness = userUltimateStillness[id];
+      const row = userRows[id];
+      const code = row?.countryCode ? row.countryCode.toLowerCase() : "un";
+      const isAstralSilenceActive = astralSilenceStatuses[id] || false;
+      let astralIconHtml = '';
+      if (isCurrentUser) {
+        astralIconHtml = isAstralSilenceActive ?
+          `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Active)">${astralSilenceActiveSvg}</span>` :
+          `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Inactive)">${astralSilenceInactiveSvg}</span>`;
+      } else if (isAstralSilenceActive) {
+        astralIconHtml = `<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Active)">${astralSilenceActiveSvg}</span>`;
+      }
+      const isRowCallable = permissions[id]?.canStartCall;
+      const amILive = liveIds.has(currentUserId);
+      return `
+      <div style="border-bottom:1px solid rgba(255,255,255,0.07); padding:7px 4px; display:flex; align-items:center; gap:6px; ${isCurrentUser ? 'background:rgba(255,215,0,0.10); border-radius:8px; font-weight:bold;' : ''}">
+        <span style="color:#888; font-size:0.85em; min-width:16px; text-align:center;">${index + 1}</span>
+        <span style="display:inline-flex; align-items:center;">${isLive ? liveSvg : blankSvg}</span>
+        <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
+        <span style="font-size:0.95em; letter-spacing:0.3px; color:${isCurrentUser ? '#fff' : '#FFD700'}; ${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''} max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">
+          ${(window.usernameCache?.[id]) ? window.usernameCache[id] : getShortUserId(id)}
+        </span>
+        <img src="assets/clock.svg" style="width:14px; height:14px; vertical-align:middle; opacity:0.7;">
+        <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'}; font-size:0.88em; ${isCurrentUser ? 'font-weight:bold;' : ''}">${formatDurationGrid(userDurations[id])}</span>
+        <span class="flame-keeper-icons" style="margin-left:auto; display:flex; align-items:center; gap:2px;">
+          ${astralIconHtml}
+          ${isDeepPresence ? deepPresenceSvg : ''}
+          ${isUltimateStillness ? ultimateStillnessSvg : ''}
+          ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}
+          ${!isCurrentUser && !canStartCall && amILive && isRowCallable ? `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>` : ''}
+          ${!isCurrentUser && isLive && canStartCall ? `<span class="call-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Start call">☎️</span>` : ''}
+        </span>
+      </div>
+      `;
+    }).join('')}
+    `;
+  }
 
   // ADD THIS ENTIRE BLOCK HERE
   // Add selection counter at top
@@ -24118,37 +23898,26 @@ window.showNotification = function(message) {
 };
 
 
+// POPUP FOR LONG FLAMES
 async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starterUserId, x, y) {
-  // Remove any previous keeper popup
-  const oldList = document.getElementById('flame-keeper-list');
-  if (oldList) oldList.remove();
+  document.getElementById('flame-keeper-list')?.remove();
 
-  // Query sessions for all users in completed flame's duration
   let { data, error } = await supabase
     .from('om_sessions')
     .select('user_id, country, countryCode, duration_seconds, started_at, ended_at')
     .gte('started_at', new Date(flameStartedAt).toISOString())
     .lte('ended_at', new Date(flameEndedAt).toISOString());
 
-  // Fallback UI
+  // Fallback — same logic, transparent premium
   if (error || !data || data.length === 0) {
     const fallbackPopup = document.createElement('div');
     fallbackPopup.id = 'flame-keeper-list';
     fallbackPopup.style.cssText = `
-      position: fixed;
-      left: ${x}px; top: ${y + 32}px;
-      transform: translate(-50%, 0);
-      background: rgba(0,0,0,0.95);
-      color: #ffd700;
-      font-size: 1.01rem;
-      padding: 11px 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 12px #FFD70088;
-      z-index: 10051;
-      min-width: 160px;
-      max-width: 340px;
-      width: 100%;
-      text-align: center;
+      position: fixed; left: ${x}px; top: ${y + 32}px; transform: translate(-50%, 0);
+      background: rgba(0,0,0,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      color: #ffd700; font-size: 1.01rem; padding: 12px 20px; border-radius: 14px;
+      border: 1px solid rgba(255,215,0,0.25); box-shadow: 0 0 20px rgba(255,215,0,0.15);
+      z-index: 10051; max-width: 340px; width: min(92vw, 340px); text-align: center;
     `;
     fallbackPopup.innerHTML = `<i>No Flame Keepers found for this flame.</i>`;
     document.body.appendChild(fallbackPopup);
@@ -24156,10 +23925,8 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
     return;
   }
 
-  // Durations per user & starter
   const userDurations = {};
   const userRows = {};
-
   data.forEach(row => {
     if (!row.user_id) return;
     let duration = row.ended_at
@@ -24169,98 +23936,94 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
     if (!userRows[row.user_id]) userRows[row.user_id] = row;
   });
 
-  // Sort all userIds by duration (excluding the starter from normal list)
-  const keeperUserIds = Object
-    .keys(userDurations)
-    .filter(id => id !== starterUserId)
-    .sort((a, b) => userDurations[b] - userDurations[a]);
-
+  const keeperUserIds = Object.keys(userDurations).filter(id => id !== starterUserId).sort((a, b) => userDurations[b] - userDurations[a]);
   const currentUserId = localStorage.getItem('omUserId');
 
-  // Format dates for display
+  // Soul Names — same as last keepers popup, else short ID
+  if (!window.usernameCache) window.usernameCache = {};
+  try {
+    const allIds = Object.keys(userDurations);
+    const { data: prefs } = await supabase.from('user_preferences').select('user_id, username').in('user_id', allIds);
+    if (prefs) prefs.forEach(p => { window.usernameCache[p.user_id] = p.username || null; });
+  } catch {}
+
   const startDate = new Date(flameStartedAt);
   const endDate = new Date(flameEndedAt);
-  
   const formatDate = (date) => {
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     return `${months[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
   };
+  const displayName = (id) => (window.usernameCache?.[id]) ? window.usernameCache[id] : getShortUserId(id);
 
-  // Build popup HTML
+  // ----- POPUP — TRANSPARENT LIKE LAST ONE -----
   const listPopup = document.createElement('div');
   listPopup.id = 'flame-keeper-list';
   listPopup.style.cssText = `
-    position: fixed;
-    left: ${x}px; top: ${y + 32}px;
-    transform: translate(-50%, 0);
-    background: rgba(0,0,0,0.96);
-    color: #ffd700;
-    font-size: 0.98rem;
-    padding: 9px 18px;
-    border-radius: 11px;
-    box-shadow: 0 0 14px #ffd700aa;
-    z-index: 10050;
-    min-width: 0;
-    max-width: 320px;
-    width: 100%;
-    max-height: 280px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
-    text-align: left;
-    scrollbar-width: thin;
-    scrollbar-color: #fde68a #000000;
+    position: fixed; left: ${x}px; top: ${y + 32}px; transform: translate(-50%, 0);
+    background: rgba(0,0,0,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+    color: #ffd700; font-size: 0.98rem; padding: 12px 14px 10px; border-radius: 16px;
+    border: 1px solid rgba(255,215,0,0.25); box-shadow: 0 0 20px rgba(255,215,0,0.15), 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 10050; max-width: 330px; width: min(92vw, 330px); max-height: 320px;
+    box-sizing: border-box; overflow-y: auto; overflow-x: hidden; text-align: left;
+    scrollbar-width: thin; scrollbar-color: #fde68a transparent; overscroll-behavior: contain; touch-action: pan-y;
   `;
-  listPopup.addEventListener('wheel', (e) => { e.stopPropagation(); });
-  listPopup.addEventListener('touchmove', (e) => { e.stopPropagation(); });
+ 
+
+	// NEW — use this in BOTH showAllFlameKeepers and showAllFlameKeepersForPeriod:
+	listPopup.addEventListener('wheel', (e) => {
+	  e.stopPropagation();
+	  // If popup can still scroll, don't let background scroll
+	  const canScrollUp = listPopup.scrollTop > 0;
+	  const canScrollDown = listPopup.scrollTop + listPopup.clientHeight < listPopup.scrollHeight;
+	  if ((e.deltaY < 0 && canScrollUp) || (e.deltaY > 0 && canScrollDown)) {
+		e.preventDefault();
+	  }
+	}, { passive: false });
+
+	listPopup.addEventListener('touchmove', (e) => {
+	  e.stopPropagation();
+	}, { passive: false });
+
+ 
+	listPopup.querySelector('#keepers-close')?.addEventListener('click', unlockScroll);
+	// Also unlock on auto-close
+	setTimeout(() => { listPopup.remove(); unlockScroll(); }, 12000);
 
   let keeperHtml = `
-    <div style="border-bottom:1px solid #ffd700;padding-bottom:6px;margin-bottom:6px;text-align:center;">
-      <strong>Flame Keepers</strong>
-      <div style="font-size:0.85em;color:#fde68a;margin-top:3px;letter-spacing:0.5px;">
-        ${formatDate(startDate)} — ${formatDate(endDate)}
-      </div>
-      <div style="font-size:0.89em;color:#bbb;margin-top:2px;">
-        (${keeperUserIds.length + 1} Soul${keeperUserIds.length ? 's' : ''} Unified)
-      </div>
+    <div style="position:relative; text-align:center; padding-bottom:8px; margin-bottom:8px; border-bottom:1px solid rgba(255,215,0,0.25);">
+      <button onclick="document.getElementById('flame-keeper-list')?.remove()" style="position:absolute; top:0; right:0; width:26px; height:26px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; cursor:pointer; font-size:0.95em;">×</button>
+      <div style="font-weight:800; letter-spacing:1px; font-size:1.02em; text-align:center; width:100%;">🔥 Flame Keepers</div>
+      <div style="font-size:0.82em; color:#fde68a; margin-top:4px; letter-spacing:0.5px;">${formatDate(startDate)} — ${formatDate(endDate)}</div>
+      <div style="font-size:0.82em; color:#aaa; margin-top:2px;">(${keeperUserIds.length + 1} Soul${keeperUserIds.length ? 's' : ''} Unified)</div>
     </div>
   `;
 
-  // Show starter as the first keeper ★
+  // Starter — Kindler ★ — premium gold card
   if (starterUserId && userRows[starterUserId]) {
     const starterRow = userRows[starterUserId];
     const starterCode = starterRow.countryCode ? starterRow.countryCode.toLowerCase() : "un";
-    const starterDuration = formatDurationGrid(userDurations[starterUserId] || 0);
     keeperHtml += `
-      <div style="padding:7px 0 5px 0;display:flex;align-items:center;gap:0;background:#22222233;font-weight:bold;">
+      <div style="padding:8px 8px; display:flex; align-items:center; gap:6px; background:rgba(255,215,0,0.10); border:1px solid rgba(255,215,0,0.25); border-radius:10px; font-weight:bold; margin-bottom:8px;">
+        <span style="font-size:1.05em;">★</span>
         <img src="https://flagcdn.com/w20/${starterCode}.png" style="width:20px;height:15px;border-radius:2px;box-shadow:0 0 2px #000;">
-        <span style="font-family:monospace; font-size:1.1em; color:#FFD700;font-weight:bold;text-shadow:0 0 8px #fff;">
-          ${getShortUserId(starterUserId)}
-        </span>
-        <img src="assets/clock.svg" style="width:17px; height:17px; vertical-align:middle; margin:0 3px;">
-        <span style="color:#FFD700;font-weight:bold;text-shadow:0 0 8px #fff;">
-          ${starterDuration} • Kindler
-        </span>
+        <span style="font-size:1.02em; color:#FFD700; font-weight:bold; text-shadow:0 0 8px rgba(255,255,255,0.3); max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${displayName(starterUserId)}</span>
+        <img src="assets/clock.svg" style="width:15px; height:15px; vertical-align:middle; opacity:0.8;">
+        <span style="color:#FFD700; font-weight:bold; font-size:0.9em;">${formatDurationGrid(userDurations[starterUserId] || 0)} • Kindler</span>
       </div>
-      <div style="border-bottom:1px solid #444;margin:2px 0 6px 0;"></div>
     `;
   }
 
-  // Show all other keepers ranked by duration
   keeperHtml += keeperUserIds.map((id, index) => {
     const row = userRows[id];
-    const code = row && row.countryCode ? row.countryCode.toLowerCase() : "un";
+    const code = row?.countryCode ? row.countryCode.toLowerCase() : "un";
     const isCurrentUser = id === currentUserId;
     return `
-      <div style="border-bottom:1px solid #222;padding:5px 0;display:flex;align-items:center;gap:0;${isCurrentUser ? 'background:#ffd70022;font-weight:bold;' : ''}">
+      <div style="border-bottom:1px solid rgba(255,255,255,0.07); padding:7px 4px; display:flex; align-items:center; gap:6px; ${isCurrentUser ? 'background:rgba(255,215,0,0.10); border-radius:8px; font-weight:bold;' : ''}">
+        <span style="color:#888; font-size:0.85em; min-width:16px; text-align:center;">${index + 1}</span>
         <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
-        <span style="font-family:monospace; font-size:1em; color:${isCurrentUser ? '#fff' : '#FFD700'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''}">
-          ${getShortUserId(id)}
-        </span>
-        <img src="assets/clock.svg" style="width:16px; height:16px; vertical-align:middle; margin:0 2px;">
-        <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'};${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 6px #fff;' : ''}">
-          ${formatDurationGrid(userDurations[id])}
-        </span>
+        <span style="font-size:0.95em; letter-spacing:0.3px; color:${isCurrentUser ? '#fff' : '#FFD700'}; ${isCurrentUser ? 'font-weight:bold;text-shadow:0 0 8px #fff;' : ''} max-width:110px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${displayName(id)}</span>
+        <img src="assets/clock.svg" style="width:14px; height:14px; vertical-align:middle; opacity:0.7;">
+        <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'}; font-size:0.88em; ${isCurrentUser ? 'font-weight:bold;' : ''}">${formatDurationGrid(userDurations[id])}</span>
       </div>
     `;
   }).join('');
