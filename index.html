@@ -26694,15 +26694,28 @@ function showScreensaver() {
   canvasEl.classList.remove("hidden");
   screensaverActive = true;
   screensaverStartTime = Date.now();
+
+  // Screensaver starts -> black background
+  document.documentElement.classList.add('particles-on');
+  document.body.classList.add('particles-on');
+
+  // Particles FULL bright + on top of card, card stays visible
+  canvasEl.style.opacity = '1';
+  canvasEl.style.zIndex = '10';
 }
 
 function hideScreensaver() {
-  // Don't hide screensaver if ANY modal is open
   if (isModalOpen) return;
-  
   if (typeof modalPopupActive !== "undefined" && modalPopupActive) return;
   canvasEl.classList.add("hidden");
   screensaverActive = false;
+
+  document.documentElement.classList.remove('particles-on');
+  document.body.classList.remove('particles-on');
+
+  // Back to normal: particles soft again
+  canvasEl.style.opacity = '';
+  canvasEl.style.zIndex = '2';
 }
 
 // Add this helper function to control modal state
