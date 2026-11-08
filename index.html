@@ -22782,23 +22782,48 @@ document.addEventListener('click', function(e) {
     e.preventDefault(); e.stopPropagation();
     document.getElementById('awareness-tooltip')?.remove();
     const flameRect = e.target.getBoundingClientRect();
+
     const awarenessTooltip = document.createElement('div');
     awarenessTooltip.id = 'awareness-tooltip';
     awarenessTooltip.innerHTML = `
-      <div class="breathing-tooltip-content" style="text-align:center; max-width:230px;">
-        <div style="font-size:1.2rem; font-weight:700; color:#FFD700; margin-bottom:10px; text-shadow:0 0 12px #FFD700;">Living Fire of Awareness</div>
-        <div style="font-size:0.95rem; color:#fff; line-height:1.5;">When at least one holds, the flame endures.</div>
-        <div style="font-size:0.72em; color:#aaa; margin-top:8px;">Tap to listen</div>
+      <div class="breathing-tooltip-content" style="text-align:center; max-width:250px; position:relative;">
+        <div style="font-size:1.15rem; font-weight:800; letter-spacing:0.5px; background:linear-gradient(90deg,#FFD700,#FF8800); -webkit-background-clip:text; -webkit-text-fill-color:transparent; color:#FFD700; margin-bottom:8px; text-shadow:none;">Living Fire of Awareness</div>
+        <div style="font-size:0.92rem; color:#fff; line-height:1.55;">When at least one holds,<br>the flame endures.</div>
       </div>
     `;
-    awarenessTooltip.style.cssText = `position:fixed; left:${flameRect.left + flameRect.width/2}px; top:${flameRect.top - 10}px; transform:translate(-50%, -100%); background:rgba(0,0,0,0.95); color:#fff; font-family:'Poppins',sans-serif; padding:14px 16px; border-radius:14px; border:1px solid #FFD700; box-shadow:0 0 20px rgba(255,215,0,0.4); z-index:10050; opacity:0; transition:opacity 0.2s; pointer-events:auto; cursor:pointer;`;
+    // PREMIUM — transparent like others, NOT solid black
+    awarenessTooltip.style.cssText = `
+      position:fixed;
+      left:${flameRect.left + flameRect.width/2}px;
+      top:${flameRect.top - 10}px;
+      transform:translate(-50%, -100%);
+      background: rgba(0,0,0,0.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color:#fff; font-family:'Poppins',sans-serif;
+      padding:16px 18px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,215,0,0.35);
+      box-shadow:0 0 20px rgba(255,215,0,0.15), 0 10px 30px rgba(0,0,0,0.5);
+      z-index:10060;
+      opacity:0; transition:opacity 0.2s;
+      pointer-events:auto; cursor:pointer;
+      width: min(92vw, 280px);
+    `;
     document.body.appendChild(awarenessTooltip);
-    awarenessTooltip.addEventListener('click', function() {
+
+    awarenessTooltip.addEventListener('click', function(ev) {
+      if (ev.target.closest('button')) return; // close button already handled
       const awAudio = document.getElementById('awareness-sound');
       if (awAudio) {
         if (awAudio.paused) {
           awAudio.currentTime = 0; awAudio.muted = false; awAudio.volume = 0.75;
-          awAudio.play().then(()=>{ document.getElementById('flame-tooltip')?.remove(); document.getElementById('flame-backdrop')?.remove(); showLyrics(); startLyricsSync(); awAudio.onended = ()=>{ document.getElementById('awareness-lyrics')?.remove(); currentLyricIndex = -1; }; }).catch(err=>console.log('Audio play failed:', err));
+          awAudio.play().then(()=>{
+            // KEEP flame popup open — same as keepers fix, don't remove it
+            // document.getElementById('flame-tooltip')?.remove(); // REMOVED
+            showLyrics(); startLyricsSync();
+            awAudio.onended = ()=>{ document.getElementById('awareness-lyrics')?.remove(); currentLyricIndex = -1; };
+          }).catch(err=>console.log('Audio play failed:', err));
         } else { awAudio.pause(); awAudio.currentTime = 0; stopLyricsSync(); }
       }
     });
