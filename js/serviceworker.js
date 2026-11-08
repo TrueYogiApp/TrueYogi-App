@@ -417,7 +417,7 @@ if (spaceshipReadyNote) spaceshipReadyNote.textContent = t('spaceship_ready_note
   	    // Reload the page after a brief delay to ensure Chrome fully releases cache space
     setTimeout(() => {
       window.location.reload(true);
-    }, 15000);
+    }, 6000);
 }
 
 // Function to show update notification
@@ -556,7 +556,7 @@ async function clearOfflineData() {
 	    // 4. Reload the page after a brief delay to ensure Chrome fully releases cache space
     setTimeout(() => {
       window.location.reload(true);
-    }, 9000);
+    }, 6000);
 	
     return true;
   } catch (error) {

@@ -24482,11 +24482,17 @@ userIdDisplay.onclick = async function(e) {
         </div>
       </div>
 
-      <!-- ===== STATUS ===== -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:10px;">
-        <span style="width:9px;height:9px;border-radius:50%;background:${missedHeartbeat?'#f72b29':'#4ade80'};box-shadow:0 0 8px ${missedHeartbeat?'#f72b29':'#4ade80'};animation:resBlink 1.8s infinite;"></span>
-        <span style="font-size:0.95em;color:${missedHeartbeat?'#ff9944':'#4ade80'};font-weight:600;letter-spacing:0.3px;">${missedHeartbeat?'Resonance interrupted':'Resonance active'}</span>
-      </div>
+	<!-- ===== STATUS — CSS HEARTBEAT, ALWAYS WHITE ===== -->
+	<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;">
+	  <span style="width:26px;height:26px;min-width:26px;min-height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
+		background:${missedHeartbeat?'#f72b29':'#29D884'};
+		box-shadow:0 0 14px ${missedHeartbeat?'#f72b29':'#29D884'};">
+		<span style="display:block; width:18px; height:12px; background:#fff; clip-path: polygon(0 45%, 20% 45%, 32% 0%, 45% 100%, 58% 20%, 72% 45%, 100% 45%, 100% 75%, 72% 75%, 58% 55%, 45% 100%, 32% 30%, 20% 75%, 0 75%);"></span>
+	  </span>
+	  <span style="font-size:0.98em;color:${missedHeartbeat?'#ff9944':'#29D884'};font-weight:600;">
+		${missedHeartbeat?'Resonance interrupted':'Resonance active'}
+	  </span>
+	</div>
 
       <!-- ===== DURATION ===== -->
       <div style="font-size:2.1em;font-weight:800;color:#fde68a;letter-spacing:1px;line-height:1;">${duration}</div>
