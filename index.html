@@ -22758,9 +22758,9 @@ flameTimer.onclick = async function(e) {
   setTimeout(() => tooltip.style.opacity = 1, 10);
 
   // NO backdrop to remove — old pattern
-  tooltip.querySelector('#flame-keepers-link').onclick = function(ev){ ev.preventDefault(); tooltip.remove(); showAllFlameKeepers(rect.left + rect.width/2, rect.top); };
+  tooltip.querySelector('#flame-keepers-link').onclick = function(ev){ ev.preventDefault(); showAllFlameKeepers(rect.left + rect.width/2, rect.top); };
   const longestLink = tooltip.querySelector('#longest-flame-keepers-link');
-  if (longestLink) longestLink.onclick = function(ev){ ev.preventDefault(); tooltip.remove(); showAllFlameKeepersForPeriod(longestFlame.started_at, longestFlame.ended_at, longestFlame.starter_user_id, rect.left + rect.width/2, rect.top); };
+  if (longestLink) longestLink.onclick = function(ev){ ev.preventDefault(); showAllFlameKeepersForPeriod(longestFlame.started_at, longestFlame.ended_at, longestFlame.starter_user_id, rect.left + rect.width/2, rect.top); };
 
   // Auto-close after 30s — no backdrop
   setTimeout(() => { tooltip.style.opacity = 0; setTimeout(() => tooltip.remove(), 300); }, 30000);
@@ -22883,8 +22883,6 @@ async function showAllFlameKeepers(x, y) {
 	}, { passive: false });
 
  	listPopup.querySelector('#keepers-close')?.addEventListener('click', unlockScroll);
-	// Also unlock on auto-close
-	setTimeout(() => { listPopup.remove(); unlockScroll(); }, 12000);
 
   listPopup.addEventListener('click', async (e) => {
     const astralIcon = e.target.closest('.astral-silence-icon');
@@ -23987,8 +23985,6 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
 
  
 	listPopup.querySelector('#keepers-close')?.addEventListener('click', unlockScroll);
-	// Also unlock on auto-close
-	setTimeout(() => { listPopup.remove(); unlockScroll(); }, 12000);
 
   let keeperHtml = `
     <div style="position:relative; text-align:center; padding-bottom:8px; margin-bottom:8px; border-bottom:1px solid rgba(255,215,0,0.25);">
