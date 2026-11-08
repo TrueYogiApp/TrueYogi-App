@@ -24207,7 +24207,7 @@ userIdDisplay.onclick = async function(e) {
     padding: 24px 24px 18px; border-radius: 20px;
     box-shadow: 0 0 24px #ffd70055, 0 0 80px #ffd70022;
     border: 1px solid rgba(255,215,0,0.22);
-    z-index: 10020; width: min(92vw, 340px); max-height: 85vh; overflow-y: auto;
+    z-index: 10100; width: min(92vw, 340px); max-height: 85vh; overflow-y: auto;
     opacity: 0; transition: opacity 0.2s, transform 0.2s; text-align: center;
   `;
 
@@ -24273,7 +24273,7 @@ userIdDisplay.onclick = async function(e) {
 
   const backdrop = document.createElement('div');
   backdrop.id = 'om-modal-backdrop';
-  backdrop.style.cssText = `position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 10019; opacity: 0; transition: opacity 0.18s;`;
+  backdrop.style.cssText = `position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 10099; opacity: 0; transition: opacity 0.18s;`;
   document.body.appendChild(backdrop);
   document.body.appendChild(popup);
   function closeModal(){ popup.style.opacity=0; popup.style.transform='translate(-50%, -50%) scale(0.96)'; backdrop.style.opacity=0; setTimeout(()=>{popup.remove(); backdrop.remove();},220); }
