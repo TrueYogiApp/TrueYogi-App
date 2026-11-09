@@ -22819,8 +22819,7 @@ document.addEventListener('click', function(e) {
         if (awAudio.paused) {
           awAudio.currentTime = 0; awAudio.muted = false; awAudio.volume = 0.75;
           awAudio.play().then(()=>{
-            // KEEP flame popup open — same as keepers fix, don't remove it
-            // document.getElementById('flame-tooltip')?.remove(); // REMOVED
+            document.getElementById('flame-tooltip')?.remove();
             showLyrics(); startLyricsSync();
             awAudio.onended = ()=>{ document.getElementById('awareness-lyrics')?.remove(); currentLyricIndex = -1; };
           }).catch(err=>console.log('Audio play failed:', err));
