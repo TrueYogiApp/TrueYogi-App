@@ -629,7 +629,13 @@
   transition: all 0.3s ease;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   /* Hide by default */
-  display: none;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#faq-tab.show {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #faq-tab {
@@ -970,8 +976,15 @@
   border-radius: 1.3em;
   box-shadow: 0 2px 12px #eab30822;
   min-width: 0;
-  transition: box-shadow 0.18s;
+  transition: box-shadow 0.18s, opacity 0.5s;
   height: 35px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+#lang-switch-container.show {
+  opacity: 1;
+  pointer-events: auto;
 }
 
 #lang-switch-container i.fas.fa-globe-asia {
@@ -8271,7 +8284,31 @@ function closeEncouragementModal() {
     };
 
 
-// Custom audio file storage
+
+/// LANG AND FAQ AUTOHIDE ///
+const langBox = document.getElementById('lang-switch-container');
+const faqTab = document.getElementById('faq-tab');
+let langHideTimer;
+
+function showLang() {
+  if (langBox) langBox.classList.add('show');
+  if (faqTab) faqTab.classList.add('show');
+
+  clearTimeout(langHideTimer);
+  langHideTimer = setTimeout(() => {
+    if (langBox) langBox.classList.remove('show');
+    if (faqTab) faqTab.classList.remove('show');
+  }, 3000); // 3 seconds inactivity = hide both
+}
+
+// Only real touch / tap, NOT mousemove
+['touchstart', 'click', 'keydown'].forEach(evt => {
+  document.addEventListener(evt, showLang, { passive: true });
+});
+
+
+
+/// Custom audio file storage ///
 window.customAudioFile = null;
 
 // Get the file input (same as avatar pattern)
