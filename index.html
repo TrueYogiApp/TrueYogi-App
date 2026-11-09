@@ -22945,7 +22945,7 @@ async function showAllFlameKeepers(x, y) {
         <div style="font-weight:800; letter-spacing:1px; font-size:1.02em; text-align:center; width:100%;">Flame Keepers</div>
         <div style="font-size:0.72em; color:#aaa;">${userIds.length} holding this flame</div>
       </div>
-      <button id="keepers-close" style="position:absolute; top:0; right:0; width:26px; height:26px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; cursor:pointer;">×</button>
+      <button onclick="document.getElementById('flame-keeper-list')?.remove()" style="position:absolute; top:0; right:0; width:26px; height:26px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; cursor:pointer; font-size:0.95em;">×</button>
     </div>
     <div id="my-notifications"></div>
     ${userIds.map((id, index) => {
@@ -24007,8 +24007,6 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
 	  e.stopPropagation();
 	}, { passive: false });
 
- 
-	listPopup.querySelector('#keepers-close')?.addEventListener('click', unlockScroll);
 
   let keeperHtml = `
     <div style="position:relative; text-align:center; padding-bottom:8px; margin-bottom:8px; border-bottom:1px solid rgba(255,215,0,0.25);">
