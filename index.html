@@ -22921,14 +22921,21 @@ async function showAllFlameKeepers(x, y) {
     listPopup.innerHTML = "<i>No Flame Keepers found.</i>";
   } else {
     listPopup.innerHTML = `
-    <div style="position:relative; text-align:center; padding-bottom:8px; margin-bottom:6px; border-bottom:1px solid rgba(255,215,0,0.25);">
-      <div style="text-align:left;">
-        <div style="font-weight:800; letter-spacing:1px; font-size:1.02em; text-align:center; width:100%;">Flame Keepers</div>
-        <div style="font-size:0.72em; color:#aaa;">${userIds.length} holding this flame</div>
-      </div>
-      <button onclick="document.getElementById('flame-keeper-list')?.remove()" style="position:absolute; top:0; right:0; width:26px; height:26px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; cursor:pointer; font-size:0.95em;">×</button>
-    </div>
-    <div id="my-notifications"></div>
+		<div style="position:relative; text-align:center; padding-bottom:8px; margin-bottom:6px; border-bottom:1px solid rgba(255,215,0,0.25);">
+		  <div style="text-align:left;">
+			<div style="font-weight:800; letter-spacing:1px; font-size:1.02em; text-align:center; width:100%;">Flame Keepers</div>
+			<div style="font-size:0.72em; color:#aaa;">${userIds.length} holding this flame</div>
+		  </div>
+		  <button onclick="document.getElementById('flame-keeper-list')?.remove()" style="position:absolute; top:0; right:0; width:26px; height:26px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; cursor:pointer; font-size:0.95em;">×</button>
+		</div>
+		<div id="selection-counter"></div>
+		<div id="my-notifications"></div>		
+		<div id="call-button-container" style="text-align:center; margin:6px 0 10px;">
+		  <button id="start-group-call-btn" style="display:none;padding:8px 24px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold;font-size:0.95rem;cursor:pointer;box-shadow:0 2px 10px #FFD70044;">
+			📞 Call Selected (<span id="selected-count">0</span>)
+		  </button>
+		</div>
+		<div id="my-notifications"></div>
     ${userIds.map((id, index) => {
       const isCurrentUser = id === currentUserId;
       const isLive = liveIds.has(id);
@@ -22970,23 +22977,6 @@ async function showAllFlameKeepers(x, y) {
     }).join('')}
     `;
   }
-
-  // ADD THIS ENTIRE BLOCK HERE
-  // Add selection counter at top
-  const selectionCounter = document.createElement('div');
-  selectionCounter.id = 'selection-counter';
-  listPopup.insertBefore(selectionCounter, listPopup.firstChild);
-
-  // Add group call button
-  const callButtonContainer = document.createElement('div');
-  callButtonContainer.id = 'call-button-container';
-  callButtonContainer.style.cssText = 'text-align:center;margin-top:8px;';
-  callButtonContainer.innerHTML = `
-    <button id="start-group-call-btn" style="display:none;padding:8px 24px;background:#FFD700;color:#000;border:none;border-radius:8px;font-weight:bold;font-size:0.95rem;cursor:pointer;box-shadow:0 2px 10px #FFD70044;">
-      📞 Call Selected (<span id="selected-count">0</span>)
-    </button>
-  `;
-  listPopup.appendChild(callButtonContainer);
 
   // Handle checkbox changes
   listPopup.addEventListener('change', function(e) {
