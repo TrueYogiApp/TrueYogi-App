@@ -8289,6 +8289,7 @@ function closeEncouragementModal() {
 const langBox = document.getElementById('lang-switch-container');
 const faqTab = document.getElementById('faq-tab');
 let langHideTimer;
+let holdTimer;
 
 function showLang() {
   if (langBox) langBox.classList.add('show');
@@ -8298,13 +8299,29 @@ function showLang() {
   langHideTimer = setTimeout(() => {
     if (langBox) langBox.classList.remove('show');
     if (faqTab) faqTab.classList.remove('show');
-  }, 3000); // 3 seconds inactivity = hide both
+  }, 3000); // 3 sec no touch = hide
 }
 
-// Only real touch / tap, NOT mousemove
-['touchstart', 'click', 'keydown'].forEach(evt => {
-  document.addEventListener(evt, showLang, { passive: true });
-});
+// Start 1s hold timer
+function startHold() {
+  clearTimeout(holdTimer);
+  holdTimer = setTimeout(() => {
+    showLang();
+  }, 1000); // 1 sec continuous touch = show
+}
+
+// Cancel if you lift before 1s
+function cancelHold() {
+  clearTimeout(holdTimer);
+}
+
+document.addEventListener('touchstart', startHold, { passive: true });
+document.addEventListener('touchend', cancelHold, { passive: true });
+document.addEventListener('touchcancel', cancelHold, { passive: true });
+
+// For desktop mouse - same: hold click 1s
+document.addEventListener('mousedown', startHold);
+document.addEventListener('mouseup', cancelHold);
 
 
 
