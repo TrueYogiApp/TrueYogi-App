@@ -22906,7 +22906,6 @@ async function showAllFlameKeepers(x, y) {
 	  e.stopPropagation();
 	}, { passive: false });
 
- 	listPopup.querySelector('#keepers-close')?.addEventListener('click', unlockScroll);
 
   listPopup.addEventListener('click', async (e) => {
     const astralIcon = e.target.closest('.astral-silence-icon');
