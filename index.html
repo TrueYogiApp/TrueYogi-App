@@ -24123,7 +24123,7 @@ void resonanceMsg.offsetWidth;
 // Apply the animation
 resonanceMsg.style.animation = 'scrollMsg 25s linear infinite';
 
-// --- Grid ID display ---
+// --- Grid ID display — PREMIUM PILL, aura color kept ---
 let userIdDisplay = document.getElementById('userIdDisplay');
 if (!userIdDisplay) {
   userIdDisplay = document.createElement('div');
@@ -24134,18 +24134,37 @@ if (!userIdDisplay) {
     left: 50%;
     transform: translateX(-50%);
     font-family: 'Poppins', sans-serif;
-    font-size: 0.98rem;
-    letter-spacing: 2px;
-    opacity: 0.93;
-    border-radius: 16px;
-    padding: 4px 16px;
+    font-size: 0.92rem;
+    letter-spacing: 1.5px;
+    opacity: 0.95;
+    border-radius: 20px;
+    padding: 6px 16px;
     z-index: 10001;
     font-weight: 600;
     margin-top: 4px;
-    box-shadow: 0 0 6px #ffd70033;
+    background: rgba(0,0,0,0.35);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,215,0,0.28);
+    box-shadow: 0 0 12px rgba(255,215,0,0.15), 0 4px 12px rgba(0,0,0,0.35);
     width: max-content;
     max-width: calc(100vw - 32px);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   `;
+  userIdDisplay.onmouseenter = () => {
+    userIdDisplay.style.boxShadow = '0 0 18px rgba(255,215,0,0.35), 0 4px 14px rgba(0,0,0,0.4)';
+    userIdDisplay.style.borderColor = 'rgba(255,215,0,0.5)';
+    userIdDisplay.style.transform = 'translateX(-50%) scale(1.03)';
+  };
+  userIdDisplay.onmouseleave = () => {
+    userIdDisplay.style.boxShadow = '0 0 12px rgba(255,215,0,0.15), 0 4px 12px rgba(0,0,0,0.35)';
+    userIdDisplay.style.borderColor = 'rgba(255,215,0,0.28)';
+    userIdDisplay.style.transform = 'translateX(-50%) scale(1)';
+  };
   container.appendChild(userIdDisplay);
 }
 
@@ -24165,10 +24184,10 @@ async function refreshGridIdDisplay() {
   } catch(e) {}
 
   if (displayName) {
-    // Has Soul Name — Grid ID IS their name now
-    userIdDisplay.innerHTML = `Grid ID: <span style="font-weight:700; letter-spacing:1px;">${displayName}</span>`;
+    // Has Soul Name — Grid ID IS their name now, aura color from setAuraColor()
+    userIdDisplay.innerHTML = `Grid ID: <span style="font-weight:800; letter-spacing:1px;">${displayName}</span>`;
   } else {
-    // No name yet — fallback to short ID
+    // No name yet — fallback to short ID, aura color from setAuraColor()
     userIdDisplay.innerHTML = `Grid ID: <span style="font-family:monospace;font-size:1.05em;">${getShortUserId(userId)}</span>`;
   }
 }
