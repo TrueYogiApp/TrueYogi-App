@@ -22863,48 +22863,30 @@ async function showAllFlameKeepers(x, y) {
   // ----- POPUP — TRANSPARENT LIKE ORIGINAL, NOT SOLID -----
   const listPopup = document.createElement('div');
   listPopup.id = 'flame-keeper-list';
-  listPopup.style.cssText = `
-    position: fixed;
-    left: ${x}px; top: ${y + 32}px;
-    transform: translate(-50%, 0);
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    color: #ffd700;
-    font-size: 0.98rem;
-    padding: 12px 14px 10px;
-    border-radius: 16px;
-    border: 1px solid rgba(255,215,0,0.25);
-    box-shadow: 0 0 20px rgba(255,215,0,0.15), 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 10050;
-    max-width: 330px;
-    width: min(92vw, 330px);
-    max-height: 320px;
-    box-sizing: border-box;
-    overflow-y: auto;
-    overflow-x: hidden;
-	overscroll-behavior: contain;
-    touch-action: pan-y;
-    text-align: left;
-    scrollbar-width: thin;
-    scrollbar-color: #fde68a transparent;
-  `;
- 
-
-	// NEW — use this in BOTH showAllFlameKeepers and showAllFlameKeepersForPeriod:
-	listPopup.addEventListener('wheel', (e) => {
-	  e.stopPropagation();
-	  // If popup can still scroll, don't let background scroll
-	  const canScrollUp = listPopup.scrollTop > 0;
-	  const canScrollDown = listPopup.scrollTop + listPopup.clientHeight < listPopup.scrollHeight;
-	  if ((e.deltaY < 0 && canScrollUp) || (e.deltaY > 0 && canScrollDown)) {
-		e.preventDefault();
-	  }
-	}, { passive: false });
-
-	listPopup.addEventListener('touchmove', (e) => {
-	  e.stopPropagation();
-	}, { passive: false });
+	listPopup.style.cssText = `
+	  position: fixed;
+	  left: ${x}px; top: ${y + 32}px;
+	  transform: translate(-50%, 0);
+	  background: rgba(0,0,0,0.55);
+	  backdrop-filter: blur(10px);
+	  -webkit-backdrop-filter: blur(10px);
+	  color: #ffd700;
+	  font-size: 0.98rem;
+	  padding: 12px 14px 10px;
+	  border-radius: 16px;
+	  border: 1px solid rgba(255,215,0,0.25);
+	  box-shadow: 0 0 20px rgba(255,215,0,0.15), 0 10px 30px rgba(0,0,0,0.5);
+	  z-index: 10050;
+	  max-width: 330px;
+	  width: min(92vw, 330px);
+	  max-height: 320px;
+	  box-sizing: border-box;
+	  overflow-y: auto;
+	  overflow-x: hidden;
+	  text-align: left;
+	  scrollbar-width: thin;
+	  scrollbar-color: #fde68a transparent;
+	`;
 
 
   listPopup.addEventListener('click', async (e) => {
