@@ -3510,11 +3510,24 @@ body:has(#challenge-history-modal:not(.hidden)) #end-date-display {
 /* ios 27 FIX */
 #mode-selection {
   position: relative;
-  z-index: 1;
+  z-index: auto;
   margin-top: 12px;
 }
+
+/* particles black backgrnd */
 html.particles-on, body.particles-on {
   background: #000 !important;
+}
+
+/* svg top of nebula */
+#meditation-container {
+  position: relative;
+  z-index: 999;
+}
+
+.meditation-svg {
+  position: relative;
+  z-index: 999;
 }
 
 
