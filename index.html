@@ -22641,6 +22641,44 @@ if (!window.liveOmTickerInterval) {
 })();
  
 
+function showBlurBackdrop() {
+  if (document.getElementById('om-blur-backdrop')) return; // already there
+  const bd = document.createElement('div');
+  bd.id = 'om-blur-backdrop';
+  bd.style.cssText = `
+    position: fixed; inset: 0;
+    background: rgba(0,0,0,0.08);          /* very light tint */
+    backdrop-filter: blur(1px);            /* ← increase to 3px, 4px… for more blur */
+    -webkit-backdrop-filter: blur(1px);    /* ← keep in sync with above */
+    z-index: 10030;                        /* below Flame 10040, Keepers 10050, Awareness 10060, Grid 10100 */
+    opacity: 0; transition: opacity 0.2s;
+    pointer-events: auto;
+  `;
+  document.body.appendChild(bd);
+  requestAnimationFrame(() => bd.style.opacity = 1);
+  bd.onclick = () => {
+    document.getElementById('flame-tooltip')?.remove();
+    document.getElementById('flame-keeper-list')?.remove();
+    document.getElementById('awareness-tooltip')?.remove();
+    document.getElementById('current-user-mins-popup')?.remove();
+    hideBlurBackdrop();
+  };
+}
+
+function hideBlurBackdrop() {
+  // Don't remove if any OM popup is still open
+  if (document.getElementById('flame-tooltip') ||
+      document.getElementById('flame-keeper-list') ||
+      document.getElementById('awareness-tooltip') ||
+      document.getElementById('current-user-mins-popup')) return;
+
+  const bd = document.getElementById('om-blur-backdrop');
+  if (!bd) return;
+  bd.style.opacity = 0;
+  setTimeout(() => bd.remove(), 200); // matches the 0.2s fade
+} 
+
+
 // --- OM Flame Timer — PREMIUM ---
 let flameTimer = document.getElementById('om-flame-timer');
 if (!flameTimer) {
@@ -22670,6 +22708,7 @@ if (!flameTimer) {
 
 flameTimer.onclick = async function(e) {
   document.getElementById('flame-tooltip')?.remove();
+  hideBlurBackdrop();
   // NO backdrop — old pattern
 
   const flameTimeEl = document.getElementById('om-flame-time');
@@ -22755,6 +22794,7 @@ flameTimer.onclick = async function(e) {
     width: min(92vw, 340px);
   `;
   document.body.appendChild(tooltip);
+  showBlurBackdrop();
   setTimeout(() => tooltip.style.opacity = 1, 10);
 
   // NO backdrop to remove — old pattern
@@ -22763,7 +22803,7 @@ flameTimer.onclick = async function(e) {
   if (longestLink) longestLink.onclick = function(ev){ ev.preventDefault(); showAllFlameKeepersForPeriod(longestFlame.started_at, longestFlame.ended_at, longestFlame.starter_user_id, rect.left + rect.width/2, rect.top); };
 
   // Auto-close after 30s — no backdrop
-  setTimeout(() => { tooltip.style.opacity = 0; setTimeout(() => tooltip.remove(), 300); }, 30000);
+  setTimeout(() => { tooltip.style.opacity = 0; setTimeout(() => { tooltip.remove(); hideBlurBackdrop(); }, 300); }, 30000);
 };
 
 // Breathing + awareness — UNCHANGED LOGIC, only styles kept
