@@ -3530,6 +3530,17 @@ html.particles-on, body.particles-on {
   z-index: 11;
 }
 
+/* tap to edit autohide */
+#name-edit-trigger {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.5s;
+}
+#name-edit-trigger.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+
 
 </style>
   
@@ -8316,8 +8327,22 @@ function isEarthGridOpen() {
 }
 
 function showLang() {
-  if (isEarthGridOpen()) return;
-  
+  const nameTrigger = document.getElementById('name-edit-trigger');
+  const welcome = document.getElementById('welcome-message');
+  const isWelcomeOpen = welcome && !welcome.classList.contains('hidden');
+  if (isWelcomeOpen) return; // never show in Welcome
+
+  // If in Earth Grid -> show ONLY tap to edit name
+  if (typeof earthGridOpen !== 'undefined' && earthGridOpen === true) {
+    if (nameTrigger) nameTrigger.classList.add('show');
+    clearTimeout(langHideTimer);
+    langHideTimer = setTimeout(() => {
+      if (nameTrigger) nameTrigger.classList.remove('show');
+    }, 3000); // 3s no touch = hide
+    return;
+  }
+
+  // If on Home -> show ONLY EN + FAQ, like before
   if (langBox) langBox.classList.add('show');
   if (faqTab) faqTab.classList.add('show');
 
@@ -8325,15 +8350,24 @@ function showLang() {
   langHideTimer = setTimeout(() => {
     if (langBox) langBox.classList.remove('show');
     if (faqTab) faqTab.classList.remove('show');
-  }, 3000); // 3 sec no touch = hide
+  }, 3000);
 }
 
-// Start 1s hold timer
 function startHold() {
+  const welcome = document.getElementById('welcome-message');
+  if (welcome && !welcome.classList.contains('hidden')) return;
+
+  // Earth Grid -> show tap to edit name IMMEDIATELY, no 1s hold
+  if (typeof earthGridOpen !== 'undefined' && earthGridOpen === true) {
+    showLang(); // this shows only "tap to edit name" in Earth Grid
+    return;
+  }
+
+  // Home -> hold 1s to show EN + FAQ
   clearTimeout(holdTimer);
   holdTimer = setTimeout(() => {
     showLang();
-  }, 500); // 1 sec continuous touch = show
+  }, 1000);
 }
 
 // Cancel if you lift before 1s
