@@ -8305,7 +8305,14 @@ let langHideTimer;
 let holdTimer;
 
 function isEarthGridOpen() {
-  return typeof earthGridOpen !== 'undefined' && earthGridOpen === true;
+  // 1. Earth Grid open = block
+  if (typeof earthGridOpen !== 'undefined' && earthGridOpen === true) return true;
+
+  // 2. Welcome modal open = block
+  const welcome = document.getElementById('welcome-message');
+  if (welcome && !welcome.classList.contains('hidden')) return true;
+
+  return false;
 }
 
 function showLang() {
