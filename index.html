@@ -8304,7 +8304,13 @@ const faqTab = document.getElementById('faq-tab');
 let langHideTimer;
 let holdTimer;
 
+function isEarthGridOpen() {
+  return typeof earthGridOpen !== 'undefined' && earthGridOpen === true;
+}
+
 function showLang() {
+  if (isEarthGridOpen()) return;
+  
   if (langBox) langBox.classList.add('show');
   if (faqTab) faqTab.classList.add('show');
 
