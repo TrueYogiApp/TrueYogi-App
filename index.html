@@ -8353,17 +8353,27 @@ function showLang() {
   }, 3000);
 }
 
-function startHold() {
+function startHold(e) {
   const welcome = document.getElementById('welcome-message');
   if (welcome && !welcome.classList.contains('hidden')) return;
 
-  // Earth Grid -> show tap to edit name IMMEDIATELY, no 1s hold
-  if (typeof earthGridOpen !== 'undefined' && earthGridOpen === true) {
-    showLang(); // this shows only "tap to edit name" in Earth Grid
+  // If Grid popup is open, ignore taps EXCEPT on the username itself
+  const popup = document.getElementById('current-user-mins-popup');
+  if (popup) {
+    // Tap on × close, backdrop, or anywhere else in popup (not name) = do nothing, let it close
+    const isOnName = e.target.closest('#name-saved-state') || e.target.closest('#saved-name-text');
+    if (!isOnName) return;
+    // On name -> show "Change your Name" immediately
+    showLang();
     return;
   }
 
-  // Home -> hold 1s to show EN + FAQ
+  // No popup — Home -> hold 1s to show EN + FAQ
+  // But don't fire if tap is on Earth Grid button / OM etc — only on Home background
+  if (typeof earthGridOpen !== 'undefined' && earthGridOpen === true) {
+    return; // Earth Grid without popup = do nothing, name trigger only works inside popup
+  }
+
   clearTimeout(holdTimer);
   holdTimer = setTimeout(() => {
     showLang();
@@ -8374,6 +8384,10 @@ function startHold() {
 function cancelHold() {
   clearTimeout(holdTimer);
 }
+
+document.addEventListener('touchstart', startHold, { passive: true });
+document.addEventListener('touchend', cancelHold, { passive: true });
+document.addEventListener('touchcancel', cancelHold, { passive: true });
 
 document.addEventListener('touchstart', startHold, { passive: true });
 document.addEventListener('touchend', cancelHold, { passive: true });
@@ -24387,12 +24401,12 @@ userIdDisplay.onclick = async function(e) {
     popup.innerHTML = `
       <button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
 
-      <!-- ===== NAME — WITH GENERATE ====== -->
+      <!-- ===== NAME — WITH GENERATE ===== -->
       <div style="margin:8px 0 16px;">
         <div style="font-size:1.1rem; margin-bottom:2px;"></div>
         <div id="name-saved-state" style="display:${userUsername ? 'block' : 'none'};">
-          <div id="saved-name-text" style="font-size:1.65em; font-weight:800; letter-spacing:2.5px; color:#fde68a; text-shadow:0 0 14px rgba(255,215,0,0.35); line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${userUsername || ''}</div>
-          <span id="name-edit-trigger" style="font-size:0.72em; color:#8a8a8a; cursor:pointer;">Change your Name</span>
+          <div id="saved-name-text" style="font-size:1.65em; font-weight:800; letter-spacing:2.5px; color:#fde68a; text-shadow:0 0 14px rgba(255,215,0,0.35); line-height:1.1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer;">${userUsername || ''}</div>
+          <span id="name-edit-trigger" style="font-size:0.72em; color:#8a8a8a; cursor:pointer;">Touch to rename</span>
         </div>
         <div id="name-edit-state" style="display:${userUsername ? 'none' : 'block'};">
           <div style="font-size:0.8em; color:#9a8a4a; margin-bottom:8px; letter-spacing:0.5px;">Choose your Name <span style="color:#666;">(optional)</span></div>
