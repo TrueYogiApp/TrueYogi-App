@@ -19654,8 +19654,9 @@ async function sendHeartbeat() {
 }
 
 function startHeartbeat() {
-  sendHeartbeat(); // send once immediately
-  heartbeatInterval = setInterval(sendHeartbeat, 30 * 60 * 1000); // every 30 minutes
+  if (heartbeatInterval) clearInterval(heartbeatInterval);
+  sendHeartbeat();
+  heartbeatInterval = setInterval(sendHeartbeat, 30 * 60 * 1000);
 }
 
 function stopHeartbeat() {
@@ -22563,6 +22564,188 @@ async function fetchMyCallbackRequests() {
   return data.requests || [];
 }
 
+
+// Set stillness: user will stay for X hours without phone
+// --- NEW: Select first, confirm later — blocks accidental touches ---
+let pendingStillnessHours = null;
+
+function selectStillnessHours(hours, btn) {
+  pendingStillnessHours = hours;
+  // Highlight selected
+  document.querySelectorAll('.stillness-opt').forEach(b => {
+    b.style.background = 'rgba(255,255,255,0.08)';
+    b.style.color = '#fff';
+    b.style.fontWeight = '400';
+  });
+  if (btn) {
+    btn.style.background = '#fde68a';
+    btn.style.color = '#000';
+    btn.style.fontWeight = '700';
+  }
+  // Show OK + auto time — updates for every duration
+	// If until is next day, show day too — e.g. Thu 04:30 AM, else just time
+	const untilDate = new Date(Date.now() + hours * 60 * 60 * 1000);
+	const isNextDay = untilDate.getDate() !== new Date().getDate();
+	const untilStr = isNextDay
+	  ? untilDate.toLocaleDateString([], { weekday: 'short' }) + ' ' + untilDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+	  : untilDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('stillness-selected-label').textContent = hours + 'h';
+  document.getElementById('stillness-selected-until').textContent = untilStr;
+  document.getElementById('stillness-ok-row').style.display = 'block';
+}
+
+function selectStillnessCustom() {
+  const input = document.getElementById('stillness-custom-hours');
+  const hours = parseInt(input.value, 10);
+  if (!hours || hours < 1 || hours > 24) {
+    input.style.borderColor = '#ff6b6b';
+    setTimeout(() => { input.style.borderColor = 'rgba(255,215,0,0.35)'; }, 1500);
+    return;
+  }
+  selectStillnessHours(hours, null);
+}
+
+function showStillnessConfirm() {
+  if (!pendingStillnessHours) return;
+  document.getElementById('stillness-confirm-popup')?.remove();
+
+	const until = new Date(Date.now() + pendingStillnessHours * 60 * 60 * 1000);
+	const isNextDay = until.getDate() !== new Date().getDate();
+	const untilStr = isNextDay
+	  ? until.toLocaleDateString([], { weekday: 'short' }) + ' ' + until.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+	  : until.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+  const pop = document.createElement('div');
+  pop.id = 'stillness-confirm-popup';
+  pop.style.cssText = `
+    position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    background: linear-gradient(180deg, rgba(18,16,8,0.98), rgba(0,0,0,0.98));
+    color: #ffd700; font-family: 'Poppins', sans-serif;
+    padding: 22px 22px 18px; border-radius: 20px;
+    box-shadow: 0 0 24px #ffd70055, 0 0 80px #ffd70022;
+    border: 1px solid rgba(255,215,0,0.30);
+    z-index: 10200; width: min(92vw, 320px); text-align: center;
+  `;
+	pop.innerHTML = `
+	  <div style="text-align:center; padding:4px 4px 2px;">
+		<div style="font-size:1.9em; line-height:1; margin-bottom:10px; text-shadow:0 0 18px rgba(255,215,0,0.5);">🕯</div>
+		<div style="font-size:1.12em; font-weight:800; color:#fde68a; letter-spacing:0.3px; margin-bottom:4px;">Stay in the Flame for ${pendingStillnessHours}h?</div>
+		<div style="font-size:0.78em; color:#9a8a4a; letter-spacing:1px; margin-bottom:14px;">BREATH • LET GO • BE STILL</div>
+
+		<div style="background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.18); border-radius:14px; padding:13px 14px; text-align:left; margin:0 auto; max-width:272px;">
+		  <div style="display:flex; gap:9px; margin-bottom:9px; align-items:flex-start;">
+			<span style="font-size:1em; line-height:1.4;">🌿</span>
+			<span style="font-size:0.87em; color:#ffeb99; line-height:1.55;">Leave your phone. Stay in stillness. Be present</span>
+		  </div>
+		  <div style="display:flex; gap:9px; margin-bottom:9px; align-items:flex-start;">
+			<span style="font-size:1em; line-height:1.4;">🕯</span>
+			<span style="font-size:0.87em; color:#ffeb99; line-height:1.55;">Your presence stays counted until <b style="color:#29D884;">${untilStr}</b>, even if you close the app</span>
+		  </div>
+		  <div style="display:flex; gap:9px; align-items:flex-start;">
+			<span style="font-size:1em; line-height:1.4;">↩</span>
+			<span style="font-size:0.87em; color:#ffeb99; line-height:1.55;">You can return early anytime with <b>“I have returned”</b></span>
+		  </div>
+		</div>
+
+		<div style="display:flex; gap:10px; justify-content:center; margin-top:18px;">
+		  <button onclick="closeStillnessConfirm()" style="background:rgba(255,255,255,0.06); color:#ddd; border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:11px 20px; cursor:pointer; font-size:0.9em;">Cancel</button>
+		  <button onclick="confirmStillness()" style="background:#fde68a; color:#000; border:none; border-radius:20px; padding:11px 24px; cursor:pointer; font-weight:800; font-size:0.92em; box-shadow:0 0 16px rgba(253,230,138,0.35);">✓ Confirm • Stillness ${pendingStillnessHours}h</button>
+		</div>
+	  </div>
+	`;
+  document.body.appendChild(pop);
+}
+
+function closeStillnessConfirm() {
+  document.getElementById('stillness-confirm-popup')?.remove();
+}
+
+function confirmStillness() {
+  const h = pendingStillnessHours;
+  closeStillnessConfirm();
+  pendingStillnessHours = null;
+  document.getElementById('stillness-ok-row').style.display = 'none';
+  if (h) setStillnessHours(h); // <-- only here we actually save
+}
+
+
+async function setStillnessHours(hours) {
+  const until = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
+  
+  // Update your row in om_presence
+  const { error } = await supabase
+    .from('om_presence')
+    .update({ intended_until: until, last_heartbeat: new Date().toISOString() })
+    .eq('user_id', omUserId);
+
+  if (error) { console.log('stillness error', error); return; }
+
+  // --- NEW: also save to om_sessions so reward cron knows ---
+  await supabase
+    .from('om_sessions')
+    .update({ intended_until: until })
+    .eq('user_id', omUserId)
+    .is('ended_at', null);
+  // --- END NEW ---
+
+  // Show active UI
+  document.getElementById('stillness-picker').style.display = 'none';
+  document.getElementById('stillness-active').style.display = 'block';
+  document.getElementById('stillness-until').textContent = new Date(until).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  updateStillnessCountdown(until);
+}
+
+// Manual hours: user types e.g. 3, 6, 12
+function setStillnessCustom() {
+  const input = document.getElementById('stillness-custom-hours');
+  const hours = parseInt(input.value, 10);
+  if (!hours || hours < 1 || hours > 24) {
+    // gentle, no error popup - just ignore
+    input.style.borderColor = '#ff6b6b';
+    setTimeout(() => { input.style.borderColor = 'rgba(255,215,0,0.35)'; }, 1500);
+    return;
+  }
+  setStillnessHours(hours);
+}
+
+function updateStillnessCountdown(until) {
+  const update = () => {
+    const el = document.getElementById('stillness-left');
+    if (!el) return; // popup closed - don't crash
+    const left = new Date(until) - Date.now();
+    if (left <= 0) {
+      el.textContent = '0h 00m';
+      return;
+    }
+    const h = Math.floor(left / 3600000);
+    const m = Math.floor((left % 3600000) / 60000);
+    el.textContent = `${h}h ${String(m).padStart(2,'0')}m`;
+  };
+  update();
+  setInterval(update, 60000);
+}
+
+// Cancel stillness early - user came back
+async function cancelStillness() {
+  // OM sound — same as OM join, unmute or it plays silent
+  const omEl = document.getElementById('om-sound');
+  if (omEl) { omEl.muted = false; omEl.volume = 1; omEl.currentTime = 0; omEl.play().catch(()=>{}); }
+
+  const nowISO = new Date().toISOString();
+  await supabase.from('om_presence').update({ intended_until: null, last_heartbeat: nowISO }).eq('user_id', omUserId);
+  await supabase.from('om_sessions').update({ intended_until: null, last_heartbeat: nowISO }).eq('user_id', omUserId).is('ended_at', null);
+
+  document.getElementById('stillness-picker').style.display = 'block';
+  document.getElementById('stillness-active').style.display = 'none';
+
+  // --- NEW: Restart heartbeat timer, same as OM join ---
+  if (typeof startHeartbeat === 'function') startHeartbeat();
+  // --- END NEW ---
+
+  if (typeof fetchPresenceRowsAndRender === 'function') fetchPresenceRowsAndRender();
+}
+
+
 // --- Main renderer (called whenever data changes or grid opens) ---
 function renderEarthGrid() {
   // --- Setup container, canvas, and label ---
@@ -22683,6 +22866,33 @@ statsLabel.style.cssText = `
 }
 
 
+  // --- Check saved stillness from data you ALREADY fetched ---
+  // No extra DB call, no loadStillnessState needed
+  const myStillRow = (typeof livePresenceRows !== 'undefined' ? livePresenceRows : []).find(r => r.user_id === omUserId);
+  const savedStillUntil = myStillRow && myStillRow.intended_until ? new Date(myStillRow.intended_until) : null;
+  const isInStillnessNow = savedStillUntil && savedStillUntil > new Date();
+  
+// When in stillness, user did NOT miss OM — he chose stillness
+// Compute missed safely from your own row, don't depend on missedHeartbeat variable
+const myLastHb = myStillRow && myStillRow.last_heartbeat ? new Date(myStillRow.last_heartbeat) : null;
+const wasMissed = myLastHb ? (Date.now() - myLastHb.getTime() > 33 * 60 * 1000) : false;
+const effectiveMissed = wasMissed && !isInStillnessNow;
+
+  // For countdown text
+  let stillLeftText = '';
+  let stillUntilText = '';
+  if (isInStillnessNow) {
+    const leftMs = savedStillUntil - new Date();
+    const h = Math.floor(leftMs / 3600000);
+    const m = Math.floor((leftMs % 3600000) / 60000);
+    stillLeftText = `${h}h ${String(m).padStart(2, '0')}m`;
+	const _isNextDay = savedStillUntil.getDate() !== new Date().getDate();
+	stillUntilText = _isNextDay
+	  ? savedStillUntil.toLocaleDateString([], { weekday: 'short' }) + ' ' + savedStillUntil.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+	  : savedStillUntil.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+  
+  
 // ===== FINAL: Global Resonance Field + One in Stillness =====
 let globalHeading = document.getElementById('globalHeading');
 if (!globalHeading) {
@@ -22829,7 +23039,6 @@ function hideBlurBackdrop() {
   // Don't remove if any OM popup is still open
   if (document.getElementById('flame-tooltip') ||
       document.getElementById('flame-keeper-list') ||
-      document.getElementById('awareness-tooltip') ||
       document.getElementById('current-user-mins-popup')) return;
 
   const bd = document.getElementById('om-blur-backdrop');
@@ -23020,6 +23229,7 @@ document.addEventListener('click', function(e) {
           awAudio.currentTime = 0; awAudio.muted = false; awAudio.volume = 0.75;
           awAudio.play().then(()=>{
             document.getElementById('flame-tooltip')?.remove();
+			hideBlurBackdrop();
             showLyrics(); startLyricsSync();
             awAudio.onended = ()=>{ document.getElementById('awareness-lyrics')?.remove(); currentLyricIndex = -1; };
           }).catch(err=>console.log('Audio play failed:', err));
@@ -24450,7 +24660,7 @@ userIdDisplay.onclick = async function(e) {
           </div>
           <div style="margin-top:10px; display:flex; gap:14px; justify-content:center; align-items:center;">
             <span id="generate-name" style="font-size:0.78em; color:#fde68a; cursor:pointer; text-decoration:underline;">Generate Name</span>
-            ${userUsername ? `<span id="name-cancel" style="font-size:0.78em;color:#8a8a8a;cursor:pointer;">cancel</span>` : ''}
+           <span id="name-cancel" style="font-size:0.72em;color:#8a8a8a;cursor:pointer;display:none;">cancel</span>
           </div>
         </div>
       </div>
@@ -24458,12 +24668,12 @@ userIdDisplay.onclick = async function(e) {
 	<!-- ===== STATUS — CSS HEARTBEAT, ALWAYS WHITE ===== -->
 	<div id="res-status-row" style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:12px;">
 	  <span id="res-status-dot" style="width:26px;height:26px;min-width:26px;min-height:26px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;
-		background:${missedHeartbeat?'#f72b29':'#29D884'};
-		box-shadow:0 0 14px ${missedHeartbeat?'#f72b29':'#29D884'};">
+		background:${effectiveMissed?'#f72b29':'#29D884'};
+		box-shadow:0 0 14px ${effectiveMissed?'#f72b29':'#29D884'};">
 		<span style="display:block; width:18px; height:12px; background:#fff; clip-path: polygon(0 45%, 20% 45%, 32% 0%, 45% 100%, 58% 20%, 72% 45%, 100% 45%, 100% 75%, 72% 75%, 58% 55%, 45% 100%, 32% 30%, 20% 75%, 0 75%);"></span>
 	  </span>
-	  <span style="font-size:0.98em;color:${missedHeartbeat?'#ff9944':'#29D884'};font-weight:600;">
-		${missedHeartbeat?'Resonance interrupted':'Resonance active'}
+	  <span style="font-size:0.98em;color:${effectiveMissed?'#ff9944':'#29D884'};font-weight:600;">
+		${effectiveMissed?'Resonance interrupted':'Resonance active'}
 	  </span>
 	</div>
 
@@ -24472,16 +24682,54 @@ userIdDisplay.onclick = async function(e) {
       <div style="font-size:0.75em;opacity:0.6;color:#ffe066;margin:4px 0 14px;">connected</div>
       <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
 
-      <!-- ===== HEARTBEAT ===== -->
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
-        <span style="opacity:0.7;color:#ffeb99;font-size:0.88em;">Next pulse:</span>
-        <b style="color:#fde68a;font-size:0.95em;">${nextHeartbeatStr || 'Unknown'}</b>
-      </div>
-      <div id="hb-countdown" style="font-size:0.88em;color:#fde68a;font-weight:600;letter-spacing:0.4px;background:rgba(255,215,0,0.06);padding:7px 14px;border-radius:20px;border:1px solid rgba(255,215,0,0.22);display:inline-block;margin-bottom:12px;">${nextCountdownText}</div>
+	<!-- ===== HEARTBEAT ===== -->
+	<div style="display:${isInStillnessNow ? 'none' : 'flex'};align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+	  <span style="opacity:0.7;color:#ffeb99;font-size:0.88em;">Next pulse:</span>
+	  <b style="color:#fde68a;font-size:0.95em;">${nextHeartbeatStr || 'Unknown'}</b>
+	</div>
+      <div id="hb-countdown" style="font-size:0.88em;color:#ff8c42;font-weight:700;letter-spacing:0.4px;background:rgba(255,140,66,0.10);padding:7px 14px;border-radius:20px;border:1px solid rgba(255,140,66,0.45);box-shadow:0 0 12px rgba(255,140,66,0.25);display:inline-block;margin-bottom:12px;">${isInStillnessNow ? `🕯 In stillness • ${stillLeftText} left` : nextCountdownText}</div>
 
-      ${missedHeartbeat ? `<div id="pulse-missed-box" style="margin-top:6px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:8px;font-size:0.92em;color:#ff6b6b;font-weight:bold;border:1px solid rgba(255,68,68,0.3);">Pulse missed! <span style="color:#ffd700;">OM</span> again.</div>` : ''}
+      ${effectiveMissed ? `<div id="pulse-missed-box" style="margin-top:6px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:8px;font-size:0.92em;color:#ff6b6b;font-weight:bold;border:1px solid rgba(255,68,68,0.3);">Pulse missed! <span style="color:#ffd700;">OM</span> again.</div>` : ''}
       ${canBroadcast ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,215,0,0.12);"><label style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.88em;color:#ffeb99;cursor:pointer;"><input type="checkbox" id="broadcast-toggle" style="accent-color:#ffd700;width:1.1em;height:1.1em;" ${broadcastMode ? 'checked' : ''} /><span>Broadcast Mode</span></label></div>` : ''}
-    `;
+    
+	<!-- ===== STAY IN THE FLAME (optional) ===== -->
+	<div style="margin-top:16px; padding:14px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.25); border-radius:12px; text-align:center;">
+	  <div style="font-size:0.85em; color:#fde68a; letter-spacing:1px; margin-bottom:4px;">STAY IN THE FLAME</div>
+	  <div style="font-size:0.78em; color:#9a9a9a; margin-bottom:10px;">Leave your phone. Stay in stillness.<br>Your presence will stay counted.<br></div>
+
+	<!-- If NOT in stillness yet -->
+	<div id="stillness-picker" style="display:${isInStillnessNow ? 'none' : 'block'};">
+	  <!-- Quick picks — now SELECT only, don't save -->
+	  <div style="display:flex; gap:8px; justify-content:center; margin-bottom:12px;">
+		<button onclick="selectStillnessHours(1, this)" class="stillness-opt" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,215,0,0.3); border-radius:20px; padding:8px 14px; cursor:pointer;">1h</button>
+		<button onclick="selectStillnessHours(2, this)" class="stillness-opt" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,215,0,0.3); border-radius:20px; padding:8px 14px; cursor:pointer;">2h</button>
+		<button onclick="selectStillnessHours(4, this)" class="stillness-opt" style="background:rgba(255,255,255,0.08); color:#fff; border:1px solid rgba(255,215,0,0.3); border-radius:20px; padding:8px 14px; cursor:pointer;">4h</button>
+		<button onclick="selectStillnessHours(8, this)" class="stillness-opt" style="background:#fde68a; color:#000; border:none; border-radius:20px; padding:8px 16px; cursor:pointer; font-weight:700;">8h</button>
+	  </div>
+
+	  <!-- Manual hours -->
+	  <div style="display:flex; gap:6px; justify-content:center; align-items:center;">
+		<input type="number" id="stillness-custom-hours" placeholder="Hours" min="1" max="24" 
+		  style="background:rgba(255,255,255,0.07); border:1px solid rgba(255,215,0,0.35); color:#fff; border-radius:10px; padding:9px 10px; font-size:0.9rem; width:90px; outline:none; text-align:center;">
+		<button onclick="selectStillnessCustom()" style="background:rgba(255,215,0,0.15); color:#fde68a; border:1px solid rgba(255,215,0,0.4); border-radius:10px; padding:9px 14px; font-size:0.85rem; cursor:pointer; font-weight:600;">Select</button>
+	  </div>
+	  <div style="font-size:0.72em; color:#666; margin-top:8px;">Max 24 hours</div>
+
+	  <!-- Cute OK — hidden until you select -->
+	  <div id="stillness-ok-row" style="display:none; margin-top:12px;">
+		<button onclick="showStillnessConfirm()" style="background:#fde68a; color:#000; border:none; border-radius:20px; padding:10px 28px; cursor:pointer; font-weight:800; font-size:0.95em; box-shadow:0 0 14px rgba(253,230,138,0.35);">🕯 OK — Stay in the Flame</button>
+		<div style="font-size:0.72em; color:#888; margin-top:6px;">You selected <span id="stillness-selected-label">—</span> • Until <span id="stillness-selected-until" style="color:#29D884; font-weight:700;">—</span></div>
+	  </div>
+	</div>
+
+	  <!-- If IN stillness -->
+	  <div id="stillness-active" style="display:${isInStillnessNow ? 'block' : 'none'};">
+		<div style="font-size:0.95em; color:#fde68a; font-weight:700;">Your presence stays in the flame<br>until <span id="stillness-until" style="color:#29D884;">${stillUntilText}</span></div>
+		<button onclick="cancelStillness()" style="margin-top:10px; background:none; border:none; color:#888; text-decoration:underline; cursor:pointer; font-size:0.78em;">I have returned</button>
+	  </div>
+	</div>
+
+	`;
   }
 
 	  // --- NEW: When Grid ID opens, show "Touch to rename" for 3s so user discovers it ---
@@ -24491,7 +24739,7 @@ userIdDisplay.onclick = async function(e) {
 		showLang(); // this shows name-edit-trigger for 3s, then auto-hides — same as tap
 	  }
 	}, 300); // 300ms delay so popup animation finishes first
-	
+
   const backdrop = document.createElement('div');
   backdrop.id = 'om-modal-backdrop';
   backdrop.style.cssText = `position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 10099; opacity: 0; transition: opacity 0.18s;`;
@@ -24513,34 +24761,49 @@ userIdDisplay.onclick = async function(e) {
   const cancelBtn = popup.querySelector('#name-cancel');
   const generateBtn = popup.querySelector('#generate-name');
 
-  if (nameEditTrigger) nameEditTrigger.onclick = (e) => { e.preventDefault(); nameSavedState.style.display='none'; nameEditState.style.display='block'; popup.querySelector('#username-input').focus(); };
-  if (cancelBtn) cancelBtn.onclick = () => { nameEditState.style.display='none'; nameSavedState.style.display='block'; };
+	if (nameEditTrigger) nameEditTrigger.onclick = (e) => {
+	  e.preventDefault();
+	  nameSavedState.style.display='none';
+	  nameEditState.style.display='block';
+	  // Show Cancel when renaming an existing name, so user can go back
+	  const cancelBtn2 = popup.querySelector('#name-cancel');
+	  if (cancelBtn2 && userUsername) cancelBtn2.style.display = 'inline';
+	  popup.querySelector('#username-input').focus();
+	};
+  
+	const originalName = userUsername || '';
+	if (cancelBtn) cancelBtn.onclick = () => {
+	  const input = popup.querySelector('#username-input');
+	  if (input) input.value = originalName; // clear generated, back to old name
+	  cancelBtn.style.display = 'none'; // hide Cancel again
+	  if (originalName) {
+		nameEditState.style.display = 'none';
+		nameSavedState.style.display = 'block'; // back to saved view
+	  } else {
+		if (input) input.value = ''; // no name yet — just clear all, stay in edit
+	  }
+	};
 
   // GENERATE SOUL NAME — TRUEYOGI + NUMBER
   if (generateBtn) {
-    generateBtn.onclick = async () => {
-      generateBtn.textContent = 'Generating...';
-      let randomName = '';
-      let tries = 0;
-      while (tries < 5) {
-        const num = Math.floor(100 + Math.random() * 900);
-        randomName = `TRUEYOGI ${num}`;
-        const { data } = await supabase.from('user_preferences').select('username').eq('username', randomName).maybeSingle();
-        if (!data) break;
-        tries++;
-      }
-      const { error } = await supabase.from('user_preferences').upsert({ user_id: userId, username: randomName }, { onConflict: 'user_id' });
-      if (error) { generateBtn.textContent = 'Generate Name'; return; }
-      userUsername = randomName;
-	  if (window.refreshGridIdDisplay) window.refreshGridIdDisplay();
-      nameEditState.style.display = 'none';
-      nameSavedState.style.display = 'block';
-      const savedText = popup.querySelector('#saved-name-text');
-      if (savedText) { savedText.innerText = randomName; savedText.style.fontSize = '1.5em'; savedText.style.letterSpacing = '1.5px'; }
-      const input = popup.querySelector('#username-input');
-      if (input) input.value = randomName;
-      generateBtn.textContent = 'Generate Name';
-    };
+	generateBtn.onclick = async () => {
+	  generateBtn.textContent = 'Generating...';
+	  let randomName = '';
+	  let tries = 0;
+	  while (tries < 5) {
+		const num = Math.floor(100 + Math.random() * 900);
+		randomName = `TRUEYOGI ${num}`;
+		const { data } = await supabase.from('user_preferences').select('username').eq('username', randomName).maybeSingle();
+		if (!data) break;
+		tries++;
+	  }
+	  // NO upsert here — only fill the field, user taps Save manually if he likes it
+	  const input = popup.querySelector('#username-input');
+	  if (input) input.value = randomName;
+	  const cancelBtn2 = popup.querySelector('#name-cancel');
+      if (cancelBtn2) cancelBtn2.style.display = 'inline'; // <-- NEW: Cancel appears now
+	  generateBtn.textContent = 'Generate Name';
+	};
   }
 
   if (saveNameBtn) {
@@ -24597,7 +24860,7 @@ userIdDisplay.onclick = async function(e) {
         return;
       }
       const minsLeft = Math.floor(timeLeftMs/60000); const secsLeft = Math.floor((timeLeftMs%60000)/1000);
-      countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s left`;
+      countdownEl.textContent = `${minsLeft} min${minsLeft!==1?'s':''} ${secsLeft}s`;
     }
     const intervalId = setInterval(updateCountdown,1000); updateCountdown();
     const observer = new MutationObserver(()=>{ if(!document.getElementById('current-user-mins-popup')){ clearInterval(intervalId); observer.disconnect(); } });
