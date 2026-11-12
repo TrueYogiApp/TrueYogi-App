@@ -22031,7 +22031,23 @@ async function showUserCountrySessions(userId, country, x, y) {
   `;
 
   document.body.appendChild(popup);
-  setTimeout(() => popup.remove(), 8000);
+
+  // --- NEW: Close on outside tap ---
+  const closePopup = () => {
+    popup.remove();
+    document.removeEventListener('click', outsideHandler, true);
+  };
+
+  const outsideHandler = (e) => {
+    if (!popup.contains(e.target)) {
+      closePopup();
+    }
+  };
+
+  // Timeout so the click that opened the popup doesn't instantly close it
+  setTimeout(() => document.addEventListener('click', outsideHandler, true), 50);
+
+  setTimeout(() => closePopup(), 30000);
 }
 
 function getDbCountryName(displayName) {
@@ -22402,8 +22418,24 @@ livePresenceRows.forEach(row => {
     `;
   }
 
-  document.body.appendChild(listPopup);
-  setTimeout(() => { listPopup.remove(); }, 12000);
+	document.body.appendChild(listPopup);
+
+	// --- Close on outside tap ---
+	const closeListPopup = () => {
+	  listPopup.remove();
+	  document.removeEventListener('click', outsideListHandler, true);
+	};
+
+	const outsideListHandler = (e) => {
+	  if (!listPopup.contains(e.target)) {
+		closeListPopup();
+	  }
+	};
+
+	// Timeout so the click that opened it doesn't instantly close it
+	setTimeout(() => document.addEventListener('click', outsideListHandler, true), 50);
+
+	setTimeout(() => { closeListPopup(); }, 30000);
 }
 
 function getShortUserId(id) {
@@ -22931,7 +22963,7 @@ flameTimer.onclick = async function(e) {
   if (longestLink) longestLink.onclick = function(ev){ ev.preventDefault(); showAllFlameKeepersForPeriod(longestFlame.started_at, longestFlame.ended_at, longestFlame.starter_user_id, rect.left + rect.width/2, rect.top); };
 
   // Auto-close after 30s — no backdrop
-  setTimeout(() => { tooltip.style.opacity = 0; setTimeout(() => { tooltip.remove(); hideBlurBackdrop(); }, 300); }, 30000);
+  setTimeout(() => { tooltip.style.opacity = 0; setTimeout(() => { tooltip.remove(); hideBlurBackdrop(); }, 300); }, 300000);
 };
 
 // Breathing + awareness — UNCHANGED LOGIC, only styles kept
@@ -23585,7 +23617,7 @@ if (document.getElementById('my-notifications')) {
   });
 }
 
-  setTimeout(() => listPopup.remove(), 30000);
+  setTimeout(() => listPopup.remove(), 300000);
 }
 
 // Helper functions for deep presence tooltip
