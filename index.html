@@ -22630,7 +22630,6 @@ function showStillnessConfirm() {
 	  <div style="text-align:center; padding:4px 4px 2px;">
 		<img src="/assets/flame1.svg" style="display:block; margin:0 auto 12px auto; width:27px; height:27px; filter:drop-shadow(0 0 14px rgba(255,215,0,0.55));" alt="">
 		<div style="font-size:1.12em; font-weight:800; color:#fde68a; letter-spacing:0.3px; margin-bottom:4px;">Stay in the Flame for ${pendingStillnessHours}h?</div>
-		<div style="font-size:0.78em; color:#9a8a4a; letter-spacing:1px; margin-bottom:14px;">BREATH • LET GO • BE STILL</div>
 
 		<div style="background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.18); border-radius:14px; padding:13px 14px; text-align:left; margin:0 auto; max-width:272px;">
 		  <div style="display:flex; gap:9px; margin-bottom:9px; align-items:flex-start;">
@@ -22666,6 +22665,25 @@ function confirmStillness() {
   pendingStillnessHours = null;
   document.getElementById('stillness-ok-row').style.display = 'none';
   if (h) setStillnessHours(h); // <-- only here we actually save
+
+  // NEW: Switch popup UI immediately, don't wait for reopen
+  const picker = document.getElementById('stillness-picker');
+  const active = document.getElementById('stillness-active');
+  const header = document.getElementById('stillness-header');
+  if (picker) picker.style.display = 'none';
+  if (active) active.style.display = 'block';
+  if (header) header.style.display = 'none';
+
+  // NEW: Update Until text immediately
+  const untilEl = document.getElementById('stillness-until');
+  if (untilEl && h) {
+    const untilDate = new Date(Date.now() + h * 60 * 60 * 1000);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const isTomorrow = untilDate.getDate() === tomorrow.getDate() && untilDate.getMonth() === tomorrow.getMonth();
+    const timeStr = untilDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    untilEl.textContent = (isTomorrow ? 'Tomorrow ' : '') + timeStr;
+  }
 }
 
 
@@ -22754,6 +22772,16 @@ async function confirmCancelStillness() {
   document.getElementById('stillness-picker').style.display = 'block';
   document.getElementById('stillness-active').style.display = 'none';
 
+  // NEW: Show header again immediately, don't wait for reopen
+  const header = document.getElementById('stillness-header');
+  if (header) header.style.display = 'block';
+
+  // NEW: Reset Yes/No back to I have returned for next time
+  const conf = document.getElementById('return-confirm');
+  const btn = document.getElementById('return-btn');
+  if (conf) conf.style.display = 'none';
+  if (btn) btn.style.display = 'inline-block';
+  
   if (typeof startHeartbeat === 'function') startHeartbeat();
   if (typeof fetchPresenceRowsAndRender === 'function') fetchPresenceRowsAndRender();
 }
@@ -24739,14 +24767,15 @@ userIdDisplay.onclick = async function(e) {
 	<div id="stillness-active" style="display:${isInStillnessNow ? 'block' : 'none'}; text-align:center;">
 	  <img src="/assets/flame1.svg" style="display:block; margin:2px auto 10px auto; width:22px; height:22px; filter:drop-shadow(0 0 10px rgba(255,215,0,0.45));" alt="">
 	  <div style="font-size:0.95em; color:#fde68a; font-weight:700; line-height:1.55;">Your presence stays in the flame<br>until <span id="stillness-until" style="color:#29D884;">${stillUntilText}</span></div>
+	  <div style="font-size:0.78em; color:#9a9a9a; margin-top:8px; line-height:1.55;">BREATHE • LET GO • BE STILL</div>
 	  <button id="return-btn" onclick="cancelStillness()" class="mode-btn" style="margin-top:14px; background:rgba(255,255,255,0.06); color:#ffeb99; border:1px solid rgba(255,215,0,0.35); border-radius:20px; padding:9px 20px; cursor:pointer; font-size:0.85em; font-weight:600;">I have returned</button>
-	  <div id="return-confirm" style="display:none; margin-top:14px;">
-		<div style="font-size:0.88em; color:#ffeb99; margin-bottom:10px;">Confirm?</div>
-		<div style="display:flex; gap:10px; justify-content:center;">
-		  <button onclick="hideReturnConfirm()" class="mode-btn" style="background:rgba(255,255,255,0.06); color:#ddd; border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:9px 20px; cursor:pointer; font-size:0.85em;">No</button>
-		  <button onclick="confirmCancelStillness()" class="mode-btn" style="background:#fde68a; color:#000; border:none; border-radius:20px; padding:9px 22px; cursor:pointer; font-weight:800; font-size:0.85em;">Yes</button>
-		</div>
+	<div id="return-confirm" style="display:none; margin-top:14px; padding:12px 12px 13px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.25); border-radius:12px;">
+	  <div style="font-size:0.88em; color:#ffeb99; font-weight:700; letter-spacing:0.5px; margin-bottom:10px;">Confirm?</div>
+	  <div style="display:flex; gap:10px; justify-content:center;">
+		<button onclick="hideReturnConfirm()" class="mode-btn" style="background:rgba(255,255,255,0.06); color:#ddd; border:1px solid rgba(255,255,255,0.18); border-radius:20px; padding:9px 20px; cursor:pointer; font-size:0.85em;">No</button>
+		<button onclick="confirmCancelStillness()" class="mode-btn" style="background:#fde68a; color:#000; border:none; border-radius:20px; padding:9px 22px; cursor:pointer; font-weight:800; font-size:0.85em; box-shadow:0 0 12px rgba(253,230,138,0.3);">Yes</button>
 	  </div>
+	</div>
 	</div>
 	</div>
 
