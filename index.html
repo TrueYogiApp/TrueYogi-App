@@ -24643,6 +24643,7 @@ userIdDisplay.onclick = async function(e) {
   let missedHeartbeat = false;
   let nextCountdownText = "";
   let nextHeartbeatDate = null;
+  let isNextPulsePast = false; // <-- NEW
   if (userRow?.last_heartbeat) {
     const lastHeartbeatDate = new Date(userRow.last_heartbeat);
     const graceMins = 30;
@@ -24652,6 +24653,7 @@ userIdDisplay.onclick = async function(e) {
     nextHeartbeatDate = new Date(lastMs + 30 * 60 * 1000);
     nextHeartbeatStr = nextHeartbeatDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     const timeLeftMs = nextHeartbeatDate - now;
+	isNextPulsePast = timeLeftMs < 0; // <-- NEW: past = hide Next pulse row
     if (timeLeftMs < 0) nextCountdownText = "Due now!";
     else {
       const minsLeft = Math.floor(timeLeftMs / 60000);
@@ -24724,7 +24726,7 @@ userIdDisplay.onclick = async function(e) {
       <hr style="border:none;height:1px;background:linear-gradient(90deg,transparent 0%,rgba(255,215,0,0.3) 50%,transparent 100%);margin:12px 0;">
 
 	<!-- ===== HEARTBEAT ===== -->
-	<div style="display:${isInStillnessNow ? 'none' : 'flex'};align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
+	<div style="display:${(isInStillnessNow || isNextPulsePast) ? 'none' : 'flex'};align-items:center;justify-content:center;gap:6px;margin-bottom:8px;">
 	  <span style="opacity:0.7;color:#ffeb99;font-size:0.88em;">Next pulse:</span>
 	  <b style="color:#fde68a;font-size:0.95em;">${nextHeartbeatStr || 'Unknown'}</b>
 	</div>
