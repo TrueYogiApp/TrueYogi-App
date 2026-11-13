@@ -23591,7 +23591,10 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 	  <!-- History — collapsed, tap to view -->
 	<div id="history-toggle" style="margin-bottom:18px;padding:10px 12px;border:1px solid #333;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
 	  <span style="color:#fde68a;font-size:0.9em;">🕊️ History</span>
-	  <span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
+	  <span style="display:flex;gap:8px;align-items:center;">
+		<span id="history-refresh" style="color:#fde68a;font-size:0.9em;cursor:pointer;padding:2px 6px;border:1px solid #444;border-radius:6px;">↻</span>
+		<span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
+	  </span>
 	</div>
 	<ul id="callback-history" style="list-style:none;padding-left:0;margin:0 0 18px 0;text-align:left;display:none;"></ul>
 	<button id="history-load-more" style="display:none;width:100%;margin-bottom:18px;padding:8px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;font-size:0.85em;">Load more ↓</button>      
@@ -23643,6 +23646,16 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 		loadHistoryPage();
 	  };
 
+		document.getElementById('history-refresh').onclick = (e) => {
+		  e.stopPropagation(); // don't toggle open/close
+		  const list = document.getElementById('callback-history');
+		  if (list.style.display === 'none') return; // only if History is open
+		  historyPage = 0;
+		  historyOpened = true;
+		  list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">Refreshing...</li>`;
+		  loadHistoryPage();
+		};
+		
 	  async function loadHistoryPage() {
 		const list = document.getElementById('callback-history');
 		const btn = document.getElementById('history-load-more');
@@ -23993,13 +24006,10 @@ if (document.getElementById('my-notifications')) {
 		  fetchMyCallbackRequests().then(newRequests => {
 			// Update local list so next Acknowledge still works
 			requests = newRequests;
-			if (document.getElementById('my-notifications')) {
-			  document.getElementById('my-notifications').innerHTML =
-				newRequests.length
-				? `<span id="callback-requests-badge" style="cursor:pointer;color:#ffe066;font-size:1.1em;">🔔 ${newRequests.length} callback request${newRequests.length > 1 ? 's' : ''}!</span>`
-				: '';
-			  // Re-attach badge click so badge still works after refresh
-			  // (only if you still need it — your outer code already does this)
+			const badge = document.getElementById('callback-requests-badge');
+			if (badge) {
+			  if (newRequests.length) badge.textContent = `🔔 ${newRequests.length} callback request${newRequests.length > 1 ? 's' : ''}!`;
+			  else badge.remove();
 			}
 			// If nothing left, show empty state INSIDE modal, don't close
 			if (newRequests.length === 0) {
