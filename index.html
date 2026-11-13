@@ -25837,51 +25837,53 @@ async function showUserListPopup(users, parentPopup, x, y) {
 }
 
 // Track which call id you've already popped up for in this session
-function startCallPolling() {
-  if (typeof supabase === "undefined") {
-    // Wait and try again in 500ms, up to N tries
-    setTimeout(startCallPolling, 500);
-    return;
-  }
+let callChannel = null;
+let callbackChannel = null;
 
-  let lastCallId = null;
-  setInterval(async () => {
-    const currentUserId = localStorage.getItem('omUserId');
-    if (!currentUserId) return;
-    const { data, error } = await supabase
-      .from('om_calls')
-      .select('*')
-      .eq('participant_user_id', currentUserId)
-      .in('status', ['pending'])
-      .order('created_at', { ascending: false })
-      .limit(1);
+function startCallRealtime() {
+  if (callChannel) return; // already running
+  const currentUserId = localStorage.getItem('omUserId');
+  if (!currentUserId) return;
 
-    if (data && data.length) {
-      const call = data[0];
-      if (lastCallId === call.id) return;
+  // --- 1. Calls ---
+  callChannel = supabase
+    .channel('calls-' + currentUserId)
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'om_calls', filter: `participant_user_id=eq.${currentUserId}` },
+      async (payload) => {
+        const call = payload.new;
+        if (!call || call.status !== 'pending') return;
 
-      const callTime = new Date(call.created_at).getTime();
-      const now = Date.now();
-      if ((now - callTime) > 3 * 60 * 1000) {
-        await supabase.from('om_calls').update({ status: 'expired' }).eq('id', call.id);
-        return;
+        // Same 3-min expiry check you already had
+        if (Date.now() - new Date(call.created_at).getTime() > 3 * 60 * 1000) {
+          await supabase.from('om_calls').update({ status: 'expired' }).eq('id', call.id);
+          return;
+        }
+        stopAllAudio();
+        showWherebyParticipantDialog(call.whereby_participant_url, call.id);
+        await supabase.from('om_calls').update({ status: 'active' }).eq('id', call.id);
       }
+    )
+    .subscribe();
 
-      lastCallId = call.id;
-	  
-	  stopAllAudio();
-      showWherebyParticipantDialog(call.whereby_participant_url, call.id);
-
-      const { error: updateError } = await supabase
-        .from('om_calls')
-        .update({ status: 'active' })
-        .eq('id', call.id);
-
-      if (updateError) {
-        console.error('Call status update failed:', updateError);
+  // --- 2. Callback requests ---
+  callbackChannel = supabase
+    .channel('callbacks-' + currentUserId)
+    .on('postgres_changes',
+      { event: 'INSERT', schema: 'public', table: 'callback_requests', filter: `to_user_id=eq.${currentUserId}` },
+      (payload) => {
+        const req = payload.new;
+        if (!req) return;
+        playCallbackBellSound();
+        showCallbackNotification(req.from_user_id);
       }
-    }
-  }, 3000);
+    )
+    .subscribe();
+}
+
+function stopCallRealtime() {
+  if (callChannel) { supabase.removeChannel(callChannel); callChannel = null; }
+  if (callbackChannel) { supabase.removeChannel(callbackChannel); callbackChannel = null; }
 }
 
 // Add this function to play bell sound (loops 3 times)
@@ -25917,52 +25919,7 @@ function playCallbackBellSound() {
   }
 }
 
-// Add this to your existing startCallPolling function or create a separate one
-function startCallbackPolling() {
-  if (typeof supabase === "undefined") {
-    setTimeout(startCallbackPolling, 500);
-    return;
-  }
 
-  // Track which callback requests we've already notified about
-  let notifiedCallbacks = new Set();
-
-  setInterval(async () => {
-    const currentUserId = localStorage.getItem('omUserId');
-    if (!currentUserId) return;
-
-    // Poll for new callback requests where current user is the recipient (to_user_id)
-    // and they haven't been seen/acknowledged yet
-    const { data, error } = await supabase
-      .from('callback_requests')
-      .select('id, from_user_id, created_at')
-      .eq('to_user_id', currentUserId)
-      .eq('seen', false) // Assuming you have a 'seen' field in your callback_requests table
-      .gte('created_at', new Date(Date.now() - 60000).toISOString()); // Last 60 seconds
-
-    if (data && data.length) {
-      data.forEach(request => {
-        // Check if we've already notified about this request
-        if (!notifiedCallbacks.has(request.id)) {
-          // Play the bell sound
-          playCallbackBellSound();
-          
-          // Mark as notified
-          notifiedCallbacks.add(request.id);
-          
-          // Optional: Show a subtle notification
-          showCallbackNotification(request.from_user_id);
-        }
-      });
-    }
-
-    // Clean up old notified IDs (keep last 50 to prevent memory growth)
-    if (notifiedCallbacks.size > 50) {
-      const idsArray = Array.from(notifiedCallbacks);
-      notifiedCallbacks = new Set(idsArray.slice(-50));
-    }
-  }, 3000); // Poll every 3 seconds, same as call polling
-}
 
 function showCallbackNotification(fromUserId) {
   // Create a temporary notification that fades out
@@ -27704,8 +27661,7 @@ window.addEventListener('online', () => {
   window.authenticateWithWallet = authenticateWithWallet;
   window.promptVerifyAndSync = promptVerifyAndSync;
   window.updateWalletUI = updateWalletUI;
-  startCallPolling();
-  startCallbackPolling();
+  startCallRealtime();
   
 </script>
 
