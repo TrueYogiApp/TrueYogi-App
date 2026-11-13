@@ -23566,7 +23566,7 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
           Add a note (optional):
         </label>
         <textarea id="callback-message-input" 
-          maxlength="100" 
+          maxlength="500" 
           placeholder="e.g., Would love to connect..." 
           style="
             width: 100%;
@@ -23584,7 +23584,7 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
           "
         ></textarea>
         <div style="text-align: right; color: #888; font-size: 0.8em; margin-top: 3px;">
-          <span id="char-counter">0</span>/100
+          <span id="char-counter">0</span>/500
         </div>
       </div>
       
@@ -23781,9 +23781,19 @@ if (document.getElementById('my-notifications')) {
          </span>`;
 
       // Add click handler for badge
-      document.getElementById('callback-requests-badge').onclick = function() {
+      document.getElementById('callback-requests-badge').onclick = async function() {
+	  // NEW: Fetch Soul Names for senders
+	  const fromIds = [...new Set(requests.map(r => r.from_user_id))];
+	  try {
+		const { data: prefs } = await supabase.from('user_preferences').select('user_id, username').in('user_id', fromIds);
+		if (prefs) {
+		  window.usernameCache = window.usernameCache || {};
+		  prefs.forEach(p => { if (p.username) window.usernameCache[p.user_id] = p.username; });
+		}
+	  } catch(e) {}	  
+	  
         // Build checkbox list for each requester with message
-        const userList = requests.map(req => {
+        const userList = [...requests].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).map(req => {
           const hasMessage = req.message ? 
             `<div style="color:#fff;font-size:0.85em;margin-left:30px;margin-top:2px;opacity:0.8;font-style:italic;word-wrap:break-word;max-width:250px;">
               📝 "${req.message}"
@@ -23792,8 +23802,8 @@ if (document.getElementById('my-notifications')) {
           return `<li style="margin-bottom:12px;font-family:monospace;border-bottom:1px solid #333;padding-bottom:8px;">
             <label style="cursor:pointer;display:block;">
               <input type="checkbox" class="acknowledge-checkbox" value="${req.id}" style="vertical-align:middle;margin-right:8px;">
-              <span>${getShortUserId(req.from_user_id)}</span>
-              ${req.created_at ? `<span style="color:#888;font-size:0.7em;margin-left:8px;">${new Date(req.created_at).toLocaleTimeString()}</span>` : ''}
+              ${(window.usernameCache?.[req.from_user_id]) ? `<span style="display:inline-block;text-align:center;vertical-align:middle;line-height:1.2;"><span style="display:block;">${window.usernameCache[req.from_user_id]}</span><span style="display:block;color:#888;font-size:0.7em;">${getShortUserId(req.from_user_id)}</span></span>` : `<span>${getShortUserId(req.from_user_id)}</span>`}
+              ${req.created_at ? `<span style="color:#888;font-size:0.7em;margin-left:8px;">${new Date(req.created_at.endsWith('Z') || req.created_at.includes('+') ? req.created_at : req.created_at + 'Z').toLocaleString([], { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}</span>` : ''}
             </label>
             ${hasMessage}
           </li>`;
