@@ -23587,7 +23587,15 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
           <span id="char-counter">0</span>/500
         </div>
       </div>
-      
+	  
+	  <!-- History — collapsed, tap to view -->
+	<div id="history-toggle" style="margin-bottom:18px;padding:10px 12px;border:1px solid #333;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+	  <span style="color:#fde68a;font-size:0.9em;">🕊️ History</span>
+	  <span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
+	</div>
+	<ul id="callback-history" style="list-style:none;padding-left:0;margin:0 0 18px 0;text-align:left;display:none;"></ul>
+	<button id="history-load-more" style="display:none;width:100%;margin-bottom:18px;padding:8px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;font-size:0.85em;">Load more ↓</button>      
+	
       <div style="display: flex; gap: 12px; justify-content: center;">
         <button id="confirm-callback-yes" class="mode-btn" style="
           padding: 10px 25px;
@@ -23617,6 +23625,64 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 
   document.body.appendChild(modal);
 
+	  // History — loads ONLY on tap, 10 per page
+	  let historyPage = 0;
+	  let historyOpened = false;
+
+	  document.getElementById('history-toggle').onclick = async () => {
+		const list = document.getElementById('callback-history');
+		const arrow = document.getElementById('history-arrow');
+		const btn = document.getElementById('history-load-more');
+		const isOpen = list.style.display !== 'none';
+		if (isOpen) { list.style.display = 'none'; btn.style.display = 'none'; arrow.textContent = '▸ Tap to view'; return; }
+		list.style.display = 'block'; arrow.textContent = '▾ Hide';
+		if (historyOpened) { btn.style.display = btn.dataset.done ? 'none' : 'block'; return; }
+		historyOpened = true;
+		historyPage = 0;
+		list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">Loading history...</li>`;
+		loadHistoryPage();
+	  };
+
+	  async function loadHistoryPage() {
+		const list = document.getElementById('callback-history');
+		const btn = document.getElementById('history-load-more');
+		try {
+		  const hRes = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests/history?user_id=${fromUserId}&limit=10&offset=${historyPage * 10}`);
+		  let page = await hRes.json();
+		  if (!Array.isArray(page)) page = [];
+		  // Get names for this page
+		  try {
+			const ids = [...new Set(page.flatMap(h => [h.from_user_id, h.to_user_id]))];
+			const { data: prefs } = await supabase.from('user_preferences').select('user_id, username').in('user_id', ids);
+			if (prefs) {
+			  window.usernameCache = window.usernameCache || {};
+			  prefs.forEach(p => { if (p.username) window.usernameCache[p.user_id] = p.username; });
+			}
+		  } catch(e) {}
+		  const getName = (id) => window.usernameCache?.[id] || getShortUserId(id);
+
+		  if (historyPage === 0 && page.length === 0) { list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">No bells yet. This will be your first. ✨</li>`; btn.style.display = 'none'; return; }
+		  if (page.length < 10) { btn.style.display = 'none'; btn.dataset.done = '1'; } else { btn.style.display = 'block'; }
+
+		  const html = page.map(h => {
+			const isMine = h.from_user_id === fromUserId;
+			const d = new Date(h.created_at.endsWith('Z') || h.created_at.includes('+') ? h.created_at : h.created_at + 'Z');
+			const timeStr = d.toLocaleString([], { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' });
+			return `<li style="margin-bottom:8px;padding-bottom:6px;border-bottom:1px solid #333;font-size:0.85em;">
+			  <div style="display:flex;justify-content:space-between;">
+				<span>${isMine ? `You → ${getName(h.to_user_id)}` : `${getName(h.from_user_id)} → You`}</span>
+				<span style="color:${h.seen ? '#29D884' : '#ffe066'};font-size:0.75em;">${h.seen ? '✓ Seen' : '• Waiting'}</span>
+			  </div>
+			  ${h.message ? `<div style="color:#ccc;font-style:italic;margin-top:2px;">"${h.message}"</div>` : ''}
+			  <div style="color:#888;font-size:0.7em;">${timeStr}</div>
+			</li>`;
+		  }).join('');
+		  if (historyPage === 0) list.innerHTML = html; else list.innerHTML += html;
+		  historyPage++;
+		} catch(e) { list.innerHTML = ``; }
+	  }
+	  document.getElementById('history-load-more').onclick = () => loadHistoryPage();
+	  
   // Character counter
   const textarea = document.getElementById('callback-message-input');
   const counter = document.getElementById('char-counter');
@@ -23769,7 +23835,7 @@ Array.from(listPopup.querySelectorAll('.ultimate-stillness-icon')).forEach(el =>
   // ONLY ONE appendChild and setTimeout here
   document.body.appendChild(listPopup);
   
-  // Now, show notification badge for the main user:
+// Now, show callback notification badge for the main user:
 if (document.getElementById('my-notifications')) {
   fetchMyCallbackRequests().then(requests => {
     if (requests.length) {
@@ -23818,16 +23884,64 @@ if (document.getElementById('my-notifications')) {
         modal.innerHTML = `
           <div style="background:#222;color:#ffd700;padding:24px 30px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:290px;max-width:400px;max-height:80vh;overflow-y:auto;">
             <h3 style="margin-bottom:15px;font-size:1.17em;">🔔 Callback Requests</h3>
-            <ul style="list-style:none;padding-left:0;margin:0;">${userList}</ul>
-            <div style="margin-top:15px;border-top:1px solid #333;padding-top:15px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-              <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
+			<ul id="pending-list" style="list-style:none;padding-left:0;margin:0;">${userList}</ul>
+			   <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
                 id="acknowledge-selected-btn">✓ Acknowledge Selected</button>
               <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
                 id="close-callback-requests-modal">✕ Close</button>
+			<div id="history-toggle" style="margin:18px 0 8px;padding:10px 12px;border:1px solid #333;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+			  <span style="color:#fde68a;font-size:0.9em;">🕊️ History</span>
+			  <span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
+			</div>
+			<ul id="history-list" style="list-style:none;padding-left:0;margin:0;display:none;"></ul>
+			<button id="history-load-more" style="display:none;width:100%;margin-top:8px;padding:8px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;font-size:0.85em;">Load more ↓</button>
+            <div style="margin-top:15px;border-top:1px solid #333;padding-top:15px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
+
             </div>
           </div>
         `;
         document.body.appendChild(modal);
+
+		// NEW: History loads ONLY when tapped
+		let historyPage = 0;
+		let historyOpened = false;
+
+		document.getElementById('history-toggle').onclick = async () => {
+		  const list = document.getElementById('history-list');
+		  const arrow = document.getElementById('history-arrow');
+		  const btn = document.getElementById('history-load-more');
+		  const isOpen = list.style.display !== 'none';
+		  if (isOpen) { list.style.display = 'none'; btn.style.display = 'none'; arrow.textContent = '▸ Tap to view'; return; }
+		  list.style.display = 'block'; arrow.textContent = '▾ Hide';
+		  if (historyOpened) { btn.style.display = btn.dataset.done ? 'none' : 'block'; return; }
+		  historyOpened = true;
+		  historyPage = 0;
+		  list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">Loading history...</li>`;
+		  loadHistoryPage();
+		};
+
+		async function loadHistoryPage() {
+		  const list = document.getElementById('history-list');
+		  const btn = document.getElementById('history-load-more');
+		  const myId = localStorage.getItem('omUserId');
+		  const hRes = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests/history?user_id=${myId}&limit=10&offset=${historyPage * 10}`);
+		  let page = await hRes.json();
+		  if (!Array.isArray(page)) page = [];
+		  if (historyPage === 0 && page.length === 0) { list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">No acknowledged bells yet.</li>`; btn.style.display = 'none'; return; }
+		  if (page.length < 10) { btn.style.display = 'none'; btn.dataset.done = '1'; } else { btn.style.display = 'block'; }
+		  const html = page.map(h => {
+			const name = window.usernameCache?.[h.from_user_id] || getShortUserId(h.from_user_id);
+			const d = new Date(h.created_at.endsWith('Z') || h.created_at.includes('+') ? h.created_at : h.created_at + 'Z');
+			return `<li style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #222;font-size:0.85em;">
+			  <div style="display:flex;justify-content:space-between;"><span>${name} → You</span><span style="color:#29D884;font-size:0.75em;">✓ Seen</span></div>
+			  ${h.message ? `<div style="color:#ccc;font-style:italic;">"${h.message}"</div>` : ''}
+			  <div style="color:#888;font-size:0.7em;">${d.toLocaleString([], { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}</div>
+			</li>`;
+		  }).join('');
+		  if (historyPage === 0) list.innerHTML = html; else list.innerHTML += html;
+		  historyPage++;
+		}
+		document.getElementById('history-load-more').onclick = () => loadHistoryPage();
 
         // Close button handler
         document.getElementById('close-callback-requests-modal').onclick = () => modal.remove();
@@ -23855,22 +23969,45 @@ if (document.getElementById('my-notifications')) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ ids: checkedIds })
           }).then(r => r.json())
-            .then(data => {
-              // Remove modal
-              modal.remove();
-              // Refresh badge
-              if (document.getElementById('my-notifications')) {
-                fetchMyCallbackRequests().then(requests => {
-                  document.getElementById('my-notifications').innerHTML =
-                    requests.length
-                    ? `<span id="callback-requests-badge"
-                        style="cursor:pointer;color:#ffe066;font-size:1.1em;">
-                        🔔 ${requests.length} callback request${requests.length > 1 ? 's' : ''}!
-                       </span>`
-                    : '';
-                });
-              }
-            });
+		.then(data => {
+		  // NEW: Don't close modal — just remove acknowledged rows
+		checkedIds.forEach(id => {
+		  const box = modal.querySelector(`.acknowledge-checkbox[value="${id}"]`);
+		  const li = box?.closest('li');
+		  if (!li) return;
+		  // Grab data before moving
+		  const nameHtml = li.querySelector('label > span')?.outerHTML || '';
+		  const msgHtml = li.querySelector('div')?.outerHTML || '';
+		  const timeHtml = li.querySelector('label > span:last-child')?.outerHTML || '';
+		  // Build history row, prepend to History
+		  const histLi = document.createElement('li');
+		  histLi.style.cssText = `margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #222;font-size:0.85em;`;
+		  histLi.innerHTML = `<div style="display:flex;justify-content:space-between;"><span>${nameHtml} → You</span><span style="color:#29D884;font-size:0.75em;">✓ Seen</span></div>${msgHtml}<div style="color:#888;font-size:0.7em;">Just now</div>`;
+		  const histList = document.getElementById('history-list');
+		  if (histList && histList.textContent.includes('No acknowledged')) histList.innerHTML = '';
+		  histList?.prepend(histLi);
+		  li.remove(); // remove from pending, but now it lives in History
+		});
+
+		  // Update badge count without closing
+		  fetchMyCallbackRequests().then(newRequests => {
+			// Update local list so next Acknowledge still works
+			requests = newRequests;
+			if (document.getElementById('my-notifications')) {
+			  document.getElementById('my-notifications').innerHTML =
+				newRequests.length
+				? `<span id="callback-requests-badge" style="cursor:pointer;color:#ffe066;font-size:1.1em;">🔔 ${newRequests.length} callback request${newRequests.length > 1 ? 's' : ''}!</span>`
+				: '';
+			  // Re-attach badge click so badge still works after refresh
+			  // (only if you still need it — your outer code already does this)
+			}
+			// If nothing left, show empty state INSIDE modal, don't close
+			if (newRequests.length === 0) {
+			  const ul = modal.querySelector('ul');
+			  if (ul) ul.innerHTML = `<li style="text-align:center;color:#aaa;padding:20px 0;">All acknowledged. Be Still. ✨</li>`;
+			}
+		  });
+		});
         };
       };
     } else {
