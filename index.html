@@ -23868,7 +23868,9 @@ if (document.getElementById('my-notifications')) {
 	  } catch(e) {}	  
 	  
         // Build checkbox list for each requester with message
-        const userList = [...requests].sort((a, b) => new Date(b.created_at) - new Date(a.created_at)).map(req => {
+			  let notifPage = 0;
+		const sortedRequests = [...requests].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+		const userList = sortedRequests.slice(0, 5).map(req => {
           const hasMessage = req.message ? 
             `<div style="color:#fff;font-size:0.85em;margin-left:30px;margin-top:2px;opacity:0.8;font-style:italic;word-wrap:break-word;max-width:250px;">
               📝 "${req.message}"
@@ -23894,6 +23896,11 @@ if (document.getElementById('my-notifications')) {
           <div style="background:#222;color:#ffd700;padding:24px 30px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:290px;max-width:400px;max-height:80vh;overflow-y:auto;">
             <h3 style="margin-bottom:15px;font-size:1.17em;">🔔 Callback Requests</h3>
 			<ul id="pending-list" style="list-style:none;padding-left:0;margin:0;">${userList}</ul>
+			<div style="display:flex;justify-content:space-between;margin:10px 0;">
+			  <button id="notif-prev">‹ Prev</button>
+			  <span id="notif-page-label">Page 1</span>
+			  <button id="notif-next">Next ›</button>
+			</div>
 			   <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
                 id="acknowledge-selected-btn">✓ Acknowledge Selected</button>
               <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
@@ -23903,13 +23910,34 @@ if (document.getElementById('my-notifications')) {
 			  <span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
 			</div>
 			<ul id="history-list" style="list-style:none;padding-left:0;margin:0;display:none;"></ul>
-			<button id="history-load-more" style="display:none;width:100%;margin-top:8px;padding:8px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;font-size:0.85em;">Load more ↓</button>
+			<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-top:8px;">
+			  <button id="history-prev" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
+			  <span id="history-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
+			  <button id="history-next" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
+			</div>
             <div style="margin-top:15px;border-top:1px solid #333;padding-top:15px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
 
             </div>
           </div>
         `;
         document.body.appendChild(modal);
+
+		function showNotifPage() {
+		  const start = notifPage * 5;
+		  const html = sortedRequests.slice(start, start + 5).map(req => {
+			const hasMessage = req.message ? `<div style="color:#fff;font-size:0.85em;margin-left:30px;margin-top:2px;opacity:0.8;font-style:italic;">📝 "${req.message}"</div>` : '';
+			return `<li style="margin-bottom:12px;font-family:monospace;border-bottom:1px solid #333;padding-bottom:8px;">
+			  <label style="cursor:pointer;display:block;">
+				<input type="checkbox" class="acknowledge-checkbox" value="${req.id}" style="vertical-align:middle;margin-right:8px;">
+				<span class="sender-profile-link" data-user-id="${req.from_user_id}" style="cursor:pointer;text-decoration:underline;text-decoration-color:#fde68a55;">${window.usernameCache?.[req.from_user_id] || getShortUserId(req.from_user_id)}</span>
+				${req.created_at ? `<span style="color:#888;font-size:0.7em;margin-left:8px;">${new Date(req.created_at.endsWith('Z') || req.created_at.includes('+') ? req.created_at : req.created_at + 'Z').toLocaleString([], { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}</span>` : ''}
+			  </label>${hasMessage}</li>`;
+		  }).join('');
+		  document.getElementById('pending-list').innerHTML = html;
+		  document.getElementById('notif-page-label').textContent = `Page ${notifPage + 1}`;
+		}
+		document.getElementById('notif-prev').onclick = () => { if (notifPage > 0) { notifPage--; showNotifPage(); } };
+		document.getElementById('notif-next').onclick = () => { if ((notifPage + 1) * 5 < sortedRequests.length) { notifPage++; showNotifPage(); } };
 
 		// NEW: Tap sender name → show their profile
 		modal.querySelectorAll('.sender-profile-link').forEach(el => {
@@ -24010,7 +24038,7 @@ if (document.getElementById('my-notifications')) {
 		  const isOpen = list.style.display !== 'none';
 		  if (isOpen) { list.style.display = 'none'; btn.style.display = 'none'; arrow.textContent = '▸ Tap to view'; return; }
 		  list.style.display = 'block'; arrow.textContent = '▾ Hide';
-		  if (historyOpened) { btn.style.display = btn.dataset.done ? 'none' : 'block'; return; }
+		  if (historyOpened) { document.getElementById('history-pager').style.display = list.style.display === 'none' ? 'none' : 'flex'; return; }
 		  historyOpened = true;
 		  historyPage = 0;
 		  list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">Loading history...</li>`;
@@ -24019,13 +24047,15 @@ if (document.getElementById('my-notifications')) {
 
 		async function loadHistoryPage() {
 		  const list = document.getElementById('history-list');
-		  const btn = document.getElementById('history-load-more');
 		  const myId = localStorage.getItem('omUserId');
-		  const hRes = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests/history?user_id=${myId}&limit=10&offset=${historyPage * 10}`);
+		  const hRes = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests/history?user_id=${myId}&limit=5&offset=${historyPage * 5}`);
 		  let page = await hRes.json();
 		  if (!Array.isArray(page)) page = [];
-		  if (historyPage === 0 && page.length === 0) { list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">No acknowledged bells yet.</li>`; btn.style.display = 'none'; return; }
-		  if (page.length < 10) { btn.style.display = 'none'; btn.dataset.done = '1'; } else { btn.style.display = 'block'; }
+		  if (historyPage === 0 && page.length === 0) {
+			list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">No acknowledged bells yet.</li>`;
+			document.getElementById('history-pager').style.display = 'none';
+			return;
+		  }
 		  const html = page.map(h => {
 			const name = window.usernameCache?.[h.from_user_id] || getShortUserId(h.from_user_id);
 			const d = new Date(h.created_at.endsWith('Z') || h.created_at.includes('+') ? h.created_at : h.created_at + 'Z');
@@ -24035,9 +24065,15 @@ if (document.getElementById('my-notifications')) {
 			  <div style="color:#888;font-size:0.7em;">${d.toLocaleString([], { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}</div>
 			</li>`;
 		  }).join('');
-		  if (historyPage === 0) list.innerHTML = html; else list.innerHTML += html;
-		  historyPage++;
+		  list.innerHTML = html; // <-- replace, not +=, so never grows to 10
+		  document.getElementById('history-pager').style.display = 'flex';
+		  document.getElementById('history-page-label').textContent = `Page ${historyPage + 1}`;
+		  document.getElementById('history-prev').disabled = historyPage === 0;
+		  document.getElementById('history-next').disabled = page.length < 5;
 		}
+		document.getElementById('history-prev').onclick = () => { if (historyPage > 0) { historyPage--; loadHistoryPage(); } };
+		document.getElementById('history-next').onclick = () => { historyPage++; loadHistoryPage(); };
+
 		document.getElementById('history-load-more').onclick = () => loadHistoryPage();
 
         // Close button handler
