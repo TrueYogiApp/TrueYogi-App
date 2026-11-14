@@ -24017,91 +24017,79 @@ if (document.getElementById('my-notifications')) {
 
 
 		// NEW: Tap sender name → show their profile
-		modal.querySelectorAll('.sender-profile-link').forEach(el => {
-		el.onclick = async (e) => {
-		e.preventDefault();
+		modal.addEventListener('click', async (e) => {
+		  const el = e.target.closest('.sender-profile-link');
+		  if (!el) return;
+		  e.preventDefault();
 		  e.stopPropagation();
 		  const uid = el.dataset.userId;
 		  const row = (window.livePresenceRows || livePresenceRows || []).find(r => r.user_id === uid) || {};
-		const name = window.usernameCache?.[uid] || row.username || getShortUserId(uid);
-		// Country flag from countryCode: CA -> 🇨🇦, US -> 🇺🇸, etc.
-		const flag = row.countryCode ? String.fromCodePoint(...[...row.countryCode.toUpperCase()].map(c => 127397 + c.charCodeAt(0))) : '🌍';
-		const country = row.country || '';
-		// Live = heartbeat within last 2 min
-		const lastBeat = row.last_heartbeat ? new Date(row.last_heartbeat).getTime() : 0;
-		const isLive = (Date.now() - lastBeat) < 35 * 60 * 1000; // 35 min — matches your 30 min heartbeat
-		// Current Flame = now - joined_at
-		const joined = row.joined_at ? new Date(row.joined_at).getTime() : 0;
-		const flameSecs = joined ? Math.max(0, Math.floor((Date.now() - joined) / 1000)) : 0;
-		const flame = joined ? `${Math.floor(flameSecs/3600)}h ${Math.floor((flameSecs%3600)/60)}m ${flameSecs%60}s`.replace(/^0h /, '') : '—';
+		  const name = window.usernameCache?.[uid] || row.username || getShortUserId(uid);
+		  const flag = row.countryCode ? String.fromCodePoint(...[...row.countryCode.toUpperCase()].map(c => 127397 + c.charCodeAt(0))) : '🌍';
+		  const lastBeat = row.last_heartbeat ? new Date(row.last_heartbeat).getTime() : 0;
+		  const isLive = (Date.now() - lastBeat) < 35 * 60 * 1000;
+		  const joined = row.joined_at ? new Date(row.joined_at).getTime() : 0;
+		  const flameSecs = joined ? Math.max(0, Math.floor((Date.now() - joined) / 1000)) : 0;
+		  const flame = joined ? `${Math.floor(flameSecs/3600)}h ${Math.floor((flameSecs%3600)/60)}m ${flameSecs%60}s`.replace(/^0h /, '') : '—';
 
-			const pModal = document.createElement('div');
-			pModal.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10200;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;`;
-			pModal.innerHTML = `
-			  <div style="background:#222;color:#ffd700;padding:24px 28px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:280px;max-width:360px;text-align:center;">
-				<div style="font-size:1.4em;font-weight:800;letter-spacing:1.5px;margin:6px 0 2px;">${name}</div>
-				<div style="color:#888;font-size:0.8em;">${getShortUserId(uid)}</div>
-				<div style="margin:14px 0;padding:10px;background:#1a1a1a;border-radius:10px;text-align:left;font-size:0.9em;color:#fff;">
-				  <div>● Status: <span style="color:${isLive ? '#29D884' : '#888'}">${isLive ? 'Live in OM' : 'Not live now'}</span></div>
+		  const pModal = document.createElement('div');
+		  pModal.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10200;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;`;
+		  pModal.innerHTML = `
+			<div style="background:#222;color:#ffd700;padding:24px 28px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:280px;max-width:360px;text-align:center;">
+			  <div style="font-size:1.4em;font-weight:800;letter-spacing:1.5px;margin:6px 0 2px;">${name}</div>
+			  <div style="color:#888;font-size:0.8em;">${getShortUserId(uid)}</div>
+			  <div style="margin:14px 0;padding:10px;background:#1a1a1a;border-radius:10px;text-align:left;font-size:0.9em;color:#fff;">
+				<div>● Status: <span style="color:${isLive ? '#29D884' : '#888'}">${isLive ? 'Live in OM' : 'Not live now'}</span></div>
 				<div>🔥 Current Flame: ${flame}</div>
-				${row.deep_presence ? `<div>🕉️ Deep Presence: ${row.deep_presence}</div>` : ''}
+				${row.deep_presence ? `<div>🕉 Deep Presence: ${row.deep_presence}</div>` : ''}
 				${row.ultimate_stillness ? `<div>🧘 Ultimate Stillness: ${row.ultimate_stillness}</div>` : ''}
 				<div id="profile-countries-${uid}" style="margin-top:8px;text-align:left;">
 				  <div style="color:#888;font-size:0.8em;">Loading countries...</div>
 				</div>
-				</div>
-				<button id="close-profile-popup" style="padding:8px 20px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;border:none;cursor:pointer;">✕ Close</button>
 			  </div>
-			`;
-			document.body.appendChild(pModal);
-			document.getElementById('close-profile-popup').onclick = () => pModal.remove();
-			pModal.onclick = (ev) => { if (ev.target === pModal) pModal.remove(); };
-			
-						// NEW: Fetch all sessions for this user, group by country
-			(async () => {
-			  const box = document.getElementById(`profile-countries-${uid}`);
-			  if (!box) return;
-			  try {
-				const { data: sessions } = await supabase.from('om_sessions')
-				  .select('country, countryCode, duration_seconds, started_at')
-				  .eq('user_id', uid)
-				  .order('started_at', { ascending: false });
+			  <button id="close-profile-popup" style="padding:8px 20px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;border:none;cursor:pointer;">✕ Close</button>
+			</div>
+		  `;
+		  document.body.appendChild(pModal);
+		  document.getElementById('close-profile-popup').onclick = () => pModal.remove();
+		  pModal.onclick = (ev) => { if (ev.target === pModal) pModal.remove(); };
 
-				if (!sessions || !sessions.length) { box.innerHTML = `<div style="color:#888;font-size:0.8em;">No OM sessions yet.</div>`; return; }
-
-				// Group by country — same as your country popup
-				const byCountry = {};
-				let totalAll = 0, totalSessions = sessions.length;
-				sessions.forEach(s => {
-				  const c = s.country || 'Unknown';
-				  const code = (s.countryCode || '').toLowerCase() || 'un';
-				  if (!byCountry[c]) byCountry[c] = { code, total: 0, count: 0 };
-				  byCountry[c].total += (s.duration_seconds || 0);
-				  byCountry[c].count++;
-				  totalAll += (s.duration_seconds || 0);
-				});
-
-				const fmt = (sec) => {
-				  if (!sec) return '0m';
-				  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
-				  return `${h ? h + 'h ' : ''}${m}m`.trim();
-				};
-
-				const sorted = Object.entries(byCountry).sort((a,b) => b[1].total - a[1].total);
-
-				box.innerHTML = `
-				  <div style="color:#fde68a;font-size:0.85em;margin-bottom:6px;">🕉️ Total OM: ${fmt(totalAll)} • ${totalSessions} sessions</div>
-				  ${sorted.map(([cName, v]) => `
-					<div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #222;font-size:0.85em;">
-					  <span><img src="https://flagcdn.com/w20/${v.code}.png" style="width:18px;height:12px;border-radius:2px;vertical-align:middle;margin-right:6px;">${cName}</span>
-						<span style="text-align:right;"><span style="color:#fff;">${fmt(v.total)}</span><br><span style="color:#888;font-size:0.7em;">${v.count} session${v.count > 1 ? 's' : ''}</span></span>
-					</div>
-				  `).join('')}
-				`;
-			  } catch(err) { box.innerHTML = ``; }
-			})();
-
-		  };
+		  (async () => {
+			const box = document.getElementById(`profile-countries-${uid}`);
+			if (!box) return;
+			try {
+			  const { data: sessions } = await supabase.from('om_sessions')
+				.select('country, countryCode, duration_seconds, started_at')
+				.eq('user_id', uid)
+				.order('started_at', { ascending: false });
+			  if (!sessions || !sessions.length) { box.innerHTML = `<div style="color:#888;font-size:0.8em;">No OM sessions yet.</div>`; return; }
+			  const byCountry = {};
+			  let totalAll = 0, totalSessions = sessions.length;
+			  sessions.forEach(s => {
+				const c = s.country || 'Unknown';
+				const code = (s.countryCode || '').toLowerCase() || 'un';
+				if (!byCountry[c]) byCountry[c] = { code, total: 0, count: 0 };
+				byCountry[c].total += (s.duration_seconds || 0);
+				byCountry[c].count++;
+				totalAll += (s.duration_seconds || 0);
+			  });
+			  const fmt = (sec) => {
+				if (!sec) return '0m';
+				const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+				return `${h ? h + 'h ' : ''}${m}m`.trim();
+			  };
+			  const sorted = Object.entries(byCountry).sort((a,b) => b[1].total - a[1].total);
+			  box.innerHTML = `
+				<div style="color:#fde68a;font-size:0.85em;margin-bottom:6px;">🕉 Total OM: ${fmt(totalAll)} • ${totalSessions} sessions</div>
+				${sorted.map(([cName, v]) => `
+				  <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #222;font-size:0.85em;">
+					<span><img src="https://flagcdn.com/w20/${v.code}.png" style="width:18px;height:12px;border-radius:2px;vertical-align:middle;margin-right:6px;">${cName}</span>
+					<span style="text-align:right;"><span style="color:#fff;">${fmt(v.total)}</span><br><span style="color:#888;font-size:0.7em;">${v.count} session${v.count > 1 ? 's' : ''}</span></span>
+				  </div>
+				`).join('')}
+			  `;
+			} catch(err) { box.innerHTML = ``; }
+		  })();
 		});
 
 		// NEW: History loads ONLY when tapped
@@ -24137,7 +24125,7 @@ if (document.getElementById('my-notifications')) {
 			const name = window.usernameCache?.[h.from_user_id] || getShortUserId(h.from_user_id);
 			const d = new Date(h.created_at.endsWith('Z') || h.created_at.includes('+') ? h.created_at : h.created_at + 'Z');
 			return `<li style="margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid #222;font-size:0.85em;">
-			  <div style="display:flex;justify-content:space-between;"><span>${name} → You</span><span style="color:#29D884;font-size:0.75em;">✓ Seen</span></div>
+			  <div style="display:flex;justify-content:space-between;"><span><span class="sender-profile-link" data-user-id="${h.from_user_id}" style="cursor:pointer;text-decoration:underline;text-decoration-color:#fde68a55;">${name}</span> → You</span><span style="color:#29D884;font-size:0.75em;">✓ Seen</span></div>
 			  ${h.message ? `<div style="color:#ccc;font-style:italic;">"${h.message}"</div>` : ''}
 			  <div style="color:#888;font-size:0.7em;">${d.toLocaleString([], { weekday:'short', day:'numeric', month:'short', hour:'numeric', minute:'2-digit' })}</div>
 			</li>`;
