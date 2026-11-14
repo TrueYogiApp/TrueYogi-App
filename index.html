@@ -23552,14 +23552,17 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
   // Create modal content with message input
   modal.innerHTML = `
     <div style="
-      background: #222;
-      color: #ffd700;
-      padding: 24px 30px;
-      border-radius: 16px;
-      box-shadow: 0 4px 20px #ffd70055;
-      min-width: 320px;
-      max-width: 450px;
-      text-align: center;
+	  background: #222;
+	  color: #ffd700;
+	  padding: 24px 30px;
+	  border-radius: 16px;
+	  box-shadow: 0 4px 20px #ffd70055;
+	  width: min(94vw, 450px);
+	  max-width: 450px;
+	  max-height: 88vh;
+	  overflow-y: auto;
+	  box-sizing: border-box;
+	  text-align: center;
     ">
       <h3 style="margin-bottom: 20px; font-size: 1.2em; color: #ffd700;">Ring the Guidance Bell</h3>
       <p style="margin-bottom: 15px; color: #fff; font-size: 1.1em;">
@@ -23594,17 +23597,21 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
           <span id="char-counter">0</span>/500
         </div>
       </div>
-	  
+      
 	  <!-- History — collapsed, tap to view -->
 	<div id="history-toggle" style="margin-bottom:18px;padding:10px 12px;border:1px solid #333;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-	  <span style="color:#fde68a;font-size:0.9em;">Bell Records</span>
-	  <span style="display:flex;gap:8px;align-items:center;">
-		<span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
-	  </span>
+  <span style="color:#fde68a;font-size:0.9em;">Bell Records</span>
+  <span style="display:flex;gap:8px;align-items:center;">
+    <span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
+  </span>
 	</div>
 	<ul id="callback-history" style="list-style:none;padding-left:0;margin:0 0 18px 0;text-align:left;display:none;"></ul>
-	<button id="history-load-more" style="display:none;width:100%;margin-bottom:18px;padding:8px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;font-size:0.85em;">Load more ↓</button>      
-	
+	<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-bottom:18px;">
+	  <button id="history-prev" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
+	  <span id="history-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
+	  <button id="history-next" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
+	</div>
+
       <div style="display: flex; gap: 12px; justify-content: center;">
         <button id="confirm-callback-yes" class="mode-btn" style="
           padding: 10px 25px;
@@ -23643,20 +23650,20 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 		const arrow = document.getElementById('history-arrow');
 		const btn = document.getElementById('history-load-more');
 		const isOpen = list.style.display !== 'none';
-		if (isOpen) { list.style.display = 'none'; btn.style.display = 'none'; arrow.textContent = '▸ Tap to view'; return; }
+		if (isOpen) { list.style.display = 'none'; document.getElementById('history-pager').style.display = 'none'; arrow.textContent = '▸ Tap to view'; return; }
 		list.style.display = 'block'; arrow.textContent = '▾ Hide';
-		if (historyOpened) { btn.style.display = btn.dataset.done ? 'none' : 'block'; return; }
+		if (historyOpened) { document.getElementById('history-pager').style.display = 'flex'; return; }
 		historyOpened = true;
 		historyPage = 0;
 		list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">Loading history...</li>`;
 		loadHistoryPage();
 	  };
-		
+
 	  async function loadHistoryPage() {
 		const list = document.getElementById('callback-history');
 		const btn = document.getElementById('history-load-more');
 		try {
-		  const hRes = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests/history?user_id=${fromUserId}&limit=10&offset=${historyPage * 10}`);
+		  const hRes = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests/history?user_id=${fromUserId}&limit=5&offset=${historyPage * 5}`);
 		  let page = await hRes.json();
 		  if (!Array.isArray(page)) page = [];
 		  // Get names for this page
@@ -23670,8 +23677,7 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 		  } catch(e) {}
 		  const getName = (id) => window.usernameCache?.[id] || getShortUserId(id);
 
-		  if (historyPage === 0 && page.length === 0) { list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">No bells yet. This will be your first. ✨</li>`; btn.style.display = 'none'; return; }
-		  if (page.length < 10) { btn.style.display = 'none'; btn.dataset.done = '1'; } else { btn.style.display = 'block'; }
+		  if (historyPage === 0 && page.length === 0) { list.innerHTML = `<li style="color:#888;font-size:0.8em;text-align:center;">No bells yet. This will be your first. ✨</li>`; document.getElementById('history-pager').style.display = 'none'; return; }
 
 		  const html = page.map(h => {
 			const isMine = h.from_user_id === fromUserId;
@@ -23686,12 +23692,16 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 			  <div style="color:#888;font-size:0.7em;">${timeStr}</div>
 			</li>`;
 		  }).join('');
-		  if (historyPage === 0) list.innerHTML = html; else list.innerHTML += html;
-		  historyPage++;
+		list.innerHTML = html;
+		document.getElementById('history-pager').style.display = 'flex';
+		document.getElementById('history-page-label').textContent = `Page ${historyPage + 1}`;
+		document.getElementById('history-prev').disabled = historyPage === 0;
+		document.getElementById('history-next').disabled = page.length < 5;
 		} catch(e) { list.innerHTML = ``; }
 	  }
-	  document.getElementById('history-load-more').onclick = () => loadHistoryPage();
-	  
+	  document.getElementById('history-prev').onclick = () => { if (historyPage > 0) { historyPage--; loadHistoryPage(); } };
+	  document.getElementById('history-next').onclick = () => { historyPage++; loadHistoryPage(); };
+  
   // Character counter
   const textarea = document.getElementById('callback-message-input');
   const counter = document.getElementById('char-counter');
@@ -23896,12 +23906,12 @@ if (document.getElementById('my-notifications')) {
           <div style="background:#222;color:#ffd700;padding:24px 30px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:290px;max-width:400px;max-height:80vh;overflow-y:auto;">
             <h3 style="margin-bottom:15px;font-size:1.17em;">🔔 Callback Requests</h3>
 			<ul id="pending-list" style="list-style:none;padding-left:0;margin:0;">${userList}</ul>
-			<div style="display:flex;justify-content:space-between;margin:10px 0;">
+			<div style="display:flex;justify-content:space-between;margin:10px 0 16px;">
 			  <button id="notif-prev">‹ Prev</button>
 			  <span id="notif-page-label">Page 1</span>
 			  <button id="notif-next">Next ›</button>
 			</div>
-			   <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
+			   <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;border:none;margin-top:4px;"
                 id="acknowledge-selected-btn">✓ Acknowledge Selected</button>
               <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
                 id="close-callback-requests-modal">✕ Close</button>
