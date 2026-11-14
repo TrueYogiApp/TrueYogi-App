@@ -23312,11 +23312,18 @@ async function showAllFlameKeepers(x, y) {
   });
 
   // ----- POPUP — TRANSPARENT LIKE ORIGINAL, NOT SOLID -----
-  const listPopup = document.createElement('div');
-  listPopup.id = 'flame-keeper-list';
+	const popupWidth = Math.min(430, window.innerWidth * 0.94);
+	const popupHalf = popupWidth / 2;
+	const clampedX = Math.max(popupHalf + 8, Math.min(x, window.innerWidth - popupHalf - 8));
+
+	const popupTop = y + 32;
+	const maxPopupHeight = Math.max(180, Math.min(280, window.innerHeight - popupTop - 16));
+
+	const listPopup = document.createElement('div');
+	listPopup.id = 'flame-keeper-list';
 	listPopup.style.cssText = `
 	  position: fixed;
-	  left: ${x}px; top: ${y + 32}px;
+	  left: ${clampedX}px; top: ${popupTop}px;
 	  transform: translate(-50%, 0);
 	  background: rgba(0,0,0,0.55);
 	  backdrop-filter: blur(10px);
@@ -23328,9 +23335,9 @@ async function showAllFlameKeepers(x, y) {
 	  border: 1px solid rgba(255,215,0,0.25);
 	  box-shadow: 0 0 20px rgba(255,215,0,0.15), 0 10px 30px rgba(0,0,0,0.5);
 	  z-index: 10050;
-	  max-width: 330px;
-	  width: min(92vw, 330px);
-	  max-height: 320px;
+	  max-width: 430px;
+	  width: min(94vw, 430px);
+	  max-height: ${maxPopupHeight}px;
 	  box-sizing: border-box;
 	  overflow-y: auto;
 	  overflow-x: hidden;
