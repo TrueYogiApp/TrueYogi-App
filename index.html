@@ -23922,6 +23922,7 @@ if (document.getElementById('my-notifications')) {
         `;
         document.body.appendChild(modal);
 
+
 		function showNotifPage() {
 		  const start = notifPage * 5;
 		  const html = sortedRequests.slice(start, start + 5).map(req => {
@@ -23938,6 +23939,7 @@ if (document.getElementById('my-notifications')) {
 		}
 		document.getElementById('notif-prev').onclick = () => { if (notifPage > 0) { notifPage--; showNotifPage(); } };
 		document.getElementById('notif-next').onclick = () => { if ((notifPage + 1) * 5 < sortedRequests.length) { notifPage++; showNotifPage(); } };
+
 
 		// NEW: Tap sender name → show their profile
 		modal.querySelectorAll('.sender-profile-link').forEach(el => {
@@ -24073,8 +24075,6 @@ if (document.getElementById('my-notifications')) {
 		}
 		document.getElementById('history-prev').onclick = () => { if (historyPage > 0) { historyPage--; loadHistoryPage(); } };
 		document.getElementById('history-next').onclick = () => { historyPage++; loadHistoryPage(); };
-
-		document.getElementById('history-load-more').onclick = () => loadHistoryPage();
 
         // Close button handler
         document.getElementById('close-callback-requests-modal').onclick = () => modal.remove();
