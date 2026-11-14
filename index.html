@@ -23607,9 +23607,9 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 	</div>
 	<ul id="callback-history" style="list-style:none;padding-left:0;margin:0 0 18px 0;text-align:left;display:none;"></ul>
 	<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-bottom:18px;">
-	  <button id="history-prev" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
+	  <button id="history-prev" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
 	  <span id="history-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
-	  <button id="history-next" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
+	  <button id="history-next"  class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
 	</div>
 
       <div style="display: flex; gap: 12px; justify-content: center;">
@@ -23668,7 +23668,7 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 			${row.ultimate_stillness ? `<div>🧘 Ultimate Stillness: ${row.ultimate_stillness}</div>` : ''}
 			<div id="profile-countries-${uid}" style="margin-top:8px;text-align:left;"><div style="color:#888;font-size:0.8em;">Loading countries...</div></div>
 		  </div>
-		  <button id="close-profile-popup" style="padding:8px 20px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;border:none;cursor:pointer;">✕ Close</button>
+		  <button id="close-profile-popup" class="mode-btn" style="padding:8px 20px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;border:none;cursor:pointer;">✕ Close</button>
 		</div>
 	  `;
 	  document.body.appendChild(pModal);
@@ -23986,9 +23986,9 @@ if (document.getElementById('my-notifications')) {
 			</div>
 			<ul id="history-list" style="list-style:none;padding-left:0;margin:0;display:none;"></ul>
 			<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-top:8px;">
-			  <button id="history-prev" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
+			  <button id="history-prev" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
 			  <span id="history-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
-			  <button id="history-next" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
+			  <button id="history-next" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
 			</div>
             <div style="margin-top:15px;border-top:1px solid #333;padding-top:15px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
 
