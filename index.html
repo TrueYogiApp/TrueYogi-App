@@ -23407,7 +23407,7 @@ async function showAllFlameKeepers(x, y) {
       const isRowCallable = permissions[id]?.canStartCall;
       const amILive = liveIds.has(currentUserId);
       return `
-      <div style="border-bottom:1px solid rgba(255,255,255,0.07); padding:7px 4px; display:flex; align-items:center; gap:6px; ${isCurrentUser ? 'background:rgba(255,215,0,0.10); border-radius:8px; font-weight:bold;' : ''}">
+      <div style="border-bottom:1px solid rgba(255,255,255,0.07); padding:7px 10px 7px 4px; display:flex; align-items:center; gap:6px; min-width:0;
         <span style="color:#888; font-size:0.85em; min-width:16px; text-align:center;">${index + 1}</span>
         <span style="display:inline-flex; align-items:center;">${isLive ? liveSvg : blankSvg}</span>
         <img src="https://flagcdn.com/w20/${code}.png" style="width:19px;height:14px;border-radius:2px;box-shadow:0 0 2px #000;">
@@ -23416,12 +23416,12 @@ async function showAllFlameKeepers(x, y) {
 		</span>
         <img src="assets/clock.svg" style="width:14px; height:14px; vertical-align:middle; opacity:0.7;">
         <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'}; font-size:0.88em; ${isCurrentUser ? 'font-weight:bold;' : ''}">${formatDurationGrid(userDurations[id])}</span>
-        <span class="flame-keeper-icons" style="margin-left:auto; display:flex; align-items:center; gap:2px;">
+        <span class="flame-keeper-icons" style="margin-left:auto; display:flex; align-items:center; gap:2px; flex-shrink:0; white-space:nowrap;">
           ${astralIconHtml}
           ${isDeepPresence ? deepPresenceSvg : ''}
           ${isUltimateStillness ? ultimateStillnessSvg : ''}
           ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}
-          ${!isCurrentUser && !canStartCall && amILive && isRowCallable ? `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>` : ''}
+          ${!isCurrentUser && amILive && isRowCallable ? `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>` : ''}
           ${!isCurrentUser && isLive && canStartCall ? `<span class="call-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Start call">☎️</span>` : ''}
         </span>
       </div>
@@ -23971,8 +23971,8 @@ if (document.getElementById('my-notifications')) {
 
 				const fmt = (sec) => {
 				  if (!sec) return '0m';
-				  const d = Math.floor(sec/86400), h = Math.floor((sec%86400)/3600), m = Math.floor((sec%3600)/60);
-				  return `${d?d+'d ':''}${h?h+'h ':''}${m}m`.trim();
+				  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60);
+				  return `${h ? h + 'h ' : ''}${m}m`.trim();
 				};
 
 				const sorted = Object.entries(byCountry).sort((a,b) => b[1].total - a[1].total);
