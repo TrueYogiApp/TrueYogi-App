@@ -24643,14 +24643,21 @@ async function showAllFlameKeepersForPeriod(flameStartedAt, flameEndedAt, starte
   const displayName = (id) => (window.usernameCache?.[id]) ? window.usernameCache[id] : getShortUserId(id);
 
   // ----- POPUP — TRANSPARENT LIKE LAST ONE -----
+  const popupWidth = Math.min(430, window.innerWidth * 0.94);
+  const popupHalf = popupWidth / 2;
+  const clampedX = Math.max(popupHalf + 8, Math.min(x, window.innerWidth - popupHalf - 8));
+
+  const popupTop = y + 32;
+  const maxPopupHeight = Math.max(180, Math.min(280, window.innerHeight - popupTop - 16));
+
   const listPopup = document.createElement('div');
   listPopup.id = 'flame-keeper-list';
   listPopup.style.cssText = `
-    position: fixed; left: ${x}px; top: ${y + 32}px; transform: translate(-50%, 0);
+    position: fixed; left: ${clampedX}px; top: ${popupTop}px; transform: translate(-50%, 0);
     background: rgba(0,0,0,0.55); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
     color: #ffd700; font-size: 0.98rem; padding: 12px 14px 10px; border-radius: 16px;
     border: 1px solid rgba(255,215,0,0.25); box-shadow: 0 0 20px rgba(255,215,0,0.15), 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 10050; max-width: 330px; width: min(92vw, 330px); max-height: 320px;
+    z-index: 10050; max-width: 430px; width: min(94vw, 430px); max-height: ${maxPopupHeight}px;
     box-sizing: border-box; overflow-y: auto; overflow-x: hidden; text-align: left;
     scrollbar-width: thin; scrollbar-color: #fde68a transparent; overscroll-behavior: contain; touch-action: pan-y;
   `;
