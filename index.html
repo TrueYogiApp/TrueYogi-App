@@ -24099,7 +24099,7 @@ if (document.getElementById('my-notifications')) {
 		document.getElementById('history-toggle').onclick = async () => {
 		  const list = document.getElementById('history-list');
 		  const arrow = document.getElementById('history-arrow');
-		  const btn = document.getElementById('history-load-more');
+		  const btn = document.getElementById('history-pager');
 		  const isOpen = list.style.display !== 'none';
 		  if (isOpen) { list.style.display = 'none'; btn.style.display = 'none'; arrow.textContent = '▸ Tap to view'; return; }
 		  list.style.display = 'block'; arrow.textContent = '▾ Hide';
