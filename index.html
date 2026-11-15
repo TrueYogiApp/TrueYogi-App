@@ -23564,7 +23564,10 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 	  box-sizing: border-box;
 	  text-align: center;
     ">
-      <h3 style="margin-bottom: 20px; font-size: 1.2em; color: #ffd700;">Ring the Guidance Bell</h3>
+		<div style="margin-bottom: 16px; color: #fff; font-size: 1.05em;">
+		 <span style="color:#ffd700;font-weight:bold;">${window.usernameCache?.[toUserId] || getShortUserId(toUserId)}</span>
+		</div>	  
+      <h3 style="margin-bottom: 16px; font-size: 0.95em; color: #fde68a; font-weight: 400;">Ring the Guidance Bell</h3>
       <p style="margin-bottom: 15px; color: #fff; font-size: 1.1em;">
         Send a gentle bell to invite connection.
         You will be connected when available.
@@ -23729,8 +23732,13 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 		const btn = document.getElementById('history-load-more');
 		try {
 		  const hRes = await fetch(`https://trueyogi-backend-knkq.onrender.com/api/callback-requests/history?user_id=${fromUserId}&limit=5&offset=${historyPage * 5}`);
-		  let page = await hRes.json();
-		  if (!Array.isArray(page)) page = [];
+			let page = await hRes.json();
+			if (!Array.isArray(page)) page = [];
+			// Only this conversation — you <-> this user
+			page = page.filter(h =>
+			  (h.from_user_id === fromUserId && h.to_user_id === toUserId) ||
+			  (h.from_user_id === toUserId && h.to_user_id === fromUserId)
+			);
 		  // Get names for this page
 		  try {
 			const ids = [...new Set(page.flatMap(h => [h.from_user_id, h.to_user_id]))];
