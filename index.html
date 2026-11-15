@@ -6955,11 +6955,11 @@ const audioHints = {
 const hintText = (type === 'live' || !multiAudio) ? '' : (audioHints[currentLang] || '');
 
 overlay.innerHTML = `
-  <div class="video-outer-container" style="max-width:96vw;background:#171732;padding:20px;border-radius:16px;text-align:center;position:relative;">
-        <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title.replace(/\n/g, '<br>')}</div>
-    <div class="video-frame" style="border-radius:10px;overflow:hidden;margin:0 auto 24px auto;background:#211f3c;transition:background 0.6s;">
-      <div id="${playerId}" style="width:350px;height:210px;"></div>
-    </div>
+  <div class="video-outer-container" style="width:min(560px,100vw);box-sizing:border-box;background:#171732;padding:8px 0 12px 0;border-radius:0;text-align:center;position:relative;">
+       <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title.replace(/\n/g, '<br>')}</div>
+	<div class="video-frame" style="width:100%;aspect-ratio:16/9;border-radius:0;overflow:hidden;margin:0 auto 16px auto;background:#000;">
+	  <div id="${playerId}" style="width:100%;height:100%;"></div>
+	</div>
     ${hintText ? `<div class="audio-hint" style="color:#adbbef;font-size:0.85rem;margin:0 0 14px 0;padding:6px 12px;background:rgba(0,0,0,0.2);border-radius:8px;line-height:1.5;">${hintText}</div>` : ''}
     <div class="video-controls" style="transition:opacity .4s;opacity:1;pointer-events:auto;">
       <button onclick="closeVideoPlayer()" class="mode-btn" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
@@ -7039,8 +7039,8 @@ overlay.addEventListener('click', function(e) {
   // Create player when API is ready
   function createPlayer() {
     const player = new YT.Player(playerId, {
-      height: '210',
-      width: '350',
+      height: '100%',
+      width: '100%',
       videoId: youtubeId,
       playerVars: {
         'playsinline': 1,
