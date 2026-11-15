@@ -23403,8 +23403,8 @@ async function showAllFlameKeepers(x, y) {
       const code = row?.countryCode ? row.countryCode.toLowerCase() : "un";
       const isAstralSilenceActive = astralSilenceStatuses[id] || false;
       let astralIconHtml = '';
-		// Astral: self always shows, others only if LIVE
-		if (isCurrentUser) {
+		// Astral: only if LIVE — self + others same rule
+		if (isLive && isCurrentUser) {
 		  astralIconHtml = isAstralSilenceActive ?
 			`<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Active)">${astralSilenceActiveSvg}</span>` :
 			`<span class="astral-silence-icon" data-userid="${id}" style="margin-left:1px;cursor:pointer;" title="Astral Silence Mode (Inactive)">${astralSilenceInactiveSvg}</span>`;
