@@ -6711,18 +6711,17 @@ function viewPDFinline(pdfPath, pdfName) {
 
   // Always use Google Docs Viewer (works on both mobile & desktop)
   const encodedUrl = encodeURIComponent(pdfPath);
-  iframe.src = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true`;
+  iframe.src = `https://docs.google.com/viewer?url=${encodedUrl}&embedded=true&t=${Date.now()}`;
   
 }
 
 function closePDFinline() {
   const overlay = document.getElementById('pdf-viewer-overlay');
-  const container = document.querySelector('#pdf-viewer-overlay > div:last-child');
-  container.innerHTML = '<iframe id="pdf-iframe" style="width:100%;height:100%;border:none;background:white;"></iframe>';
+  const iframe = document.getElementById('pdf-iframe');
+  if (iframe) iframe.src = 'about:blank'; // stop PDF, but keep same iframe
   overlay.style.display = 'none';
   currentPDF = null;
   currentPDFName = '';
-  
 }
 
 let videos = [];
