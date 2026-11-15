@@ -7230,6 +7230,231 @@ document.addEventListener('keydown', function(e) {
 });
 
 
+function openChannelLivePlayer(channelId, title) {
+  if (typeof closeVideoPlayer === 'function') closeVideoPlayer();
+  window.isVideoOverlayActive = true;
+
+  const playerId = `live-player-${Date.now()}`;
+  const overlay = document.createElement('div');
+  overlay.className = 'video-overlay-container';
+  overlay.style.cssText = `
+    position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:11000;
+    display:flex;align-items:center;justify-content:center;
+    background:rgba(12,10,30,0.88);
+  `;
+
+  overlay.innerHTML = `
+    <div class="video-outer-container" style="width:min(560px,100vw);box-sizing:border-box;background:#171732;padding:8px 0 12px 0;border-radius:0;text-align:center;position:relative;">
+      <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
+
+      <!-- This message is HIDDEN at start. Only shows if video does NOT play -->
+      <div class="no-live-msg" style="display:none;color:#fda4af;font-size:0.95rem;padding:10px 14px;margin:0 12px 10px;background:rgba(0,0,0,0.25);border-radius:8px;line-height:1.5;">
+        No live is ongoing now<br>
+        <span style="color:#adbbef;font-size:0.85rem;">Please close and try another channel.</span>
+      </div>
+
+      <div class="video-frame" style="width:100%;aspect-ratio:16/9;border-radius:0;overflow:hidden;margin:0 auto 16px auto;background:#000;">
+        <div id="${playerId}" style="width:100%;height:100%;"></div>
+      </div>
+      <div class="video-controls" style="transition:opacity .4s;opacity:1;pointer-events:auto;">
+        <button onclick="closeVideoPlayer()" class="mode-btn" style="padding:7px 30px;border:none;background:#eadb7d;color:#3a3100;border-radius:16px;cursor:pointer;font-weight:bold;">Close</button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  window.currentVideoOverlay = overlay;
+
+  const noLiveMsg = overlay.querySelector('.no-live-msg');
+  const titleEl = overlay.querySelector('.video-title');
+  const controls = overlay.querySelector('.video-controls');
+  let hasPlayed = false;
+
+  function showNoLive() {
+    if (hasPlayed) return; // if it already played once, don't show
+    noLiveMsg.style.display = 'block';
+    // Show title + Close, like your paused logic
+    controls.style.opacity = '1';
+    controls.style.pointerEvents = 'auto';
+    controls.style.visibility = 'visible';
+    titleEl.style.opacity = '1';
+    titleEl.style.visibility = 'visible';
+  }
+
+  function hideNoLive() {
+    noLiveMsg.style.display = 'none';
+  }
+
+  // If after 7 seconds it still hasn't played, it's unavailable -> show message
+  const checkTimer = setTimeout(showNoLive, 7000);
+  overlay._liveCheckTimer = checkTimer;
+
+  // Load YT API if needed - same as your openVideoPlayer
+  if (!window.YT) {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.getElementsByTagName('script')[0].parentNode.insertBefore(tag, document.getElementsByTagName('script')[0]);
+  }
+
+  function createPlayer() {
+    const player = new YT.Player(playerId, {
+      height: '100%',
+      width: '100%',
+      videoId: 'live_stream',
+      playerVars: {
+        'playsinline': 1,
+        'rel': 0,
+        'modestbranding': 1,
+        'channel': channelId,
+        'autoplay': 1,
+        'origin': window.location.origin
+      },
+      events: {
+        'onReady': (e) => e.target.playVideo(),
+        'onStateChange': (e) => {
+          if (e.data === YT.PlayerState.PLAYING) {
+            hasPlayed = true;
+            clearTimeout(checkTimer);
+            hideNoLive();
+            // Hide - add these 2 lines, same as your openVideoPlayer
+            controls.style.opacity = '0';
+            controls.style.pointerEvents = 'none';
+            controls.style.visibility = 'hidden';
+            titleEl.style.opacity = '0';
+            titleEl.style.visibility = 'hidden';
+            overlay.querySelector('.video-outer-container').style.background = 'none';
+          } else if (e.data === YT.PlayerState.PAUSED || e.data === YT.PlayerState.ENDED) {
+            controls.style.opacity = '1';
+            controls.style.pointerEvents = 'auto';
+            controls.style.visibility = 'visible';
+            titleEl.style.opacity = '1';
+            titleEl.style.visibility = 'visible';
+            overlay.querySelector('.video-outer-container').style.background = '#171732';
+          }
+        },
+        'onError': (e) => {
+          console.log('Live Player Error:', e.data);
+          clearTimeout(checkTimer);
+          showNoLive();
+        }
+      }
+    });
+    overlay._player = player;
+  }
+
+  if (window.YT && YT.loaded) {
+    createPlayer();
+  } else {
+    window.onYouTubeIframeAPIReady = createPlayer;
+  }
+
+  let hideTimer = null;
+
+  overlay.addEventListener('click', (e) => {
+    if (controls.contains(e.target) || titleEl.contains(e.target)) return;
+
+    // Tap anywhere - show heading + Close + background back
+    controls.style.opacity = '1';
+    controls.style.pointerEvents = 'auto';
+    controls.style.visibility = 'visible';
+    titleEl.style.opacity = '1';
+    titleEl.style.visibility = 'visible';
+    overlay.querySelector('.video-outer-container').style.background = '#171732';
+
+    // Auto-hide again after 2.5 sec, like original
+    clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      controls.style.opacity = '0';
+      controls.style.pointerEvents = 'none';
+      controls.style.visibility = 'hidden';
+      titleEl.style.opacity = '0';
+      titleEl.style.visibility = 'hidden';
+      overlay.querySelector('.video-outer-container').style.background = 'none';
+    }, 2500);
+  });
+}
+
+
+let liveStreams = [];
+let LIVE_CHANNELS = []; // now from JSON, not frontend
+
+// Fetch both JSONs - channels + live.json
+document.addEventListener('DOMContentLoaded', function() {
+  Promise.all([
+    fetch(`https://assets.trueyogi.app/assets/Material/live-channels.json?t=${cacheBuster}`).then(r => r.json()).catch(() => []),
+    fetch(`https://assets.trueyogi.app/assets/Material/live.json?t=${cacheBuster}`).then(r => r.json()).catch(() => [])
+  ]).then(([channels, lives]) => {
+    LIVE_CHANNELS = (channels || []).map(ch => ({
+      handle: (ch.handle || '').trim(), // trim space automatically, so even if you leave space in JSON it still works
+      channelId: (ch.channelId || '').trim(),
+      name: ch.name || ch.handle
+    }));
+    liveStreams = lives || [];
+    renderLiveList();
+  });
+});
+
+// --- TO ADD A CHANNEL, JUST ADD ONE LINE HERE ---
+const LIVE_CHANNELS = [
+  { handle: 'Devamantram ', channelId: 'UCO3_mogUxQ13YPSJXTq8VDg', name: 'Deva Mantram' },
+  { handle: 'TrueYogi-App', channelId: 'UCX18V4P8iS0u8dxwyRv8buA', name: 'TrueYogi' },
+  { handle: 'PrimeCreator000', channelId: 'UCu0ksUDDJ06tEj1Dt6h0MLA', name: 'Prime Creator' },
+  { handle: 'GoldenAgeGurus ', channelId: 'UCb_5Mpr91TDNqc6zHbq9erQ', name: 'GoldenAgeGurus' },
+  { handle: 'pmcevents ', channelId: 'UCRdM2_Tyd58XY7caRsvrWAg', name: 'PMC EVENTS' },
+  { handle: 'pyramidcallservices ', channelId: 'UCo0OjhK6GnLxWlx-rumspbw', name: 'Pyramid Call Services' },
+];
+
+function renderLiveList() {
+  const list = document.getElementById('live-list');
+  list.innerHTML = "";
+
+  if (LIVE_CHANNELS.length === 0 && liveStreams.length === 0) {
+    list.innerHTML = '<div style="color:#94a3b8;padding:24px;text-align:center;">No one is live right now.<br>Check back soon 🙏</div>';
+    return;
+  }
+
+
+  // Your live.json list below - same as before
+  liveStreams.forEach((live) => {
+    const html = `
+      <div style="background:#232136;border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(0,0,0,0.10);">
+        <img src="${live.thumb || 'https://img.youtube.com/vi/' + live.youtubeId + '/hqdefault.jpg'}"
+          alt="live thumbnail" style="width:75px;height:52px;border-radius:8px;object-fit:cover;">
+        <div style="flex:1;">
+          <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${live.title}</div>
+          <div style="color:#adbbef;font-size:0.95rem;">${live.author || ''}</div>
+          <button onclick="openVideoPlayer('${live.youtubeId}','${live.title.replace(/'/g,'\\\'')}','live',false)" class="mode-btn"
+            style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
+            Tune In
+          </button>
+        </div>
+      </div>`;
+    list.insertAdjacentHTML('beforeend', html);
+  });
+  
+  // Your channels - same card style as live.json
+  LIVE_CHANNELS.forEach((ch) => {
+    const card = `
+    <div style="background:#232136;border-radius:12px;padding:16px 18px;margin-bottom:16px;display:flex;gap:16px;align-items:center;box-shadow:0 2px 12px 0 rgba(0,0,0,0.10);">
+      <div style="position:relative;flex-shrink:0;">
+        <img src="https://unavatar.io/youtube/${ch.handle}" alt="${ch.name}"
+          style="width:75px;height:52px;border-radius:8px;object-fit:cover;display:block;background:#171732;">
+ 
+      </div>
+      <div style="flex:1;">
+        <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${ch.name}</div>
+        <div style="color:#adbbef;font-size:0.95rem;">${ch.handle}</div>
+        <button onclick="openChannelLivePlayer('${ch.channelId}','${ch.name}')" class="mode-btn"
+          style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
+          Tune In
+        </button>
+      </div>
+    </div>`;
+    list.insertAdjacentHTML('beforeend', card);
+  });
+}
+
+
 let liveStreams = [];
 
 // Fetch live content
