@@ -2951,15 +2951,15 @@ button[disabled] {
   height: 13px;
   margin-right: 5px;
   border-radius: 50%;
-  background: #ff365a;
-  box-shadow: 0 0 4px #ff365a55;
+  background: #ff2d55;
+  box-shadow: 0 0 4px #ff2d5555;
   animation: pulseLive 2s infinite;
   vertical-align: middle;
 }
 @keyframes pulseLive {
-  0% { box-shadow: 0 0 10px 2px #ff365a55, 0 0 0 0 #ff365a; }
-  50% { box-shadow: 0 0 16px 8px #ff365a88, 0 0 0 8px #ff365a33; }
-  100% { box-shadow: 0 0 10px 2px #ff365a55, 0 0 0 0 #ff365a; }
+  0% { box-shadow: 0 0 10px 2px #ff2d5555, 0 0 0 0 #ff2d55; }
+  50% { box-shadow: 0 0 16px 8px #ff2d5588, 0 0 0 8px #ff2d5533; }
+  100% { box-shadow: 0 0 10px 2px #ff2d5555, 0 0 0 0 #ff2d55; }
 }
 
 /* live count */
@@ -23175,6 +23175,31 @@ if (!globalHeading) {
   container.appendChild(globalHeading);
 }
 
+if (!document.getElementById('live-dot-style')) {
+  const s = document.createElement('style');
+  s.id = 'live-dot-style';
+  s.textContent = `
+    .live-dot {
+      display:inline-block;
+      width:9px; height:9px;
+      background:#4ade80;
+      border-radius:50%;
+      animation: dotBlink 1.8s ease-in-out infinite;
+      box-shadow: 0 0 8px #4ade80;
+      flex-shrink:0;
+    }
+    @keyframes dotBlink {
+      0%,100% { opacity:1; transform:scale(1); }
+      50% { opacity:0.2; transform:scale(0.75); }
+    }
+    @keyframes countPop {
+      0% { transform: scale(1); }
+      40% { transform: scale(1.25); color: #86efac; text-shadow: 0 0 15px #4ade80; }
+      100% { transform: scale(1); }
+    }
+  `;
+  document.head.appendChild(s);
+}
 
 if (typeof window.lastLiveCount === 'undefined') window.lastLiveCount = null;
 
