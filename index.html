@@ -7390,7 +7390,9 @@ document.addEventListener('DOMContentLoaded', function() {
     LIVE_CHANNELS = (channels || []).map(ch => ({
       handle: (ch.handle || '').trim(), // trim space automatically, so even if you leave space in JSON it still works
       channelId: (ch.channelId || '').trim(),
-      name: ch.name || ch.handle
+      name: ch.name || ch.handle,
+	  liveDays: (ch.liveDays || '').trim(),
+	  liveTimeIST: (ch.liveTimeIST || '').trim()
     }));
     liveStreams = lives || [];
     renderLiveList();
