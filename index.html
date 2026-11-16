@@ -7233,6 +7233,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 
+  // LIVE SECTION
 function openChannelLivePlayer(channelId, title) {
   if (typeof closeVideoPlayer === 'function') closeVideoPlayer();
   window.isVideoOverlayActive = true;
@@ -7251,7 +7252,7 @@ function openChannelLivePlayer(channelId, title) {
       <div class="video-title" style="font-size:1.1rem;font-weight:bold;margin-bottom:14px;color:#ffedb5;">${title}</div>
 
       <!-- This message is HIDDEN at start. Only shows if video does NOT play -->
-      <div class="no-live-msg" style="display:none;color:#fda4af;font-size:0.95rem;padding:10px 14px;margin:0 12px 10px;background:rgba(0,0,0,0.25);border-radius:8px;line-height:1.5;">
+     <div class="no-live-msg" style="display:none;padding:12px 14px;margin:0 12px 10px;background:rgba(255,45,85,0.08);border:1px solid rgba(255,45,85,0.18);border-radius:12px;line-height:1.5;text-align:center;">
         No live is ongoing now<br>
         <span style="color:#adbbef;font-size:0.85rem;">Please close and try another channel.</span>
       </div>
@@ -7274,14 +7275,33 @@ function openChannelLivePlayer(channelId, title) {
   let hasPlayed = false;
 
   function showNoLive() {
-    if (hasPlayed) return; // if it already played once, don't show
+    if (hasPlayed) return;
     noLiveMsg.style.display = 'block';
-    // Show title + Close, like your paused logic
+    noLiveMsg.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;font-weight:700;font-size:1rem;color:#fda4af;">
+        <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:#ff2d55;box-shadow:0 0 8px #ff2d55;"></span>
+        No live right now
+      </div>
+      <div style="margin-top:6px;color:#eadb7d;font-size:0.9rem;font-weight:600;">
+        ✨ Enjoy the latest live session
+      </div>`;
+
+    // Fallback: Uploads playlist - embeddable, shows latest video first (your 1 hr ago live)
+    const frame = overlay.querySelector('.video-frame');
+    if (frame && channelId) {
+      const uploadsPlaylist = 'UU' + channelId.substring(2); // UC... -> UU...
+      frame.innerHTML = `<iframe src="https://www.youtube.com/embed/videoseries?list=${uploadsPlaylist}&autoplay=1&rel=0"
+        style="width:100%;height:100%;border:none;display:block;"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen></iframe>`;
+    }
+
     controls.style.opacity = '1';
     controls.style.pointerEvents = 'auto';
     controls.style.visibility = 'visible';
     titleEl.style.opacity = '1';
     titleEl.style.visibility = 'visible';
+    overlay.querySelector('.video-outer-container').style.background = '#171732';
   }
 
   function hideNoLive() {
@@ -7399,7 +7419,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 });
 
-
 // Convert "21:30" IST to user's local time, e.g. Canada = 11:00 AM
 function formatLiveTime(liveTimeIST, liveDays) {
   if (!liveTimeIST) return '';
@@ -7464,7 +7483,7 @@ function renderLiveList() {
         <div style="color:#adbbef;font-size:0.95rem;">${ch.handle}</div>
          ${ch.liveTimeIST ? `<div style="color:#eadb7d;font-size:0.85rem;margin-top:3px;font-weight:600;">🕐 Live: ${formatLiveTime(ch.liveTimeIST, ch.liveDays)}</div>` : ''}
 
-        <button onclick="openChannelLivePlayer('${ch.channelId}','${ch.name}')" class="mode-btn"
+        <button onclick="openChannelLivePlayer('${ch.channelId}','${ch.name}','${ch.handle}')" class="mode-btn"
           style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
           Tune In
         </button>
