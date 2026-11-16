@@ -7218,8 +7218,11 @@ if (window.currentVideoOverlay && window.currentVideoOverlay._hintTimer) {
   
   // Clear reference
   window.currentVideoOverlay = null;
-  
   window.isVideoOverlayActive = false;
+  
+    if (window.currentVideoOverlay && window.currentVideoOverlay._liveCheckTimer) {
+  clearTimeout(window.currentVideoOverlay._liveCheckTimer);
+	}
 }
 
 // Also add ESC key support
@@ -23145,31 +23148,6 @@ if (!globalHeading) {
   container.appendChild(globalHeading);
 }
 
-if (!document.getElementById('live-dot-style')) {
-  const s = document.createElement('style');
-  s.id = 'live-dot-style';
-  s.textContent = `
-    .live-dot {
-      display:inline-block;
-      width:9px; height:9px;
-      background:#4ade80;
-      border-radius:50%;
-      animation: dotBlink 1.8s ease-in-out infinite;
-      box-shadow: 0 0 8px #4ade80;
-      flex-shrink:0;
-    }
-    @keyframes dotBlink {
-      0%,100% { opacity:1; transform:scale(1); }
-      50% { opacity:0.2; transform:scale(0.75); }
-    }
-    @keyframes countPop {
-      0% { transform: scale(1); }
-      40% { transform: scale(1.25); color: #86efac; text-shadow: 0 0 15px #4ade80; }
-      100% { transform: scale(1); }
-    }
-  `;
-  document.head.appendChild(s);
-}
 
 if (typeof window.lastLiveCount === 'undefined') window.lastLiveCount = null;
 
