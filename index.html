@@ -8605,7 +8605,7 @@ function startHold(e) {
   clearTimeout(holdTimer);
   holdTimer = setTimeout(() => {
     showLang();
-  }, 500); // 0.3s — feels like tap, not hold, brings awareness
+  }, 300); // 0.3s — feels like tap, not hold, brings awareness
 }
 
 // Cancel if you lift before 1s
@@ -25381,6 +25381,19 @@ userIdDisplay.onclick = async function(e) {
 	  }
 	}, 300); // 300ms delay so popup animation finishes first
 
+	// Save "Don't show again" - only for auto popup, manual tap still works
+	const dontShowChk = popup.querySelector('#dont-show-idle-again');
+	if (dontShowChk) {
+	  dontShowChk.addEventListener('change', () => {
+		if (dontShowChk.checked) {
+		  localStorage.setItem('omHideIdlePopup', 'true');
+		  clearTimeout(idleTimer);
+		} else {
+		  localStorage.removeItem('omHideIdlePopup');
+		}
+	  });
+	}
+	
   const backdrop = document.createElement('div');
   backdrop.id = 'om-modal-backdrop';
   backdrop.style.cssText = `position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 10099; opacity: 0; transition: opacity 0.18s;`;
