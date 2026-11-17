@@ -25262,9 +25262,13 @@ userIdDisplay.onclick = async function(e) {
 
   if (!userRow) {
     popup.innerHTML = `
-      <button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
-      <div style="font-size:1.15em;font-weight:600;color:#ffd700;margin:18px 0 6px;">Connect to the OM Field</div>
-      <div style="font-size:0.88em;color:#ffeb99;opacity:0.75;margin-bottom:8px;line-height:1.45;">Tap the sacred symbol to enter the resonance</div>
+		<button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
+		<div style="font-size:1.15em;font-weight:600;color:#ffd700;margin:18px 0 6px;">Connect to the OM Field</div>
+		<div style="font-size:0.88em;color:#ffeb99;opacity:0.75;margin-bottom:8px;line-height:1.45;">Tap the sacred symbol to enter the resonance</div>
+		<label style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,215,0,0.12);font-size:0.82em;color:#b8b8b8;cursor:pointer;">
+		  <input type="checkbox" id="dont-show-idle-again" style="accent-color:#ffd700;width:1.1em;height:1.1em;cursor:pointer;">
+		  <span>Don't show again</span>
+		</label>
     `;
   } else {
     popup.innerHTML = `
