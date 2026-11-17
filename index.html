@@ -7238,6 +7238,12 @@ function openChannelLivePlayer(channelId, title) {
   if (typeof closeVideoPlayer === 'function') closeVideoPlayer();
   window.isVideoOverlayActive = true;
 
+  // SAME AS openVideoPlayer - stop screensaver + animations while video plays, stops heating
+  if (window.mainInterval) { clearInterval(window.mainInterval); window.mainInterval = null; }
+  if (window.mainRaf) { cancelAnimationFrame(window.mainRaf); window.mainRaf = null; }
+  if (typeof clearAllIdleTimeouts === 'function') clearAllIdleTimeouts();
+  if (typeof hideScreensaver === 'function') hideScreensaver();
+  
   const playerId = `live-player-${Date.now()}`;
   const overlay = document.createElement('div');
   overlay.className = 'video-overlay-container';
