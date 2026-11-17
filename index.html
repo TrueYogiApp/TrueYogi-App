@@ -7405,6 +7405,7 @@ function openChannelLivePlayer(channelId, title) {
     // Auto-hide again after 2.5 sec, like original
     clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
+	  noLiveMsg.style.display = 'none';
       controls.style.opacity = '0';
       controls.style.pointerEvents = 'none';
       controls.style.visibility = 'hidden';
@@ -25515,19 +25516,20 @@ let idleTimer;
 let idlePopupShown = false; // Add this flag
 
 function showIdlePopup() {
+  if (localStorage.getItem('omHideIdlePopup') === 'true') return; // <-- Don't show again - saved
   const userId = localStorage.getItem('omUserId');
   const userRow = livePresenceRows.find(row => row.user_id === userId);
-  if (!userRow && !idlePopupShown) { // Check flag
-    idlePopupShown = true; // Set flag so it never shows again
+  if (!userRow && !idlePopupShown) {
+    idlePopupShown = true;
     userIdDisplay.click();
   }
 }
 
 function resetIdleTimer1() {
   clearTimeout(idleTimer);
-  // Only start timer if popup hasn't been shown yet
+  if (localStorage.getItem('omHideIdlePopup') === 'true') return; // <-- Don't even start timer
   if (!idlePopupShown) {
-    idleTimer = setTimeout(showIdlePopup, 60000);
+    idleTimer = setTimeout(showIdlePopup, 60000); // <-- your duration, change to 120000 / 180000 if you want
   }
 }
 
