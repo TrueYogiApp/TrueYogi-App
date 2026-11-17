@@ -27377,7 +27377,7 @@ function unlockMeditationAudio() {
 }
 
 ['touchstart', 'mousedown', 'keydown'].forEach(evt =>
-  document.addEventListener(evt, unlockMeditationAudio, {once:true})
+  document.addEventListener(evt, unlockMeditationAudio)
 );
 
 // 2. Always use this function to play your meditation sounds
