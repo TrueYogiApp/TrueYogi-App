@@ -7399,6 +7399,7 @@ function openChannelLivePlayer(channelId, title) {
     controls.style.visibility = 'visible';
     titleEl.style.opacity = '1';
     titleEl.style.visibility = 'visible';
+	if (!hasPlayed) noLiveMsg.style.display = 'block';
     overlay.querySelector('.video-outer-container').style.background = '#171732';
 
     // Auto-hide again after 2.5 sec, like original
@@ -23382,7 +23383,7 @@ flameTimer.onclick = async function(e) {
   // 4. Longest flame — keep your current premium card version, no change here
   const longestFlameHTML = longestFlame && showLongestLine ? `
     <div style="margin-top:14px; padding:10px 12px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.18); border-radius:12px;">
-      <div style="font-size:0.68em; letter-spacing:1.8px; color:#9a8a4a; text-transform:uppercase; margin-bottom:4px;">Longest Flame Ever</div>
+      <div style="font-size:0.68em; letter-spacing:1.8px; color:#9a8a4a; text-transform:uppercase; margin-bottom:4px;">Longest Flame</div>
       <a href="#" id="longest-flame-keepers-link" style="color:#fde68a; font-weight:800; font-size:1.15em; text-decoration:none; letter-spacing:0.5px; text-shadow:0 0 12px rgba(255,215,0,0.35);">${formatFlameDuration(Math.floor(maxDuration / 1000))}</a>
       <div style="font-size:0.7em; color:#888; margin-top:2px;">Tap to see keepers of that flame</div>
     </div>
