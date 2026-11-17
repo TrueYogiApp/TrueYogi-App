@@ -20392,10 +20392,11 @@ if (truemeditateImg && (e.target === truemeditateImg || truemeditateImg.contains
     const zone = getTapZone(e.changedTouches[0].clientX, e.changedTouches[0].clientY);
     
     // Play zone-specific sound
-    playZoneSound(zone);
-		if (broadcastMode) {
-  handleZoneSoundTrigger(zone); // Now it broadcasts ONLY if checked!
-}
+	if (broadcastMode) {
+	  handleZoneSoundTrigger(zone); // plays + broadcasts
+	} else {
+	  playZoneSound(zone); // plays only locally
+	}
     
     // Show zone-specific icon
     showZoneIcon(e.changedTouches[0].clientX, e.changedTouches[0].clientY, zone);
@@ -20489,7 +20490,7 @@ supabase
       // Play sound for all others
       const omPresenceId = localStorage.getItem('omPresenceId');
       if (!omPresenceId) return; // Only for users present in OM
-      playZoneSound(payload.new.zone);
+      tryPlayZoneSound(payload.new.zone); // <-- Use unlocked DOM audio, not new Audio()
     }
   )
   .subscribe();
