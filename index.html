@@ -7302,6 +7302,17 @@ function openChannelLivePlayer(channelId, title) {
     titleEl.style.opacity = '1';
     titleEl.style.visibility = 'visible';
     overlay.querySelector('.video-outer-container').style.background = '#171732';
+	
+	    // ONLY FIX: Auto-hide title + Close + message after 4 sec - like live does
+    setTimeout(() => {
+      noLiveMsg.style.display = 'none';
+      controls.style.opacity = '0';
+      controls.style.pointerEvents = 'none';
+      controls.style.visibility = 'hidden';
+      titleEl.style.opacity = '0';
+      titleEl.style.visibility = 'hidden';
+      overlay.querySelector('.video-outer-container').style.background = 'none';
+    }, 4000);
   }
 
   function hideNoLive() {
