@@ -23015,6 +23015,129 @@ async function confirmCancelStillness() {
   if (typeof fetchPresenceRowsAndRender === 'function') fetchPresenceRowsAndRender();
 }
 
+// ===== BREATH AWARENESS - CLEAN =====
+let breathTarget = 5, breathStartTime = 0, breathTimerInt = null;
+
+function lockBreathPicker() {
+  const p = document.getElementById('breath-picker');
+  if (p) { p.style.opacity = '0.35'; p.style.filter = 'blur(1px)'; p.style.pointerEvents = 'none'; }
+  document.querySelectorAll('.breath-opt').forEach(b => b.disabled = true);
+  const inp = document.getElementById('breath-custom'); if (inp) inp.disabled = true;
+  const setBtn = document.getElementById('breath-set-btn'); if (setBtn) setBtn.disabled = true;
+}
+function unlockBreathPicker() {
+  const p = document.getElementById('breath-picker');
+  if (p) { p.style.opacity = '1'; p.style.filter = 'none'; p.style.pointerEvents = 'auto'; }
+  document.querySelectorAll('.breath-opt').forEach(b => b.disabled = false);
+  const inp = document.getElementById('breath-custom'); if (inp) inp.disabled = false;
+  const setBtn = document.getElementById('breath-set-btn'); if (setBtn) setBtn.disabled = false;
+}
+
+function breathSelect(n, btn) {
+  if (document.getElementById('breath-live').style.display === 'block') return;
+  breathTarget = n;
+  document.querySelectorAll('.breath-opt').forEach(b => { b.style.background = 'rgba(255,255,255,0.08)'; b.style.color = '#fff'; b.style.fontWeight = '400'; });
+  btn.style.background = '#fde68a'; btn.style.color = '#000'; btn.style.fontWeight = '700';
+}
+
+function breathSetCustom() {
+  if (document.getElementById('breath-live').style.display === 'block') return;
+  const v = parseInt(document.getElementById('breath-custom').value);
+  if (!v || v < 1 || v > 108) return;
+  breathTarget = v;
+  document.querySelectorAll('.breath-opt').forEach(b => { b.style.background='rgba(255,255,255,0.08)'; b.style.color='#fff'; b.style.fontWeight='400'; });
+  document.getElementById('breath-custom').style.borderColor = '#fde68a';
+}
+
+function breathStart() {
+  document.getElementById('breath-history-wrap').style.display = 'none';
+  document.getElementById('breath-history').style.display = 'none';
+  document.getElementById('breath-history-btn').textContent = '▸ View History';
+  breathStartTime = Date.now();
+  document.getElementById('breath-start-row').style.display = 'none';
+  document.getElementById('breath-done').style.display = 'none';
+  document.getElementById('breath-live').style.display = 'block';
+  document.getElementById('breath-count-big').textContent = breathTarget + ' ' + breathWord(breathTarget);
+  document.getElementById('breath-aw-timer').textContent = '00:00';
+  lockBreathPicker();
+  clearInterval(breathTimerInt);
+  breathTimerInt = setInterval(() => {
+    const s = Math.floor((Date.now() - breathStartTime) / 1000);
+    document.getElementById('breath-aw-timer').textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+  }, 500);
+}
+
+function breathStop() {
+  clearInterval(breathTimerInt);
+  document.getElementById('breath-picker').style.display = 'none';
+  const totalSec = Math.floor((Date.now() - breathStartTime) / 1000);
+  document.getElementById('breath-live').style.display = 'none';
+  document.getElementById('breath-done').style.display = 'block';
+  const avg = (totalSec / breathTarget).toFixed(1);
+  document.getElementById('breath-result').innerHTML = breathTarget + ' ' + breathWord(breathTarget) + ' in ' + Math.floor(totalSec/60) + 'm ' + (totalSec%60) + 's<br><span style="color:#888;font-size:0.85em;">~ ' + avg + 's per breath • Longer = deeper</span>';
+  unlockBreathPicker();
+  breathSave(breathTarget, totalSec);
+  document.getElementById('breath-history-wrap').style.display = 'block';
+  breathShowHistory();
+}
+
+function breathReset() {
+  document.getElementById('breath-history-wrap').style.display = 'none';
+  document.getElementById('breath-history').style.display = 'none';
+  document.getElementById('breath-history-btn').textContent = '▸ View History';
+  clearInterval(breathTimerInt);
+  document.getElementById('breath-live').style.display = 'none';
+  document.getElementById('breath-done').style.display = 'none';
+  document.getElementById('breath-start-row').style.display = 'block';
+  document.getElementById('breath-picker').style.display = 'block';
+  unlockBreathPicker();
+}
+
+async function breathSave(count, secs) {
+  const userId = localStorage.getItem('omUserId');
+  if (!userId) return;
+  try {
+    await fetch('https://trueyogi-backend-knkq.onrender.com/api/breath-sessions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId, breath_count: count, duration_seconds: secs })
+    });
+  } catch(e) {
+    // Offline / backend down — save locally so nothing is lost
+    const h = JSON.parse(localStorage.getItem('breathHistory') || '[]');
+    h.unshift({ breath_count: count, duration_seconds: secs, created_at: new Date().toISOString() });
+    localStorage.setItem('breathHistory', JSON.stringify(h.slice(0, 20)));
+  }
+  breathShowHistory();
+}
+
+async function breathShowHistory() {
+  const box = document.getElementById('breath-history');
+  if (!box) return;
+  let rows = [];
+  try {
+    const r = await fetch('https://trueyogi-backend-knkq.onrender.com/api/breath-sessions?user_id=' + localStorage.getItem('omUserId'));
+    rows = await r.json();
+    if (!Array.isArray(rows)) rows = [];
+  } catch(e) {
+    rows = JSON.parse(localStorage.getItem('breathHistory') || '[]').slice(0, 5);
+  }
+  if (!rows.length) { box.innerHTML = ''; return; }
+  box.innerHTML = '<div style="color:#fde68a;margin-bottom:4px;">Recent • Longer = deeper</div>' + rows.slice(0, 5).map(r => {
+    const d = new Date(r.created_at).toLocaleDateString([], { day:'numeric', month:'short', year:'numeric' });
+    return '<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #222;"><span>' + r.breath_count + ' ' + (r.breath_count === 1 ? 'breath' : 'breaths') + '</span><span>' + Math.floor(r.duration_seconds/60) + 'm ' + (r.duration_seconds%60) + 's • ' + d + '</span></div>';
+  }).join('');
+}
+breathShowHistory();
+
+function toggleBreathHistory() {
+  const box = document.getElementById('breath-history');
+  const btn = document.getElementById('breath-history-btn');
+  const open = box.style.display === 'block';
+  box.style.display = open ? 'none' : 'block';
+  btn.textContent = open ? '▸ View History' : '▾ Hide History';
+  if (!open) breathShowHistory();
+}
 
 // --- Main renderer (called whenever data changes or grid opens) ---
 function renderEarthGrid() {
@@ -25323,6 +25446,45 @@ userIdDisplay.onclick = async function(e) {
       ${effectiveMissed ? `<div id="pulse-missed-box" style="margin-top:6px;padding:8px 12px;background:rgba(255,68,68,0.1);border-radius:8px;font-size:0.92em;color:#ff6b6b;font-weight:bold;border:1px solid rgba(255,68,68,0.3);">Pulse missed! <span style="color:#ffd700;">OM</span> again.</div>` : ''}
       ${canBroadcast ? `<div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,215,0,0.12);"><label style="display:flex;align-items:center;justify-content:center;gap:8px;font-size:0.88em;color:#ffeb99;cursor:pointer;"><input type="checkbox" id="broadcast-toggle" style="accent-color:#ffd700;width:1.1em;height:1.1em;" ${broadcastMode ? 'checked' : ''} /><span>Broadcast Mode</span></label></div>` : ''}
     
+	<!-- ===== BREATH AWARENESS - CLEAN ===== -->
+	<div id="breath-practice" style="margin-top:16px;padding:16px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);border-radius:12px;text-align:center;">
+	  <div style="font-size:0.85em;color:#fde68a;letter-spacing:1px;">BREATH AWARENESS</div>
+	  <div style="font-size:0.78em;color:#9a9a9a;margin:6px 0 12px;">One breath = In + Out. Count in awareness.<br>Longer time = deeper stillness.</div>
+   
+	  <div id="breath-picker">
+	  <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
+		<button onclick="breathSelect(5,this)" class="breath-opt" style="background:#fde68a;color:#000;border:none;border-radius:20px;padding:8px 16px;cursor:pointer;font-weight:700;">5</button>
+		<button onclick="breathSelect(10,this)" class="breath-opt" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:8px 14px;cursor:pointer;">10</button>
+		<button onclick="breathSelect(20,this)" class="breath-opt" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:8px 14px;cursor:pointer;">20</button>
+	  </div>
+	<div style="display:flex;gap:6px;justify-content:center;align-items:center;margin-bottom:12px;box-sizing:border-box;">
+	  <input id="breath-custom" type="number" min="1" max="108" placeholder="Custom" style="width:110px;min-width:0;box-sizing:border-box;background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:7px 8px;text-align:center;outline:none;font-size:0.9em;">
+	  <button onclick="breathSetCustom()" id="breath-set-btn" style="flex-shrink:0;background:rgba(255,255,255,0.08);color:#fde68a;border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:7px 16px;cursor:pointer;">Set</button>
+	</div>
+	</div>
+	  <div id="breath-start-row">
+		<button onclick="breathStart()" class="mode-btn" style="background:#fde68a;color:#000;border:none;border-radius:20px;padding:10px 28px;cursor:pointer;font-weight:800;">Start — Close Eyes</button>
+	  </div>
+
+	  <div id="breath-live" style="display:none;">
+		<div id="breath-count-big" style="font-size:2.2em;color:#fff;font-weight:800;">5 breaths</div>
+		<div id="breath-aw-timer" style="font-size:2.4em;color:#29D884;margin:10px 0;font-weight:700;">00:00</div>
+		<div style="font-size:0.8em;color:#888;">Eyes closed... just observe your natural breath...<br>Let it come, let it go...<br>Stop when you finish.</div>
+		<button onclick="breathStop()" class="mode-btn" style="margin-top:16px;background:#fde68a;color:#000;border:none;border-radius:20px;padding:12px 36px;cursor:pointer;font-weight:800;font-size:1em;">■ Stop</button>
+	  </div>
+
+	    <div id="breath-done" style="display:none;margin-top:12px;background:rgba(41,216,132,0.08);border:1px solid rgba(41,216,132,0.35);border-radius:12px;padding:14px 10px;">
+		<div style="font-size:1.1em;color:#fde68a;">✨ Complete</div>
+		<div id="breath-result" style="color:#fff;margin:8px 0;"></div>
+		<button onclick="breathReset()" class="mode-btn" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,215,0,0.3);border-radius:20px;padding:8px 18px;cursor:pointer;">Again</button>
+	  </div>
+
+	<div id="breath-history-wrap" style="margin-top:14px;display:none;">
+	  <button onclick="toggleBreathHistory()" id="breath-history-btn" style="background:none;border:none;color:#888;cursor:pointer;font-size:0.8em;padding:0;">▸ View History</button>
+	  <div id="breath-history" style="display:none;text-align:left;font-size:0.8em;color:#aaa;margin-top:6px;"></div>
+	</div>
+	</div>
+	
 	<!-- ===== STAY IN THE FLAME (optional) ===== -->
 	<div style="margin-top:16px; padding:14px; background:rgba(255,215,0,0.06); border:1px solid rgba(255,215,0,0.25); border-radius:12px; text-align:center;">
 	<div id="stillness-header" style="display:${isInStillnessNow ? 'none' : 'block'};">
