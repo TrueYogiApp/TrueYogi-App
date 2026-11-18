@@ -7498,7 +7498,7 @@ function renderLiveList() {
       </div>
       <div style="flex:1;">
         <div style="font-weight:bold;font-size:1.08rem;color:#fffbe5;">${ch.name}</div>
-         ${ch.liveTimeIST ? `<div style="color:#eadb7d;font-size:0.85rem;margin-top:3px;font-weight:600;">🕐 Live: ${formatLiveTime(ch.liveTimeIST, ch.liveDays)}</div>` : ''}
+         ${ch.liveTimeIST ? `<div style="color:#eadb7d;font-size:0.85rem;margin-top:3px;font-weight:600;">🕐: ${formatLiveTime(ch.liveTimeIST, ch.liveDays)}</div>` : ''}
 
         <button onclick="openChannelLivePlayer('${ch.channelId}','${ch.name}','${ch.handle}')" class="mode-btn"
           style="margin-top:7px;padding:5px 14px;background:#28a745;color:#fff;border-radius:16px;border:none;cursor:pointer;font-size:0.92rem;font-weight:bold;box-shadow:0 0 12px #28a74522;">
