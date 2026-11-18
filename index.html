@@ -23049,6 +23049,8 @@ function breathSetCustom() {
   document.getElementById('breath-custom').style.borderColor = '#fde68a';
 }
 
+function breathWord(n) { return n === 1 ? 'breath' : 'breaths'; }
+
 function breathStart() {
   document.getElementById('breath-history-wrap').style.display = 'none';
   document.getElementById('breath-history').style.display = 'none';
