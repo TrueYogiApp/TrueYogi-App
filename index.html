@@ -9816,6 +9816,16 @@ function toggleResetButton(show) {
   }
 }
 
+// Silent check — no red HEAD 400 in console
+function imageExists(url) {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = url;
+  });
+}
+
 // === LOAD USER AVATAR ===
 async function loadUserAvatar() {
   if (!userId) {
@@ -9830,7 +9840,7 @@ async function loadUserAvatar() {
     const avatarUrl = `${supabaseUrl}/storage/v1/object/public/avatars/users/${userId}.webp`;
     
     // Use fetch with HEAD to check if file exists
-    const response = await fetch(avatarUrl, { method: 'HEAD' });
+    const response = { ok: await imageExists(avatarUrl) };
     
     if (response.ok) {
       // File exists - load it with cache busting
@@ -9840,7 +9850,7 @@ async function loadUserAvatar() {
     } else {
       // Try PNG format as fallback
       const pngUrl = `${supabaseUrl}/storage/v1/object/public/avatars/users/${userId}.png`;
-      const pngResponse = await fetch(pngUrl, { method: 'HEAD' });
+      const pngResponse = { ok: await imageExists(pngUrl) };
       
       if (pngResponse.ok) {
         avatarImg.src = pngUrl + '?t=' + Date.now();
