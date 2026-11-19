@@ -23057,6 +23057,7 @@ function breathSetCustom() {
 function breathWord(n) { return n === 1 ? 'breath' : 'breaths'; }
 
 function breathStart() {
+  document.getElementById('current-user-mins-popup')?.classList.add('breath-running');
   document.getElementById('breath-history-wrap').style.display = 'none';
   document.getElementById('breath-history').style.display = 'none';
   document.getElementById('breath-history-btn').textContent = '▸ View History';
@@ -23089,6 +23090,7 @@ function breathStop() {
 }
 
 function breathReset() {
+  document.getElementById('current-user-mins-popup')?.classList.remove('breath-running');
   document.getElementById('breath-history-wrap').style.display = 'none';
   document.getElementById('breath-history').style.display = 'none';
   document.getElementById('breath-history-btn').textContent = '▸ View History';
@@ -25476,7 +25478,8 @@ userIdDisplay.onclick = async function(e) {
 	  <div id="breath-live" style="display:none;">
 		<div id="breath-count-big" style="font-size:2.2em;color:#fff;font-weight:800;">5 breaths</div>
 		<div id="breath-aw-timer" style="font-size:2.4em;color:#29D884;margin:10px 0;font-weight:700;">00:00</div>
-		<div style="font-size:0.8em;color:#888;">Eyes closed... just observe your natural breath...<br>Let it come, let it go...<br>Stop when you finish.</div>
+		<div style="font-size:1.05em;color:#fff;font-weight:500;line-height:1.5;margin-top:4px;">Eyes closed... just observe your natural<br>breath...</div>
+		<div style="font-size:0.9em;color:#aaa;line-height:1.6;margin-top:14px;">Let it come, let it go...<br>Stop when you finish.</div>
 		<button onclick="breathStop()" class="mode-btn" style="margin-top:16px;background:#fde68a;color:#000;border:none;border-radius:20px;padding:12px 36px;cursor:pointer;font-weight:800;font-size:1em;">■ Stop</button>
 	  </div>
 
@@ -25569,6 +25572,44 @@ userIdDisplay.onclick = async function(e) {
   backdrop.style.cssText = `position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(3px); z-index: 10099; opacity: 0; transition: opacity 0.18s;`;
   document.body.appendChild(backdrop);
   document.body.appendChild(popup);
+  
+  // --- Breath blur: no need to edit main file ---
+(function(){
+  // 1. Make sure overlay CSS exists (even if <style> in innerHTML was stripped)
+  if (!document.getElementById('breath-blur-style')) {
+    const st = document.createElement('style');
+    st.id = 'breath-blur-style';
+st.textContent = `#current-user-mins-popup.breath-running>*:not(#breath-practice):not(#om-modal-close){filter:blur(8px);opacity:.35;pointer-events:none}#current-user-mins-popup.breath-running #breath-practice{filter:none!important;opacity:1!important;position:relative;z-index:20}`;
+    document.head.appendChild(st);
+  }
+  // 2. Hook Start / Stop / Again buttons INSIDE this popup
+  const startBtn = popup.querySelector('[onclick="breathStart()"]');
+  if (startBtn) startBtn.addEventListener('click', () => {
+  popup.classList.add('breath-running');
+  // Center Breath section in popup, so no manual scroll
+  setTimeout(() => {
+    const bp = popup.querySelector('#breath-practice');
+    if (bp) bp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, 60);
+});
+  const stopBtn = popup.querySelector('[onclick="breathStop()"]');
+  if (stopBtn) stopBtn.addEventListener('click', () => {
+    // Stop = KEEP blur, stay centered
+    setTimeout(() => {
+      const bp = popup.querySelector('#breath-practice');
+      if (bp) bp.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 120);
+  });
+  const againBtn = popup.querySelector('[onclick="breathReset()"]');
+  if (againBtn) againBtn.addEventListener('click', () => {
+    // Again = ONLY now go back to top + clear
+    popup.classList.remove('breath-running');
+    setTimeout(() => {
+      popup.scrollTo({ top: 0, behavior: 'smooth' });
+    }, 60);
+  });
+})();
+
   function closeModal(){ popup.style.opacity=0; popup.style.transform='translate(-50%, -50%) scale(0.96)'; backdrop.style.opacity=0; setTimeout(()=>{popup.remove(); backdrop.remove();},220); }
   backdrop.onclick = closeModal;
   popup.querySelector('#om-modal-close').onclick = closeModal;
