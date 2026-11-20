@@ -10556,14 +10556,25 @@ function updateTimerDisplay() {
   const totalSeconds = minutes * 60;
   const remaining = totalSeconds - elapsedSeconds;
 
-  // Silence using TOP settings: 29 music + 1 silence = 30 cycle
-  if (minutes > PAUSE_AFTER_MINUTES && audio) {
-    const cycleLength = (PAUSE_AFTER_MINUTES + PAUSE_DURATION_MINUTES) * 60;
-    const cycle = elapsedSeconds % cycleLength;
-    const isSilenceMinute = cycle >= (PAUSE_AFTER_MINUTES * 60) && cycle < cycleLength;
-    audio.muted = isSilenceMinute;
-    audio.volume = isSilenceMinute ? 0 : 1;
+// Silence using TOP settings: 29 music + 1 silence = 30 cycle
+if (minutes > PAUSE_AFTER_MINUTES && audio) {
+  const cycleLength = (PAUSE_AFTER_MINUTES + PAUSE_DURATION_MINUTES) * 60;
+  const cycle = elapsedSeconds % cycleLength;
+  const isSilenceMinute = cycle >= (PAUSE_AFTER_MINUTES * 60) && cycle < cycleLength;
+
+  if (isSilenceMinute) {
+    // Silence: keep playing but volume 0 - DON'T use muted=true, muted kills iOS session
+    audio.volume = 0;
+    audio.muted = false;
+  } else {
+    // Music: make sure it's actually PLAYING, not just unmuted
+    audio.volume = 1;
+    audio.muted = false;
+    if (yogiPlaying && audio.paused) {
+      audio.play().catch(() => {}); // try to resume after lock
+    }
   }
+}
 
   if (remaining >= 0) {
     let m = Math.floor(remaining / 60);
