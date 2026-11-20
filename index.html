@@ -23913,9 +23913,9 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 	  box-sizing: border-box;
 	  text-align: center;
     ">
-		<div style="margin-bottom: 16px; color: #fff; font-size: 1.05em;">
-		 <span style="color:#ffd700;font-weight:bold;">${window.usernameCache?.[toUserId] || getShortUserId(toUserId)}</span>
-		</div>	  
+	<div style="margin-bottom: 16px; color: #fff; font-size: 1.05em;">
+	 <span class="sender-profile-link" data-user-id="${toUserId}" title="View profile" style="color:#ffd700;font-weight:bold;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[toUserId] || getShortUserId(toUserId)}</span>
+	</div>  
       <h3 style="margin-bottom: 16px; font-size: 0.95em; color: #fde68a; font-weight: 400;">Ring the Guidance Bell</h3>
       <p style="margin-bottom: 15px; color: #fff; font-size: 1.1em;">
         Send a gentle bell to invite connection.
@@ -24323,9 +24323,12 @@ if (document.getElementById('my-notifications')) {
         modal.style = `
           position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10100;
           background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;`;
-
+        const myId = localStorage.getItem('omUserId');
         modal.innerHTML = `
-          <div style="background:#222;color:#ffd700;padding:24px 30px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:290px;max-width:400px;max-height:80vh;overflow-y:auto;">
+          <div style="background:#222;color:#ffd700;padding:24px 30px;border-radius:16px;...">
+            <div style="text-align:center;margin-bottom:12px;">
+              <span class="sender-profile-link" data-user-id="${myId}" title="View my profile" style="color:#ffd700;font-weight:bold;font-size:1.05em;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[myId] || getShortUserId(myId)}</span>
+            </div>
             <h3 style="margin-bottom:15px;font-size:1.17em;">🔔 Callback Requests</h3>
 			<ul id="pending-list" style="list-style:none;padding-left:0;margin:0;">${userList}</ul>
 			<div style="display:flex;justify-content:space-between;margin:10px 0 16px;">
