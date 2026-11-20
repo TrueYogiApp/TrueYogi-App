@@ -10540,42 +10540,29 @@ let yogiPlaying = false;
 let yogiTimer = null;
 let yogiInterval = null;
 let startMessageTimeout = null;
-let silenceTimeout = null;
-let resumeTimeout = null;
 let meditationStartTime = null;
 
-// === The repeated audio pause function ===
-function scheduleAudioVolumeSilence(minutes, audio) {
-  silenceTimeout = setTimeout(() => {
-    if (!yogiPlaying) return;
-    // Mute the audio as well as set volume to zero
-    audio.volume = 0.0;
-    audio.muted = true;
-
-    resumeTimeout = setTimeout(() => {
-      if (!yogiPlaying) return;
-      // Restore volume and unmute
-      audio.volume = 1.0;
-      audio.muted = false;
-      // Schedule the next silence cycle
-      scheduleAudioVolumeSilence(minutes, audio);
-    }, PAUSE_DURATION_MINUTES * 60 * 1000);
-
-  }, PAUSE_AFTER_MINUTES * 60 * 1000);
-}
-
-// === Your timer update logic: (never pauses) ===
+// === Your timer update logic ===
 function updateTimerDisplay() {
   if (!meditationStartTime) return;
   const minutesText = document.getElementById("yogi-total-minutes").innerText;
   const minutes = parseInt(minutesText) || 0;
   const timerDisplay = document.getElementById("deep-timer");
+  const audio = document.getElementById("yogiMeditationAudio");
 
   const now = Date.now();
   const elapsedMs = now - meditationStartTime;
   const elapsedSeconds = Math.floor(elapsedMs / 1000);
   const totalSeconds = minutes * 60;
   const remaining = totalSeconds - elapsedSeconds;
+
+  // NEW SIMPLE SILENCE: 29-30 min, 59-60 min, 89-90 min... = 1 min silence for awareness
+  if (minutes > 29 && audio) {
+    const cycle = elapsedSeconds % (30 * 60); // 0-1799 sec, repeats every 30 min
+    const isSilenceMinute = cycle >= (29 * 60) && cycle < (30 * 60);
+    audio.muted = isSilenceMinute;
+    audio.volume = isSilenceMinute ? 0 : 1;
+  }
 
   if (remaining >= 0) {
     let m = Math.floor(remaining / 60);
@@ -10585,7 +10572,6 @@ function updateTimerDisplay() {
       String(s).padStart(2,"0");
   }
 }
-
 
 function toggleYogiMeditation() {
   const minutesText = document.getElementById("yogi-total-minutes").innerText;
@@ -10634,11 +10620,6 @@ function toggleYogiMeditation() {
       timerDisplay.style.fontSize = "";
       yogiInterval = setInterval(updateTimerDisplay, 1000);
 
-      // Use the new recursive pause logic for repeated pauses
-      if (minutes > PAUSE_AFTER_MINUTES) {
-        scheduleAudioVolumeSilence(minutes, audio);
-      }
-
       // Main timer to end meditation
       yogiTimer = setTimeout(() => {
         audio.pause();
@@ -10666,8 +10647,6 @@ function toggleYogiMeditation() {
     updateDeepPresence && updateDeepPresence(false);
 
     if (startMessageTimeout) { clearTimeout(startMessageTimeout); startMessageTimeout = null; }
-    if (silenceTimeout) { clearTimeout(silenceTimeout); silenceTimeout = null; }
-    if (resumeTimeout) { clearTimeout(resumeTimeout); resumeTimeout = null; }
     if (yogiTimer) { clearTimeout(yogiTimer); yogiTimer = null; }
     if (yogiInterval) { clearInterval(yogiInterval); yogiInterval = null; }
 
