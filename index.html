@@ -23913,9 +23913,12 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 	  box-sizing: border-box;
 	  text-align: center;
     ">
-	<div style="margin-bottom: 16px; color: #fff; font-size: 1.05em;">
+	<div style="margin-bottom: 4px; color: #fff; font-size: 1.05em; text-align:center;">
 	 <span class="sender-profile-link" data-user-id="${toUserId}" title="View profile" style="color:#ffd700;font-weight:bold;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[toUserId] || getShortUserId(toUserId)}</span>
-	</div>  
+	</div>
+	<div style="text-align:center;margin-bottom: 16px;">
+	  <span style="color:#888;font-size:0.85em;">You: </span><span class="sender-profile-link" data-user-id="${fromUserId || localStorage.getItem('omUserId')}" title="View my profile" style="color:#fde68a;font-weight:bold;font-size:0.9em;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[fromUserId || localStorage.getItem('omUserId')] || getShortUserId(fromUserId || localStorage.getItem('omUserId'))}</span>
+	</div>
       <h3 style="margin-bottom: 16px; font-size: 0.95em; color: #fde68a; font-weight: 400;">Ring the Guidance Bell</h3>
       <p style="margin-bottom: 15px; color: #fff; font-size: 1.1em;">
         Send a gentle bell to invite connection.
