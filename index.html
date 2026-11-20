@@ -10511,29 +10511,20 @@ document.addEventListener('keydown', function(e) {
 
 
 // === Deep Presence Tracking ===
-async function updateDeepPresence(isDeep) {
+async function updateDeepPresence(isDeep, minutes = 0) {
   const presenceId = localStorage.getItem('omPresenceId');
-  
-  // Only update if user is in OM presence
-  if (!presenceId) {
-    //console.log('No OM presence, skipping deep presence update');
-    return false;
-  }
-  
+  if (!presenceId) return false;
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/update-deep-presence', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         presence_id: presenceId,
-        deep_presence: isDeep
+        deep_presence: isDeep,
+        duration_minutes: isDeep ? minutes : 0 // NEW: just send minutes
       })
     });
-    
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-    
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return true;
   } catch (err) {
     console.error('Failed to update deep presence:', err);
@@ -10624,7 +10615,7 @@ function toggleYogiMeditation() {
     dim.style.pointerEvents = "auto";
 
     // Update deep presence if you need to
-    updateDeepPresence && updateDeepPresence(true);
+    updateDeepPresence && updateDeepPresence(true, minutes);
 
     // Start music immediately
     audio.currentTime = 0;
@@ -10712,29 +10703,20 @@ document.getElementById("deep-dim-layer").addEventListener("click", () => {
 
 
 // === Ultimate Stillness Tracking (for challenge history meditation) ===
-async function updateUltimateStillness(isStill) {
+async function updateUltimateStillness(isStill, minutes = 0) {
   const presenceId = localStorage.getItem('omPresenceId');
-  
-  // Only update if user is in OM presence
-  if (!presenceId) {
-    //console.log('No OM presence, skipping ultimate stillness update');
-    return false;
-  }
-  
+  if (!presenceId) return false;
   try {
     const res = await fetch('https://trueyogi-backend-knkq.onrender.com/update-ultimate-stillness', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         presence_id: presenceId,
-        ultimate_stillness: isStill
+        ultimate_stillness: isStill,
+        duration_minutes: isStill ? minutes : 0 // NEW: just send minutes
       })
     });
-    
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`);
-    }
-    
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return true;
   } catch (err) {
     console.error('Failed to update ultimate stillness:', err);
@@ -10819,7 +10801,7 @@ function toggleUltimateStillnessMeditation(minutes) {
     dim.style.opacity = "0.5";
     dim.style.pointerEvents = "auto";
 
-    updateUltimateStillness && updateUltimateStillness(true);
+    updateUltimateStillness && updateUltimateStillness(true, minutes);
 
     audio.currentTime = 0;
     audio.volume = 1.0;
