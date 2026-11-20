@@ -10556,10 +10556,11 @@ function updateTimerDisplay() {
   const totalSeconds = minutes * 60;
   const remaining = totalSeconds - elapsedSeconds;
 
-  // NEW SIMPLE SILENCE: 29-30 min, 59-60 min, 89-90 min... = 1 min silence for awareness
-  if (minutes > 29 && audio) {
-    const cycle = elapsedSeconds % (30 * 60); // 0-1799 sec, repeats every 30 min
-    const isSilenceMinute = cycle >= (29 * 60) && cycle < (30 * 60);
+  // Silence using TOP settings: 29 music + 1 silence = 30 cycle
+  if (minutes > PAUSE_AFTER_MINUTES && audio) {
+    const cycleLength = (PAUSE_AFTER_MINUTES + PAUSE_DURATION_MINUTES) * 60;
+    const cycle = elapsedSeconds % cycleLength;
+    const isSilenceMinute = cycle >= (PAUSE_AFTER_MINUTES * 60) && cycle < cycleLength;
     audio.muted = isSilenceMinute;
     audio.volume = isSilenceMinute ? 0 : 1;
   }
@@ -10626,8 +10627,6 @@ function toggleYogiMeditation() {
 		audio.volume = 1.0;
 		audio.muted = false;
         clearInterval(yogiInterval);
-        if (silenceTimeout) clearTimeout(silenceTimeout);
-        if (resumeTimeout) clearTimeout(resumeTimeout);
 
         updateDeepPresence && updateDeepPresence(false);
 
@@ -10712,8 +10711,6 @@ let ultimatePlaying = false;
 let ultimateTimer = null;
 let ultimateInterval = null;
 let ultimateStartMessageTimeout = null;
-let ultimateSilenceTimeout = null;
-let ultimateResumeTimeout = null;
 let ultimateMeditationStartTime = null;
 let ultimateSessionMinutes = null;
 
@@ -10734,35 +10731,29 @@ function showUltimateMessage(timerDisplay, msg, duration, next) {
 function updateUltimateTimerDisplay() {
   if (!ultimateMeditationStartTime) return;
   const timerDisplay = document.getElementById("deep-timer");
+  const audio = document.getElementById("yogiMeditationAudio2");
   const minutes = ultimateSessionMinutes || 0;
   const now = Date.now();
   const elapsedMs = now - ultimateMeditationStartTime;
   const elapsedSeconds = Math.floor(elapsedMs / 1000);
   const totalSeconds = minutes * 60;
   const remaining = totalSeconds - elapsedSeconds;
+
+  // Silence using TOP settings: 57 music + 3 silence = 60 cycle
+  if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES && audio) {
+    const cycleLength = (ULTIMATE_PAUSE_AFTER_MINUTES + ULTIMATE_PAUSE_DURATION_MINUTES) * 60;
+    const cycle = elapsedSeconds % cycleLength;
+    const isSilence = cycle >= (ULTIMATE_PAUSE_AFTER_MINUTES * 60) && cycle < cycleLength;
+    audio.muted = isSilence;
+    audio.volume = isSilence ? 0 : 1;
+  }
+
   if (remaining >= 0) {
     let m = Math.floor(remaining / 60);
     let s = remaining % 60;
     timerDisplay.innerText =
       String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
   }
-}
-
-// --- Repeated volume silence ---
-function scheduleUltimateAudioVolumeSilence(minutes, audio) {
-  ultimateSilenceTimeout = setTimeout(() => {
-    if (!ultimatePlaying) return;
-    audio.volume = 0.0;
-    audio.muted = true;
-
-    ultimateResumeTimeout = setTimeout(() => {
-      if (!ultimatePlaying) return;
-      audio.volume = 1.0;
-      audio.muted = false;
-      scheduleUltimateAudioVolumeSilence(minutes, audio);
-    }, ULTIMATE_PAUSE_DURATION_MINUTES * 60 * 1000);
-
-  }, ULTIMATE_PAUSE_AFTER_MINUTES * 60 * 1000);
 }
 
 // --- MAIN FUNCTION ---
@@ -10802,10 +10793,6 @@ function toggleUltimateStillnessMeditation(minutes) {
         timerDisplay.style.fontSize = "";
         // Start timer interval
         ultimateInterval = setInterval(updateUltimateTimerDisplay, 1000);
-        // Schedule silence logic
-        if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES) {
-          scheduleUltimateAudioVolumeSilence(minutes, audio);
-        }
 
         // End timer
         ultimateTimer = setTimeout(() => {
@@ -10813,9 +10800,6 @@ function toggleUltimateStillnessMeditation(minutes) {
           audio.volume = 1.0;
           audio.muted = false;
           clearInterval(ultimateInterval);
-          if (ultimateSilenceTimeout) clearTimeout(ultimateSilenceTimeout);
-          if (ultimateResumeTimeout) clearTimeout(ultimateResumeTimeout);
-
           updateUltimateStillness && updateUltimateStillness(false);
 
           showUltimateMessage(
@@ -10842,14 +10826,6 @@ function toggleUltimateStillnessMeditation(minutes) {
     if (ultimateStartMessageTimeout) {
       clearTimeout(ultimateStartMessageTimeout);
       ultimateStartMessageTimeout = null;
-    }
-    if (ultimateSilenceTimeout) {
-      clearTimeout(ultimateSilenceTimeout);
-      ultimateSilenceTimeout = null;
-    }
-    if (ultimateResumeTimeout) {
-      clearTimeout(ultimateResumeTimeout);
-      ultimateResumeTimeout = null;
     }
     if (ultimateTimer) {
       clearTimeout(ultimateTimer);
