@@ -22912,23 +22912,14 @@ function confirmStillness() {
 
 
 async function setStillnessHours(hours) {
-  const until = new Date(Date.now() + hours * 60 * 60 * 1000).toISOString();
-  
-  // Update your row in om_presence
-  const { error } = await supabase
-    .from('om_presence')
-    .update({ intended_until: until, last_heartbeat: new Date().toISOString() })
-    .eq('user_id', omUserId);
-
-  if (error) { console.log('stillness error', error); return; }
-
-  // --- NEW: also save to om_sessions so reward cron knows ---
-  await supabase
-    .from('om_sessions')
-    .update({ intended_until: until })
-    .eq('user_id', omUserId)
-    .is('ended_at', null);
-  // --- END NEW ---
+  const res = await fetch(`${API_BASE_URL}/api/stillness`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ om_user_id: omUserId, hours })
+  });
+  const result = await res.json();
+  if (!result.success) { console.log('stillness error', result); return; }
+  const until = result.intended_until;
 
   // Show active UI
   document.getElementById('stillness-picker').style.display = 'none';
@@ -22994,8 +22985,11 @@ async function confirmCancelStillness() {
   if (omEl) { omEl.muted = false; omEl.volume = 1; omEl.currentTime = 0; omEl.play().catch(()=>{}); }
 
   const nowISO = new Date().toISOString();
-  await supabase.from('om_presence').update({ intended_until: null, last_heartbeat: nowISO }).eq('user_id', omUserId);
-  await supabase.from('om_sessions').update({ intended_until: null, last_heartbeat: nowISO }).eq('user_id', omUserId).is('ended_at', null);
+  await fetch(`${API_BASE_URL}/api/stillness/cancel`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ om_user_id: omUserId })
+  });
 
   document.getElementById('stillness-picker').style.display = 'block';
   document.getElementById('stillness-active').style.display = 'none';
