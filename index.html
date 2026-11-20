@@ -10750,14 +10750,23 @@ function updateUltimateTimerDisplay() {
   const totalSeconds = minutes * 60;
   const remaining = totalSeconds - elapsedSeconds;
 
-  // Silence using TOP settings: 57 music + 3 silence = 60 cycle
-  if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES && audio) {
-    const cycleLength = (ULTIMATE_PAUSE_AFTER_MINUTES + ULTIMATE_PAUSE_DURATION_MINUTES) * 60;
-    const cycle = elapsedSeconds % cycleLength;
-    const isSilence = cycle >= (ULTIMATE_PAUSE_AFTER_MINUTES * 60) && cycle < cycleLength;
-    audio.muted = isSilence;
-    audio.volume = isSilence ? 0 : 1;
+// Silence using TOP settings: 57 music + 3 silence = 60 cycle
+if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES && audio) {
+  const cycleLength = (ULTIMATE_PAUSE_AFTER_MINUTES + ULTIMATE_PAUSE_DURATION_MINUTES) * 60;
+  const cycle = elapsedSeconds % cycleLength;
+  const isSilence = cycle >= (ULTIMATE_PAUSE_AFTER_MINUTES * 60) && cycle < cycleLength;
+
+  if (isSilence) {
+    audio.volume = 0;
+    audio.muted = false;
+  } else {
+    audio.volume = 1;
+    audio.muted = false;
+    if (ultimatePlaying && audio.paused) {
+      audio.play().catch(() => {});
+    }
   }
+}
 
   if (remaining >= 0) {
     let m = Math.floor(remaining / 60);
