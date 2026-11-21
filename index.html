@@ -26636,7 +26636,8 @@ function stopCallRealtime() {
 // Add this function to play bell sound (loops 3 times)
 function playCallbackBellSound() {
   try {
-    const audio = new Audio('https://assets.trueyogi.app/assets/incomingbell.wav');
+    const audio = window.callbackBellAudio || new Audio('https://assets.trueyogi.app/assets/incomingbell.wav');
+    audio.currentTime = 0;
     audio.volume = 0.9;
     let playCount = 0;
     const maxPlays = 3;
@@ -26711,17 +26712,31 @@ function showCallbackNotification(fromUserId) {
 
 // Unlock audio on first tap — browser needs this once
 let audioUnlocked = false;
+// Unlock callback bell on first tap/click/key — silent unlock only, don't play it
 function unlockCallbackAudio() {
-  if (audioUnlocked) return;
-  audioUnlocked = true;
   try {
-    const a = new Audio('https://assets.trueyogi.app/assets/incomingbell.wav');
-    a.volume = 0;
-    a.play().catch(()=>{});
+    window.callbackBellAudio = window.callbackBellAudio || new Audio('https://assets.trueyogi.app/assets/incomingbell.wav');
+    const el = window.callbackBellAudio;
+    el.muted = true;    // ← Mute for real silence
+    el.volume = 0;
+    el.play()
+      .then(() => {
+        setTimeout(() => {
+          el.pause();
+          el.currentTime = 0;
+          el.muted = false; // ← Unmute for future!
+          el.volume = 0.9;  // Reset to normal loudness
+        }, 50);
+      })
+      .catch(()=>{});
   } catch(e) {}
+  window.yogiAudioCtx = window.yogiAudioCtx || new (window.AudioContext || window.webkitAudioContext)();
+  window.yogiAudioCtx.resume && window.yogiAudioCtx.resume();
 }
-document.addEventListener('click', unlockCallbackAudio, { once: true });
-document.addEventListener('touchstart', unlockCallbackAudio, { once: true });
+
+['touchstart', 'mousedown', 'keydown'].forEach(evt =>
+  document.addEventListener(evt, unlockCallbackAudio)
+);
 
 function closeEarthGrid() {
   earthGridOpen = false;
