@@ -26637,35 +26637,20 @@ function stopCallRealtime() {
 function playCallbackBellSound() {
   try {
     const audio = new Audio('https://assets.trueyogi.app/assets/incomingbell.wav');
-    audio.volume = 0.9; // Set to 90% volume
-    
+    audio.volume = 0.9;
     let playCount = 0;
     const maxPlays = 3;
-    
-    // Function to play and handle loop
-    function playWithLoop() {
-      if (playCount < maxPlays) {
-        playCount++;
-        audio.play()
-          .catch(e => console.log('Audio play failed:', e));
-      }
+    function playOnce() {
+      if (playCount >= maxPlays) return;
+      playCount++;
+      const p = audio.play();
+      // If browser blocks, try again in 500ms
+      if (p) p.catch(() => setTimeout(playOnce, 500));
     }
-    
-    // When audio ends, play again if we haven't reached max plays
-    audio.addEventListener('ended', () => {
-      if (playCount < maxPlays) {
-        playWithLoop();
-      }
-    });
-    
-    // Start first play
-    playWithLoop();
-    
-  } catch (e) {
-    console.log('Bell sound error:', e);
-  }
+    audio.addEventListener('ended', playOnce);
+    playOnce();
+  } catch(e) { console.log('Bell sound error:', e); }
 }
-
 
 
 function showCallbackNotification(fromUserId) {
@@ -26723,6 +26708,20 @@ function showCallbackNotification(fromUserId) {
     }
   }, 9000);
 }
+
+// Unlock audio on first tap — browser needs this once
+let audioUnlocked = false;
+function unlockCallbackAudio() {
+  if (audioUnlocked) return;
+  audioUnlocked = true;
+  try {
+    const a = new Audio('https://assets.trueyogi.app/assets/incomingbell.wav');
+    a.volume = 0;
+    a.play().catch(()=>{});
+  } catch(e) {}
+}
+document.addEventListener('click', unlockCallbackAudio, { once: true });
+document.addEventListener('touchstart', unlockCallbackAudio, { once: true });
 
 function closeEarthGrid() {
   earthGridOpen = false;
