@@ -18946,6 +18946,16 @@ function showNextWisdom() {
   // 🟢 Always hide the like button at start
   document.getElementById('wisdom-like-container').style.display = 'none';
 
+  // Play wisdom sound on 1st, 4th, 7th, 10th...
+  const upcomingNumber = wisdomShownCount + 1;
+  if (upcomingNumber % 4 === 1) {
+    const moonSound = document.getElementById('moon-sound');
+    if (moonSound) {
+      moonSound.currentTime = 0;
+      moonSound.play().catch(()=>{});
+    }
+  }
+  
   const wisdomSection = document.getElementById('wisdom-section');
   const wisdomTextEl = document.getElementById('wisdom-text');
   const wisdomBtn = document.getElementById('show-wisdom');
