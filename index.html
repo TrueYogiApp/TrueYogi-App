@@ -22993,8 +22993,10 @@ function breathStart() {
   lockBreathPicker();
   clearInterval(breathTimerInt);
   breathTimerInt = setInterval(() => {
+    const el = document.getElementById('breath-aw-timer');
+    if (!el) { clearInterval(breathTimerInt); return; }
     const s = Math.floor((Date.now() - breathStartTime) / 1000);
-    document.getElementById('breath-aw-timer').textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
+    el.textContent = String(Math.floor(s/60)).padStart(2,'0') + ':' + String(s%60).padStart(2,'0');
   }, 500);
 }
 
