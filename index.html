@@ -22742,9 +22742,12 @@ function selectStillnessHours(hours, btn) {
 	// If until is next day, show day too — e.g. Thu 04:30 AM, else just time
 	const untilDate = new Date(Date.now() + hours * 60 * 60 * 1000);
 	const isNextDay = untilDate.getDate() !== new Date().getDate();
+	
+  // ADDED .replace(/\./g, '') HERE
 	const untilStr = isNextDay
-	  ? untilDate.toLocaleDateString([], { weekday: 'short' }) + ' ' + untilDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-	  : untilDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+	  ? untilDate.toLocaleDateString([], { weekday: 'short' }) + ' ' + untilDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\./g, '')
+	  : untilDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\./g, '');
+	  
   document.getElementById('stillness-selected-label').textContent = hours + 'h';
   document.getElementById('stillness-selected-until').textContent = untilStr;
   document.getElementById('stillness-ok-row').style.display = 'block';
@@ -22767,9 +22770,9 @@ function showStillnessConfirm() {
 
 	const until = new Date(Date.now() + pendingStillnessHours * 60 * 60 * 1000);
 	const isNextDay = until.getDate() !== new Date().getDate();
-	const untilStr = isNextDay
-	  ? until.toLocaleDateString([], { weekday: 'short' }) + ' ' + until.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-	  : until.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const untilStr = isNextDay
+      ? until.toLocaleDateString([], { weekday: 'short' }) + ' ' + until.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\./g, '')
+      : until.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\./g, '');
 
   const pop = document.createElement('div');
   pop.id = 'stillness-confirm-popup';
@@ -23204,14 +23207,18 @@ const effectiveMissed = wasMissed && !isInStillnessNow;
   let stillLeftText = '';
   let stillUntilText = '';
   if (isInStillnessNow) {
-    const leftMs = savedStillUntil - new Date();
+    // Added .getTime() for safe math
+    const leftMs = savedStillUntil.getTime() - new Date().getTime(); 
     const h = Math.floor(leftMs / 3600000);
     const m = Math.floor((leftMs % 3600000) / 60000);
     stillLeftText = `${h}h ${String(m).padStart(2, '0')}m`;
-	const _isNextDay = savedStillUntil.getDate() !== new Date().getDate();
-	stillUntilText = _isNextDay
-	  ? savedStillUntil.toLocaleDateString([], { weekday: 'short' }) + ' ' + savedStillUntil.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-	  : savedStillUntil.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    
+    const _isNextDay = savedStillUntil.getDate() !== new Date().getDate();
+    
+    // Added .replace(/\./g, '') to strip the extra dots
+    stillUntilText = _isNextDay
+      ? savedStillUntil.toLocaleDateString([], { weekday: 'short' }) + ' ' + savedStillUntil.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\./g, '')
+      : savedStillUntil.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }).replace(/\./g, '');
   }
   
   
@@ -25293,7 +25300,7 @@ userIdDisplay.onclick = async function(e) {
     const lastMs = lastHeartbeatDate.getTime();
     missedHeartbeat = (now - lastMs) > (graceMins * 60 * 1000);
     nextHeartbeatDate = new Date(lastMs + 30 * 60 * 1000);
-    nextHeartbeatStr = nextHeartbeatDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    nextHeartbeatStr = nextHeartbeatDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, '');
     const timeLeftMs = nextHeartbeatDate - now;
 	isNextPulsePast = timeLeftMs < 0; // <-- NEW: past = hide Next pulse row
     if (timeLeftMs < 0) nextCountdownText = "Due now!";
@@ -25384,7 +25391,7 @@ userIdDisplay.onclick = async function(e) {
 	<!-- ===== BREATH AWARENESS - CLEAN ===== -->
 	<div id="breath-practice" style="margin-top:16px;padding:16px;background:rgba(255,215,0,0.06);border:1px solid rgba(255,215,0,0.25);border-radius:12px;text-align:center;">
 	  <div style="font-size:0.85em;color:#fde68a;letter-spacing:1px;">BREATH AWARENESS</div>
-	  <div style="font-size:0.78em;color:#9a9a9a;margin:6px 0 12px;">One breath = In + Out. Count in awareness.<br>Longer time = deeper stillness.</div>
+	  <div style="font-size:0.78em;color:#9a9a9a;margin:6px 0 12px;">One breath = In + Out.<br> Count with awareness.</div>
    
 	  <div id="breath-picker">
 	  <div style="display:flex;gap:8px;justify-content:center;margin-bottom:12px;">
