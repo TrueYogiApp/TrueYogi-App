@@ -5879,10 +5879,10 @@ html.particles-on, body.particles-on {
 <audio id="spaceship-heal-sound" src="https://assets.trueyogi.app/assets/Spaceship-heal.wav" preload="auto"></audio>
 
 <audio id="yogiMeditationAudio" preload="auto" loop>
-  <source src="https://assets.trueyogi.app/assets/deep.space.mp3" type="audio/mpeg">
+  <source src="https://assets.trueyogi.app/assets/deep.space.m4a" type="audio/mp4">
 </audio>
 <audio id="yogiMeditationAudio2" preload="auto" loop>
-  <source src="https://assets.trueyogi.app/assets/ultimate.stillness.mp3" type="audio/mpeg">
+  <source src="https://assets.trueyogi.app/assets/ultimate.stillness.m4a" type="audio/mp4">
 </audio>
 
 <!-- Hidden audio element for manifest tone -->
@@ -10532,39 +10532,14 @@ async function updateDeepPresence(isDeep, minutes = 0) {
   }
 }
 
-// === CONFIGURATION: Easy to customize ===
-const PAUSE_AFTER_MINUTES = 29;  // When to pause music (in minutes)
-const PAUSE_DURATION_MINUTES = 1; // How long to pause (in minutes)
-
 let yogiPlaying = false;
 let yogiTimer = null;
 let yogiInterval = null;
 let startMessageTimeout = null;
-let silenceTimeout = null;
-let resumeTimeout = null;
 let meditationStartTime = null;
 
-// === The repeated audio pause function ===
-function scheduleAudioVolumeSilence(minutes, audio) {
-  silenceTimeout = setTimeout(() => {
-    if (!yogiPlaying) return;
-    // Mute the audio as well as set volume to zero
-    audio.volume = 0.0;
-    audio.muted = true;
 
-    resumeTimeout = setTimeout(() => {
-      if (!yogiPlaying) return;
-      // Restore volume and unmute
-      audio.volume = 1.0;
-      audio.muted = false;
-      // Schedule the next silence cycle
-      scheduleAudioVolumeSilence(minutes, audio);
-    }, PAUSE_DURATION_MINUTES * 60 * 1000);
-
-  }, PAUSE_AFTER_MINUTES * 60 * 1000);
-}
-
-// === Your timer update logic: (never pauses) ===
+// === Your timer update logic ===
 function updateTimerDisplay() {
   if (!meditationStartTime) return;
   const minutesText = document.getElementById("yogi-total-minutes").innerText;
@@ -10576,6 +10551,7 @@ function updateTimerDisplay() {
   const elapsedSeconds = Math.floor(elapsedMs / 1000);
   const totalSeconds = minutes * 60;
   const remaining = totalSeconds - elapsedSeconds;
+
 
   if (remaining >= 0) {
     let m = Math.floor(remaining / 60);
@@ -10634,20 +10610,12 @@ function toggleYogiMeditation() {
       timerDisplay.style.fontSize = "";
       yogiInterval = setInterval(updateTimerDisplay, 1000);
 
-      // Use the new recursive pause logic for repeated pauses
-      if (minutes > PAUSE_AFTER_MINUTES) {
-        scheduleAudioVolumeSilence(minutes, audio);
-      }
-
       // Main timer to end meditation
       yogiTimer = setTimeout(() => {
         audio.pause();
 		audio.volume = 1.0;
 		audio.muted = false;
         clearInterval(yogiInterval);
-        if (silenceTimeout) clearTimeout(silenceTimeout);
-        if (resumeTimeout) clearTimeout(resumeTimeout);
-
         updateDeepPresence && updateDeepPresence(false);
 
         showYogiMessage(t && t('presence.deepened') || "Stillness deepened", 6000, () => {
@@ -10666,8 +10634,6 @@ function toggleYogiMeditation() {
     updateDeepPresence && updateDeepPresence(false);
 
     if (startMessageTimeout) { clearTimeout(startMessageTimeout); startMessageTimeout = null; }
-    if (silenceTimeout) { clearTimeout(silenceTimeout); silenceTimeout = null; }
-    if (resumeTimeout) { clearTimeout(resumeTimeout); resumeTimeout = null; }
     if (yogiTimer) { clearTimeout(yogiTimer); yogiTimer = null; }
     if (yogiInterval) { clearInterval(yogiInterval); yogiInterval = null; }
 
@@ -10685,6 +10651,7 @@ function toggleYogiMeditation() {
     });
   }
 }
+
 
 // Add this after the first click handler
 document.getElementById("deep-dim-layer").addEventListener("click", () => {
@@ -10724,17 +10691,11 @@ async function updateUltimateStillness(isStill, minutes = 0) {
   }
 }
 
-// === Ultimate Stillness CONFIG ===
-const ULTIMATE_PAUSE_AFTER_MINUTES = 57;
-const ULTIMATE_PAUSE_DURATION_MINUTES = 3;
-
 // --- GLOBAL STATE FOR ULTIMATE STILLNESS ---
 let ultimatePlaying = false;
 let ultimateTimer = null;
 let ultimateInterval = null;
 let ultimateStartMessageTimeout = null;
-let ultimateSilenceTimeout = null;
-let ultimateResumeTimeout = null;
 let ultimateMeditationStartTime = null;
 let ultimateSessionMinutes = null;
 
@@ -10754,36 +10715,21 @@ function showUltimateMessage(timerDisplay, msg, duration, next) {
 // --- Helper to update display ---
 function updateUltimateTimerDisplay() {
   if (!ultimateMeditationStartTime) return;
+
   const timerDisplay = document.getElementById("deep-timer");
   const minutes = ultimateSessionMinutes || 0;
-  const now = Date.now();
-  const elapsedMs = now - ultimateMeditationStartTime;
-  const elapsedSeconds = Math.floor(elapsedMs / 1000);
-  const totalSeconds = minutes * 60;
-  const remaining = totalSeconds - elapsedSeconds;
+  const elapsedSeconds = Math.floor(
+    (Date.now() - ultimateMeditationStartTime) / 1000
+  );
+  const remaining = minutes * 60 - elapsedSeconds;
+
   if (remaining >= 0) {
-    let m = Math.floor(remaining / 60);
-    let s = remaining % 60;
+    const m = Math.floor(remaining / 60);
+    const s = remaining % 60;
     timerDisplay.innerText =
-      String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+      String(m).padStart(2, "0") + ":" +
+      String(s).padStart(2, "0");
   }
-}
-
-// --- Repeated volume silence ---
-function scheduleUltimateAudioVolumeSilence(minutes, audio) {
-  ultimateSilenceTimeout = setTimeout(() => {
-    if (!ultimatePlaying) return;
-    audio.volume = 0.0;
-    audio.muted = true;
-
-    ultimateResumeTimeout = setTimeout(() => {
-      if (!ultimatePlaying) return;
-      audio.volume = 1.0;
-      audio.muted = false;
-      scheduleUltimateAudioVolumeSilence(minutes, audio);
-    }, ULTIMATE_PAUSE_DURATION_MINUTES * 60 * 1000);
-
-  }, ULTIMATE_PAUSE_AFTER_MINUTES * 60 * 1000);
 }
 
 // --- MAIN FUNCTION ---
@@ -10823,10 +10769,6 @@ function toggleUltimateStillnessMeditation(minutes) {
         timerDisplay.style.fontSize = "";
         // Start timer interval
         ultimateInterval = setInterval(updateUltimateTimerDisplay, 1000);
-        // Schedule silence logic
-        if (minutes > ULTIMATE_PAUSE_AFTER_MINUTES) {
-          scheduleUltimateAudioVolumeSilence(minutes, audio);
-        }
 
         // End timer
         ultimateTimer = setTimeout(() => {
@@ -10834,8 +10776,6 @@ function toggleUltimateStillnessMeditation(minutes) {
           audio.volume = 1.0;
           audio.muted = false;
           clearInterval(ultimateInterval);
-          if (ultimateSilenceTimeout) clearTimeout(ultimateSilenceTimeout);
-          if (ultimateResumeTimeout) clearTimeout(ultimateResumeTimeout);
 
           updateUltimateStillness && updateUltimateStillness(false);
 
@@ -10848,7 +10788,7 @@ function toggleUltimateStillnessMeditation(minutes) {
               dim.style.pointerEvents = "none";
               timerDisplay.innerText = "";
               ultimatePlaying = false;
-			  ultimateSessionMinutes = null,
+			  ultimateSessionMinutes = null;
               ultimateMeditationStartTime = null;
             }
           );
@@ -10863,14 +10803,6 @@ function toggleUltimateStillnessMeditation(minutes) {
     if (ultimateStartMessageTimeout) {
       clearTimeout(ultimateStartMessageTimeout);
       ultimateStartMessageTimeout = null;
-    }
-    if (ultimateSilenceTimeout) {
-      clearTimeout(ultimateSilenceTimeout);
-      ultimateSilenceTimeout = null;
-    }
-    if (ultimateResumeTimeout) {
-      clearTimeout(ultimateResumeTimeout);
-      ultimateResumeTimeout = null;
     }
     if (ultimateTimer) {
       clearTimeout(ultimateTimer);
