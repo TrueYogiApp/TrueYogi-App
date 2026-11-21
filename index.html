@@ -26653,7 +26653,6 @@ function playCallbackBellSound() {
   } catch(e) { console.log('Bell sound error:', e); }
 }
 
-
 function showCallbackNotification(fromUserId) {
   // Create a temporary notification that fades out
   const notification = document.createElement('div');
@@ -26737,6 +26736,7 @@ function unlockCallbackAudio() {
 ['touchstart', 'mousedown', 'keydown'].forEach(evt =>
   document.addEventListener(evt, unlockCallbackAudio)
 );
+
 
 function closeEarthGrid() {
   earthGridOpen = false;
