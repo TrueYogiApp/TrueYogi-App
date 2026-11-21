@@ -23591,7 +23591,7 @@ async function showAllFlameKeepers(x, y) {
 
   let { data, error } = await supabase
     .from('om_sessions')
-    .select('user_id, country, countryCode, duration_seconds, started_at, ended_at, deep_presence, ultimate_stillness')
+    .select('user_id, country, countryCode, duration_seconds, started_at, ended_at, deep_presence, deep_presence_until, ultimate_stillness, ultimate_stillness_until')
     .gte('started_at', lastFlameStarted.toISOString());
 
   if (error || !data) return;
@@ -23606,9 +23606,12 @@ async function showAllFlameKeepers(x, y) {
     if (row.ended_at) duration = row.duration_seconds || Math.floor((new Date(row.ended_at) - new Date(row.started_at)) / 1000);
     else duration = Math.floor((Date.now() - new Date(row.started_at)) / 1000);
     userDurations[row.user_id] = (userDurations[row.user_id] || 0) + duration;
-    if (!userRows[row.user_id]) userRows[row.user_id] = row;
-    if (row.deep_presence) userDeepPresence[row.user_id] = true;
-    if (row.ultimate_stillness) userUltimateStillness[row.user_id] = true;
+	if (!userRows[row.user_id]) userRows[row.user_id] = row;
+	// Keep the row that actually has the Deep timer — not the old session
+	if (row.deep_presence && row.deep_presence_until) userRows[row.user_id] = row;
+	if (row.ultimate_stillness && row.ultimate_stillness_until) userRows[row.user_id] = row;
+	if (row.deep_presence) userDeepPresence[row.user_id] = true;
+	if (row.ultimate_stillness) userUltimateStillness[row.user_id] = true;
   });
 
   // ----- POPUP — TRANSPARENT LIKE ORIGINAL, NOT SOLID -----
@@ -23725,10 +23728,10 @@ async function showAllFlameKeepers(x, y) {
         <span style="color:${isCurrentUser ? '#fff' : '#bbea6a'}; font-size:0.88em; ${isCurrentUser ? 'font-weight:bold;' : ''}">${formatDurationGrid(userDurations[id])}</span>
         <span class="flame-keeper-icons" style="margin-left:auto; display:flex; align-items:center; gap:2px; flex-shrink:0; white-space:nowrap;">
           ${astralIconHtml}
-          ${isDeepPresence ? deepPresenceSvg : ''}
-          ${isUltimateStillness ? ultimateStillnessSvg : ''}
-          ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}
+		  ${isDeepPresence ? `<span data-until="${row?.deep_presence_until || ''}" style="display:inline-flex;">${deepPresenceSvg}</span>` : ''}
+		  ${isUltimateStillness ? ultimateStillnessSvg : ''}
           ${!isCurrentUser && amILive && isRowCallable ? `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>` : ''}
+          ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}		  
           ${!isCurrentUser && isLive && canStartCall ? `<span class="call-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Start call">☎</span>` : ''}
         </span>
       </div>
@@ -24191,20 +24194,38 @@ function showCallbackResultModal(message) {
   };
 }
 
-// Add tooltip event handlers for deep presence icons
+// Add tooltip event handlers for deep presence icons - WITH TIMER (plain text only)
+let deepTooltipTimer = null;
+
+function showDeepPresenceWithTimer(el) {
+  if (deepTooltipTimer) clearInterval(deepTooltipTimer);
+const untilStr = el.dataset.until || el.parentElement?.dataset.until || el.closest('[data-until]')?.dataset.until || '';
+const until = new Date(untilStr).getTime();
+console.log('Deep timer until:', untilStr); // keep this for 1 test, then delete
+
+  const update = () => {
+    if (!until) { showDeepPresenceTooltip(el, 'In Deep Presence'); return; }
+    const left = Math.max(0, Math.floor((until - Date.now()) / 1000));
+    const m = Math.floor(left / 60);
+    const s = left % 60;
+    // Plain text only - no HTML, so it won't show code
+    showDeepPresenceTooltip(el, 'In Deep Presence - ' + String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0'));
+    if (left <= 0) { clearInterval(deepTooltipTimer); removeDeepPresenceTooltip(); }
+  };
+  update();
+  deepTooltipTimer = setInterval(update, 1000);
+}
+
 Array.from(listPopup.querySelectorAll('.deep-presence-icon')).forEach(el => {
-  // For touch devices (mobile)
   el.addEventListener('touchstart', function(e) {
     e.stopPropagation();
-    showDeepPresenceTooltip(this, 'In Deep Presence');
+    showDeepPresenceWithTimer(this);
   });
-  
-  // For desktop hover
   el.addEventListener('mouseenter', function(e) {
-    showDeepPresenceTooltip(this, 'In Deep Presence');
+    showDeepPresenceWithTimer(this);
   });
-  
   el.addEventListener('mouseleave', function(e) {
+    if (deepTooltipTimer) clearInterval(deepTooltipTimer);
     removeDeepPresenceTooltip();
   });
 });
@@ -24229,6 +24250,100 @@ Array.from(listPopup.querySelectorAll('.ultimate-stillness-icon')).forEach(el =>
 
   // ONLY ONE appendChild and setTimeout here
   document.body.appendChild(listPopup);
+  
+
+// Helper functions for deep presence tooltip
+function showDeepPresenceTooltip(el, text) {
+  removeDeepPresenceTooltip();
+  const r = el.getBoundingClientRect();
+
+  // Split "In Deep Presence - 09:11 left" into 2 lines
+  let line1 = text, line2 = '';
+  if (text.includes(' - ')) {
+    const parts = text.split(' - ');
+    line1 = parts[0];
+    line2 = parts.slice(1).join(' - ');
+  }
+
+  const tip = document.createElement('div');
+  tip.id = 'deep-presence-tooltip';
+  tip.innerHTML = `
+    <div style="font-weight:700;">${line1}</div>
+    ${line2 ? `<div style="font-size:0.85em; opacity:0.9; margin-top:2px;">${line2}</div>` : ''}
+  `;
+  tip.style.cssText = `
+    position: fixed;
+    left: ${r.left + r.width / 2}px;
+    top: ${r.bottom + 8}px;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    color: #ffd700;
+    font-size: 0.88rem;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255,215,0,0.35);
+    box-shadow: 0 4px 18px rgba(0,0,0,0.5);
+    z-index: 10100;
+    text-align: center;
+    white-space: nowrap;
+    pointer-events: none;
+  `;
+  document.body.appendChild(tip);
+
+  // If it would go off right edge, nudge it back in
+  const tr = tip.getBoundingClientRect();
+  if (tr.right > window.innerWidth - 8) {
+    tip.style.left = (window.innerWidth - tr.width / 2 - 8) + 'px';
+  }
+  if (tr.left < 8) {
+    tip.style.left = (tr.width / 2 + 8) + 'px';
+  }
+}
+
+function removeDeepPresenceTooltip() {
+  const tooltip = document.getElementById('deep-presence-tooltip');
+  if (tooltip) tooltip.remove();
+}
+
+// Helper functions for ultimate stillness tooltip
+function showUltimateStillnessTooltip(element, text) {
+  // Remove any existing tooltip
+  removeUltimateStillnessTooltip();
+  
+  const tooltip = document.createElement('div');
+  tooltip.id = 'ultimate-stillness-tooltip';
+  tooltip.textContent = text;
+  tooltip.style.cssText = `
+    position: fixed;
+    background: rgba(0,0,0,0.95);
+    color: #ffd700;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    z-index: 10060;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(255,215,0,0.3);
+    border: 1px solid rgba(255,215,0,0.5);
+  `;
+  
+  document.body.appendChild(tooltip);
+  
+  // Position the tooltip above the icon
+  const rect = element.getBoundingClientRect();
+  const tooltipRect = tooltip.getBoundingClientRect();
+  tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
+  tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
+  
+  // Auto-remove after 3 seconds (for touch) 
+  setTimeout(() => removeUltimateStillnessTooltip(), 3000);
+}
+
+function removeUltimateStillnessTooltip() {
+  const tooltip = document.getElementById('ultimate-stillness-tooltip');
+  if (tooltip) tooltip.remove();
+}
   
 // Now, show callback notification badge for the main user:
 if (document.getElementById('my-notifications')) {
@@ -24526,83 +24641,6 @@ if (document.getElementById('my-notifications')) {
   setTimeout(() => listPopup.remove(), 300000);
 }
 
-// Helper functions for deep presence tooltip
-function showDeepPresenceTooltip(element, text) {
-  // Remove any existing tooltip
-  removeDeepPresenceTooltip();
-  
-  const tooltip = document.createElement('div');
-  tooltip.id = 'deep-presence-tooltip';
-  tooltip.textContent = text;
-  tooltip.style.cssText = `
-    position: fixed;
-    background: rgba(0,0,0,0.95);
-    color: #ffd700;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    z-index: 10060;
-    pointer-events: none;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(255,215,0,0.3);
-    border: 1px solid rgba(255,215,0,0.5);
-  `;
-  
-  document.body.appendChild(tooltip);
-  
-  // Position the tooltip above the icon
-  const rect = element.getBoundingClientRect();
-  const tooltipRect = tooltip.getBoundingClientRect();
-  tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-  tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
-  
-  // Auto-remove after 3 seconds (for touch)
-  setTimeout(() => removeDeepPresenceTooltip(), 3000);
-}
-
-function removeDeepPresenceTooltip() {
-  const tooltip = document.getElementById('deep-presence-tooltip');
-  if (tooltip) tooltip.remove();
-}
-
-// Helper functions for ultimate stillness tooltip
-function showUltimateStillnessTooltip(element, text) {
-  // Remove any existing tooltip
-  removeUltimateStillnessTooltip();
-  
-  const tooltip = document.createElement('div');
-  tooltip.id = 'ultimate-stillness-tooltip';
-  tooltip.textContent = text;
-  tooltip.style.cssText = `
-    position: fixed;
-    background: rgba(0,0,0,0.95);
-    color: #ffd700;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    z-index: 10060;
-    pointer-events: none;
-    white-space: nowrap;
-    box-shadow: 0 2px 8px rgba(255,215,0,0.3);
-    border: 1px solid rgba(255,215,0,0.5);
-  `;
-  
-  document.body.appendChild(tooltip);
-  
-  // Position the tooltip above the icon
-  const rect = element.getBoundingClientRect();
-  const tooltipRect = tooltip.getBoundingClientRect();
-  tooltip.style.left = `${rect.left + rect.width / 2 - tooltipRect.width / 2}px`;
-  tooltip.style.top = `${rect.top - tooltipRect.height - 8}px`;
-  
-  // Auto-remove after 3 seconds (for touch) 
-  setTimeout(() => removeUltimateStillnessTooltip(), 3000);
-}
-
-function removeUltimateStillnessTooltip() {
-  const tooltip = document.getElementById('ultimate-stillness-tooltip');
-  if (tooltip) tooltip.remove();
-}
 
 // ===== ASTRAL SILENCE FUNCTIONS =====
 // Place these at the VERY BOTTOM of your file, after all other functions
