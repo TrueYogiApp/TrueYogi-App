@@ -6497,12 +6497,6 @@ contentContainers.forEach(container => {
 contentContainers.forEach(container => {
   if (container) {
     container.addEventListener('scroll', function() {
-      // FIX: NEVER hide header in Live - keep tabs visible to go back
-      if (this.id === 'live-list') {
-        showHeaderAndFooter();
-        return;
-      }
-
       const currentScroll = this.scrollTop;
       
       if (currentScroll > lastScrollTop && currentScroll > 30) {
@@ -6512,6 +6506,12 @@ contentContainers.forEach(container => {
       }
       
       lastScrollTop = currentScroll;
+      
+      if (currentScroll > 0) {
+        hideHeaderAndFooter();
+      } else {
+        showHeaderAndFooter();
+      }
     }, { passive: true });
   }
 });
