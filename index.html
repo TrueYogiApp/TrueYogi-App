@@ -23725,10 +23725,10 @@ async function showAllFlameKeepers(x, y) {
         <span class="flame-keeper-icons" style="margin-left:auto; display:flex; align-items:center; gap:2px; flex-shrink:0; white-space:nowrap;">
           ${astralIconHtml}
 		  ${isDeepPresence ? `<span data-until="${row?.deep_presence_until || ''}" style="display:inline-flex;">${deepPresenceSvg}</span>` : ''}
-		  ${isUltimateStillness ? ultimateStillnessSvg : ''}
+		  ${isUltimateStillness ? ultimateStillnessSvg : ''}     
           ${!isCurrentUser && amILive && isRowCallable ? `<span class="callback-bell-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Request Call Back">🔔</span>` : ''}
-          ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}		  
           ${!isCurrentUser && isLive && canStartCall ? `<span class="call-icon" data-userid="${id}" style="margin-left:3px;cursor:pointer;" title="Start call">☎</span>` : ''}
+		  ${!isCurrentUser && isLive && canStartCall ? `<input type="checkbox" class="call-checkbox" data-userid="${id}" style="accent-color:#FFD700;margin-left:3px;width:16px;height:16px;cursor:pointer;">` : ''}
         </span>
       </div>
       `;
