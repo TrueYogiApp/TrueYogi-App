@@ -6494,24 +6494,41 @@ contentContainers.forEach(container => {
 });
 
 // Add scroll listener
+let headerHidden = false;
+let lastHeaderChangeAt = 0;
+
 contentContainers.forEach(container => {
   if (container) {
     container.addEventListener('scroll', function() {
-      const currentScroll = this.scrollTop;
-      
-      if (currentScroll > lastScrollTop && currentScroll > 30) {
-        hideHeaderAndFooter();
-      } else if (currentScroll < lastScrollTop) {
+      // NEVER hide header in Live
+      if (this.id === 'live-list') {
         showHeaderAndFooter();
+        return;
+      }
+
+      const currentScroll = this.scrollTop;
+
+      // FIX 1: At bottom, do nothing - stop fighting
+      const atBottom = (this.scrollHeight - currentScroll - this.clientHeight) < 10;
+      if (atBottom) return;
+
+      // FIX 2: Need 60px move to change header - ignore 1px flicker
+      if (Math.abs(currentScroll - lastHeaderChangeAt) < 60) {
+        lastScrollTop = currentScroll;
+        return;
+      }
+
+      if (currentScroll > lastScrollTop && currentScroll > 30 && !headerHidden) {
+        hideHeaderAndFooter();
+        headerHidden = true;
+        lastHeaderChangeAt = currentScroll;
+      } else if (currentScroll < lastScrollTop && headerHidden) {
+        showHeaderAndFooter();
+        headerHidden = false;
+        lastHeaderChangeAt = currentScroll;
       }
       
       lastScrollTop = currentScroll;
-      
-      if (currentScroll > 0) {
-        hideHeaderAndFooter();
-      } else {
-        showHeaderAndFooter();
-      }
     }, { passive: true });
   }
 });
