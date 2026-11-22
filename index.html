@@ -6373,17 +6373,7 @@ html.particles-on, body.particles-on {
       </div>
     </div>
   </div>
-  
-  <!-- Simple Footer -->
-  <div id="dashboard-footer" style="
-    padding: 15px;
-    text-align: center;
-    color: #64748b;
-    font-size: 13px;
-    border-top: 1px solid rgba(255,255,255,0.1);
-  ">
-    Tap any teaching to open, or watch a video from the Videos tab.
-  </div>
+
   <!-- Scroll to Top Button -->
 <button id="scroll-to-top-btn" style="
   display: none;
@@ -6428,8 +6418,7 @@ html.particles-on, body.particles-on {
 
 /* Ensure header, tabs, and footer don't shrink */
 #dashboard-header,
-#dashboard-tabs,
-#dashboard-footer {
+#dashboard-tabs {
   flex-shrink: 0;
 }
 
@@ -6487,7 +6476,6 @@ let lastScrollTop = 0;
 // Get elements
 const header = document.getElementById('dashboard-header');
 const tabBar = document.getElementById('dashboard-tabs');
-const footer = document.getElementById('dashboard-footer');
 const contentContainers = [
   document.getElementById('pdf-list'),
   document.getElementById('video-list'),
@@ -6509,6 +6497,12 @@ contentContainers.forEach(container => {
 contentContainers.forEach(container => {
   if (container) {
     container.addEventListener('scroll', function() {
+      // FIX: NEVER hide header in Live - keep tabs visible to go back
+      if (this.id === 'live-list') {
+        showHeaderAndFooter();
+        return;
+      }
+
       const currentScroll = this.scrollTop;
       
       if (currentScroll > lastScrollTop && currentScroll > 30) {
@@ -6518,12 +6512,6 @@ contentContainers.forEach(container => {
       }
       
       lastScrollTop = currentScroll;
-      
-      if (currentScroll > 0) {
-        hideHeaderAndFooter();
-      } else {
-        showHeaderAndFooter();
-      }
     }, { passive: true });
   }
 });
@@ -6532,7 +6520,6 @@ function hideHeaderAndFooter() {
   // Hide header and tabs
   header.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease';
   tabBar.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease';
-  footer.style.transition = 'transform 0.3s ease, opacity 0.3s ease, height 0.3s ease';
   
   header.style.transform = 'translateY(-100%)';
   header.style.opacity = '0';
@@ -6547,13 +6534,6 @@ function hideHeaderAndFooter() {
   tabBar.style.margin = '0';
   tabBar.style.padding = '0';
   tabBar.style.overflow = 'hidden';
-  
-  footer.style.transform = 'translateY(100%)';
-  footer.style.opacity = '0';
-  footer.style.height = '0';
-  footer.style.margin = '0';
-  footer.style.padding = '0';
-  footer.style.overflow = 'hidden';
   
   // Content will automatically expand to fill the space because of flex: 1
 }
@@ -6576,15 +6556,6 @@ function showHeaderAndFooter() {
   tabBar.style.padding = '12px 0 0 0'; // Restore original padding
   tabBar.style.overflow = '';
   tabBar.style.position = '';
-  
-  // Reset footer
-  footer.style.transform = 'translateY(0)';
-  footer.style.opacity = '1';
-  footer.style.height = '';
-  footer.style.margin = '';
-  footer.style.padding = '15px'; // Restore original padding
-  footer.style.overflow = '';
-  footer.style.position = '';
 }
 
 
@@ -6598,7 +6569,7 @@ contentContainers.forEach(container => {
       const scrollPosition = this.scrollTop;
       
       // Show button when scrolled down more than 200px
-      if (scrollPosition > 200) {
+      if (scrollPosition > 30) {
         scrollToTopBtn.classList.add('show');
         scrollToTopBtn.style.display = 'flex';
       } else {
