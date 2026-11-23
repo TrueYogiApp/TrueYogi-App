@@ -24395,37 +24395,55 @@ if (document.getElementById('my-notifications')) {
           position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10100;
           background:rgba(0,0,0,0.88);display:flex;align-items:center;justify-content:center;`;
         const myId = localStorage.getItem('omUserId');
-        modal.innerHTML = `
-          <div style="background:#222;color:#ffd700;padding:24px 30px;border-radius:16px;...">
-            <div style="text-align:center;margin-bottom:12px;">
-              <span class="sender-profile-link" data-user-id="${myId}" title="View my profile" style="color:#ffd700;font-weight:bold;font-size:1.05em;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[myId] || getShortUserId(myId)}</span>
-            </div>
-            <h3 style="margin-bottom:15px;font-size:1.17em;">🔔 Callback Requests</h3>
-			<ul id="pending-list" style="list-style:none;padding-left:0;margin:0;">${userList}</ul>
-			<div style="display:flex;justify-content:space-between;margin:10px 0 16px;">
-			  <button id="notif-prev">‹ Prev</button>
-			  <span id="notif-page-label">Page 1</span>
-			  <button id="notif-next">Next ›</button>
+		modal.innerHTML = `
+		  <div style="
+			background: linear-gradient(180deg, #262626 0%, #1c1c1c 100%);
+			color: #fff;
+			padding: 22px 22px 20px;
+			border-radius: 20px;
+			border: 1px solid #ffd70055;
+			box-shadow: 0 4px 20px #ffd70055, 0 0 45px #ffd70044, 0 0 90px #ffd70022, 0 20px 50px rgba(0,0,0,0.6);
+			width: min(94vw, 440px);
+			max-width: 440px;
+			max-height: 88vh;
+			overflow-y: auto;
+			box-sizing: border-box;
+			text-align: center;
+		  ">
+			<!-- YOUR NAME — compact premium pill, same as Ring Bell -->
+			<div style="background: rgba(255,215,0,0.06); border: 1px solid #ffd70022; border-radius: 14px; padding: 10px 12px 11px; margin-bottom: 18px; text-align:center;">
+			  <span class="sender-profile-link" data-user-id="${myId}" title="View my profile" style="color:#ffd700;font-weight:800;font-size:1.1em;cursor:pointer;text-decoration:underline;text-underline-offset:4px;letter-spacing:0.5px;">${window.usernameCache?.[myId] || getShortUserId(myId)}</span>
 			</div>
-			   <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#ffe066;color:#222;font-weight:bold;font-size:1em;cursor:pointer;border:none;margin-top:4px;"
-                id="acknowledge-selected-btn">✓ Acknowledge Selected</button>
-              <button class="mode-btn" style="padding:7px 17px;border-radius:8px;background:#444;color:#ffd700;font-weight:bold;font-size:1em;cursor:pointer;border:none;"
-                id="close-callback-requests-modal">✕ Close</button>
-			<div id="history-toggle" style="margin:18px 0 8px;padding:10px 12px;border:1px solid #333;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-			  <span style="color:#fde68a;font-size:0.9em;">Records</span>
+
+			<h3 style="margin:0 0 16px;font-size:0.95em;color:#fde68a;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;">🔔 Callback Requests</h3>
+
+			<ul id="pending-list" style="list-style:none;padding-left:0;margin:0;text-align:left;">${userList}</ul>
+
+			<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 18px;">
+			  <button id="notif-prev" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
+			  <span id="notif-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
+			  <button id="notif-next" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
+			</div>
+
+			<div style="display:flex;gap:10px;justify-content:center;margin-bottom:18px;">
+			  <button class="mode-btn" style="padding:11px 18px;border-radius:12px;background:linear-gradient(180deg,#ffe066,#f5c518);color:#222;font-weight:800;font-size:0.95em;cursor:pointer;border:none;box-shadow:0 6px 18px #f5c51844;"
+				id="acknowledge-selected-btn">✓ Acknowledge Selected</button>
+			  <button class="mode-btn" style="padding:11px 18px;border-radius:12px;background:#333;color:#ffd700;font-weight:700;font-size:0.95em;cursor:pointer;border:1px solid #444;"
+				id="close-callback-requests-modal">✕ Close</button>
+			</div>
+
+			<div id="history-toggle" style="padding:11px 13px;background:#1a1a1a;border:1px solid #333;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+			  <span style="color:#fde68a;font-size:0.9em;font-weight:600;">Records</span>
 			  <span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
 			</div>
-			<ul id="history-list" style="list-style:none;padding-left:0;margin:0;display:none;"></ul>
-			<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-top:8px;">
+			<ul id="history-list" style="list-style:none;padding-left:0;margin:8px 0 0;text-align:left;display:none;"></ul>
+			<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-top:10px;">
 			  <button id="history-prev" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
 			  <span id="history-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
 			  <button id="history-next" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
 			</div>
-            <div style="margin-top:15px;border-top:1px solid #333;padding-top:15px;display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-
-            </div>
-          </div>
-        `;
+		  </div>
+		`;
         document.body.appendChild(modal);
 
 
