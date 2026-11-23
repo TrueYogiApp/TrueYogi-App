@@ -23967,11 +23967,13 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 	  const flameSecs = joined ? Math.max(0, Math.floor((Date.now() - joined) / 1000)) : 0;
 	  const flame = joined ? `${Math.floor(flameSecs/3600)}h ${Math.floor((flameSecs%3600)/60)}m ${flameSecs%60}s`.replace(/^0h /, '') : '—';
 
+	  const isOwnProfile = uid === localStorage.getItem('omUserId');
 	  const pModal = document.createElement('div');
 	  pModal.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10200;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;`;
 	  pModal.innerHTML = `
 		<div style="background:#222;color:#ffd700;padding:24px 28px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:280px;max-width:360px;text-align:center;">
 		  <div style="font-size:1.4em;font-weight:800;letter-spacing:1.5px;margin:6px 0 2px;">${name}</div>
+		  ${isOwnProfile ? `<div style="color:#888;font-size:0.8em;">${getShortUserId(uid)}</div>` : ''}		  
 		  <div style="margin:14px 0;padding:10px;background:#1a1a1a;border-radius:10px;text-align:left;font-size:0.9em;color:#fff;">
 			<div>● Status: <span style="color:${isLive ? '#29D884' : '#888'}">${isLive ? 'Live in OM' : 'Not live now'}</span></div>
 			<div>🔥 Current Flame: ${flame}</div>
@@ -24480,13 +24482,13 @@ if (document.getElementById('my-notifications')) {
 		  const joined = row.joined_at ? new Date(row.joined_at).getTime() : 0;
 		  const flameSecs = joined ? Math.max(0, Math.floor((Date.now() - joined) / 1000)) : 0;
 		  const flame = joined ? `${Math.floor(flameSecs/3600)}h ${Math.floor((flameSecs%3600)/60)}m ${flameSecs%60}s`.replace(/^0h /, '') : '—';
-
+		  const isOwnProfile = uid === localStorage.getItem('omUserId');	
 		  const pModal = document.createElement('div');
 		  pModal.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10200;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;`;
 		  pModal.innerHTML = `
 			<div style="background:#222;color:#ffd700;padding:24px 28px;border-radius:16px;box-shadow:0 4px 20px #ffd70055;min-width:280px;max-width:360px;text-align:center;">
 			  <div style="font-size:1.4em;font-weight:800;letter-spacing:1.5px;margin:6px 0 2px;">${name}</div>
-			  <div style="color:#888;font-size:0.8em;">${getShortUserId(uid)}</div>
+			  ${isOwnProfile ? `<div style="color:#888;font-size:0.8em;">${getShortUserId(uid)}</div>` : ''}
 			  <div style="margin:14px 0;padding:10px;background:#1a1a1a;border-radius:10px;text-align:left;font-size:0.9em;color:#fff;">
 				<div>● Status: <span style="color:${isLive ? '#29D884' : '#888'}">${isLive ? 'Live in OM' : 'Not live now'}</span></div>
 				<div>🔥 Current Flame: ${flame}</div>
