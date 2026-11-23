@@ -24421,7 +24421,7 @@ if (document.getElementById('my-notifications')) {
 
 			<ul id="pending-list" style="list-style:none;padding-left:0;margin:0;text-align:left;">${userList}</ul>
 
-			<div style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 18px;">
+			<div id="notif-pager" style="display:flex;justify-content:space-between;align-items:center;margin:12px 0 18px;">
 			  <button id="notif-prev" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
 			  <span id="notif-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
 			  <button id="notif-next" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
@@ -24448,6 +24448,37 @@ if (document.getElementById('my-notifications')) {
 		`;
         document.body.appendChild(modal);
 
+		// Pager only active when 6+ requests — 5 per page, so 1-5 = only Page 1
+		function updateNotifPager() {
+		  const pager = document.getElementById('notif-pager');
+		  const prevBtn = document.getElementById('notif-prev');
+		  const nextBtn = document.getElementById('notif-next');
+		  if (!pager || !prevBtn || !nextBtn) return;
+
+		  // 1-5 requests = only 1 page = hide whole row
+		  if (sortedRequests.length <= 5) {
+			pager.style.display = 'none';
+			return;
+		  }
+
+		  // 6+ requests = show row
+		  pager.style.display = 'flex';
+
+		  const isFirstPage = notifPage === 0;
+		  const isLastPage = (notifPage + 1) * 5 >= sortedRequests.length;
+
+		  // Prev: OFF on Page 1, ON after that
+		  prevBtn.disabled = isFirstPage;
+		  prevBtn.style.opacity = isFirstPage ? '0.35' : '1';
+		  prevBtn.style.cursor = isFirstPage ? 'default' : 'pointer';
+
+		  // Next: ON if more pages, OFF on last page
+		  nextBtn.disabled = isLastPage;
+		  nextBtn.style.opacity = isLastPage ? '0.35' : '1';
+		  nextBtn.style.cursor = isLastPage ? 'default' : 'pointer';
+		}
+		updateNotifPager();
+
 
 		function showNotifPage() {
 		  const start = notifPage * 5;
@@ -24462,6 +24493,7 @@ if (document.getElementById('my-notifications')) {
 		  }).join('');
 		  document.getElementById('pending-list').innerHTML = html;
 		  document.getElementById('notif-page-label').textContent = `Page ${notifPage + 1}`;
+		  updateNotifPager();
 		}
 		document.getElementById('notif-prev').onclick = () => { if (notifPage > 0) { notifPage--; showNotifPage(); } };
 		document.getElementById('notif-next').onclick = () => { if ((notifPage + 1) * 5 < sortedRequests.length) { notifPage++; showNotifPage(); } };
