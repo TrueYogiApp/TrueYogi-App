@@ -23849,100 +23849,106 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
   `;
 
   // Create modal content with message input
-  modal.innerHTML = `
-    <div style="
-	  background: #222;
-	  color: #ffd700;
-	  padding: 24px 30px;
-	  border-radius: 16px;
-	  box-shadow: 0 4px 20px #ffd70055;
-	  width: min(94vw, 450px);
-	  max-width: 450px;
-	  max-height: 88vh;
-	  overflow-y: auto;
-	  box-sizing: border-box;
-	  text-align: center;
-    ">
-	<div style="margin-bottom: 4px; color: #fff; font-size: 1.05em; text-align:center;">
-	 <span class="sender-profile-link" data-user-id="${toUserId}" title="View profile" style="color:#ffd700;font-weight:bold;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[toUserId] || getShortUserId(toUserId)}</span>
-	</div>
-	<div style="text-align:center;margin-bottom: 16px;">
-	  <span style="color:#888;font-size:0.85em;">You: </span><span class="sender-profile-link" data-user-id="${fromUserId || localStorage.getItem('omUserId')}" title="View my profile" style="color:#fde68a;font-weight:bold;font-size:0.9em;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[fromUserId || localStorage.getItem('omUserId')] || getShortUserId(fromUserId || localStorage.getItem('omUserId'))}</span>
-	</div>
-      <h3 style="margin-bottom: 16px; font-size: 0.95em; color: #fde68a; font-weight: 400;">Ring the Guidance Bell</h3>
-      <p style="margin-bottom: 15px; color: #fff; font-size: 1.1em;">
-        Send a gentle bell to invite connection.
-        You will be connected when available.
-      </p>
-      
-      <!-- Add message input -->
-      <div style="margin-bottom: 20px; text-align: left;">
-        <label style="color: #fff; font-size: 0.9em; display: block; margin-bottom: 5px;">
-          Add a note (optional):
-        </label>
-        <textarea id="callback-message-input" 
-          maxlength="500" 
-          placeholder="e.g., Would love to connect..." 
-          style="
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            border: 1px solid #ffd70044;
-            background: #1a1a1a;
-            color: #fff;
-            font-size: 0.95em;
-            resize: vertical;
-            min-height: 60px;
-            max-height: 100px;
-            box-sizing: border-box;
-            font-family: inherit;
-          "
-        ></textarea>
-        <div style="text-align: right; color: #888; font-size: 0.8em; margin-top: 3px;">
-          <span id="char-counter">0</span>/500
-        </div>
-      </div>
-      
-	  <!-- History — collapsed, tap to view -->
-	<div id="history-toggle" style="margin-bottom:18px;padding:10px 12px;border:1px solid #333;border-radius:10px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-  <span style="color:#fde68a;font-size:0.9em;">Records</span>
-  <span style="display:flex;gap:8px;align-items:center;">
-    <span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
-  </span>
-	</div>
-	<ul id="callback-history" style="list-style:none;padding-left:0;margin:0 0 18px 0;text-align:left;display:none;"></ul>
-	<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-bottom:18px;">
-	  <button id="history-prev" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
-	  <span id="history-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
-	  <button id="history-next"  class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
-	</div>
+	modal.innerHTML = `
+	  <div style="
+		background: linear-gradient(180deg, #262626 0%, #1c1c1c 100%);
+		color: #fff;
+		padding: 22px 22px 20px;
+		border-radius: 20px;
+		border: 1px solid #ffd70055;
+		box-shadow: 0 4px 20px #ffd70055, 0 0 45px #ffd70044, 0 0 90px #ffd70022, 0 20px 50px rgba(0,0,0,0.6);
+		width: min(94vw, 440px);
+		max-width: 440px;
+		max-height: 88vh;
+		overflow-y: auto;
+		box-sizing: border-box;
+		text-align: center;
+	  ">
+		<!-- TOP NAMES — compact premium pill, not empty box -->
+		<div style="background: rgba(255,215,0,0.06); border: 1px solid #ffd70022; border-radius: 14px; padding: 10px 12px 11px; margin-bottom: 18px;">
+		  <div style="font-size: 1.1em; line-height: 1.3;">
+			<span class="sender-profile-link" data-user-id="${toUserId}" title="View profile" style="color:#ffd700;font-weight:800;cursor:pointer;text-decoration:underline;text-underline-offset:4px;letter-spacing:0.5px;">${window.usernameCache?.[toUserId] || getShortUserId(toUserId)}</span>
+		  </div>
+		  <div style="height:1px;background:#ffffff14;margin:9px 20px 8px;"></div>
+		  <div style="font-size:0.88em;color:#aaa;">
+			You: <span class="sender-profile-link" data-user-id="${fromUserId || localStorage.getItem('omUserId')}" title="View my profile" style="color:#fde68a;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:3px;">${window.usernameCache?.[fromUserId || localStorage.getItem('omUserId')] || getShortUserId(fromUserId || localStorage.getItem('omUserId'))}</span>
+		  </div>
+		</div>
 
-      <div style="display: flex; gap: 12px; justify-content: center;">
-        <button id="confirm-callback-yes" class="mode-btn" style="
-          padding: 10px 25px;
-          border-radius: 8px;
-          background: #ffe066;
-          color: #222;
-          font-weight: bold;
-          font-size: 1em;
-          cursor: pointer;
-          border: none;
-          min-width: 100px;
-        ">🔔 Ring Bell</button>
-        <button id="confirm-callback-no" class="mode-btn" style="
-          padding: 10px 25px;
-          border-radius: 8px;
-          background: #444;
-          color: #ffd700;
-          font-weight: bold;
-          font-size: 1em;
-          cursor: pointer;
-          border: none;
-          min-width: 100px;
-        ">Cancel</button>
-      </div>
-    </div>
-  `;
+		<h3 style="margin:0 0 8px;font-size:0.95em;color:#fde68a;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;">Ring the Guidance Bell</h3>
+		<p style="margin:0 0 18px;color:#e8e8e8;font-size:1.02em;line-height:1.5;">
+		  Send a gentle bell to invite connection.<br>You will be connected when available.
+		</p>
+
+		<!-- NOTE -->
+		<div style="margin-bottom:18px;text-align:left;">
+		  <label style="color:#ddd;font-size:0.88em;display:block;margin-bottom:7px;font-weight:500;">Add a note <span style="color:#888;font-weight:400;">(optional)</span></label>
+		  <textarea id="callback-message-input"
+			maxlength="500"
+			placeholder="e.g., Would love to connect..."
+			style="
+			  width:100%;
+			  padding:12px;
+			  border-radius:12px;
+			  border:1px solid #ffd70033;
+			  background:#151515;
+			  color:#fff;
+			  font-size:0.95em;
+			  resize:vertical;
+			  min-height:64px;
+			  max-height:100px;
+			  box-sizing:border-box;
+			  font-family:inherit;
+			  outline:none;
+			"
+		  ></textarea>
+		  <div style="text-align:right;color:#777;font-size:0.78em;margin-top:5px;">
+			<span id="char-counter">0</span>/500
+		  </div>
+		</div>
+
+		<!-- RECORDS -->
+		<div id="history-toggle" style="margin-bottom:16px;padding:11px 13px;background:#1a1a1a;border:1px solid #333;border-radius:12px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+		  <span style="color:#fde68a;font-size:0.9em;font-weight:600;">Records</span>
+		  <span style="display:flex;gap:8px;align-items:center;">
+			<span id="history-arrow" style="color:#888;font-size:0.8em;">▸ Tap to view</span>
+		  </span>
+		</div>
+		<ul id="callback-history" style="list-style:none;padding-left:0;margin:0 0 16px 0;text-align:left;display:none;"></ul>
+		<div id="history-pager" style="display:none;justify-content:space-between;align-items:center;margin-bottom:16px;">
+		  <button id="history-prev" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">‹ Prev</button>
+		  <span id="history-page-label" style="color:#888;font-size:0.8em;">Page 1</span>
+		  <button id="history-next" class="mode-btn" style="padding:6px 14px;border-radius:8px;background:#333;color:#fde68a;border:none;cursor:pointer;">Next ›</button>
+		</div>
+
+		<!-- BUTTONS -->
+		<div style="display:flex;gap:10px;justify-content:center;">
+		  <button id="confirm-callback-yes" class="mode-btn" style="
+			padding:11px 22px;
+			border-radius:12px;
+			background:linear-gradient(180deg,#ffe066,#f5c518);
+			color:#222;
+			font-weight:800;
+			font-size:0.98em;
+			cursor:pointer;
+			border:none;
+			min-width:130px;
+			box-shadow:0 6px 18px #f5c51844;
+		  ">🔔 Ring Bell</button>
+		  <button id="confirm-callback-no" class="mode-btn" style="
+			padding:11px 22px;
+			border-radius:12px;
+			background:#333;
+			color:#ffd700;
+			font-weight:700;
+			font-size:0.98em;
+			cursor:pointer;
+			border:1px solid #444;
+			min-width:110px;
+		  ">Cancel</button>
+		</div>
+	  </div>
+	`;
 
   document.body.appendChild(modal);
 
@@ -25373,15 +25379,22 @@ userIdDisplay.onclick = async function(e) {
   `;
 
   if (!userRow) {
+    // Checkbox ONLY for auto idle popup, NOT for manual tap
+    const dontShowHtml = omPopupIsAuto ? `
+	  <label style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,215,0,0.12);font-size:0.82em;color:#b8b8b8;cursor:pointer;">
+      <input type="checkbox" id="dont-show-idle-again" style="accent-color:#ffd700;width:1.1em;height:1.1em;cursor:pointer;">
+      <span>Don't show again</span>
+    </label>` : '';
+
     popup.innerHTML = `
-		<button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
-		<div style="font-size:1.15em;font-weight:600;color:#ffd700;margin:18px 0 6px;">Connect to the OM Field</div>
-		<div style="font-size:0.88em;color:#ffeb99;opacity:0.75;margin-bottom:8px;line-height:1.45;">Tap the sacred symbol to enter the resonance</div>
-		<label style="display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid rgba(255,215,0,0.12);font-size:0.82em;color:#b8b8b8;cursor:pointer;">
-		  <input type="checkbox" id="dont-show-idle-again" style="accent-color:#ffd700;width:1.1em;height:1.1em;cursor:pointer;">
-		  <span>Don't show again</span>
-		</label>
+      <button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
+	  <div style="font-size:1.15em;font-weight:600;color:#ffd700;margin:18px 0 6px;">Connect to the OM Field</div>
+      <div style="font-size:0.88em;color:#ffeb99;opacity:0.75;margin-bottom:8px;line-height:1.45;">Tap the sacred symbol to enter the resonance</div>
+	  ${dontShowHtml}
     `;
+
+    // Reset - next manual tap will have no checkbox
+    omPopupIsAuto = false;
   } else {
     popup.innerHTML = `
       <button id="om-modal-close" style="position:absolute; top:10px; right:10px; width:30px; height:30px; border-radius:50%; background:rgba(255,215,0,0.08); border:1px solid rgba(255,215,0,0.25); color:#ffd700; font-size:1.1rem; cursor:pointer; display:flex; align-items:center; justify-content:center;">×</button>
@@ -25721,13 +25734,15 @@ if (!document.getElementById('res-pulse-style')) {
 // Auto-show grid id popup after 60 seconds idle (ONCE)
 let idleTimer;
 let idlePopupShown = false; // Add this flag
+let omPopupIsAuto = false; // true = auto idle popup, false = manual tap
 
 function showIdlePopup() {
-  if (localStorage.getItem('omHideIdlePopup') === 'true') return; // <-- Don't show again - saved
+  if (localStorage.getItem('omHideIdlePopup') === 'true') return;
   const userId = localStorage.getItem('omUserId');
   const userRow = livePresenceRows.find(row => row.user_id === userId);
   if (!userRow && !idlePopupShown) {
     idlePopupShown = true;
+    omPopupIsAuto = true; // <-- auto, so show checkbox
     userIdDisplay.click();
   }
 }
