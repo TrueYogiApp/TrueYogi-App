@@ -7519,15 +7519,33 @@ let selectedFile = null;
 // Check if authorized based on challenge history
 function canPost() {
   try {
-    // Get challenge history from localStorage
+    // RULE 1 - Old rule: at least 1 completed challenge in history
     const historyData = localStorage.getItem('challengeHistory');
-    if (!historyData) return false;
-    
-    const history = JSON.parse(historyData);
-    
-    // Check if user has at least 1 completed challenge
-    // You can change this to 3 if you want
-    return history.length >= 1;
+    if (historyData) {
+      const history = JSON.parse(historyData);
+      if (Array.isArray(history) && history.length >= 1) return true;
+    }
+
+    // RULE 2 - Current challenge, without reset - only streakDays
+    const challengeData = localStorage.getItem('yogiChallenge') || localStorage.getItem('yogichallenge');
+    if (challengeData) {
+      const c = JSON.parse(challengeData);
+
+      // Must have start date
+      const hasStart = !!(c.startDate || c.start_date);
+      if (!hasStart) return false;
+
+      // ONLY streakDays - always
+      const days = Number(c.streakDays || 0);
+
+      // 2 TYPES
+      const hasWallet = !!(window.walletPublicKey || localStorage.getItem('jwtToken'));
+      const needed = hasWallet ? 41 : 21;
+
+      if (days >= needed) return true;
+    }
+
+    return false;
   } catch (e) {
     console.error('Error checking challenge history:', e);
     return false;
