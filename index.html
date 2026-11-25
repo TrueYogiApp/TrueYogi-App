@@ -7757,13 +7757,21 @@ function renderSeedsWithFilter() {
   }).join('');
 }
 
-// Open image viewer
+// Open image viewer.
+let imgScale = 1;
+let imgX = 0, imgY = 0;
+
 function openImageViewer(imageUrl) {
   const modal = document.getElementById('image-viewer-modal');
   const img = document.getElementById('image-viewer-img');
   
   img.src = imageUrl;
   modal.style.display = 'flex';
+
+  // Reset zoom every time you open
+  imgScale = 1; imgX = 0; imgY = 0;
+  img.style.transform = 'scale(1) translate(0px, 0px)';
+  img.style.touchAction = 'none'; // <-- needed for pinch on phone
   
   // Prevent body scroll
   document.body.style.overflow = 'hidden';
@@ -7777,6 +7785,77 @@ function closeImageViewer() {
   // Restore body scroll
   document.body.style.overflow = '';
 }
+
+// ===== Pinch to zoom - simple =====
+(function() {
+  const img = document.getElementById('image-viewer-img');
+  if (!img || img.dataset.pinchDone) return;
+  img.dataset.pinchDone = '1';
+
+  let startDist = 0, startScale = 1;
+  let startX = 0, startY = 0, startImgX = 0, startImgY = 0;
+  let lastTap = 0;
+
+  function applyZoom() {
+    imgScale = Math.min(4, Math.max(1, imgScale)); // 1x to 4x only
+    if (imgScale === 1) { imgX = 0; imgY = 0; } // snap back when zoomed out
+    img.style.transform = `scale(${imgScale}) translate(${imgX}px, ${imgY}px)`;
+  }
+
+  // Double-tap = zoom in / out
+  img.addEventListener('click', (e) => {
+    e.stopPropagation(); // don't close when tapping image
+    const now = Date.now();
+    if (now - lastTap < 300) {
+      imgScale = (imgScale > 1) ? 1 : 2.5;
+      imgX = 0; imgY = 0;
+      applyZoom();
+    }
+    lastTap = now;
+  });
+
+  img.addEventListener('touchstart', (e) => {
+    if (e.touches.length === 2) {
+      // Pinch start
+      startDist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      startScale = imgScale;
+    } else if (e.touches.length === 1 && imgScale > 1) {
+      // One finger drag when zoomed - to move around
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startImgX = imgX; startImgY = imgY;
+    }
+  }, { passive: true });
+
+  img.addEventListener('touchmove', (e) => {
+    if (e.touches.length === 2) {
+      e.preventDefault();
+      const dist = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      if (startDist > 0) {
+        imgScale = startScale * (dist / startDist);
+        applyZoom();
+      }
+    } else if (e.touches.length === 1 && imgScale > 1) {
+      e.preventDefault();
+      imgX = startImgX + (e.touches[0].clientX - startX) / imgScale;
+      imgY = startImgY + (e.touches[0].clientY - startY) / imgScale;
+      applyZoom();
+    }
+  }, { passive: false });
+
+  // Mouse wheel zoom for desktop - bonus, no extra code
+  img.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    imgScale += (e.deltaY < 0 ? 0.2 : -0.2);
+    applyZoom();
+  }, { passive: false });
+})();
 
 // Close on ESC key
 document.addEventListener('keydown', function(e) {
