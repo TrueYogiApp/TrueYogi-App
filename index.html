@@ -21727,6 +21727,16 @@ function formatDurationGrid(seconds) {
   return parts.join(' ') || '0s';
 }
 
+function formatDurationWithDays(secs) {
+  secs = Math.max(0, Math.floor(secs || 0));
+  const days = Math.floor(secs / 86400);
+  const hours = Math.floor((secs % 86400) / 3600);
+  const mins = Math.floor((secs % 3600) / 60);
+  if (days > 0) return `${days}d ${hours}h ${mins}m`;
+  if (hours > 0) return `${hours}h ${mins}m`;
+  return `${mins}m`;
+}
+
 async function showCountryStatsOnEarthGrid() {
   const stats = await fetchCountryStats();
   const statsLabel = document.getElementById('gridStatsLabel');
@@ -25534,11 +25544,11 @@ userIdDisplay.onclick = async function(e) {
   document.getElementById('current-user-mins-popup')?.remove();
   document.getElementById('om-modal-backdrop')?.remove();
 
-  let duration = "";
-  if (userRow?.joined_at) {
-    const secs = Math.floor((Date.now() - new Date(userRow.joined_at)) / 1000);
-    duration = formatDurationGrid(secs);
-  }
+	let duration = "";
+	if (userRow?.joined_at) {
+	  const secs = Math.floor((Date.now() - new Date(userRow.joined_at)) / 1000);
+	  duration = formatDurationWithDays(secs);
+	}
   let nextHeartbeatStr = "";
   let missedHeartbeat = false;
   let nextCountdownText = "";
