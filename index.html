@@ -21727,14 +21727,18 @@ function formatDurationGrid(seconds) {
   return parts.join(' ') || '0s';
 }
 
-function formatDurationWithDays(secs) {
+function formatDurationWithDays(secs, showSeconds = false) {
   secs = Math.max(0, Math.floor(secs || 0));
   const days = Math.floor(secs / 86400);
   const hours = Math.floor((secs % 86400) / 3600);
   const mins = Math.floor((secs % 3600) / 60);
-  if (days > 0) return `${days}d ${hours}h ${mins}m`;
-  if (hours > 0) return `${hours}h ${mins}m`;
-  return `${mins}m`;
+  const s = secs % 60;
+  let out = '';
+  if (days > 0) out += `${days}d `;
+  if (hours > 0 || days > 0) out += `${hours}h `;
+  out += `${mins}m`;
+  if (showSeconds) out += ` ${s}s`;
+  return out.trim();
 }
 
 async function showCountryStatsOnEarthGrid() {
@@ -23774,7 +23778,7 @@ async function showAllFlameKeepers(x, y) {
 	  const isLive = (Date.now() - lastBeat) < 35 * 60 * 1000;
 	  const joined = row.joined_at ? new Date(row.joined_at).getTime() : 0;
 	  const flameSecs = joined ? Math.max(0, Math.floor((Date.now() - joined) / 1000)) : 0;
-	  const flame = joined ? `${Math.floor(flameSecs/3600)}h ${Math.floor((flameSecs%3600)/60)}m ${flameSecs%60}s`.replace(/^0h /, '') : '—';
+	  const flame = joined ? formatDurationWithDays(flameSecs, true) : '—';
 
 	  const pModal = document.createElement('div');
 	  pModal.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10200;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;`;
@@ -24122,7 +24126,7 @@ function showCallbackConfirmModal(toUserId, fromUserId) {
 	  const isLive = (Date.now() - lastBeat) < 35 * 60 * 1000;
 	  const joined = row.joined_at ? new Date(row.joined_at).getTime() : 0;
 	  const flameSecs = joined ? Math.max(0, Math.floor((Date.now() - joined) / 1000)) : 0;
-	  const flame = joined ? `${Math.floor(flameSecs/3600)}h ${Math.floor((flameSecs%3600)/60)}m ${flameSecs%60}s`.replace(/^0h /, '') : '—';
+	  const flame = joined ? formatDurationWithDays(flameSecs, true) : '—';
 
 	  const isOwnProfile = uid === localStorage.getItem('omUserId');
 	  const pModal = document.createElement('div');
@@ -24670,7 +24674,7 @@ if (document.getElementById('my-notifications')) {
 		  const isLive = (Date.now() - lastBeat) < 35 * 60 * 1000;
 		  const joined = row.joined_at ? new Date(row.joined_at).getTime() : 0;
 		  const flameSecs = joined ? Math.max(0, Math.floor((Date.now() - joined) / 1000)) : 0;
-		  const flame = joined ? `${Math.floor(flameSecs/3600)}h ${Math.floor((flameSecs%3600)/60)}m ${flameSecs%60}s`.replace(/^0h /, '') : '—';
+		  const flame = joined ? formatDurationWithDays(flameSecs, true) : '—';
 		  const isOwnProfile = uid === localStorage.getItem('omUserId');	
 		  const pModal = document.createElement('div');
 		  pModal.style.cssText = `position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:10200;background:rgba(0,0,0,0.85);display:flex;align-items:center;justify-content:center;`;
@@ -26754,7 +26758,7 @@ async function showUserListPopup(users, parentPopup, x, y) {
       let duration = "";
       if (u.joined_at) {
         const secs = Math.floor((Date.now() - new Date(u.joined_at)) / 1000);
-        duration = formatDuration(secs);
+        duration = formatDurationWithDays(secs);
       }
       const isCurrentUser = u.user_id === currentUserId;
       
